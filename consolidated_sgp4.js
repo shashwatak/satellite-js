@@ -2164,17 +2164,15 @@ function twoline2rv(longstr1, longstr2){
     satrec.epochyr      = parseInt(longstr1.substring(18, 20), 10);
     satrec.epochdays    = parseFloat(longstr1.substring(20, 32));
     satrec.ndot         = parseFloat(longstr1.substring(33, 43));
-    satrec.nddot        = parseFloat("." + parseInt(longstr1.substring(44, 50), 10));
-    var nexp            = parseInt(longstr1.substring(50, 52), 10);
-    satrec.bstar        = parseFloat("." + parseInt(longstr1.substring(53, 59), 10));
-    var ibexp           = parseInt(longstr1.substring(59, 61), 10);
+    satrec.nddot        = parseFloat("." + parseInt(longstr1.substring(44, 50), 10) + "E" + longstr1.substring(50, 52));
+    satrec.bstar        = parseFloat("." + parseInt(longstr1.substring(53, 59), 10) + "E" + longstr1.substring(59, 61));
     var numb            = parseInt(longstr1.substring(62, 63), 10);
     elnum           = parseInt(longstr1.substring(64, 68), 10);
 
     satrec.satnum   = parseInt(longstr2.substring(2, 7), 10);
     satrec.inclo    = parseFloat(longstr2.substring(8, 16));
     satrec.nodeo    = parseFloat(longstr2.substring(17, 25));
-    satrec.ecco     = parseFloat("." + parseInt(longstr2.substring(26, 33), 10));
+    satrec.ecco     = parseFloat("." + longstr2.substring(26, 33));
     satrec.argpo    = parseFloat(longstr2.substring(34, 42));
     satrec.mo       = parseFloat(longstr2.substring(43, 51));
     satrec.no       = parseFloat(longstr2.substring(52, 63));
@@ -2183,8 +2181,8 @@ function twoline2rv(longstr1, longstr2){
 
     //  ---- find no, ndot, nddot ----
     satrec.no   = satrec.no / xpdotp; //   rad/min
-    satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
-    satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
+    //satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
+    //satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
     //  ---- convert to sgp4 units ----
     satrec.a    = Math.pow( satrec.no*tumin , (-2.0/3.0) );
@@ -2241,3 +2239,15 @@ function propagate(satrec, year, month, day, hour, minute, second){
     var m = (j - satrec.jdsatepoch) * minutes_per_day;
     return sgp4(satrec, m);
 }
+
+var longstr1 = '1 25544U 98067A   13078.13851745  .00016933  00000-0  27326-3 0  4342'
+var longstr2 = '2 25544 051.6478 195.4204 0012557 031.8133 025.8706 15.52936562820728'
+var satellite = twoline2rv(longstr1, longstr2);
+var today = new Date();
+var year = today.getFullYear();
+var month = today.getMonth();
+var date_of_month = today.getDate();
+var hour = today.getHours();
+var minute = today.getMinutes();
+var second = today.getSeconds();
+var r_v = propagate(satellite, year, month, date_of_month, hour, minute, second);
