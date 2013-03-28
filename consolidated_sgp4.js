@@ -1,6 +1,7 @@
 var pi = Math.PI;
 var twopi = pi * 2;
 var deg2rad = pi / 180.0;
+var rad2deg = 180 / pi;
 var minutes_per_day = 1440.0;
 var mu     = 398600.5;            //  in km3 / s2
 var radiusearthkm = 6378.137;     //  km
@@ -2167,7 +2168,7 @@ function twoline2rv(longstr1, longstr2){
     satrec.nddot        = parseFloat("." + parseInt(longstr1.substring(44, 50), 10) + "E" + longstr1.substring(50, 52));
     satrec.bstar        = parseFloat("." + parseInt(longstr1.substring(53, 59), 10) + "E" + longstr1.substring(59, 61));
     var numb            = parseInt(longstr1.substring(62, 63), 10);
-    elnum           = parseInt(longstr1.substring(64, 68), 10);
+    elnum               = parseInt(longstr1.substring(64, 68), 10);
 
     satrec.satnum   = parseInt(longstr2.substring(2, 7), 10);
     satrec.inclo    = parseFloat(longstr2.substring(8, 16));
@@ -2240,10 +2241,173 @@ function propagate(satrec, year, month, day, hour, minute, second){
     return sgp4(satrec, m);
 }
 
-var longstr1 = '1 25544U 98067A   13078.13851745  .00016933  00000-0  27326-3 0  4342'
-var longstr2 = '2 25544 051.6478 195.4204 0012557 031.8133 025.8706 15.52936562820728'
+function eci_to_geodetic (eci_coords, gmst) {
+    'use strict';
+    // http://www.celestrak.com/columns/v02n03/
+    var a   = 6378.137;
+    var b   = 6356.7523142;
+    var R   = Math.sqrt( (eci_coords[0]*eci_coords[0]) + (eci_coords[1]*eci_coords[1]) );
+    var f   = (a - b)/a;
+    var e2  = ((2*f) - (f*f));
+    var longitude = Math.atan2(eci_coords[1], eci_coords[0]) - gmst;
+    var kmax = 20;
+    var k = 0;
+    var latitude = Math.atan2(eci_coords[2],
+                   Math.sqrt(eci_coords[0]*eci_coords[0] +
+                                eci_coords[1]*eci_coords[1]));
+    var C;
+    while (k < kmax){
+        C = 1 / Math.sqrt( 1 - e2*(Math.sin(latitude)*Math.sin(latitude)) );
+        latitude = Math.atan2 (eci_coords[2] + (a*C*e2*Math.sin(latitude)), R);
+        k += 1;
+    }
+    var h = (R/Math.cos(latitude)) - (a*C);
+    return [longitude, latitude, h];
+}
+
+function eci_to_ecf (eci_coords, gmst){
+    'use strict';
+    // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
+    //
+    // [X]     [C -S  0][X]
+    // [Y]  =  [S  C  0][Y]
+    // [Z]eci  [0  0  1][Z]ecf
+    //
+    //
+    // Inverse:
+    // [X]     [C  S  0][X]
+    // [Y]  =  [-S C  0][Y]
+    // [Z]ecf  [0  0  1][Z]eci
+
+    var X = (eci_coords[0] * Math.cos(gmst))    + (eci_coords[1] * Math.sin(gmst));
+    var Y = (eci_coords[0] * (-Math.sin(gmst))) + (eci_coords[1] * Math.cos(gmst));
+    var Z =  eci_coords[2];
+    return [X, Y, Z];
+}
+
+function ecf_to_eci (ecf_coords, gmst){
+    'use strict';
+    // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
+    //
+    // [X]     [C -S  0][X]
+    // [Y]  =  [S  C  0][Y]
+    // [Z]eci  [0  0  1][Z]ecf
+    //
+    var X = (ecf_coords[0] * Math.cos(gmst))    - (ecf_coords[1] * Math.sin(gmst));
+    var Y = (ecf_coords[0] * (Math.sin(gmst)))  + (ecf_coords[1] * Math.cos(gmst));
+    var Z =  ecf_coords[2];
+    return [X, Y, Z];
+}
+
+function eci_to_geodetic (eci_coords, gmst) {
+    'use strict';
+    // http://www.celestrak.com/columns/v02n03/
+    var a   = 6378.137;
+    var b   = 6356.7523142;
+    var R   = Math.sqrt( (eci_coords[0]*eci_coords[0]) + (eci_coords[1]*eci_coords[1]) );
+    var f   = (a - b)/a;
+    var e2  = ((2*f) - (f*f));
+    var longitude = Math.atan2(eci_coords[1], eci_coords[0]) - gmst;
+    var kmax = 20;
+    var k = 0;
+    var latitude = Math.atan2(eci_coords[2],
+                   Math.sqrt(eci_coords[0]*eci_coords[0] +
+                                eci_coords[1]*eci_coords[1]));
+    var C;
+    while (k < kmax){
+        C = 1 / Math.sqrt( 1 - e2*(Math.sin(latitude)*Math.sin(latitude)) );
+        latitude = Math.atan2 (eci_coords[2] + (a*C*e2*Math.sin(latitude)), R);
+        k += 1;
+    }
+    var h = (R/Math.cos(latitude)) - (a*C);
+    return [longitude, latitude, h];
+}
+
+function geodetic_to_ecf (geodetic_coords){
+    'use strict';
+    var longitude   = geodetic_coords[0];
+    var latitude    = geodetic_coords[1];
+    var height      = geodetic_coords[2];
+    var a           = 6378.137;
+    var b           = 6356.7523142;
+    var f           = (a - b)/a;
+    var e2          = ((2*f) - (f*f));
+    var normal      = a / Math.sqrt( 1 - (e2*(Math.sin(latitude)*Math.sin(latitude))));
+
+    var X           = (normal + height) * Math.cos (latitude) * Math.cos (longitude);
+    var Y           = (normal + height) * Math.cos (latitude) * Math.sin (longitude);
+    var Z           = ((normal*(1-e2)) + height) * Math.sin (latitude);
+    return [X, Y, Z];
+}
+
+function ecf_to_topocentric (observer_coords, satellite_coords){
+    // http://www.celestrak.com/columns/v02n02/
+    // TS Kelso's method, except I'm using ECF frame
+    // and he uses ECI
+    'use strict';
+    var longitude   = observer_coords[0];
+    var latitude    = observer_coords[1];
+    var height      = observer_coords[2];
+
+    var observer_ecf = geodetic_to_ecf (observer_coords);
+
+    var rx      = satellite_coords[0] - observer_ecf[0];
+    var ry      = satellite_coords[1] - observer_ecf[1];
+    var rz      = satellite_coords[2] - observer_ecf[2];
+
+    var top_s   = ( (Math.sin(latitude)*Math.cos(longitude)*rx) +
+                  (Math.sin(latitude)*Math.sin(longitude)*ry) -
+                  (Math.cos(latitude)*rz));
+    var top_e   = ( -Math.sin(longitude) * rx) + (Math.cos(longitude) * ry);
+    var top_z   = ( (Math.cos(latitude)*Math.cos(longitude)*rx) +
+                  (Math.cos(latitude)*Math.sin(longitude)*ry) +
+                  (Math.sin(latitude)*rz));
+    return [top_s, top_e, top_z];
+}
+
+function topocentric_to_look_angles  (topocentric){
+    'use strict';
+    var top_s = topocentric[0];
+    var top_e = topocentric[1];
+    var top_z = topocentric[2];
+    var range_sat    = Math.sqrt((top_s*top_s) + (top_e*top_e) + (top_z*top_z));
+    var El      = Math.asin (top_z/range_sat);
+    var Az      = Math.atan2 (-top_e, top_s) + pi;
+    return [Az, El, range_sat];
+}
+
+function degrees_long                (radians){
+    'use strict';
+    var degrees = (radians/pi*180) % (360);
+    if (degrees > 180){
+        degrees = 360 - degrees;
+    }
+    else if (degrees < -180){
+        degrees = 360 + degrees;
+    }
+    return degrees;
+}
+
+function degrees_lat                 (radians){
+    'use strict';
+    if (radians > pi/2 || radians < (-pi/2)){
+        return "Err";
+    }
+    var degrees = (radians/pi*180);
+    if (degrees < 0){
+        degrees = degrees;
+    }
+    else{
+        degrees = degrees;
+    }
+    return degrees;
+}
+/*
+var my_location_gd = [(237.9615841)*deg2rad, (36.9613422)*deg2rad, 0];
+var longstr1 = '1 25544U 98067A   13078.13851745  .00016933  00000-0  27326-3 0  4342';
+var longstr2 = '2 25544 051.6478 195.4204 0012557 031.8133 025.8706 15.52936562820728';
 var satellite = twoline2rv(longstr1, longstr2);
-var today = new Date();
+var today = new Date(2013, 5, 19, 0, 0, 0);
 var year = today.getFullYear();
 var month = today.getMonth();
 var date_of_month = today.getDate();
@@ -2251,3 +2415,13 @@ var hour = today.getHours();
 var minute = today.getMinutes();
 var second = today.getSeconds();
 var r_v = propagate(satellite, year, month, date_of_month, hour, minute, second);
+var position_eci = r_v[0];
+var julian_day = jday (year, month, date_of_month, hour, minute, second);
+var gmst = gstime (julian_day);
+var position_ecf = eci_to_ecf (position_eci, gmst);
+var position_gd = eci_to_geodetic (position_eci, gmst);
+var topocentric = ecf_to_topocentric (my_location_gd, position_ecf);
+var look_angles = topocentric_to_look_angles (topocentric);
+var az_el   = [look_angles[0]*rad2deg, look_angles[1]*rad2deg, look_angles[2]*rad2deg];
+var lat_long = [degrees_long(position_gd[0]), degrees_lat(position_gd[1]), position_gd[2]];
+*/
