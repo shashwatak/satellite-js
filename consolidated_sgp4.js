@@ -1556,7 +1556,7 @@ function sgp4(satrec, tsince){
                 tem5 = -0.95;
             }
         }
-        eo1    = eo1 + tem5;
+        eo1 = eo1 + tem5;
         ktr = ktr + 1;
     }
     //  ------------- short period preliminary quantities -----------
@@ -1572,7 +1572,6 @@ function sgp4(satrec, tsince){
         return [false, false];
      }
      else{
-
         rl     = am * (1.0 - ecose);
         rdotl  = Math.sqrt(am) * esine/rl;
         rvdotl = Math.sqrt(pl) / rl;
@@ -1630,7 +1629,7 @@ function sgp4(satrec, tsince){
         v[2] = (mvt * uz + rvdot * vz) * vkmpersec;
     }
     //  sgp4fix for decaying satellites
-    if (mrt < 1.0){
+    if (mrt < 1.0) {
         // printf("// decay condition %11.6f \n",mrt);
         satrec.error = 6;
         return [false, false];
@@ -2402,6 +2401,33 @@ function degrees_lat                 (radians){
     }
     return degrees;
 }
+
+function doppler (my_location, position, velocity, frequency) {
+    var current_range = Math.sqrt(
+                        Math.pow(position[0] - my_location[0], 2) +
+                        Math.pow(position[1] - my_location[1], 2) +
+                        Math.pow(position[2] - my_location[2], 2));
+    var next_pos   = [position[0] + velocity[0],
+                      position[1] + velocity[1],
+                      position[2] + velocity[2]];
+    var next_range = Math.sqrt(
+                      Math.pow(next_pos[0] - my_location[0], 2) +
+                      Math.pow(next_pos[1] - my_location[1], 2) +
+                      Math.pow(next_pos[2] - my_location[2], 2));
+    var range_rate = next_range - current_range;
+    var v = Math.sqrt(
+             Math.pow(velocity[0], 2) +
+             Math.pow(velocity[1], 2) +
+             Math.pow(velocity[2], 2));
+
+    function sign (value) {if (value >= 0) {return 1;} else {return -1;}};
+    v *= sign(range_rate);
+    var c = 299792.458;
+    var f = ((c / (c + v)) * listen_frequency);
+    return f;
+
+}
+
 /*
 var my_location_gd = [(237.9615841)*deg2rad, (36.9613422)*deg2rad, 0];
 var longstr1 = '1 25544U 98067A   13078.13851745  .00016933  00000-0  27326-3 0  4342';
