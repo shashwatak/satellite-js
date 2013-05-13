@@ -13,6 +13,7 @@ Based off:
     *   [Part I](http://celestrak.com/columns/v02n01/)
     *   [Part II](http://celestrak.com/columns/v02n02/)
     *   [Part III](http://celestrak.com/columns/v02n03/)
+
 I would recommend everybody interested in satellite tracking or orbital propagation read [all of Kelso's columns](http://celestrak.com/columns/).
 
 Makefile
@@ -32,5 +33,3 @@ I took advantage of the fact that Python and JavaScript are nearly semantically 
 Testing
 -------
 I've included a small testing app, that provides some benchmarking tools and verifies SGP4 and SDP4 using the Test Criteria provided by SpaceTrack Report #3. The testing app is a Chrome Packaged App that uses the angular.js framework
-
-
