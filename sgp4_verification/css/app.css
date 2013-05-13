@@ -1,0 +1,47 @@
+body
+{
+    font-size: 24pt;
+}
+
+button
+{
+    font-size: 24pt;
+}
+
+td
+{
+    border-style: dotted;
+    border-color: gray;
+    border-width: 2px;
+    margin: 100px 50px;
+}
+
+.tle
+{
+    font-family: monospace;
+    white-space: pre;
+}
+
+#test_result_area
+{
+    overflow-y:auto;
+    height:800px;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.x.axis path {
+    display: none;
+}
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+

@@ -20,7 +20,7 @@ Like Brandon Rhodes before me, I chose to maintain as little difference between 
 How this was written
 --------------------
 
-I took advantage of the fact that Python and JavaScript are nearly semantically identical. Most of the code is just copied straight from Python. Drandon Rhodes did me the favor of including semi-colons on most of the lines of code. JavaScript doesn't support multiple values returned per statement, so I had to rewrite the function calls. Absolutely none of the mathematical logic had to be rewritten.
+I took advantage of the fact that Python and JavaScript are nearly semantically identical. Most of the code is just copied straight from Python. Brandon Rhodes did me the favor of including semi-colons on most of the lines of code. JavaScript doesn't support multiple values returned per statement, so I had to rewrite the function calls. Absolutely none of the mathematical logic had to be rewritten.
 
 Testing
 -------

@@ -1,0 +1,15 @@
+{
+  "name": "SGP4 Verification",
+  "version": "1",
+  "manifest_version": 2,
+  "minimum_chrome_version": "23",
+
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [
+    {"fileSystem": ["write"]}
+  ]
+}

@@ -1,0 +1,41 @@
+<h1>Verify SGP4 / SDP4</h1>
+<p>
+  <button ng-click="choose_file()">Choose File</button>
+  <button ng-click="verify_sgp4()">Run Tests</button>
+</p>
+<table><tr ng-repeat="test in tests"><td>
+  <table>
+    <tr>
+      <p class="tle">{{test["info"]}}</p>
+      <p class="tle">{{test["tle_line_1"]}}</p>
+      <p class="tle">{{test["tle_line_2"]}}</p>
+    </tr>
+    <tr><th>TSince (min)</th><th>Position Error ()</th><th>Velocity Error</th><th>LookAngle Error</th></tr>
+    <tr ng-repeat="results in test['results']">
+      <td>{{results["time"]}}</td>
+      <td><table>
+        <tr>
+          <td ng-repeat="pos_err in results['pos_error']">
+            {{pos_err}}
+          </td>
+        </tr>
+      </table></td>
+      <td><table>
+        <tr>
+          <td ng-repeat="vel_err in results['vel_error']">
+            {{vel_err}}
+          </td>
+        </tr>
+      </table></td>
+      <td><table>
+        <tr>
+          <td ng-repeat="look_angles_err in results['look_angles_error']">
+            {{look_angles_err}}
+          </td>
+        </tr>
+      </table></td>
+    </tr>
+  </table>
+</td></tr></table>
+
+<p><button ng-click="save_file()">Save As</button></p>
