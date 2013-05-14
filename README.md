@@ -1,9 +1,8 @@
 satellite.js
 ==============
-
 Introduction
 --------------
-Provides the functions necessary for SGP4/SDP4 calculations as modular blocks. Also provides math for coordinate transforms.
+Provides the functions necessary for SGP4/SDP4 calculations, as modular blocks. Also provides functions for coordinate transforms.
 
 First, Start Here: [SpaceTrack Report #3, by Hoots and Roehrich](http://celestrak.com/NORAD/documentation/spacetrk.pdf).
 
@@ -24,7 +23,7 @@ Makefile
 --------
 The code is divided up into separate files, but the final library will be a single file called satellite.js. The Makefile concatenates all the dependencies into a single file, for inclusion in a web application.
 
-    cat ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} > ${FINAL}
+```cat ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} > ${FINAL}```
 
 Usage
 -----
@@ -32,14 +31,14 @@ When you include satellite.js as a script in your html, the object 'satellite' i
 
 EX:
 ```javascript
-satellite.sgp4 (test_sat, test_time);
+var position_velocity = satellite.sgp4 (test_sat, test_time);
 ```
 
 Exposed Functions
 ---
 ###Initialization
 ```javascript
-satellite.twoline2satrec(longstr1, longstr2)
+var sat_rec = satellite.twoline2satrec(longstr1, longstr2)
 ```
 returns satrec object, created from the TLEs passed in. The satrec object is vastly complicated, but you don't have to do anything with it, except pass it around.
 NOTE! You are responsible for providing TLEs. [Get your free Space Track account here.](https://www.space-track.org/auth/login)
@@ -47,23 +46,27 @@ longstr1 and longstr2 are the two lines of the TLE, properly formatted by NASA a
 
 
 ###Propogation
+Both propagation function return position_velocity in a 2D array of the form:
+```[[position_x, position_y, position_z], [velocity_x, velocity_y, velocity_z]]```
+position is in km, velocity is in km/s, in the ECI coordinate frame.
+
 ```javascript
-satellite.propagate(satrec, year, month, day, hour, minute, second)
+var position_velocity = satellite.propagate(satrec, year, month, day, hour, minute, second)
 ```
-returns position and velocity, given a satrec and the calendar date. is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
+Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
 ```javascript
-satellite.sgp4(satrec, time_since_epoch_seconds)
+var position_velocity = satellite.sgp4(satrec, time_since_epoch_seconds)
 ```
-returns position and velocity, given a satrec and time delta. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
+Returns position and velocity, given a satrec and the time in seconds since epoch. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
 
 ###Coordinate Transforms
 ####Greenwich Mean Sidereal Time
 You'll need to provide some of the coordinate transform functions with your current GMST aka GSTIME. You can use Julian Day or a calendar date.
 ```javascript
-satellite.gstime_from_jday(julian_day)
+var gmst = satellite.gstime_from_jday(julian_day)
 ```
 ```javascript
-satellite.gstime_from_date(year, mon, day, hr, minute, sec)
+var gmst = satellite.gstime_from_date(year, mon, day, hr, minute, sec)
 ```
 ####Transforms
 Most of these are self explanatory from their names. Coords are arrays of three floats EX: [1.1, 1.2, 1.3] in kilometers. Once again, read the following first:
@@ -74,38 +77,37 @@ The coordinate transforms are based off T.S. Kelso's columns:
 And the coursework for UC Boulder's ASEN students
 *   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
-These four are used to convert between ECI, ECF, and Geodetic, as you need them.
+These four are used to convert between ECI, ECF, and Geodetic, as you need them. ECI and ECF coordinates are in km or km/s. Geodetic coords are in radians.
 ```javascript
-satellite.eci_to_ecf(eci_coords, gmst)
+var ecf_coords = satellite.eci_to_ecf(eci_coords, gmst)
 ```
 ```javascript
-satellite.ecf_to_eci(ecf_coords, gmst)
+var eci_coords = satellite.ecf_to_eci(ecf_coords, gmst)
 ```
 ```javascript
-satellite.eci_to_geodetic (eci_coords, gmst)
+var geodetic_coords = satellite.eci_to_geodetic (eci_coords, gmst)
 ```
 ```javascript
-satellite.geodetic_to_ecf(geodetic_coords)
+var ecf_coords = satellite.geodetic_to_ecf(geodetic_coords)
 ```
 
 These two are used to compute your look angle. I'm considering coupling them into one function.
 ```javascript
-satellite.ecf_to_topocentric(observer_coords_lat_long, satellite_coords)
+satellite.ecf_to_topocentric(observer_coords_geodetic, satellite_coords_ecf)
 ```
-NOTE: Observer Coords are provided as Lat/Long in RADIANS!
 ```javascript
 satellite.topocentric_to_look_angles (topocentric)
 ```
-returns Azimuth, Elevation, Range
+returns [Azimuth, Elevation, Range]. Az, El are in radians, Range is in km.
 
 ####Latitude and Longitude
 These two functions will return human readable Latitude or Longitude
-(Ex: "125.35W" or "45.565N") from radians.
+(Ex: "125.35W" or "45.565N") from geodetic_coords.
 ```javascript
-satellite.degrees_lat (radians)
+satellite.degrees_lat (geodetic_radians)
 ```
 ```javascript
-satellite.degrees_long (radians)
+satellite.degrees_long (geodetic_radians)
 ```
 
 Note about Code Conventions
@@ -121,3 +123,7 @@ Testing
 I've included a small testing app, that provides some benchmarking tools and verifies SGP4 and SDP4 using the Test Criteria provided by SpaceTrack Report #3. The testing app is a Chrome Packaged App that uses the angular. js framework.
 
 To run the test, open up Chrome, go to the extensions page, and check "Developer Mode". Then, click "Load Unpacked App", and select the "sgp4_verification" folder. Then run the app from within Chrome. The test file is located within the "sgp4_verification" directory, as a JSON file called "spacetrack-report-3.json".
+
+Acknowledgments
+---------------
+Major thanks go to Brandon Rhodes, TS Kelso, and David Vallado's team. Also, I'd like to thank Professor Steve Petersen (AC6P) of UCSC for pointing me in the correct directions.
