@@ -74,6 +74,7 @@ The coordinate transforms are based off T.S. Kelso's columns:
 *   [Part I](http://celestrak.com/columns/v02n01/)
 *   [Part II](http://celestrak.com/columns/v02n02/)
 *   [Part III](http://celestrak.com/columns/v02n03/)
+
 And the coursework for UC Boulder's ASEN students
 *   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
