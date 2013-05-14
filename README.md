@@ -31,28 +31,40 @@ Usage
 When you include satellite.js as a script in your html, the object 'satellite' is defined in global scope. You use this object to access all the functions in the satellite library.
 
 EX:
-     satellite.sgp4 (test_sat, test_time);
+```javascript
+satellite.sgp4 (test_sat, test_time);
+```
 
 Exposed Functions
 ---
 ###Initialization
-     satellite.twoline2satrec(longstr1, longstr2)
+```javascript
+satellite.twoline2satrec(longstr1, longstr2)
+```
 returns satrec object, created from the TLEs passed in. The satrec object is vastly complicated, but you don't have to do anything with it, except pass it around.
 NOTE! You are responsible for providing TLEs. [Get your free Space Track account here.](https://www.space-track.org/auth/login)
 longstr1 and longstr2 are the two lines of the TLE, properly formatted by NASA and NORAD standards. if you use Space Track, there should be no problem.
 
 
 ###Propogation
-     satellite.propagate(satrec, year, month, day, hour, minute, second)
+```javascript
+satellite.propagate(satrec, year, month, day, hour, minute, second)
+```
 returns position and velocity, given a satrec and the calendar date. is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
-     satellite.sgp4(satrec, time_since_epoch_seconds)
+```javascript
+satellite.sgp4(satrec, time_since_epoch_seconds)
+```
 returns position and velocity, given a satrec and time delta. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
 
 ###Coordinate Transforms
 ####Greenwich Mean Sidereal Time
 You'll need to provide some of the coordinate transform functions with your current GMST aka GSTIME. You can use Julian Day or a calendar date.
-    satellite.gstime_from_jday(julian_day)
-    satellite.gstime_from_date(year, mon, day, hr, minute, sec)
+```javascript
+satellite.gstime_from_jday(julian_day)
+```
+```javascript
+satellite.gstime_from_date(year, mon, day, hr, minute, sec)
+```
 ####Transforms
 Most of these are self explanatory from their names. Coords are arrays of three floats EX: [1.1, 1.2, 1.3] in kilometers. Once again, read the following first:
 The coordinate transforms are based off T.S. Kelso's columns:
@@ -63,22 +75,38 @@ And the coursework for UC Boulder's ASEN students
 *   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
 These four are used to convert between ECI, ECF, and Geodetic, as you need them.
-    satellite.eci_to_ecf(eci_coords, gmst)
-    satellite.ecf_to_eci(ecf_coords, gmst)
-    satellite.eci_to_geodetic (eci_coords, gmst)
-    satellite.geodetic_to_ecf(geodetic_coords)
-These two are used to compute your look angle.
-    satellite.ecf_to_topocentric(observer_coords_lat_long, satellite_coords)
+```javascript
+satellite.eci_to_ecf(eci_coords, gmst)
+```
+```javascript
+satellite.ecf_to_eci(ecf_coords, gmst)
+```
+```javascript
+satellite.eci_to_geodetic (eci_coords, gmst)
+```
+```javascript
+satellite.geodetic_to_ecf(geodetic_coords)
+```
+
+These two are used to compute your look angle. I'm considering coupling them into one function.
+```javascript
+satellite.ecf_to_topocentric(observer_coords_lat_long, satellite_coords)
+```
 NOTE: Observer Coords are provided as Lat/Long in RADIANS!
-    satellite.topocentric_to_look_angles (topocentric)
-        returns Azimuth, Elevation, Range
-I'm considering coupling them into one function.
+```javascript
+satellite.topocentric_to_look_angles (topocentric)
+```
+returns Azimuth, Elevation, Range
 
 ####Latitude and Longitude
 These two functions will return human readable Latitude or Longitude
 (Ex: "125.35W" or "45.565N") from radians.
-    satellite.degrees_lat (radians)
-    satellite.degrees_long (radians)
+```javascript
+satellite.degrees_lat (radians)
+```
+```javascript
+satellite.degrees_long (radians)
+```
 
 Note about Code Conventions
 ---------------------------
