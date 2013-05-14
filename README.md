@@ -70,7 +70,6 @@ You'll need to provide some of the coordinate transform functions with your
 current GMST aka GSTIME. You can use Julian Day or a calendar date.
     satellite.gstime_from_jday(julian_day)
     satellite.gstime_from_date(year, mon, day, hr, minute, sec)
-
 ####Transforms
 Most of these are self explanatory from their names.
 Coords are arrays of three floats EX: [1.1, 1.2, 1.3]
@@ -88,7 +87,6 @@ as you need them.
     satellite.ecf_to_eci(ecf_coords, gmst)
     satellite.eci_to_geodetic (eci_coords, gmst)
     satellite.geodetic_to_ecf(geodetic_coords)
-
 These two are used to compute your look angle.
     satellite.ecf_to_topocentric(observer_coords_lat_long, satellite_coords)
 NOTE: Observer Coords are provided as Lat/Long in RADIANS!
@@ -101,7 +99,6 @@ These two functions will return human readable Latitude or Longitude
 (Ex: "125.35W" or "45.565N") from radians.
     satellite.degrees_lat (radians)
     satellite.degrees_long (radians)
-
 Note about Code Conventions
 ---------------------------
 Like Brandon Rhodes before me, I chose to maintain as little difference between this implementation and the prior works. This is to make adapting future changes suggested by Vallado much simpler. Thus, some of the conventions used in this library are very weird.
