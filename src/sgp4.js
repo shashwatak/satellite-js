@@ -1,3 +1,5 @@
+
+
 function sgp4(satrec, tsince){
     /*-----------------------------------------------------------------------------
     *
@@ -364,4 +366,8 @@ function sgp4(satrec, tsince){
         return [false, false];
     }
     return [r, v];
+}
+
+satellite.sgp4 = function (satrec, tsince) {
+    return sgp4 (satrec, tsince);
 }

@@ -1,4 +1,4 @@
-function dspace(
+function dspace (
         irez,
         d2201,  d2211,  d3210,  d3222,  d4410,
         d4422,  d5220,  d5232,  d5421,  d5433,

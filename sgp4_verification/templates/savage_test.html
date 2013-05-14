@@ -1,11 +1,3 @@
 <h1>Savage Benchmark</h1>
 <p><button ng-click="run_savage()">Run Test</button></p>
-<p>Average Savage Time: {{average_time}} ms</p>
-<p>Std Dev Savage Time: {{std_deviation_time}} ms</p>
-<table><tr ng-repeat="test in tests"><td>
-  <p>Savage Value: {{test.savage_value}}</p>
-  <p>Time: {{test.savage_time}} ms</p>
-</td></tr></table>
-
-
-<p><button ng-click="save_file()">Save As</button></p>
+<div id="chart"></div>

@@ -1,4 +1,4 @@
-function gstime(jdut1){
+function gstime (jdut1){
     /* -----------------------------------------------------------------------------
     *
     *                           function gstime
@@ -112,4 +112,13 @@ function jday(year, mon, day, hr, minute, sec){
           ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
           //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
           );
+}
+
+satellite.gstime_from_jday = function (julian_day) {
+    return gstime (julian_day);
+}
+
+satellite.gstime_from_date = function (year, mon, day, hr, minute, sec) {
+    var julian_day = jday(year, mon, day, hr, minute, sec);
+    return gstime (julian_day);
 }

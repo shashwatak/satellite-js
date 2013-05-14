@@ -104,3 +104,11 @@ function propagate(satrec, year, month, day, hour, minute, second){
     var m = (j - satrec.jdsatepoch) * minutes_per_day;
     return sgp4(satrec, m);
 }
+
+satellite.twoline2satrec = function (longstr1, longstr2) {
+    return twoline2rv (longstr1, longstr2);
+}
+
+satellite.propagate = function (satrec, year, month, day, hour, minute, second) {
+    return propagate (satrec, year, month, day, hour, minute, second);
+}

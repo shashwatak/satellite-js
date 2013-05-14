@@ -85,7 +85,7 @@ function waitForIO(writer, callback) {
 };
 
 function TestCtrl($scope) {
-    $scope.tests = {};
+    $scope.tests = [];
     $scope.run_savage = function () {
       $scope.tests = [];
       for (var i = 0; i < 100; i++) {
@@ -96,9 +96,10 @@ function TestCtrl($scope) {
         }
         savage_end = performance.now();
         savage_time = savage_end - savage_start;
-        $scope.tests.push({"savage_value" : savage_value, "savage_time" : savage_time})
+        $scope.tests.push(savage_time);
       };
 
+      /*
       var time_variance = 0;
       var value_variance = 0;
       var num_tests = $scope.tests.length;
@@ -115,7 +116,27 @@ function TestCtrl($scope) {
         };
         time_variance = total_time_variance / num_tests;
         $scope.std_deviation_time = Math.sqrt(time_variance);
-      }
+      }*/
+
+      console.log($scope.tests);
+      var data  = $scope.tests;
+      var w     = 700;
+      var h     = 300;
+      var max   = d3.max(data);
+
+      var x  = d3.scale.linear().domain([0, data.length - 1]).range([0, w]);
+      var y  = d3.scale.linear().domain([0, max]).range([h, 0]);
+
+      var vis = d3.select('#chart')
+        .append('svg:svg')
+          .attr('width', w)
+          .attr('height', h);
+
+      vis.selectAll('path.line')
+        .data([data])
+        .enter()
+        .append("svg:path")
+        .attr("d", d3.svg.line().x(function(d, i){return x(i);}).y(y));
     };
 
     $scope.choose_file = function () {
@@ -142,13 +163,16 @@ function TestCtrl($scope) {
     };
 
     $scope.verify_sgp4 = function() {
+
+        var deg2rad = Math.PI / 180.0;
+        var rad2deg = 180 / Math.PI;
         for (var tests_itor = 0; tests_itor < $scope.tests.length; tests_itor++) {
-            var my_location_gd = [(-122.0308)*deg2rad, (36.9613422)*deg2rad, 1];
+            var my_location_gd = [(-122.0308)*deg2rad, (36.9613422)*deg2rad, .5];
             var test = $scope.tests[tests_itor];
             var tle_line_1 = test["tle_line_1"];
             var tle_line_2 = test["tle_line_2"];
             var init_start = performance.now();
-            var test_sat = twoline2rv (tle_line_1, tle_line_2);
+            var test_sat = satellite.twoline2satrec (tle_line_1, tle_line_2);
             var init_fin = performance.now();
             var init_time = init_fin - init_start;
             for (var results_itor = 0; results_itor < test["results"].length; results_itor++) {
@@ -157,7 +181,7 @@ function TestCtrl($scope) {
                 var known_pos       = result["known_pos"];
                 var known_vel       = result["known_vel"];
                 var prpgtion_start  = performance.now();
-                var r_v             = sgp4(test_sat, time);
+                var r_v             = satellite.sgp4(test_sat, time);
                 var prpgtion_fin    = performance.now();
                 var prpgtion_time   = prpgtion_fin - prpgtion_start;
                 var test_pos        = r_v[0];
@@ -176,15 +200,15 @@ function TestCtrl($scope) {
                 result["prpgtion_time"]  = prpgtion_time;
 
                 var julian_day = test_sat.jdsatepoch + (time*60);
-                var gmst = gstime (julian_day);
+                var gmst = satellite.gstime_from_jday (julian_day);
 
-                var test_position_ecf = eci_to_ecf (test_pos, gmst);
-                var test_topocentric = ecf_to_topocentric (my_location_gd, test_position_ecf);
-                var test_look_angles = topocentric_to_look_angles (test_topocentric);
+                var test_position_ecf = satellite.eci_to_ecf (test_pos, gmst);
+                var test_topocentric = satellite.ecf_to_topocentric (my_location_gd, test_position_ecf);
+                var test_look_angles = satellite.topocentric_to_look_angles (test_topocentric);
 
-                var known_position_ecf = eci_to_ecf (known_pos, gmst);
-                var known_topocentric = ecf_to_topocentric (my_location_gd, known_position_ecf);
-                var known_look_angles = topocentric_to_look_angles (known_topocentric);
+                var known_position_ecf = satellite.eci_to_ecf (known_pos, gmst);
+                var known_topocentric = satellite.ecf_to_topocentric (my_location_gd, known_position_ecf);
+                var known_look_angles = satellite.topocentric_to_look_angles (known_topocentric);
 
                 var look_angles_error = [Math.abs((known_look_angles[0] - test_look_angles[0]) / known_look_angles[0]),
                                          Math.abs((known_look_angles[1] - test_look_angles[1]) / known_look_angles[1]),
@@ -193,6 +217,7 @@ function TestCtrl($scope) {
 
             };
         };
+
     };
 
     $scope.benchmark_sgp4 = function() {
@@ -202,7 +227,7 @@ function TestCtrl($scope) {
             var tle_line_1 = test["tle_line_1"];
             var tle_line_2 = test["tle_line_2"];
             var init_start = performance.now();
-            var test_sat = twoline2rv (tle_line_1, tle_line_2);
+            var test_sat = satellite.twoline2satrec (tle_line_1, tle_line_2);
             var init_fin = performance.now();
             test["init_time"] = init_fin - init_start;
             var full_day = 1440;
@@ -211,7 +236,7 @@ function TestCtrl($scope) {
             var total_prpgtion_time = 0;
             while (time < full_day) {
                 var prpgtion_start  = performance.now();
-                var r_v             = sgp4(test_sat, time);
+                var r_v             = satellite.sgp4(test_sat, time);
                 var prpgtion_fin    = performance.now();
                 var prpgtion_time   = prpgtion_fin - prpgtion_start;
                 var test_pos        = r_v[0];

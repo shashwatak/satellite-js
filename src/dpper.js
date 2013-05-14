@@ -1,4 +1,4 @@
-function dpper(satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
+function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
     /* -----------------------------------------------------------------------------
     *
     *                           procedure dpper

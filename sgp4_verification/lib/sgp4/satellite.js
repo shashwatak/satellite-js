@@ -1,3 +1,26 @@
+satellite = (function () {
+
+    var satellite = { version : "0.1" };
+/*
+    satellite-head.js and satellite-tail.js sandwich all the other
+    functions in the library.
+
+    Only three are exposed, via the satellite return object
+    satellite.twoline2satrec(longstr1, longstr2)
+        returns satrec object from TLE
+    satellite.propagate(satrec, year, month, day, hour, minute, second)
+        returns position and velocity
+        is merely a wrapper for sgp4, converts the calendar day to julian
+        time since satellite epoch
+    satellite.sgp4(satrec, tsince)
+        returns position and velocity, given a satrec and
+
+    This is to separate the satellite.js namespace from the rest of
+    the javascript environment.
+
+    Consult the Makefile to see which files are going to be sandwiched.
+
+})() The footer is in satellite-tail.js*/
 var pi = Math.PI;
 var twopi = pi * 2;
 var deg2rad = pi / 180.0;
@@ -12,7 +35,7 @@ var j3     =  -0.00000253215306;
 var j4     =  -0.00000161098761;
 var j3oj2  =  j3 / j2;
 var x2o3   = 2.0 / 3.0;
-function dpper(satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
+function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
     /* -----------------------------------------------------------------------------
     *
     *                           procedure dpper
@@ -820,7 +843,7 @@ function dsinit(
             del1,   del2,   del3,
             xfact,  xlamo,  xli,    xni  ];
 }
-function dspace(
+function dspace (
         irez,
         d2201,  d2211,  d3210,  d3222,  d4410,
         d4422,  d5220,  d5232,  d5421,  d5433,
@@ -1027,7 +1050,7 @@ function dspace(
     return [ atime, em,     argpm,  inclm,  xli,
                 mm, xni,    nodem,  dndt,   nm   ];
 }
-function gstime(jdut1){
+function gstime (jdut1){
     /* -----------------------------------------------------------------------------
     *
     *                           function gstime
@@ -1141,6 +1164,19 @@ function jday(year, mon, day, hr, minute, sec){
           ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
           //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
           );
+}
+
+satellite.jday_from_date = function (year, mon, day, hr, minute, sec) {
+    return jday(year, mon, day, hr, minute, sec);
+}
+
+satellite.gstime_from_jday = function (julian_day) {
+    return gstime (julian_day);
+}
+
+satellite.gstime_from_date = function (year, mon, day, hr, minute, sec) {
+    var julian_day = jday(year, mon, day, hr, minute, sec);
+    return gstime (julian_day);
 }
 function initl(
        satn,
@@ -1862,6 +1898,16 @@ function propagate(satrec, year, month, day, hour, minute, second){
     var m = (j - satrec.jdsatepoch) * minutes_per_day;
     return sgp4(satrec, m);
 }
+
+satellite.twoline2satrec = function (longstr1, longstr2) {
+    return twoline2rv (longstr1, longstr2);
+}
+
+satellite.propagate = function (satrec, year, month, day, hour, minute, second) {
+    return propagate (satrec, year, month, day, hour, minute, second);
+}
+
+
 function sgp4(satrec, tsince){
     /*-----------------------------------------------------------------------------
     *
@@ -2229,6 +2275,10 @@ function sgp4(satrec, tsince){
     }
     return [r, v];
 }
+
+satellite.sgp4 = function (satrec, tsince) {
+    return sgp4 (satrec, tsince);
+}
 function eci_to_geodetic (eci_coords, gmst) {
     'use strict';
     // http://www.celestrak.com/columns/v02n03/
@@ -2287,30 +2337,6 @@ function ecf_to_eci (ecf_coords, gmst){
     return [X, Y, Z];
 }
 
-function eci_to_geodetic (eci_coords, gmst) {
-    'use strict';
-    // http://www.celestrak.com/columns/v02n03/
-    var a   = 6378.137;
-    var b   = 6356.7523142;
-    var R   = Math.sqrt( (eci_coords[0]*eci_coords[0]) + (eci_coords[1]*eci_coords[1]) );
-    var f   = (a - b)/a;
-    var e2  = ((2*f) - (f*f));
-    var longitude = Math.atan2(eci_coords[1], eci_coords[0]) - gmst;
-    var kmax = 20;
-    var k = 0;
-    var latitude = Math.atan2(eci_coords[2],
-                   Math.sqrt(eci_coords[0]*eci_coords[0] +
-                                eci_coords[1]*eci_coords[1]));
-    var C;
-    while (k < kmax){
-        C = 1 / Math.sqrt( 1 - e2*(Math.sin(latitude)*Math.sin(latitude)) );
-        latitude = Math.atan2 (eci_coords[2] + (a*C*e2*Math.sin(latitude)), R);
-        k += 1;
-    }
-    var h = (R/Math.cos(latitude)) - (a*C);
-    return [longitude, latitude, h];
-}
-
 function geodetic_to_ecf (geodetic_coords){
     'use strict';
     var longitude   = geodetic_coords[0];
@@ -2331,7 +2357,8 @@ function geodetic_to_ecf (geodetic_coords){
 function ecf_to_topocentric (observer_coords, satellite_coords){
     // http://www.celestrak.com/columns/v02n02/
     // TS Kelso's method, except I'm using ECF frame
-    // and he uses ECI
+    // and he uses ECI.
+    //
     'use strict';
     var longitude   = observer_coords[0];
     var latitude    = observer_coords[1];
@@ -2343,9 +2370,9 @@ function ecf_to_topocentric (observer_coords, satellite_coords){
     var ry      = satellite_coords[1] - observer_ecf[1];
     var rz      = satellite_coords[2] - observer_ecf[2];
 
-    var top_s   = ( (Math.sin(latitude)*Math.cos(longitude)*rx) +
-                  (Math.sin(latitude)*Math.sin(longitude)*ry) -
-                  (Math.cos(latitude)*rz));
+    var top_s   = ( (Math.sin(latitude) * Math.cos(longitude) * rx) +
+                  (Math.sin(latitude) * Math.sin(longitude) * ry) -
+                  (Math.cos(latitude) * rz));
     var top_e   = ( -Math.sin(longitude) * rx) + (Math.cos(longitude) * ry);
     var top_z   = ( (Math.cos(latitude)*Math.cos(longitude)*rx) +
                   (Math.cos(latitude)*Math.sin(longitude)*ry) +
@@ -2391,6 +2418,31 @@ function degrees_lat                 (radians){
     return degrees;
 }
 
+satellite.eci_to_geodetic = function (eci_coords, gmst) {
+    return eci_to_geodetic (eci_coords, gmst);
+}
+satellite.degrees_lat = function                 (radians) {
+    return degrees_lat (radians);
+}
+satellite.degrees_long = function                (radians) {
+    return degrees_long (radians);
+}
+satellite.topocentric_to_look_angles = function  (topocentric) {
+    return topocentric_to_look_angles (topocentric);
+}
+satellite.ecf_to_topocentric = function (observer_coords, satellite_coords) {
+    return ecf_to_topocentric (observer_coords, satellite_coords);
+}
+satellite.geodetic_to_ecf = function (geodetic_coords) {
+    return geodetic_to_ecf (geodetic_coords);
+}
+satellite.ecf_to_eci = function (ecf_coords, gmst) {
+    return ecf_to_eci (ecf_coords, gmst);
+}
+satellite.eci_to_ecf = function (eci_coords, gmst) {
+    return eci_to_ecf (eci_coords, gmst);
+}
+
 
 function doppler (my_location, position, velocity, frequency) {
     var current_range = Math.sqrt(
@@ -2414,3 +2466,19 @@ function doppler (my_location, position, velocity, frequency) {
     return f;
 
 }
+/*
+var satellite = (function () {
+
+    satellite-head.js and satellite-tail.js sandwich the remaining
+    functions and code in the library headers.
+
+    This is to separate the satellite.js namespace from the rest of
+    the javascript environment.
+
+    Consult the Makefile to see which files are going to be sandwiched. */
+
+// This is the actual footer to the entire satellite.js library definition.
+
+    return satellite;
+
+})();

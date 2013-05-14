@@ -7,6 +7,6 @@ sgp4_verify_app.config(['$routeProvider', function($routeProvider) {
                                  controller: TestCtrl}).
       when('/sgp4_benchmark',   {templateUrl: 'templates/sgp4_benchmark.html',
                                  controller: TestCtrl}).
-      otherwise({redirectTo: '/sgp4_verify'});
+      otherwise({redirectTo: '/savage_test'});
 }]);
 

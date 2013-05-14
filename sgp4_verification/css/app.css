@@ -1,21 +1,43 @@
 body
 {
+    background-color: rgb(22, 0, 22);
+    color: rgb(208, 208, 208);
     font-size: 24pt;
 }
 
 button
 {
+    background-color: rgb(64, 64, 64);
+    color: rgb(208, 208, 208);
+    border-color: rgb(208, 208, 208);
+    border-radius: 15px;
     font-size: 24pt;
+}
+
+a:link
+{
+    color: green;
+}
+
+a:hover
+{
+    color: yellow;
+}
+
+a:active
+{
+    color: red;
+}
+
+a:visited
+{
+    color: gray;
 }
 
 td
 {
-    border-style: dotted;
-    border-color: gray;
-    border-width: 2px;
-    margin: 100px 50px;
+    padding: 15px;
 }
-
 .tle
 {
     font-family: monospace;
@@ -28,20 +50,8 @@ td
     height:800px;
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
-
-.x.axis path {
-    display: none;
-}
-
-.line {
-    fill: none;
-    stroke: steelblue;
-    stroke-width: 1.5px;
+path {
+  stroke: #c00;
+  stroke-width: 3px;
 }
 

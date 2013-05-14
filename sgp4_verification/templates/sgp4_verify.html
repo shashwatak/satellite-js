@@ -10,30 +10,68 @@
       <p class="tle">{{test["tle_line_1"]}}</p>
       <p class="tle">{{test["tle_line_2"]}}</p>
     </tr>
-    <tr><th>TSince (min)</th><th>Position Error ()</th><th>Velocity Error</th><th>LookAngle Error</th></tr>
+    <tr>
+      <th>TSince (min)</th>
+      <th>
+        X
+      </th>
+      <th>
+        Y
+      </th>
+      <th>
+        Z
+      </th>
+    </tr>
     <tr ng-repeat="results in test['results']">
       <td>{{results["time"]}}</td>
-      <td><table>
-        <tr>
-          <td ng-repeat="pos_err in results['pos_error']">
-            {{pos_err}}
-          </td>
-        </tr>
-      </table></td>
-      <td><table>
-        <tr>
-          <td ng-repeat="vel_err in results['vel_error']">
-            {{vel_err}}
-          </td>
-        </tr>
-      </table></td>
-      <td><table>
-        <tr>
-          <td ng-repeat="look_angles_err in results['look_angles_error']">
-            {{look_angles_err}}
-          </td>
-        </tr>
-      </table></td>
+      <td>
+        <table>
+          <tr>
+            <td>{{results["known_pos"][0]}}</td>
+            <td>{{results["known_vel"][0]}}</td>
+          </tr>
+          <tr>
+            <td>{{results["test_pos"][0]}}</td>
+            <td>{{results["test_vel"][0]}}</td>
+          </tr>
+          <tr>
+            <td>{{results["pos_error"][0]}}</td>
+            <td>{{results["vel_error"][0]}}</td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <table>
+          <tr>
+            <td>{{results["known_pos"][1]}}</td>
+            <td>{{results["known_vel"][1]}}</td>
+          </tr>
+          <tr>
+            <td>{{results["test_pos"][1]}}</td>
+            <td>{{results["test_vel"][1]}}</td>
+          </tr>
+          <tr>
+            <td>{{results["pos_error"][1]}}</td>
+            <td>{{results["vel_error"][1]}}</td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <table>
+          <tr>
+            <td>{{results["known_pos"][2]}}</td>
+            <td>{{results["known_vel"][2]}}</td>
+          </tr>
+          <tr>
+            <td>{{results["test_pos"][2]}}</td>
+            <td>{{results["test_vel"][2]}}</td>
+          </tr>
+          <tr>
+            <td>{{results["pos_error"][2]}}</td>
+            <td>{{results["vel_error"][2]}}</td>
+          </tr>
+        </table>
+      </td>
     </tr>
   </table>
 </td></tr></table>

@@ -56,30 +56,6 @@ function ecf_to_eci (ecf_coords, gmst){
     return [X, Y, Z];
 }
 
-function eci_to_geodetic (eci_coords, gmst) {
-    'use strict';
-    // http://www.celestrak.com/columns/v02n03/
-    var a   = 6378.137;
-    var b   = 6356.7523142;
-    var R   = Math.sqrt( (eci_coords[0]*eci_coords[0]) + (eci_coords[1]*eci_coords[1]) );
-    var f   = (a - b)/a;
-    var e2  = ((2*f) - (f*f));
-    var longitude = Math.atan2(eci_coords[1], eci_coords[0]) - gmst;
-    var kmax = 20;
-    var k = 0;
-    var latitude = Math.atan2(eci_coords[2],
-                   Math.sqrt(eci_coords[0]*eci_coords[0] +
-                                eci_coords[1]*eci_coords[1]));
-    var C;
-    while (k < kmax){
-        C = 1 / Math.sqrt( 1 - e2*(Math.sin(latitude)*Math.sin(latitude)) );
-        latitude = Math.atan2 (eci_coords[2] + (a*C*e2*Math.sin(latitude)), R);
-        k += 1;
-    }
-    var h = (R/Math.cos(latitude)) - (a*C);
-    return [longitude, latitude, h];
-}
-
 function geodetic_to_ecf (geodetic_coords){
     'use strict';
     var longitude   = geodetic_coords[0];
@@ -100,7 +76,8 @@ function geodetic_to_ecf (geodetic_coords){
 function ecf_to_topocentric (observer_coords, satellite_coords){
     // http://www.celestrak.com/columns/v02n02/
     // TS Kelso's method, except I'm using ECF frame
-    // and he uses ECI
+    // and he uses ECI.
+    //
     'use strict';
     var longitude   = observer_coords[0];
     var latitude    = observer_coords[1];
@@ -112,9 +89,9 @@ function ecf_to_topocentric (observer_coords, satellite_coords){
     var ry      = satellite_coords[1] - observer_ecf[1];
     var rz      = satellite_coords[2] - observer_ecf[2];
 
-    var top_s   = ( (Math.sin(latitude)*Math.cos(longitude)*rx) +
-                  (Math.sin(latitude)*Math.sin(longitude)*ry) -
-                  (Math.cos(latitude)*rz));
+    var top_s   = ( (Math.sin(latitude) * Math.cos(longitude) * rx) +
+                  (Math.sin(latitude) * Math.sin(longitude) * ry) -
+                  (Math.cos(latitude) * rz));
     var top_e   = ( -Math.sin(longitude) * rx) + (Math.cos(longitude) * ry);
     var top_z   = ( (Math.cos(latitude)*Math.cos(longitude)*rx) +
                   (Math.cos(latitude)*Math.sin(longitude)*ry) +
@@ -158,4 +135,29 @@ function degrees_lat                 (radians){
         degrees = degrees;
     }
     return degrees;
+}
+
+satellite.eci_to_geodetic = function (eci_coords, gmst) {
+    return eci_to_geodetic (eci_coords, gmst);
+}
+satellite.degrees_lat = function                 (radians) {
+    return degrees_lat (radians);
+}
+satellite.degrees_long = function                (radians) {
+    return degrees_long (radians);
+}
+satellite.topocentric_to_look_angles = function  (topocentric) {
+    return topocentric_to_look_angles (topocentric);
+}
+satellite.ecf_to_topocentric = function (observer_coords, satellite_coords) {
+    return ecf_to_topocentric (observer_coords, satellite_coords);
+}
+satellite.geodetic_to_ecf = function (geodetic_coords) {
+    return geodetic_to_ecf (geodetic_coords);
+}
+satellite.ecf_to_eci = function (ecf_coords, gmst) {
+    return ecf_to_eci (ecf_coords, gmst);
+}
+satellite.eci_to_ecf = function (eci_coords, gmst) {
+    return eci_to_ecf (eci_coords, gmst);
 }
