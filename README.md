@@ -18,9 +18,7 @@ The coordinate transforms are based off T.S. Kelso's columns:
 And the coursework for UC Boulder's ASEN students
 *   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
-I would recommend anybody interested in satellite tracking or
-orbital propagation to read [all of TS Kelso's columns](http://celestrak.com/columns/).
-Without his work, this project would not be possible.
+I would recommend anybody interested in satellite tracking or orbital propagation to read [all of TS Kelso's columns](http://celestrak.com/columns/). Without his work, this project would not be possible.
 
 Makefile
 --------
@@ -30,50 +28,33 @@ The code is divided up into separate files, but the final library will be a sing
 
 Usage
 -----
-When you include satellite.js as a script in your html,
-the object 'satellite' is defined in global scope.
-You use this object to access all the functions in
-the satellite library.
+When you include satellite.js as a script in your html, the object 'satellite' is defined in global scope. You use this object to access all the functions in the satellite library.
 
 EX:
-    satellite.sgp4 (test_sat, test_time);
+     satellite.sgp4 (test_sat, test_time);
 
 Exposed Functions
 ---
 ###Initialization
-    satellite.twoline2satrec(longstr1, longstr2)
-returns satrec object, created from the TLEs passed in.
-The satrec object is vastly complicated, but you don't
-have to do anything with it, except pass it around.
-NOTE!
-You are responsible for providing TLEs.
-[Get your free Space Track account here.](https://www.space-track.org/auth/login)
-longstr1 and longstr2 are the two lines of the TLE, properly
-formatted by NASA and NORAD standards. if you use Space Track,
-there should be no problem.
+     satellite.twoline2satrec(longstr1, longstr2)
+returns satrec object, created from the TLEs passed in. The satrec object is vastly complicated, but you don't have to do anything with it, except pass it around.
+NOTE! You are responsible for providing TLEs. [Get your free Space Track account here.](https://www.space-track.org/auth/login)
+longstr1 and longstr2 are the two lines of the TLE, properly formatted by NASA and NORAD standards. if you use Space Track, there should be no problem.
 
 
 ###Propogation
-    satellite.propagate(satrec, year, month, day, hour, minute, second)
-returns position and velocity, given a satrec and the calendar date.
-is merely a wrapper for sgp4(), converts the calendar day to julian
-time since satellite epoch. Sometimes it's better to ask for position
-and velocity given a specific date.
-    satellite.sgp4(satrec, time_since_epoch_seconds)
-returns position and velocity, given a satrec and time delta.
-Sometimes it's better to ask for position and velocity given the
-time elapsed since epoch.
+     satellite.propagate(satrec, year, month, day, hour, minute, second)
+returns position and velocity, given a satrec and the calendar date. is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
+     satellite.sgp4(satrec, time_since_epoch_seconds)
+returns position and velocity, given a satrec and time delta. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
 
 ###Coordinate Transforms
 ####Greenwich Mean Sidereal Time
-You'll need to provide some of the coordinate transform functions with your
-current GMST aka GSTIME. You can use Julian Day or a calendar date.
+You'll need to provide some of the coordinate transform functions with your current GMST aka GSTIME. You can use Julian Day or a calendar date.
     satellite.gstime_from_jday(julian_day)
     satellite.gstime_from_date(year, mon, day, hr, minute, sec)
 ####Transforms
-Most of these are self explanatory from their names.
-Coords are arrays of three floats EX: [1.1, 1.2, 1.3]
-in kilometers. Once again, read the following first:
+Most of these are self explanatory from their names. Coords are arrays of three floats EX: [1.1, 1.2, 1.3] in kilometers. Once again, read the following first:
 The coordinate transforms are based off T.S. Kelso's columns:
 *   [Part I](http://celestrak.com/columns/v02n01/)
 *   [Part II](http://celestrak.com/columns/v02n02/)
@@ -81,8 +62,7 @@ The coordinate transforms are based off T.S. Kelso's columns:
 And the coursework for UC Boulder's ASEN students
 *   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
-These four are used to convert between ECI, ECF, and Geodetic,
-as you need them.
+These four are used to convert between ECI, ECF, and Geodetic, as you need them.
     satellite.eci_to_ecf(eci_coords, gmst)
     satellite.ecf_to_eci(ecf_coords, gmst)
     satellite.eci_to_geodetic (eci_coords, gmst)
@@ -99,6 +79,7 @@ These two functions will return human readable Latitude or Longitude
 (Ex: "125.35W" or "45.565N") from radians.
     satellite.degrees_lat (radians)
     satellite.degrees_long (radians)
+
 Note about Code Conventions
 ---------------------------
 Like Brandon Rhodes before me, I chose to maintain as little difference between this implementation and the prior works. This is to make adapting future changes suggested by Vallado much simpler. Thus, some of the conventions used in this library are very weird.
@@ -109,13 +90,6 @@ I took advantage of the fact that Python and JavaScript are nearly semantically 
 
 Testing
 -------
-I've included a small testing app, that provides some benchmarking tools
-and verifies SGP4 and SDP4 using the Test Criteria provided by SpaceTrack
-Report #3. The testing app is a Chrome Packaged App that uses the angular.
-js framework.
+I've included a small testing app, that provides some benchmarking tools and verifies SGP4 and SDP4 using the Test Criteria provided by SpaceTrack Report #3. The testing app is a Chrome Packaged App that uses the angular. js framework.
 
-To run the test, open up Chrome, go to the extensions page, and check
-"Developer Mode". Then, click "Load Unpacked App", and select the
-"sgp4_verification" folder. Then run the app from within Chrome.
-The test file is located within the "sgp4_verification" directory, as a
-JSON file called "spacetrack-report-3.json".
+To run the test, open up Chrome, go to the extensions page, and check "Developer Mode". Then, click "Load Unpacked App", and select the "sgp4_verification" folder. Then run the app from within Chrome. The test file is located within the "sgp4_verification" directory, as a JSON file called "spacetrack-report-3.json".
