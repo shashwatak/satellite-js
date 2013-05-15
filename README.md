@@ -22,8 +22,9 @@ I would recommend anybody interested in satellite tracking or orbital propagatio
 Makefile
 --------
 The code is divided up into separate files, but the final library will be a single file called satellite.js. The Makefile concatenates all the dependencies into a single file, for inclusion in a web application.
+The HEAD and TAIL files encapsulate the functions, wrapping them so that they are private, only exposing the necessary functions.
 
-```cat ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} > ${FINAL}```
+```cat ${SAT_HEADER} ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} ${SAT_TAIL} > ${FINAL}```
 
 Usage
 -----
