@@ -4,12 +4,17 @@ satellite.js
 MAJOR TODOS:
 * Replace the function parameters and return values that are indexed arrays with key:value objects, to prevent the inevitable nightmare that will come if I do not do this asap. I did it incorrectly the first time because...ghosts.
 * Incorporate AC6P's method for determining range rate, to replace current doppler function.
+* Considering changing the name to satlib.js?
 
 Introduction
 --------------
-Provides the functions necessary for SGP4/SDP4 calculations, as modular blocks. Also provides functions for coordinate transforms.
+A library to make satellite propagation via TLEs possible in the web.
+Provides the functions necessary for SGP4/SDP4 calculations, as callable javascript. Also provides functions for coordinate transforms.
 
-First, Start Here: [SpaceTrack Report #3, by Hoots and Roehrich](http://celestrak.com/NORAD/documentation/spacetrk.pdf).
+Start Here:
+* [TS Kelso's Columns for Satellite Times](http://celestrak.com/columns/), Orbital Propagation Parts I and II a must!
+* [Wikipedia: Simplified Perturbations Model](http://en.wikipedia.org/wiki/Simplified_perturbations_models)
+* [SpaceTrack Report #3, by Hoots and Roehrich](http://celestrak.com/NORAD/documentation/spacetrk.pdf).
 
 The javascript in this library is heavily based (straight copied) from:
 *   The python [sgp4 1.1 by Brandon Rhodes](https://pypi.python.org/pypi/sgp4/)
@@ -27,12 +32,18 @@ And the coursework for UC Boulder's ASEN students
 
 I would recommend anybody interested in satellite tracking or orbital propagation to read [all of TS Kelso's columns](http://celestrak.com/columns/). Without his work, this project would not be possible.
 
+Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs for use with this library.
+
 Makefile
 --------
 The code is divided up into separate files, but the final library will be a single file called satellite.js. The Makefile concatenates all the dependencies into a single file, for inclusion in a web application.
-The HEAD and TAIL files encapsulate the functions, wrapping them so that they are private, only exposing the necessary functions.
+The HEAD and TAIL files encapsulate the inner files, wrapping them so that they are private, only exposing the necessary functions via the return object.
 
-```cat ${SAT_HEADER} ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} ${SAT_TAIL} > ${FINAL}```
+In essence:
+```cat HEAD JAVASCRIPT_1 JAVASCRIPT_2 ... TAIL > satellite.js ```
+
+Run "make" to build satellite.js file.
+Run "make test" to install the satellite.js library in the sgp4 verification app.
 
 Usage
 -----
@@ -44,7 +55,7 @@ var position_velocity = satellite.sgp4 (test_sat, test_time);
 ```
 
 Exposed Functions
----
+-----------------
 ###Initialization
 ```javascript
 var sat_rec = satellite.twoline2satrec(longstr1, longstr2)
