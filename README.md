@@ -2,7 +2,6 @@ satellite.js
 ==============
 
 MAJOR TODOS:
-* Replace the function parameters and return values that are indexed arrays with key:value objects, to prevent the inevitable nightmare that will come if I do not do this asap. I did it incorrectly the first time because...ghosts.
 * Incorporate AC6P's method for determining range rate, to replace current doppler function.
 * Considering changing the name to satlib.js?
 
