@@ -1,6 +1,6 @@
 satellite = (function () {
 
-    var satellite = { version : "0.1" };
+    var satellite = { version : "1.0" };
 /*
     satellite-head.js and satellite-tail.js sandwich all the other
     functions in the library.

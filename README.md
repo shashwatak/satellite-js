@@ -1,4 +1,4 @@
-satellite.js
+satellite.js v1.0
 ==============
 
 MAJOR TODOS:
@@ -113,12 +113,9 @@ var geodetic_coords = satellite.eci_to_geodetic (eci_coords, gmst)
 var ecf_coords = satellite.geodetic_to_ecf(geodetic_coords)
 ```
 
-These two are used to compute your look angle. I'm considering coupling them into one function.
+These function is used to compute the look angle, from your geodetic position to a satellite in ECF coordinates. Make sure you convert the ECI output from sgp4() and propagate() to ECF first.
 ```javascript
-satellite.ecf_to_topocentric(observer_coords_geodetic, satellite_coords_ecf)
-```
-```javascript
-satellite.topocentric_to_look_angles (topocentric)
+var look_angles = satellite.ecf_to_look_angles = function (observer_coords_geodetic, satellite_coords_ecf)
 ```
 Returns an array of [Azimuth, Elevation, Range]. Az, El are in radians, Range is in km.
 

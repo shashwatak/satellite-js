@@ -146,12 +146,12 @@ satellite.degrees_lat = function                 (radians) {
 satellite.degrees_long = function                (radians) {
     return degrees_long (radians);
 }
-satellite.topocentric_to_look_angles = function  (topocentric) {
+
+satellite.ecf_to_look_angles = function (observer_coords_geodetic, satellite_coords_ecf) {
+    var topocentric_coords = ecf_to_topocentric (observer_coords, satellite_coords);
     return topocentric_to_look_angles (topocentric);
 }
-satellite.ecf_to_topocentric = function (observer_coords, satellite_coords) {
-    return ecf_to_topocentric (observer_coords, satellite_coords);
-}
+
 satellite.geodetic_to_ecf = function (geodetic_coords) {
     return geodetic_to_ecf (geodetic_coords);
 }
