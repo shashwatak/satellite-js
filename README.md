@@ -1,5 +1,10 @@
 satellite.js
 ==============
+
+MAJOR TODOS:
+*[]Replace the function parameters and return values that are indexed arrays with key:value objects, to prevent the inevitable nightmare that will come if I do not do this asap. I did it incorrectly the first time because...ghosts.
+*[]Incorporate AC6P's method for determining range rate, to replace current doppler function.
+
 Introduction
 --------------
 Provides the functions necessary for SGP4/SDP4 calculations, as modular blocks. Also provides functions for coordinate transforms.
@@ -126,7 +131,9 @@ I took advantage of the fact that Python and JavaScript are nearly semantically 
 
 Testing
 -------
-I've included a small testing app, that provides some benchmarking tools and verifies SGP4 and SDP4 using the Test Criteria provided by SpaceTrack Report #3. The testing app is a Chrome Packaged App that uses the angular. js framework.
+I've included a small testing app, that provides some benchmarking tools and verifies SGP4 and SDP4 using the Test Criteria provided by SpaceTrack Report #3, and is based off [System Benchmarking](http://celestrak.com/columns/v02n04/) by TS Kelso.
+
+The testing app is a Chrome Packaged App that uses the angular.js framework.
 
 To run the test, open up Chrome, go to the extensions page, and check "Developer Mode". Then, click "Load Unpacked App", and select the "sgp4_verification" folder. Then run the app from within Chrome. The test file is located within the "sgp4_verification" directory, as a JSON file called "spacetrack-report-3.json".
 
@@ -136,8 +143,10 @@ Major thanks go to Brandon Rhodes, TS Kelso, and David Vallado's team. Also, I'd
 
 License
 ----------------
-I'm just going with the MIT License, same as Brandon Rhodes.
+The entire contents of this package (all files) are protected by the MIT License.
 
-I worked in the Dining Hall at UCSC for a month, which means I signed a form that gives UCSC partial ownership of anything I make while under their aegis, so I included them as owners of the copyright also.
+I chose the MIT License because this library is a derivative work off [Brandon Rhodes sgp4](https://pypi.python.org/pypi/sgp4/), and that is licensed with MIT. It just seemed simpler this way, sub-licensing freedoms notwithstanding.
 
-Please email any complaints to help@ucsc.edu
+I worked in the Dining Hall at UCSC for a month, which means I signed a form that gives UCSC partial ownership of anything I make while under their aegis, so I included them as owners of the copyright.
+
+Please email all complaints to help@ucsc.edu
