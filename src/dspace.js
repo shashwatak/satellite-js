@@ -1,13 +1,4 @@
-function dspace (
-        irez,
-        d2201,  d2211,  d3210,  d3222,  d4410,
-        d4422,  d5220,  d5232,  d5421,  d5433,
-        dedt,   del1,   del2,   del3,   didt,
-        dmdt,   dnodt,  domdt,  argpo,  argpdot,
-        t,      tc,     gsto,   xfact,  xlamo,
-        no,     atime,  em,     argpm,  inclm,
-        xli,    mm,     xni,   nodem,   nm
-       ){
+function dspace (dspace_parameters){
     /*-----------------------------------------------------------------------------
     *
     *                           procedure dspace
@@ -83,6 +74,44 @@ function dspace (
     'use strict';
     var delt,   ft,     theta,  x2li,   x2omi,
         xl,     xldot,  xnddt,  xndt,   xomi;
+
+    var irez    = dspace_parameters.irez,
+        d2201   = dspace_parameters.d2201,
+        d2211   = dspace_parameters.d2211,
+        d3210   = dspace_parameters.d3210,
+        d3222   = dspace_parameters.d3222,
+        d4410   = dspace_parameters.d4410,
+        d4422   = dspace_parameters.d4422,
+        d5220   = dspace_parameters.d5220,
+        d5232   = dspace_parameters.d5232,
+        d5421   = dspace_parameters.d5421,
+        d5433   = dspace_parameters.d5433,
+        dedt    = dspace_parameters.dedt,
+        del1    = dspace_parameters.del1,
+        del2    = dspace_parameters.del2,
+        del3    = dspace_parameters.del3,
+        didt    = dspace_parameters.didt,
+        dmdt    = dspace_parameters.dmdt,
+        dnodt   = dspace_parameters.dnodt,
+        domdt   = dspace_parameters.domdt,
+        argpo   = dspace_parameters.argpo,
+        argpdot = dspace_parameters.argpdot,
+        t       = dspace_parameters.t,
+        tc      = dspace_parameters.tc,
+        gsto    = dspace_parameters.gsto,
+        xfact   = dspace_parameters.xfact,
+        xlamo   = dspace_parameters.xlamo,
+        no      = dspace_parameters.no,
+        atime   = dspace_parameters.atime,
+        em      = dspace_parameters.em,
+        argpm   = dspace_parameters.argpm,
+        inclm   = dspace_parameters.inclm,
+        xli     = dspace_parameters.xli,
+        mm      = dspace_parameters.mm,
+        xni     = dspace_parameters.xni,
+        nodem   = dspace_parameters.nodem,
+        nm      = dspace_parameters.nm;
+
 
     var fasx2 = 0.13130908;
     var fasx4 = 2.8843198;
@@ -202,6 +231,17 @@ function dspace (
         }
         nm = no + dndt;
     }
-    return [ atime, em,     argpm,  inclm,  xli,
-                mm, xni,    nodem,  dndt,   nm   ];
+    var dspace_results = {
+        atime : atime,
+        em : em,
+        argpm : argpm,
+        inclm : inclm,
+        xli : xli,
+        mm : mm,
+        xni : xni,
+        nodem : nodem,
+        dndt : dndt,
+        nm : nm,
+    }
+    return dspace_results;
 }

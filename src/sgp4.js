@@ -1,5 +1,3 @@
-
-
 function sgp4(satrec, tsince){
     /*-----------------------------------------------------------------------------
     *
@@ -156,31 +154,61 @@ function sgp4(satrec, tsince){
     inclm = satrec.inclo;
     if (satrec.method === 'd'){
         tc = satrec.t;
-        var dspace_result = dspace(
-              satrec.irez,
-              satrec.d2201, satrec.d2211, satrec.d3210,
-              satrec.d3222, satrec.d4410, satrec.d4422,
-              satrec.d5220, satrec.d5232, satrec.d5421,
-              satrec.d5433, satrec.dedt,  satrec.del1,
-              satrec.del2,  satrec.del3,  satrec.didt,
-              satrec.dmdt,  satrec.dnodt, satrec.domdt,
-              satrec.argpo, satrec.argpdot, satrec.t, tc,
-              satrec.gsto, satrec.xfact, satrec.xlamo,
-              satrec.no, satrec.atime,
-              em, argpm, inclm, satrec.xli, mm, satrec.xni,
-              nodem, nm);
-        var atime   = dspace_result[0];
-        em          = dspace_result[1];
-        argpm       = dspace_result[2];
-        inclm       = dspace_result[3];
-        var xli     = dspace_result[4];
 
-        mm          = dspace_result[5];
-        var xni     = dspace_result[6];
-        nodem       = dspace_result[7];
-        dndt        = dspace_result[8];
-        nm          = dspace_result[9];
+        var dspace_parameters = {
+            irez  : satrec.irez,
+            d2201 : satrec.d2201,
+            d2211 : satrec.d2211,
+            d3210 : satrec.d3210,
+            d3222 : satrec.d3222,
+            d4410 : satrec.d4410,
+            d4422 : satrec.d4422,
+            d5220 : satrec.d5220,
+            d5232 : satrec.d5232,
+            d5421 : satrec.d5421,
+            d5433 : satrec.d5433,
+            dedt  : satrec.dedt,
+            del1  : satrec.del1,
+            del2  : satrec.del2,
+            del3  : satrec.del3,
+            didt  : satrec.didt,
+            dmdt  : satrec.dmdt,
+            dnodt : satrec.dnodt,
+            domdt : satrec.domdt,
+            argpo : satrec.argpo,
+            argpdot : satrec.argpdot,
+            t     : satrec.t,
+            tc    : tc,
+            gsto  : satrec.gsto,
+            xfact : satrec.xfact,
+            xlamo : satrec.xlamo,
+            no    : satrec.no,
+            atime : satrec.atime,
+            em    : em,
+            argpm :  argpm,
+            inclm :  inclm,
+            xli   :  satrec.xli,
+            mm    :  mm,
+            xni   : satrec.xni,
+            nodem : nodem,
+            nm    : nm
+        };
+
+        var dspace_result = dspace(dspace_parameters);
+
+        var atime   = dspace_result.atime;
+        em          = dspace_result.em;
+        argpm       = dspace_result.argpm;
+        inclm       = dspace_result.inclm;
+        var xli     = dspace_result.xli;
+
+        mm          = dspace_result.mm;
+        var xni     = dspace_result.xni;
+        nodem       = dspace_result.nodem;
+        dndt        = dspace_result.dndt;
+        nm          = dspace_result.nm;
     }
+
     if (nm <= 0.0){
         //  printf("// error nm %f\n", nm);
         satrec.error = 2;

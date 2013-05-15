@@ -835,16 +835,7 @@ function dsinit(
             del1,   del2,   del3,
             xfact,  xlamo,  xli,    xni  ];
 }
-function dspace (
-        irez,
-        d2201,  d2211,  d3210,  d3222,  d4410,
-        d4422,  d5220,  d5232,  d5421,  d5433,
-        dedt,   del1,   del2,   del3,   didt,
-        dmdt,   dnodt,  domdt,  argpo,  argpdot,
-        t,      tc,     gsto,   xfact,  xlamo,
-        no,     atime,  em,     argpm,  inclm,
-        xli,    mm,     xni,   nodem,   nm
-       ){
+function dspace (dspace_parameters){
     /*-----------------------------------------------------------------------------
     *
     *                           procedure dspace
@@ -920,6 +911,44 @@ function dspace (
     'use strict';
     var delt,   ft,     theta,  x2li,   x2omi,
         xl,     xldot,  xnddt,  xndt,   xomi;
+
+    var irez    = dspace_parameters.irez,
+        d2201   = dspace_parameters.d2201,
+        d2211   = dspace_parameters.d2211,
+        d3210   = dspace_parameters.d3210,
+        d3222   = dspace_parameters.d3222,
+        d4410   = dspace_parameters.d4410,
+        d4422   = dspace_parameters.d4422,
+        d5220   = dspace_parameters.d5220,
+        d5232   = dspace_parameters.d5232,
+        d5421   = dspace_parameters.d5421,
+        d5433   = dspace_parameters.d5433,
+        dedt    = dspace_parameters.dedt,
+        del1    = dspace_parameters.del1,
+        del2    = dspace_parameters.del2,
+        del3    = dspace_parameters.del3,
+        didt    = dspace_parameters.didt,
+        dmdt    = dspace_parameters.dmdt,
+        dnodt   = dspace_parameters.dnodt,
+        domdt   = dspace_parameters.domdt,
+        argpo   = dspace_parameters.argpo,
+        argpdot = dspace_parameters.argpdot,
+        t       = dspace_parameters.t,
+        tc      = dspace_parameters.tc,
+        gsto    = dspace_parameters.gsto,
+        xfact   = dspace_parameters.xfact,
+        xlamo   = dspace_parameters.xlamo,
+        no      = dspace_parameters.no,
+        atime   = dspace_parameters.atime,
+        em      = dspace_parameters.em,
+        argpm   = dspace_parameters.argpm,
+        inclm   = dspace_parameters.inclm,
+        xli     = dspace_parameters.xli,
+        mm      = dspace_parameters.mm,
+        xni     = dspace_parameters.xni,
+        nodem   = dspace_parameters.nodem,
+        nm      = dspace_parameters.nm;
+
 
     var fasx2 = 0.13130908;
     var fasx4 = 2.8843198;
@@ -1039,8 +1068,19 @@ function dspace (
         }
         nm = no + dndt;
     }
-    return [ atime, em,     argpm,  inclm,  xli,
-                mm, xni,    nodem,  dndt,   nm   ];
+    var dspace_results = {
+        atime : atime,
+        em : em,
+        argpm : argpm,
+        inclm : inclm,
+        xli : xli,
+        mm : mm,
+        xni : xni,
+        nodem : nodem,
+        dndt : dndt,
+        nm : nm,
+    }
+    return dspace_results;
 }
 function gstime (jdut1){
     /* -----------------------------------------------------------------------------
@@ -1894,8 +1934,6 @@ satellite.twoline2satrec = function (longstr1, longstr2) {
 satellite.propagate = function (satrec, year, month, day, hour, minute, second) {
     return propagate (satrec, year, month, day, hour, minute, second);
 }
-
-
 function sgp4(satrec, tsince){
     /*-----------------------------------------------------------------------------
     *
@@ -2052,31 +2090,61 @@ function sgp4(satrec, tsince){
     inclm = satrec.inclo;
     if (satrec.method === 'd'){
         tc = satrec.t;
-        var dspace_result = dspace(
-              satrec.irez,
-              satrec.d2201, satrec.d2211, satrec.d3210,
-              satrec.d3222, satrec.d4410, satrec.d4422,
-              satrec.d5220, satrec.d5232, satrec.d5421,
-              satrec.d5433, satrec.dedt,  satrec.del1,
-              satrec.del2,  satrec.del3,  satrec.didt,
-              satrec.dmdt,  satrec.dnodt, satrec.domdt,
-              satrec.argpo, satrec.argpdot, satrec.t, tc,
-              satrec.gsto, satrec.xfact, satrec.xlamo,
-              satrec.no, satrec.atime,
-              em, argpm, inclm, satrec.xli, mm, satrec.xni,
-              nodem, nm);
-        var atime   = dspace_result[0];
-        em          = dspace_result[1];
-        argpm       = dspace_result[2];
-        inclm       = dspace_result[3];
-        var xli     = dspace_result[4];
 
-        mm          = dspace_result[5];
-        var xni     = dspace_result[6];
-        nodem       = dspace_result[7];
-        dndt        = dspace_result[8];
-        nm          = dspace_result[9];
+        var dspace_parameters = {
+            irez  : satrec.irez,
+            d2201 : satrec.d2201,
+            d2211 : satrec.d2211,
+            d3210 : satrec.d3210,
+            d3222 : satrec.d3222,
+            d4410 : satrec.d4410,
+            d4422 : satrec.d4422,
+            d5220 : satrec.d5220,
+            d5232 : satrec.d5232,
+            d5421 : satrec.d5421,
+            d5433 : satrec.d5433,
+            dedt  : satrec.dedt,
+            del1  : satrec.del1,
+            del2  : satrec.del2,
+            del3  : satrec.del3,
+            didt  : satrec.didt,
+            dmdt  : satrec.dmdt,
+            dnodt : satrec.dnodt,
+            domdt : satrec.domdt,
+            argpo : satrec.argpo,
+            argpdot : satrec.argpdot,
+            t     : satrec.t,
+            tc    : tc,
+            gsto  : satrec.gsto,
+            xfact : satrec.xfact,
+            xlamo : satrec.xlamo,
+            no    : satrec.no,
+            atime : satrec.atime,
+            em    : em,
+            argpm :  argpm,
+            inclm :  inclm,
+            xli   :  satrec.xli,
+            mm    :  mm,
+            xni   : satrec.xni,
+            nodem : nodem,
+            nm    : nm
+        };
+
+        var dspace_result = dspace(dspace_parameters);
+
+        var atime   = dspace_result.atime;
+        em          = dspace_result.em;
+        argpm       = dspace_result.argpm;
+        inclm       = dspace_result.inclm;
+        var xli     = dspace_result.xli;
+
+        mm          = dspace_result.mm;
+        var xni     = dspace_result.xni;
+        nodem       = dspace_result.nodem;
+        dndt        = dspace_result.dndt;
+        nm          = dspace_result.nm;
     }
+
     if (nm <= 0.0){
         //  printf("// error nm %f\n", nm);
         satrec.error = 2;

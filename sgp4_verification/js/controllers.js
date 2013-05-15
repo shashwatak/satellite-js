@@ -99,25 +99,6 @@ function TestCtrl($scope) {
         $scope.tests.push(savage_time);
       };
 
-      /*
-      var time_variance = 0;
-      var value_variance = 0;
-      var num_tests = $scope.tests.length;
-      if (num_tests > 0){
-        var total_time = 0;
-        for (var i = 0; i < num_tests; i++) {
-          total_time += $scope.tests[i]["savage_time"];
-        };
-        $scope.average_time = total_time / (num_tests + 0.0);
-
-        var total_time_variance = 0;
-        for (var i = 0; i < num_tests; i++) {
-          total_time_variance += Math.pow($scope.tests[i]["savage_time"] - $scope.average_time, 2);
-        };
-        time_variance = total_time_variance / num_tests;
-        $scope.std_deviation_time = Math.sqrt(time_variance);
-      }*/
-
       console.log($scope.tests);
       var data  = $scope.tests;
       var w     = 700;
