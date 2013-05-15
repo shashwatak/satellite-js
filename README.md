@@ -14,6 +14,7 @@ The coordinate transforms are based off T.S. Kelso's columns:
 *   [Part I](http://celestrak.com/columns/v02n01/)
 *   [Part II](http://celestrak.com/columns/v02n02/)
 *   [Part III](http://celestrak.com/columns/v02n03/)
+
 And the coursework for UC Boulder's ASEN students
 *   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
@@ -48,8 +49,10 @@ longstr1 and longstr2 are the two lines of the TLE, properly formatted by NASA a
 
 ###Propogation
 Both propagation function return position_velocity in a 2D array of the form:
+
 ```[[position_x, position_y, position_z], [velocity_x, velocity_y, velocity_z]]```
-position is in km, velocity is in km/s, in the ECI coordinate frame.
+
+position is in km, velocity is in km/s, both the ECI coordinate frame.
 
 ```javascript
 var position_velocity = satellite.propagate(satrec, year, month, day, hour, minute, second)
