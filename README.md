@@ -10,6 +10,8 @@ The javascript in this library is heavily based (straight copied) from:
 *   The python [sgp4 1.1 by Brandon Rhodes](https://pypi.python.org/pypi/sgp4/)
 *   The C++ code by [David Vallado, et al](http://www.celestrak.com/publications/AIAA/2006-6753/)
 
+I've included the original PKG-INFO file from the python library.
+
 The coordinate transforms are based off T.S. Kelso's columns:
 *   [Part I](http://celestrak.com/columns/v02n01/)
 *   [Part II](http://celestrak.com/columns/v02n02/)
@@ -131,3 +133,11 @@ To run the test, open up Chrome, go to the extensions page, and check "Developer
 Acknowledgments
 ---------------
 Major thanks go to Brandon Rhodes, TS Kelso, and David Vallado's team. Also, I'd like to thank Professor Steve Petersen (AC6P) of UCSC for pointing me in the correct directions.
+
+License
+----------------
+I'm just going with the MIT License, same as Brandon Rhodes.
+
+I worked in the Dining Hall at UCSC for a month, which means I signed a form that gives UCSC partial ownership of anything I make while under their aegis, so I included them as owners of the copyright also.
+
+Please email any complaints to help@ucsc.edu

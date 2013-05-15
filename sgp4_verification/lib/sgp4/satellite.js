@@ -5,22 +5,14 @@ satellite = (function () {
     satellite-head.js and satellite-tail.js sandwich all the other
     functions in the library.
 
-    Only three are exposed, via the satellite return object
-    satellite.twoline2satrec(longstr1, longstr2)
-        returns satrec object from TLE
-    satellite.propagate(satrec, year, month, day, hour, minute, second)
-        returns position and velocity
-        is merely a wrapper for sgp4, converts the calendar day to julian
-        time since satellite epoch
-    satellite.sgp4(satrec, tsince)
-        returns position and velocity, given a satrec and
+    The exposed functions are returned out via the satellite object
 
     This is to separate the satellite.js namespace from the rest of
     the javascript environment.
 
     Consult the Makefile to see which files are going to be sandwiched.
 
-})() The footer is in satellite-tail.js*/
+})() The footer is in satellite-tail.js */
 var pi = Math.PI;
 var twopi = pi * 2;
 var deg2rad = pi / 180.0;
@@ -1164,10 +1156,6 @@ function jday(year, mon, day, hr, minute, sec){
           ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
           //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
           );
-}
-
-satellite.jday_from_date = function (year, mon, day, hr, minute, sec) {
-    return jday(year, mon, day, hr, minute, sec);
 }
 
 satellite.gstime_from_jday = function (julian_day) {
