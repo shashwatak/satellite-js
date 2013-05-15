@@ -16,7 +16,7 @@ The coordinate transforms are based off T.S. Kelso's columns:
 *   [Part III](http://celestrak.com/columns/v02n03/)
 
 And the coursework for UC Boulder's ASEN students
-*   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
+*   [Coodinate Transforms @ UC Boulder](http://ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
 I would recommend anybody interested in satellite tracking or orbital propagation to read [all of TS Kelso's columns](http://celestrak.com/columns/). Without his work, this project would not be possible.
 
@@ -80,7 +80,7 @@ The coordinate transforms are based off T.S. Kelso's columns:
 *   [Part III](http://celestrak.com/columns/v02n03/)
 
 And the coursework for UC Boulder's ASEN students
-*   [Coodinate Transforms @ UC Boulder](ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
+*   [Coodinate Transforms @ UC Boulder](http://ccar.colorado.edu/ASEN5070/handouts/coordsys.doc)
 
 These four are used to convert between ECI, ECF, and Geodetic, as you need them. ECI and ECF coordinates are in km or km/s. Geodetic coords are in radians.
 ```javascript
