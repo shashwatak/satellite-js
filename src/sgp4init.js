@@ -1,9 +1,4 @@
-function sgp4init(
-       opsmode,   satn,     epoch,
-       xbstar,  xecco, xargpo,
-       xinclo,  xmo,   xno,
-       xnodeo,  satrec
-       ){
+function sgp4init(satrec, sgp4init_parameters){
     /*-----------------------------------------------------------------------------
     *
     *                             procedure sgp4init
@@ -85,8 +80,23 @@ function sgp4init(
     *    vallado, crawford, hujsak, kelso  2006
       ----------------------------------------------------------------------------*/
 
-
     'use strict';
+
+    var opsmode = sgp4init_parameters.opsmode,
+        satn    = sgp4init_parameters.satn,
+        epoch   = sgp4init_parameters.epoch,
+
+        xbstar  = sgp4init_parameters.xbstar,
+        xecco   = sgp4init_parameters.xecco,
+        xargpo  = sgp4init_parameters.xargpo,
+
+        xinclo  = sgp4init_parameters.xinclo,
+        xmo     = sgp4init_parameters.xmo,
+        xno     = sgp4init_parameters.xno,
+
+        xnodeo  = sgp4init_parameters.xnodeo;
+
+
     var cnodm,  snodm,  cosim,  sinim,  cosomm, sinomm,
         cc1sq,  cc2,    cc3,    coef,   coef1,  cosio4,
         day,    dndt,

@@ -89,10 +89,25 @@ function twoline2rv(longstr1, longstr2){
    var sec      = mdhms_result[3];
    satrec.jdsatepoch = jday(year,mon,day,hr,minute,sec);
 
-   //  ---------------- initialize the orbit at sgp4epoch -------------------
-    sgp4init( opsmode, satrec.satnum, satrec.jdsatepoch-2433281.5, satrec.bstar,
-             satrec.ecco, satrec.argpo, satrec.inclo, satrec.mo, satrec.no,
-             satrec.nodeo, satrec);
+    //  ---------------- initialize the orbit at sgp4epoch -------------------
+    var sgp4init_parameters = {
+        opsmode : opsmode,
+        satn : satrec.satnum,
+        epoch : satrec.jdsatepoch-2433281.5,
+        xbstar : satrec.bstar,
+
+        xecco : satrec.ecco,
+        xargpo : satrec.argpo,
+        xinclo : satrec.inclo,
+        xmo : satrec.mo,
+        xno : satrec.no,
+
+        xnodeo : satrec.nodeo,
+    };
+
+
+
+    sgp4init(satrec, sgp4init_parameters );
 
     return satrec;
 }
