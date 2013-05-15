@@ -148,8 +148,8 @@ satellite.degrees_long = function                (radians) {
 }
 
 satellite.ecf_to_look_angles = function (observer_coords_geodetic, satellite_coords_ecf) {
-    var topocentric_coords = ecf_to_topocentric (observer_coords, satellite_coords);
-    return topocentric_to_look_angles (topocentric);
+    var topocentric_coords = ecf_to_topocentric (observer_coords_geodetic, satellite_coords_ecf);
+    return topocentric_to_look_angles (topocentric_coords);
 }
 
 satellite.geodetic_to_ecf = function (geodetic_coords) {
