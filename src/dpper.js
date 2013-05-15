@@ -1,4 +1,4 @@
-function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
+function dpper (satrec, dpper_parameters) {
     /* -----------------------------------------------------------------------------
     *
     *                           procedure dpper
@@ -68,6 +68,16 @@ function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
 
     'use strict';
 
+    var inclo   = dpper_parameters.inclo,
+        init    = dpper_parameters.init,
+        ep      = dpper_parameters.ep,
+        inclp   = dpper_parameters.inclp,
+        nodep   = dpper_parameters.nodep,
+        argpp   = dpper_parameters.argpp,
+        mp      = dpper_parameters.mp,
+        opsmode = dpper_parameters.opsmode;
+
+
     // Copy satellite attributes into local variables for convenience
     // and symmetry in writing formulae.
 
@@ -78,7 +88,6 @@ function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
         pe, pgh, ph, pinc, pl,
         sel, ses, sghl, sghs, shl, shs, sil, sinzf, sis,  sll, sls,
         xls,    xnoh,   zf, zm, shll;
-
 
     var e3      = satrec.e3;
     var ee2     = satrec.ee2;
@@ -219,5 +228,12 @@ function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
             argpp = xls - mp - cosip * nodep;
         }
     }
-    return [ep, inclp, nodep, argpp, mp];
+    var dpper_result = {
+        ep : ep,
+        inclp : inclp,
+        nodep : nodep,
+        argpp : argpp,
+        mp : mp
+    };
+    return dpper_result;
 }

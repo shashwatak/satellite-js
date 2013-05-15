@@ -77,7 +77,7 @@ function sgp4(satrec, tsince){
     *  coupling      :
     *    getgravconst-
     *    dpper
-    *    dpspace
+    *    dspace
     *
     *  references    :
     *    hoots, roehrich, norad spacetrack report //3 1980
@@ -255,15 +255,23 @@ function sgp4(satrec, tsince){
     cosip  = cosim;
     if (satrec.method === 'd'){
 
-        var dpper_result = dpper(
-               satrec, satrec.inclo,
-               'n', ep, xincp, nodep, argpp, mp, satrec.operationmode
-             );
-        ep      = dpper_result[0];
-        xincp   = dpper_result[1];
-        nodep   = dpper_result[2];
-        argpp   = dpper_result[3];
-        mp      = dpper_result[4];
+        var dpper_parameters = {
+            inclo : satrec.inclo,
+            init : 'n',
+            ep : ep,
+            inclp : xincp,
+            nodep : nodep,
+            argpp : argpp,
+            mp : mp,
+            opsmode : satrec.operationmod
+        };
+
+        var dpper_result = dpper(satrec, dpper_parameters);
+        ep      = dpper_result.ep;
+        xincp   = dpper_result.inclp;
+        nodep   = dpper_result.nodep;
+        argpp   = dpper_result.argpp;
+        mp      = dpper_result.mp;
 
         if (xincp < 0.0){
              xincp  = -xincp;

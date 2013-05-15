@@ -288,181 +288,294 @@ function sgp4init(
             satrec.isimp  = 1;
             tc    =  0.0;
             inclm = satrec.inclo;
-            var dscom_result = dscom(
-                   epoch, satrec.ecco, satrec.argpo, tc, satrec.inclo, satrec.nodeo,
-                   satrec.no,
-                   satrec.e3, satrec.ee2,
-                   satrec.peo,  satrec.pgho,   satrec.pho, satrec.pinco,
-                   satrec.plo,        satrec.se2, satrec.se3,
-                   satrec.sgh2, satrec.sgh3,   satrec.sgh4,
-                   satrec.sh2,  satrec.sh3,    satrec.si2, satrec.si3,
-                   satrec.sl2,  satrec.sl3,    satrec.sl4,
-                   satrec.xgh2, satrec.xgh3,   satrec.xgh4, satrec.xh2,
-                   satrec.xh3,  satrec.xi2,    satrec.xi3,  satrec.xl2,
-                   satrec.xl3,  satrec.xl4,
-                   satrec.zmol, satrec.zmos );
-            snodm = dscom_result[0];
-            cnodm = dscom_result[1];
-            sinim = dscom_result[2];
-            cosim = dscom_result[3];
-            sinomm = dscom_result[4];
 
-            cosomm = dscom_result[5];
-            day = dscom_result[6];
-            satrec.e3 = dscom_result[7];
-            satrec.ee2 = dscom_result[8];
-            em = dscom_result[9];
+            var dscom_parameters = {
+                epoch : epoch,
+                ep : satrec.ecco,
+                argpp : satrec.argpo,
+                tc : tc,
+                inclp : satrec.inclo,
+                nodep : satrec.nodeo,
 
-            emsq = dscom_result[10];
-            gam = dscom_result[11];
-            satrec.peo = dscom_result[12];
-            satrec.pgho = dscom_result[13];
-            satrec.pho = dscom_result[14];
+                np : satrec.no,
 
-            satrec.pinco = dscom_result[15];
-            satrec.plo = dscom_result[16];
-            rtemsq = dscom_result[17];
-            satrec.se2 = dscom_result[18];
-            satrec.se3 = dscom_result[19];
+                e3 : satrec.e3,
+                ee2 : satrec.ee2,
 
-            satrec.sgh2 = dscom_result[20];
-            satrec.sgh3 = dscom_result[21];
-            satrec.sgh4 = dscom_result[22];
-            satrec.sh2 = dscom_result[23];
-            satrec.sh3 = dscom_result[24];
+                peo : satrec.peo,
+                pgho : satrec.pgho,
+                pho : satrec.pho,
+                pinco : satrec.pinco,
 
-            satrec.si2 = dscom_result[25];
-            satrec.si3 = dscom_result[26];
-            satrec.sl2 = dscom_result[27];
-            satrec.sl3 = dscom_result[28];
-            satrec.sl4 = dscom_result[29];
+                plo : satrec.plo,
+                se2 : satrec.se2,
+                se3 : satrec.se3,
 
-            s1 = dscom_result[30];
-            s2 = dscom_result[31];
-            s3 = dscom_result[32];
-            s4 = dscom_result[33];
-            s5 = dscom_result[34];
+                sgh2 : satrec.sgh2,
+                sgh3 : satrec.sgh3,
+                sgh4 : satrec.sgh4,
 
-            s6 = dscom_result[35];
-            s7 = dscom_result[36];
-            ss1 = dscom_result[37];
-            ss2 = dscom_result[38];
-            ss3 = dscom_result[39];
+                sh2 : satrec.sh2,
+                sh3 : satrec.sh3,
+                si2 : satrec.si2,
+                si3 : satrec.si3,
 
-            ss4 = dscom_result[40];
-            ss5 = dscom_result[41];
-            ss6 = dscom_result[42];
-            ss7 = dscom_result[43];
-            sz1 = dscom_result[44];
+                sl2 : satrec.sl2,
+                sl3 : satrec.sl3,
+                sl4 : satrec.sl4,
 
-            sz2 = dscom_result[45];
-            sz3 = dscom_result[46];
-            sz11 = dscom_result[47];
-            sz12 = dscom_result[48];
-            sz13 = dscom_result[49];
+                xgh2 : satrec.xgh2,
+                xgh3 : satrec.xgh3,
+                xgh4 : satrec.xgh4,
+                xh2 : satrec.xh2,
 
-            sz21 = dscom_result[50];
-            sz22 = dscom_result[51];
-            sz23 = dscom_result[52];
-            sz31 = dscom_result[53];
-            sz32 = dscom_result[54];
+                xh3 : satrec.xh3,
+                xi2 : satrec.xi2,
+                xi3 : satrec.xi3,
+                xl2 : satrec.xl2,
 
-            sz33 = dscom_result[55];
-            satrec.xgh2 = dscom_result[56];
-            satrec.xgh3 = dscom_result[57];
-            satrec.xgh4 = dscom_result[58];
-            satrec.xh2 = dscom_result[59];
+                xl3 : satrec.xl3,
+                xl4 : satrec.xl4,
 
-            satrec.xh3 = dscom_result[60];
-            satrec.xi2 = dscom_result[61];
-            satrec.xi3 = dscom_result[62];
-            satrec.xl2 = dscom_result[63];
-            satrec.xl3 = dscom_result[64];
+                zmol : satrec.zmol,
+                zmos : satrec.zmos
+            };
 
-            satrec.xl4 = dscom_result[65];
-            nm = dscom_result[66];
-            z1 = dscom_result[67];
-            z2 = dscom_result[68];
-            z3 = dscom_result[69];
+            var dscom_result = dscom(dscom_parameters);
 
-            z11 = dscom_result[70];
-            z12 = dscom_result[71];
-            z13 = dscom_result[72];
-            z21 = dscom_result[73];
-            z22 = dscom_result[74];
+            snodm = dscom_result.snodm;
+            cnodm = dscom_result.cnodm;
+            sinim = dscom_result.sinim;
+            cosim = dscom_result.cosim;
+            sinomm = dscom_result.sinomm;
 
-            z23 = dscom_result[75];
-            z31 = dscom_result[76];
-            z32 = dscom_result[77];
-            z33 = dscom_result[78];
-            satrec.zmol = dscom_result[79];
-            satrec.zmos = dscom_result[80];
+            cosomm = dscom_result.cosomm;
+            day = dscom_result.day;
+            satrec.e3 = dscom_result.e3;
+            satrec.ee2 = dscom_result.ee2;
+            em = dscom_result.em;
 
-            var dpper_result = dpper(
-                   satrec, inclm, satrec.init,
-                   satrec.ecco, satrec.inclo, satrec.nodeo, satrec.argpo, satrec.mo,
-                   satrec.operationmode );
-            satrec.ecco = dpper_result[0];
-            satrec.inclo = dpper_result[1];
-            satrec.nodeo = dpper_result[2];
-            satrec.argpo = dpper_result[3];
-            satrec.mo = dpper_result[4];
+            emsq = dscom_result.emsq;
+            gam = dscom_result.gam;
+            satrec.peo = dscom_result.peo;
+            satrec.pgho = dscom_result.pgho;
+            satrec.pho = dscom_result.pho;
+
+            satrec.pinco = dscom_result.pinco;
+            satrec.plo = dscom_result.plo;
+            rtemsq = dscom_result.rtemsq;
+            satrec.se2 = dscom_result.se2;
+            satrec.se3 = dscom_result.se3;
+
+            satrec.sgh2 = dscom_result.sgh2;
+            satrec.sgh3 = dscom_result.sgh3;
+            satrec.sgh4 = dscom_result.sgh4;
+            satrec.sh2 = dscom_result.sh2;
+            satrec.sh3 = dscom_result.sh3;
+
+            satrec.si2 = dscom_result.si2;
+            satrec.si3 = dscom_result.si3;
+            satrec.sl2 = dscom_result.sl2;
+            satrec.sl3 = dscom_result.sl3;
+            satrec.sl4 = dscom_result.sl4;
+
+            s1 = dscom_result.s1;
+            s2 = dscom_result.s2;
+            s3 = dscom_result.s3;
+            s4 = dscom_result.s4;
+            s5 = dscom_result.s5;
+
+            s6 = dscom_result.s6;
+            s7 = dscom_result.s7;
+            ss1 = dscom_result.ss1;
+            ss2 = dscom_result.ss2;
+            ss3 = dscom_result.ss3;
+
+            ss4 = dscom_result.ss4;
+            ss5 = dscom_result.ss5;
+            ss6 = dscom_result.ss6;
+            ss7 = dscom_result.ss7;
+            sz1 = dscom_result.sz1;
+
+            sz2 = dscom_result.sz2;
+            sz3 = dscom_result.sz3;
+            sz11 = dscom_result.sz11;
+            sz12 = dscom_result.sz12;
+            sz13 = dscom_result.sz13;
+
+            sz21 = dscom_result.sz21;
+            sz22 = dscom_result.sz22;
+            sz23 = dscom_result.sz23;
+            sz31 = dscom_result.sz31;
+            sz32 = dscom_result.sz32;
+
+            sz33 = dscom_result.sz33;
+            satrec.xgh2 = dscom_result.xgh2;
+            satrec.xgh3 = dscom_result.xgh3;
+            satrec.xgh4 = dscom_result.xgh4;
+            satrec.xh2 = dscom_result.xh2;
+
+            satrec.xh3 = dscom_result.xh3;
+            satrec.xi2 = dscom_result.xi2;
+            satrec.xi3 = dscom_result.xi3;
+            satrec.xl2 = dscom_result.xl2;
+            satrec.xl3 = dscom_result.xl3;
+
+            satrec.xl4 = dscom_result.xl4;
+            nm = dscom_result.nm;
+            z1 = dscom_result.z1;
+            z2 = dscom_result.z2;
+            z3 = dscom_result.z3;
+
+            z11 = dscom_result.z11;
+            z12 = dscom_result.z12;
+            z13 = dscom_result.z13;
+            z21 = dscom_result.z21;
+            z22 = dscom_result.z22;
+
+            z23 = dscom_result.z23;
+            z31 = dscom_result.z31;
+            z32 = dscom_result.z32;
+            z33 = dscom_result.z33;
+            satrec.zmol = dscom_result.zmol;
+            satrec.zmos = dscom_result.zmos;
+
+            var dpper_parameters = {
+                inclo : inclm,
+                init : satrec.init,
+                ep : satrec.ecco,
+                inclp : satrec.inclo,
+                nodep : satrec.nodeo,
+                argpp : satrec.argpo,
+                mp : satrec.mo,
+                opsmode : satrec.operationmode,
+            };
+
+            var dpper_result = dpper(satrec, dpper_parameters);
+
+            satrec.ecco = dpper_result.ep;
+            satrec.inclo = dpper_result.inclp;
+            satrec.nodeo = dpper_result.nodep;
+            satrec.argpo = dpper_result.argpp;
+            satrec.mo = dpper_result.mp;
 
             argpm  = 0.0;
             nodem  = 0.0;
             mm     = 0.0;
 
-            var dsinit_result = dsinit(
-                   cosim, emsq, satrec.argpo, s1, s2, s3, s4, s5, sinim, ss1, ss2, ss3, ss4,
-                   ss5, sz1, sz3, sz11, sz13, sz21, sz23, sz31, sz33, satrec.t, tc,
-                   satrec.gsto, satrec.mo, satrec.mdot, satrec.no, satrec.nodeo,
-                   satrec.nodedot, xpidot, z1, z3, z11, z13, z21, z23, z31, z33,
-                   satrec.ecco, eccsq, em, argpm, inclm, mm, nm, nodem,
-                   satrec.irez,  satrec.atime,
-                   satrec.d2201, satrec.d2211, satrec.d3210, satrec.d3222 ,
-                   satrec.d4410, satrec.d4422, satrec.d5220, satrec.d5232,
-                   satrec.d5421, satrec.d5433, satrec.dedt,  satrec.didt,
-                   satrec.dmdt,  satrec.dnodt, satrec.domdt,
-                   satrec.del1,  satrec.del2,  satrec.del3,  satrec.xfact,
-                   satrec.xlamo, satrec.xli,   satrec.xni );
+            var dsinit_parameters = {
+                cosim : cosim,
+                emsq : emsq,
+                argpo : satrec.argpo,
+                s1 : s1,
+                s2 : s2,
+                s3 : s3,
+                s4 : s4,
+                s5 : s5,
+                sinim : sinim,
+                ss1 : ss1,
+                ss2 : ss2,
+                ss3 : ss3,
+                ss4 : ss4,
+                ss5 : ss5,
+                sz1 : sz1,
+                sz3 : sz3,
+                sz11 : sz11,
+                sz13 : sz13,
+                sz21 : sz21,
+                sz23 : sz23,
+                sz31 : sz31,
+                sz33 : sz33,
+                t : satrec.t,
+                tc : tc,
+                gsto : satrec.gsto,
+                mo : satrec.mo,
+                mdot : satrec.mdot,
+                no : satrec.no,
+                nodeo : satrec.nodeo,
+                nodedot : satrec.nodedot,
+                xpidot : xpidot,
+                z1 : z1,
+                z3 : z3,
+                z11 : z11,
+                z13 : z13,
+                z21 : z21,
+                z23 : z23,
+                z31 : z31,
+                z33 : z33,
+                ecco : satrec.ecco,
+                eccsq : eccsq,
+                em : em,
+                argpm : argpm,
+                inclm : inclm,
+                mm : mm,
+                nm : nm,
+                nodem : nodem,
+                irez : satrec.irez,
+                atime : satrec.atime,
+                d2201 : satrec.d2201,
+                d2211 : satrec.d2211,
+                d3210 : satrec.d3210,
+                d3222 : satrec.d3222 ,
+                d4410 : satrec.d4410,
+                d4422 : satrec.d4422,
+                d5220 : satrec.d5220,
+                d5232 : satrec.d5232,
+                d5421 : satrec.d5421,
+                d5433 : satrec.d5433,
+                dedt : satrec.dedt,
+                didt : satrec.didt,
+                dmdt : satrec.dmdt,
+                dnodt : satrec.dnodt,
+                domdt : satrec.domdt,
+                del1 : satrec.del1,
+                del2 : satrec.del2,
+                del3 : satrec.del3,
+                xfact : satrec.xfact,
+                xlamo : satrec.xlamo,
+                xli : satrec.xli,
+                xni : satrec.xni,
+            };
 
-            em              = dsinit_result[0];
-            argpm           = dsinit_result[1];
-            inclm           = dsinit_result[2];
-            mm              = dsinit_result[3];
-            nm              = dsinit_result[4];
+            var dsinit_result = dsinit( dsinit_parameters );
 
-            nodem           = dsinit_result[5];
-            satrec.irez     = dsinit_result[6];
-            satrec.atime    = dsinit_result[7];
-            satrec.d2201    = dsinit_result[8];
-            satrec.d2211    = dsinit_result[9];
+            em              = dsinit_result.em;
+            argpm           = dsinit_result.argpm;
+            inclm           = dsinit_result.inclm;
+            mm              = dsinit_result.mm;
+            nm              = dsinit_result.nm;
 
-            satrec.d3210    = dsinit_result[10];
-            satrec.d3222    = dsinit_result[11];
-            satrec.d4410    = dsinit_result[12];
-            satrec.d4422    = dsinit_result[13];
-            satrec.d5220    = dsinit_result[14];
+            nodem           = dsinit_result.nodem;
+            satrec.irez     = dsinit_result.irez;
+            satrec.atime    = dsinit_result.atime;
+            satrec.d2201    = dsinit_result.d2201;
+            satrec.d2211    = dsinit_result.d2211;
 
-            satrec.d5232    = dsinit_result[15];
-            satrec.d5421    = dsinit_result[16];
-            satrec.d5433    = dsinit_result[17];
-            satrec.dedt     = dsinit_result[18];
-            satrec.didt     = dsinit_result[19];
+            satrec.d3210    = dsinit_result.d3210;
+            satrec.d3222    = dsinit_result.d3222;
+            satrec.d4410    = dsinit_result.d4410;
+            satrec.d4422    = dsinit_result.d4422;
+            satrec.d5220    = dsinit_result.d5220;
 
-            satrec.dmdt     = dsinit_result[20];
-            dndt            = dsinit_result[21];
-            satrec.dnodt    = dsinit_result[22];
-            satrec.domdt    = dsinit_result[23];
-            satrec.del1     = dsinit_result[24];
+            satrec.d5232    = dsinit_result.d5232;
+            satrec.d5421    = dsinit_result.d5421;
+            satrec.d5433    = dsinit_result.d5433;
+            satrec.dedt     = dsinit_result.dedt;
+            satrec.didt     = dsinit_result.didt;
 
-            satrec.del2     = dsinit_result[25];
-            satrec.del3     = dsinit_result[26];
-            satrec.xfact    = dsinit_result[27];
-            satrec.xlamo    = dsinit_result[28];
-            satrec.xli      = dsinit_result[29];
+            satrec.dmdt     = dsinit_result.dmdt;
+            dndt            = dsinit_result.dndt;
+            satrec.dnodt    = dsinit_result.dnodt;
+            satrec.domdt    = dsinit_result.domdt;
+            satrec.del1     = dsinit_result.del1;
 
-            satrec.xni      = dsinit_result[30];
+            satrec.del2     = dsinit_result.del2;
+            satrec.del3     = dsinit_result.del3;
+            satrec.xfact    = dsinit_result.xfact;
+            satrec.xlamo    = dsinit_result.xlamo;
+            satrec.xli      = dsinit_result.xli;
+
+            satrec.xni      = dsinit_result.xni;
          }
 
          //----------- set variables if not deep space -----------

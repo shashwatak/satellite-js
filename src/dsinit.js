@@ -1,21 +1,5 @@
-function dsinit(
-        cosim,  emsq,   argpo,
-        s1,     s2,     s3,     s4,     s5,     sinim,
-        ss1,    ss2,    ss3,    ss4,    ss5,
-        sz1,    sz3,    sz11,   sz13,   sz21,   sz23,   sz31,   sz33,
-        t,      tc,     gsto,
-        mo,     mdot,   no,     nodeo,  nodedot,
-        xpidot,
-        z1,     z3,     z11,    z13,    z21,    z23,    z31,    z33,
-        ecco,   eccsq,  em,
-        argpm,  inclm,  mm,     nm,     nodem,  irez,   atime,
-        d2201,  d2211,  d3210,  d3222,  d4410,  d4422,
-        d5220,  d5232,  d5421,  d5433,
-        dedt,   didt,   dmdt,   dnodt, domdt,
-        del1,   del2,   del3,
-        xfact,  xlamo,  xli,    xni
-     ){
-    /*-----------------------------------------------------------------------------
+function dsinit(dsinit_parameters) {
+   /*-----------------------------------------------------------------------------
     *
     *                           procedure dsinit
     *
@@ -95,6 +79,91 @@ function dsinit(
     *    vallado, crawford, hujsak, kelso  2006
       ----------------------------------------------------------------------------*/
     'use strict';
+    var cosim   = dsinit_parameters.cosim,
+        emsq    = dsinit_parameters.emsq,
+        argpo   = dsinit_parameters.argpo,
+
+        s1      = dsinit_parameters.s1,
+        s2      = dsinit_parameters.s2,
+        s3      = dsinit_parameters.s3,
+        s4      = dsinit_parameters.s4,
+        s5      = dsinit_parameters.s5,
+        sinim   = dsinit_parameters.sinim,
+
+        ss1     = dsinit_parameters.ss1,
+        ss2     = dsinit_parameters.ss2,
+        ss3     = dsinit_parameters.ss3,
+        ss4     = dsinit_parameters.ss4,
+        ss5     = dsinit_parameters.ss5,
+
+        sz1     = dsinit_parameters.sz1,
+        sz3     = dsinit_parameters.sz3,
+        sz11    = dsinit_parameters.sz11,
+        sz13    = dsinit_parameters.sz13,
+        sz21    = dsinit_parameters.sz21,
+        sz23    = dsinit_parameters.sz23,
+        sz31    = dsinit_parameters.sz31,
+        sz33    = dsinit_parameters.sz33,
+
+        t       = dsinit_parameters.t,
+        tc      = dsinit_parameters.tc,
+        gsto    = dsinit_parameters.gsto,
+
+        mo      = dsinit_parameters.mo,
+        mdot    = dsinit_parameters.mdot,
+        no      = dsinit_parameters.no,
+        nodeo   = dsinit_parameters.nodeo,
+        nodedot = dsinit_parameters.nodedot,
+
+        xpidot  = dsinit_parameters.xpidot,
+
+        z1      = dsinit_parameters.z1,
+        z3      = dsinit_parameters.z3,
+        z11     = dsinit_parameters.z11,
+        z13     = dsinit_parameters.z13,
+        z21     = dsinit_parameters.z21,
+        z23     = dsinit_parameters.z23,
+        z31     = dsinit_parameters.z31,
+        z33     = dsinit_parameters.z33,
+
+        ecco    = dsinit_parameters.ecco,
+        eccsq   = dsinit_parameters.eccsq,
+        em      = dsinit_parameters.em,
+
+        argpm   = dsinit_parameters.argpm,
+        inclm   = dsinit_parameters.inclm,
+        mm      = dsinit_parameters.mm,
+        nm      = dsinit_parameters.nm,
+        nodem   = dsinit_parameters.nodem,
+        irez    = dsinit_parameters.irez,
+        atime   = dsinit_parameters.atime,
+
+        d2201   = dsinit_parameters.d2201,
+        d2211   = dsinit_parameters.d2211,
+        d3210   = dsinit_parameters.d3210,
+        d3222   = dsinit_parameters.d3222,
+        d4410   = dsinit_parameters.d4410,
+        d4422   = dsinit_parameters.d4422,
+
+        d5220   = dsinit_parameters.d5220,
+        d5232   = dsinit_parameters.d5232,
+        d5421   = dsinit_parameters.d5421,
+        d5433   = dsinit_parameters.d5433,
+
+        dedt    = dsinit_parameters.dedt,
+        didt    = dsinit_parameters.didt,
+        dmdt    = dsinit_parameters.dmdt,
+        dnodt   = dsinit_parameters.dnodt,
+        domdt   = dsinit_parameters.domdt,
+
+        del1    = dsinit_parameters.del1,
+        del2    = dsinit_parameters.del2,
+        del3    = dsinit_parameters.del3,
+
+        xfact   = dsinit_parameters.xfact,
+        xlamo   = dsinit_parameters.xlamo,
+        xli     = dsinit_parameters.xli,
+        xni     = dsinit_parameters.xni;
 
     var f220, f221, f311, f321, f322, f330, f441, f442, f522, f523, f542, f543;
     var g200, g201, g211, g300, g310, g322, g410, g422, g520, g521, g532, g533;
@@ -285,11 +354,44 @@ function dsinit(
         atime = 0.0;
         nm    = no + dndt;
     }
-    return [ em,    argpm,  inclm,  mm, nm, nodem,
-            irez,   atime,
-            d2201,  d2211,  d3210,  d3222,  d4410,
-            d4422,  d5220,  d5232,  d5421,  d5433,
-            dedt,   didt,   dmdt,   dndt,   dnodt, domdt,
-            del1,   del2,   del3,
-            xfact,  xlamo,  xli,    xni  ];
+    var dsinit_results = {
+        em : em,
+        argpm : argpm,
+        inclm : inclm,
+        mm : mm,
+        nm : nm,
+        nodem : nodem,
+
+        irez : irez,
+        atime : atime,
+
+        d2201 : d2201,
+        d2211 : d2211,
+        d3210 : d3210,
+        d3222 : d3222,
+        d4410 : d4410,
+
+        d4422 : d4422,
+        d5220 : d5220,
+        d5232 : d5232,
+        d5421 : d5421,
+        d5433 : d5433,
+
+        dedt : dedt,
+        didt : didt,
+        dmdt : dmdt,
+        dndt : dndt,
+        dnodt : dnodt,
+        domdt : domdt,
+
+        del1 : del1,
+        del2 : del2,
+        del3 : del3,
+
+        xfact : xfact,
+        xlamo : xlamo,
+        xli : xli,
+        xni : xni
+    };
+    return dsinit_results;
 }
