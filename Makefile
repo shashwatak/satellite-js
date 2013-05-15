@@ -7,14 +7,17 @@ SAT_TAIL    = src/satellite-tail.js
 
 FINAL       = satellite.js
 
+TEST_LOCATION = sgp4_verification/lib/sgp4/${FINAL}
+
 all : ${FINAL}
 
 ${FINAL} : ${SAT_HEADER} ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} ${SAT_TAIL}
 	cat ${SAT_HEADER} ${SGP4SOURCES} ${COORDINATES} ${DOPPLER} ${SAT_TAIL} > ${FINAL}
 
 test : ${FINAL}
-	cp satellite.js sgp4_verification/lib/sgp4/satellite.js
+	cp ${FINAL} ${TEST_LOCATION}
+
 
 clean :
-	rm ${FINAL}
+	rm ${FINAL} ${TEST_LOCATION}
 

@@ -82,12 +82,12 @@ function twoline2rv(longstr1, longstr2){
 
 
    var mdhms_result = days2mdhms(year, satrec.epochdays);
-   var mon      = mdhms_result[0];
-   var day      = mdhms_result[1];
-   var hr       = mdhms_result[2];
-   var minute   = mdhms_result[3];
-   var sec      = mdhms_result[3];
-   satrec.jdsatepoch = jday(year,mon,day,hr,minute,sec);
+   var mon      = mdhms_result.mon;
+   var day      = mdhms_result.day;
+   var hr       = mdhms_result.hr;
+   var minute   = mdhms_result.minute;
+   var sec      = mdhms_result.sec;
+   satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
     //  ---------------- initialize the orbit at sgp4epoch -------------------
     var sgp4init_parameters = {

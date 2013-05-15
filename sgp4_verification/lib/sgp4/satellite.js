@@ -27,7 +27,7 @@ var j3     =  -0.00000253215306;
 var j4     =  -0.00000161098761;
 var j3oj2  =  j3 / j2;
 var x2o3   = 2.0 / 3.0;
-function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
+function dpper (satrec, dpper_parameters) {
     /* -----------------------------------------------------------------------------
     *
     *                           procedure dpper
@@ -97,6 +97,16 @@ function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
 
     'use strict';
 
+    var inclo   = dpper_parameters.inclo,
+        init    = dpper_parameters.init,
+        ep      = dpper_parameters.ep,
+        inclp   = dpper_parameters.inclp,
+        nodep   = dpper_parameters.nodep,
+        argpp   = dpper_parameters.argpp,
+        mp      = dpper_parameters.mp,
+        opsmode = dpper_parameters.opsmode;
+
+
     // Copy satellite attributes into local variables for convenience
     // and symmetry in writing formulae.
 
@@ -107,7 +117,6 @@ function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
         pe, pgh, ph, pinc, pl,
         sel, ses, sghl, sghs, shl, shs, sil, sinzf, sis,  sll, sls,
         xls,    xnoh,   zf, zm, shll;
-
 
     var e3      = satrec.e3;
     var ee2     = satrec.ee2;
@@ -248,19 +257,16 @@ function dpper (satrec, inclo, init, ep, inclp, nodep, argpp, mp, opsmode) {
             argpp = xls - mp - cosip * nodep;
         }
     }
-    return [ep, inclp, nodep, argpp, mp];
+    var dpper_result = {
+        ep : ep,
+        inclp : inclp,
+        nodep : nodep,
+        argpp : argpp,
+        mp : mp
+    };
+    return dpper_result;
 }
-function dscom (
-        epoch,  ep,     argpp,  tc,     inclp,
-        nodep,  np,
-        e3,     ee2,
-        peo,    pgho,   pho,
-        pinco,  plo,    se2,    se3,
-        sgh2,   sgh3,   sgh4,   sh2,    sh3,
-        si2,    si3,    sl2,    sl3,    sl4,
-        xgh2,   xgh3,   xgh4,   xh2,
-        xh3,    xi2,    xi3,    xl2,    xl3,
-        xl4,    zmol,   zmos ) {
+function dscom (dscom_parameters) {
     /*-----------------------------------------------------------------------------
     *
     *                           procedure dscom
@@ -330,6 +336,46 @@ function dscom (
       ----------------------------------------------------------------------------*/
 
     'use strict';
+
+var epoch   = dscom_parameters.epoch,
+    ep      = dscom_parameters.ep,
+    argpp   = dscom_parameters.argpp,
+    tc      = dscom_parameters.tc,
+    inclp   = dscom_parameters.inclp,
+    nodep   = dscom_parameters.nodep,
+    np      = dscom_parameters.np,
+    e3      = dscom_parameters.e3,
+    ee2     = dscom_parameters.ee2,
+    peo     = dscom_parameters.peo,
+    pgho    = dscom_parameters.pgho,
+    pho     = dscom_parameters.pho,
+    pinco   = dscom_parameters.pinco,
+    plo     = dscom_parameters.plo,
+    se2     = dscom_parameters.se2,
+    se3     = dscom_parameters.se3,
+    sgh2    = dscom_parameters.sgh2,
+    sgh3    = dscom_parameters.sgh3,
+    sgh4    = dscom_parameters.sgh4,
+    sh2     = dscom_parameters.sh2,
+    sh3     = dscom_parameters.sh3,
+    si2     = dscom_parameters.si2,
+    si3     = dscom_parameters.si3,
+    sl2     = dscom_parameters.sl2,
+    sl3     = dscom_parameters.sl3,
+    sl4     = dscom_parameters.sl4,
+    xgh2    = dscom_parameters.xgh2,
+    xgh3    = dscom_parameters.xgh3,
+    xgh4    = dscom_parameters.xgh4,
+    xh2     = dscom_parameters.xh2,
+    xh3     = dscom_parameters.xh3,
+    xi2     = dscom_parameters.xi2,
+    xi3     = dscom_parameters.xi3,
+    xl2     = dscom_parameters.xl2,
+    xl3     = dscom_parameters.xl3,
+    xl4     = dscom_parameters.xl4,
+    zmol    = dscom_parameters.zmol,
+    zmos    = dscom_parameters.zmos;
+
 
     var a1, a2, a3, a4, a5, a6, a7, a8, a9, a10,
         betasq, cc,  ctem, stem,
@@ -520,44 +566,109 @@ function dscom (
     xh2  =  -2.0 * s2 * z22;
     xh3  =  -2.0 * s2 * (z23 - z21);
 
-    return [
-        snodm, cnodm, sinim,  cosim, sinomm,
-        cosomm,day,   e3,     ee2,   em,
-        emsq,  gam,   peo,    pgho,  pho,
-        pinco, plo,   rtemsq, se2,   se3,
-        sgh2,  sgh3,  sgh4,   sh2,   sh3,
-        si2,   si3,   sl2,    sl3,   sl4,
-        s1,    s2,    s3,     s4,    s5,
-        s6,    s7,    ss1,    ss2,   ss3,
-        ss4,   ss5,   ss6,    ss7,   sz1,
-        sz2,   sz3,   sz11,   sz12,  sz13,
-        sz21,  sz22,  sz23,   sz31,  sz32,
-        sz33,  xgh2,  xgh3,   xgh4,  xh2,
-        xh3,   xi2,   xi3,    xl2,   xl3,
-        xl4,   nm,    z1,     z2,    z3,
-        z11,   z12,   z13,    z21,   z22,
-        z23,   z31,   z32,    z33,   zmol,
-        zmos
-    ];
+    var dscom_results =  {
+        snodm : snodm,
+        cnodm : cnodm,
+        sinim : sinim,
+        cosim : cosim,
+        sinomm : sinomm,
+
+        cosomm : cosomm,
+        day : day,
+        e3 : e3,
+        ee2 : ee2,
+        em : em,
+
+        emsq : emsq,
+        gam : gam,
+        peo : peo,
+        pgho : pgho,
+        pho : pho,
+
+        pinco : pinco,
+        plo : plo,
+        rtemsq : rtemsq,
+        se2 : se2,
+        se3 : se3,
+
+        sgh2 : sgh2,
+        sgh3 : sgh3,
+        sgh4 : sgh4,
+        sh2 : sh2,
+        sh3 : sh3,
+
+        si2 : si2,
+        si3 : si3,
+        sl2 : sl2,
+        sl3 : sl3,
+        sl4 : sl4,
+
+        s1 : s1,
+        s2 : s2,
+        s3 : s3,
+        s4 : s4,
+        s5 : s5,
+
+        s6 : s6,
+        s7 : s7,
+        ss1 : ss1,
+        ss2 : ss2,
+        ss3 : ss3,
+
+        ss4 : ss4,
+        ss5 : ss5,
+        ss6 : ss6,
+        ss7 : ss7,
+        sz1 : sz1,
+
+        sz2 : sz2,
+        sz3 : sz3,
+        sz11 : sz11,
+        sz12 : sz12,
+        sz13 : sz13,
+
+        sz21 : sz21,
+        sz22 : sz22,
+        sz23 : sz23,
+        sz31 : sz31,
+        sz32 : sz32,
+
+        sz33 : sz33,
+        xgh2 : xgh2,
+        xgh3 : xgh3,
+        xgh4 : xgh4,
+        xh2 : xh2,
+
+        xh3 : xh3,
+        xi2 : xi2,
+        xi3 : xi3,
+        xl2 : xl2,
+        xl3 : xl3,
+
+        xl4 : xl4,
+        nm : nm,
+        z1 : z1,
+        z2 : z2,
+        z3 : z3,
+
+        z11 : z11,
+        z12 : z12,
+        z13 : z13,
+        z21 : z21,
+        z22 : z22,
+
+        z23 : z23,
+        z31 : z31,
+        z32 : z32,
+        z33 : z33,
+        zmol : zmol,
+
+        zmos : zmos
+    };
+    return dscom_results;
 }
-function dsinit(
-        cosim,  emsq,   argpo,
-        s1,     s2,     s3,     s4,     s5,     sinim,
-        ss1,    ss2,    ss3,    ss4,    ss5,
-        sz1,    sz3,    sz11,   sz13,   sz21,   sz23,   sz31,   sz33,
-        t,      tc,     gsto,
-        mo,     mdot,   no,     nodeo,  nodedot,
-        xpidot,
-        z1,     z3,     z11,    z13,    z21,    z23,    z31,    z33,
-        ecco,   eccsq,  em,
-        argpm,  inclm,  mm,     nm,     nodem,  irez,   atime,
-        d2201,  d2211,  d3210,  d3222,  d4410,  d4422,
-        d5220,  d5232,  d5421,  d5433,
-        dedt,   didt,   dmdt,   dnodt, domdt,
-        del1,   del2,   del3,
-        xfact,  xlamo,  xli,    xni
-     ){
-    /*-----------------------------------------------------------------------------
+function dsinit(dsinit_parameters) {
+   /*-----------------------------------------------------------------------------
     *
     *                           procedure dsinit
     *
@@ -637,6 +748,91 @@ function dsinit(
     *    vallado, crawford, hujsak, kelso  2006
       ----------------------------------------------------------------------------*/
     'use strict';
+    var cosim   = dsinit_parameters.cosim,
+        emsq    = dsinit_parameters.emsq,
+        argpo   = dsinit_parameters.argpo,
+
+        s1      = dsinit_parameters.s1,
+        s2      = dsinit_parameters.s2,
+        s3      = dsinit_parameters.s3,
+        s4      = dsinit_parameters.s4,
+        s5      = dsinit_parameters.s5,
+        sinim   = dsinit_parameters.sinim,
+
+        ss1     = dsinit_parameters.ss1,
+        ss2     = dsinit_parameters.ss2,
+        ss3     = dsinit_parameters.ss3,
+        ss4     = dsinit_parameters.ss4,
+        ss5     = dsinit_parameters.ss5,
+
+        sz1     = dsinit_parameters.sz1,
+        sz3     = dsinit_parameters.sz3,
+        sz11    = dsinit_parameters.sz11,
+        sz13    = dsinit_parameters.sz13,
+        sz21    = dsinit_parameters.sz21,
+        sz23    = dsinit_parameters.sz23,
+        sz31    = dsinit_parameters.sz31,
+        sz33    = dsinit_parameters.sz33,
+
+        t       = dsinit_parameters.t,
+        tc      = dsinit_parameters.tc,
+        gsto    = dsinit_parameters.gsto,
+
+        mo      = dsinit_parameters.mo,
+        mdot    = dsinit_parameters.mdot,
+        no      = dsinit_parameters.no,
+        nodeo   = dsinit_parameters.nodeo,
+        nodedot = dsinit_parameters.nodedot,
+
+        xpidot  = dsinit_parameters.xpidot,
+
+        z1      = dsinit_parameters.z1,
+        z3      = dsinit_parameters.z3,
+        z11     = dsinit_parameters.z11,
+        z13     = dsinit_parameters.z13,
+        z21     = dsinit_parameters.z21,
+        z23     = dsinit_parameters.z23,
+        z31     = dsinit_parameters.z31,
+        z33     = dsinit_parameters.z33,
+
+        ecco    = dsinit_parameters.ecco,
+        eccsq   = dsinit_parameters.eccsq,
+        em      = dsinit_parameters.em,
+
+        argpm   = dsinit_parameters.argpm,
+        inclm   = dsinit_parameters.inclm,
+        mm      = dsinit_parameters.mm,
+        nm      = dsinit_parameters.nm,
+        nodem   = dsinit_parameters.nodem,
+        irez    = dsinit_parameters.irez,
+        atime   = dsinit_parameters.atime,
+
+        d2201   = dsinit_parameters.d2201,
+        d2211   = dsinit_parameters.d2211,
+        d3210   = dsinit_parameters.d3210,
+        d3222   = dsinit_parameters.d3222,
+        d4410   = dsinit_parameters.d4410,
+        d4422   = dsinit_parameters.d4422,
+
+        d5220   = dsinit_parameters.d5220,
+        d5232   = dsinit_parameters.d5232,
+        d5421   = dsinit_parameters.d5421,
+        d5433   = dsinit_parameters.d5433,
+
+        dedt    = dsinit_parameters.dedt,
+        didt    = dsinit_parameters.didt,
+        dmdt    = dsinit_parameters.dmdt,
+        dnodt   = dsinit_parameters.dnodt,
+        domdt   = dsinit_parameters.domdt,
+
+        del1    = dsinit_parameters.del1,
+        del2    = dsinit_parameters.del2,
+        del3    = dsinit_parameters.del3,
+
+        xfact   = dsinit_parameters.xfact,
+        xlamo   = dsinit_parameters.xlamo,
+        xli     = dsinit_parameters.xli,
+        xni     = dsinit_parameters.xni;
 
     var f220, f221, f311, f321, f322, f330, f441, f442, f522, f523, f542, f543;
     var g200, g201, g211, g300, g310, g322, g410, g422, g520, g521, g532, g533;
@@ -827,13 +1023,46 @@ function dsinit(
         atime = 0.0;
         nm    = no + dndt;
     }
-    return [ em,    argpm,  inclm,  mm, nm, nodem,
-            irez,   atime,
-            d2201,  d2211,  d3210,  d3222,  d4410,
-            d4422,  d5220,  d5232,  d5421,  d5433,
-            dedt,   didt,   dmdt,   dndt,   dnodt, domdt,
-            del1,   del2,   del3,
-            xfact,  xlamo,  xli,    xni  ];
+    var dsinit_results = {
+        em : em,
+        argpm : argpm,
+        inclm : inclm,
+        mm : mm,
+        nm : nm,
+        nodem : nodem,
+
+        irez : irez,
+        atime : atime,
+
+        d2201 : d2201,
+        d2211 : d2211,
+        d3210 : d3210,
+        d3222 : d3222,
+        d4410 : d4410,
+
+        d4422 : d4422,
+        d5220 : d5220,
+        d5232 : d5232,
+        d5421 : d5421,
+        d5433 : d5433,
+
+        dedt : dedt,
+        didt : didt,
+        dmdt : dmdt,
+        dndt : dndt,
+        dnodt : dnodt,
+        domdt : domdt,
+
+        del1 : del1,
+        del2 : del2,
+        del3 : del3,
+
+        xfact : xfact,
+        xlamo : xlamo,
+        xli : xli,
+        xni : xni
+    };
+    return dsinit_results;
 }
 function dspace (dspace_parameters){
     /*-----------------------------------------------------------------------------
@@ -1184,7 +1413,15 @@ function days2mdhms(year, days){
     var minute  = Math.floor(temp);
     var sec  = (temp - minute) * 60.0;
 
-    return [mon, day, hr, minute, sec];
+    var mdhms_result = {
+        mon : mon,
+        day : day,
+        hr : hr,
+        minute : minute,
+        sec : sec
+    };
+
+    return mdhms_result;
 }
 
 function jday(year, mon, day, hr, minute, sec){
@@ -1206,12 +1443,7 @@ satellite.gstime_from_date = function (year, mon, day, hr, minute, sec) {
     var julian_day = jday(year, mon, day, hr, minute, sec);
     return gstime (julian_day);
 }
-function initl(
-       satn,
-       ecco,   epoch,  inclo,   no,
-       method,
-       opsmode
-       ){
+function initl(initl_parameters){
     /*-----------------------------------------------------------------------------
     *
     *                           procedure initl
@@ -1264,6 +1496,14 @@ function initl(
       ----------------------------------------------------------------------------*/
 
     'use strict';
+    var satn    = initl_parameters.satn,
+        ecco    = initl_parameters.ecco,
+        epoch   = initl_parameters.epoch,
+        inclo   = initl_parameters.inclo,
+        no      = initl_parameters.no,
+        method  = initl_parameters.method,
+        opsmode = initl_parameters.opsmode;
+
     var ak, d1,  del,  adel, po, gsto;
 
     // sgp4fix use old way of finding gst
@@ -1317,20 +1557,30 @@ function initl(
        gsto = gstime(epoch + 2433281.5);
     }
 
-    return [
-       no,
-       method,
-       ainv,  ao,    con41,  con42, cosio,
-       cosio2,eccsq, omeosq, posq,
-       rp,    rteosq,sinio , gsto
-       ];
+    var initl_results = {
+        no : no,
+
+        method : method,
+
+        ainv : ainv,
+        ao : ao,
+        con41 : con41,
+        con42 : con42,
+        cosio : cosio,
+
+        cosio2 : cosio2,
+        eccsq : eccsq,
+        omeosq : omeosq,
+        posq : posq,
+
+        rp : rp,
+        rteosq : rteosq,
+        sinio : sinio ,
+        gsto : gsto
+    };
+    return initl_results;
 }
-function sgp4init(
-       opsmode,   satn,     epoch,
-       xbstar,  xecco, xargpo,
-       xinclo,  xmo,   xno,
-       xnodeo,  satrec
-       ){
+function sgp4init(satrec, sgp4init_parameters){
     /*-----------------------------------------------------------------------------
     *
     *                             procedure sgp4init
@@ -1412,8 +1662,23 @@ function sgp4init(
     *    vallado, crawford, hujsak, kelso  2006
       ----------------------------------------------------------------------------*/
 
-
     'use strict';
+
+    var opsmode = sgp4init_parameters.opsmode,
+        satn    = sgp4init_parameters.satn,
+        epoch   = sgp4init_parameters.epoch,
+
+        xbstar  = sgp4init_parameters.xbstar,
+        xecco   = sgp4init_parameters.xecco,
+        xargpo  = sgp4init_parameters.xargpo,
+
+        xinclo  = sgp4init_parameters.xinclo,
+        xmo     = sgp4init_parameters.xmo,
+        xno     = sgp4init_parameters.xno,
+
+        xnodeo  = sgp4init_parameters.xnodeo;
+
+
     var cnodm,  snodm,  cosim,  sinim,  cosomm, sinomm,
         cc1sq,  cc2,    cc3,    coef,   coef1,  cosio4,
         day,    dndt,
@@ -1498,24 +1763,37 @@ function sgp4init(
     satrec.t    = 0.0;
 
 
-    var initl_result= initl( satn, satrec.ecco,
-                                epoch, satrec.inclo, satrec.no,
-                                satrec.method,  satrec.operationmode );
-    satrec.no       = initl_result[0];
-    var method      = initl_result[1];
-    var ainv        = initl_result[2];
-    var ao          = initl_result[3];
-    satrec.con41    = initl_result[4];
-    var con42       = initl_result[5];
-    var cosio       = initl_result[6];
-    var cosio2      = initl_result[7];
-    var eccsq       = initl_result[8];
-    var omeosq      = initl_result[9];
-    var posq        = initl_result[10];
-    var rp          = initl_result[11];
-    var rteosq      = initl_result[12];
-    var sinio       = initl_result[13];
-    satrec.gsto     = initl_result[14];
+    var initl_parameters = {
+        satn : satn,
+        ecco : satrec.ecco,
+
+        epoch : epoch,
+        inclo : satrec.inclo,
+        no : satrec.no,
+
+        method : satrec.method,
+        opsmode : satrec.operationmode
+    };
+
+
+
+    var initl_result= initl(initl_parameters);
+
+    satrec.no       = initl_result.no
+    var method      = initl_result.method
+    var ainv        = initl_result.ainv
+    var ao          = initl_result.ao
+    satrec.con41    = initl_result.con41
+    var con42       = initl_result.con42
+    var cosio       = initl_result.cosio
+    var cosio2      = initl_result.cosio2
+    var eccsq       = initl_result.eccsq
+    var omeosq      = initl_result.omeosq
+    var posq        = initl_result.posq
+    var rp          = initl_result.rp
+    var rteosq      = initl_result.rteosq
+    var sinio       = initl_result.sinio
+    satrec.gsto     = initl_result.gsto
 
     satrec.error = 0;
 
@@ -1615,181 +1893,294 @@ function sgp4init(
             satrec.isimp  = 1;
             tc    =  0.0;
             inclm = satrec.inclo;
-            var dscom_result = dscom(
-                   epoch, satrec.ecco, satrec.argpo, tc, satrec.inclo, satrec.nodeo,
-                   satrec.no,
-                   satrec.e3, satrec.ee2,
-                   satrec.peo,  satrec.pgho,   satrec.pho, satrec.pinco,
-                   satrec.plo,        satrec.se2, satrec.se3,
-                   satrec.sgh2, satrec.sgh3,   satrec.sgh4,
-                   satrec.sh2,  satrec.sh3,    satrec.si2, satrec.si3,
-                   satrec.sl2,  satrec.sl3,    satrec.sl4,
-                   satrec.xgh2, satrec.xgh3,   satrec.xgh4, satrec.xh2,
-                   satrec.xh3,  satrec.xi2,    satrec.xi3,  satrec.xl2,
-                   satrec.xl3,  satrec.xl4,
-                   satrec.zmol, satrec.zmos );
-            snodm = dscom_result[0];
-            cnodm = dscom_result[1];
-            sinim = dscom_result[2];
-            cosim = dscom_result[3];
-            sinomm = dscom_result[4];
 
-            cosomm = dscom_result[5];
-            day = dscom_result[6];
-            satrec.e3 = dscom_result[7];
-            satrec.ee2 = dscom_result[8];
-            em = dscom_result[9];
+            var dscom_parameters = {
+                epoch : epoch,
+                ep : satrec.ecco,
+                argpp : satrec.argpo,
+                tc : tc,
+                inclp : satrec.inclo,
+                nodep : satrec.nodeo,
 
-            emsq = dscom_result[10];
-            gam = dscom_result[11];
-            satrec.peo = dscom_result[12];
-            satrec.pgho = dscom_result[13];
-            satrec.pho = dscom_result[14];
+                np : satrec.no,
 
-            satrec.pinco = dscom_result[15];
-            satrec.plo = dscom_result[16];
-            rtemsq = dscom_result[17];
-            satrec.se2 = dscom_result[18];
-            satrec.se3 = dscom_result[19];
+                e3 : satrec.e3,
+                ee2 : satrec.ee2,
 
-            satrec.sgh2 = dscom_result[20];
-            satrec.sgh3 = dscom_result[21];
-            satrec.sgh4 = dscom_result[22];
-            satrec.sh2 = dscom_result[23];
-            satrec.sh3 = dscom_result[24];
+                peo : satrec.peo,
+                pgho : satrec.pgho,
+                pho : satrec.pho,
+                pinco : satrec.pinco,
 
-            satrec.si2 = dscom_result[25];
-            satrec.si3 = dscom_result[26];
-            satrec.sl2 = dscom_result[27];
-            satrec.sl3 = dscom_result[28];
-            satrec.sl4 = dscom_result[29];
+                plo : satrec.plo,
+                se2 : satrec.se2,
+                se3 : satrec.se3,
 
-            s1 = dscom_result[30];
-            s2 = dscom_result[31];
-            s3 = dscom_result[32];
-            s4 = dscom_result[33];
-            s5 = dscom_result[34];
+                sgh2 : satrec.sgh2,
+                sgh3 : satrec.sgh3,
+                sgh4 : satrec.sgh4,
 
-            s6 = dscom_result[35];
-            s7 = dscom_result[36];
-            ss1 = dscom_result[37];
-            ss2 = dscom_result[38];
-            ss3 = dscom_result[39];
+                sh2 : satrec.sh2,
+                sh3 : satrec.sh3,
+                si2 : satrec.si2,
+                si3 : satrec.si3,
 
-            ss4 = dscom_result[40];
-            ss5 = dscom_result[41];
-            ss6 = dscom_result[42];
-            ss7 = dscom_result[43];
-            sz1 = dscom_result[44];
+                sl2 : satrec.sl2,
+                sl3 : satrec.sl3,
+                sl4 : satrec.sl4,
 
-            sz2 = dscom_result[45];
-            sz3 = dscom_result[46];
-            sz11 = dscom_result[47];
-            sz12 = dscom_result[48];
-            sz13 = dscom_result[49];
+                xgh2 : satrec.xgh2,
+                xgh3 : satrec.xgh3,
+                xgh4 : satrec.xgh4,
+                xh2 : satrec.xh2,
 
-            sz21 = dscom_result[50];
-            sz22 = dscom_result[51];
-            sz23 = dscom_result[52];
-            sz31 = dscom_result[53];
-            sz32 = dscom_result[54];
+                xh3 : satrec.xh3,
+                xi2 : satrec.xi2,
+                xi3 : satrec.xi3,
+                xl2 : satrec.xl2,
 
-            sz33 = dscom_result[55];
-            satrec.xgh2 = dscom_result[56];
-            satrec.xgh3 = dscom_result[57];
-            satrec.xgh4 = dscom_result[58];
-            satrec.xh2 = dscom_result[59];
+                xl3 : satrec.xl3,
+                xl4 : satrec.xl4,
 
-            satrec.xh3 = dscom_result[60];
-            satrec.xi2 = dscom_result[61];
-            satrec.xi3 = dscom_result[62];
-            satrec.xl2 = dscom_result[63];
-            satrec.xl3 = dscom_result[64];
+                zmol : satrec.zmol,
+                zmos : satrec.zmos
+            };
 
-            satrec.xl4 = dscom_result[65];
-            nm = dscom_result[66];
-            z1 = dscom_result[67];
-            z2 = dscom_result[68];
-            z3 = dscom_result[69];
+            var dscom_result = dscom(dscom_parameters);
 
-            z11 = dscom_result[70];
-            z12 = dscom_result[71];
-            z13 = dscom_result[72];
-            z21 = dscom_result[73];
-            z22 = dscom_result[74];
+            snodm = dscom_result.snodm;
+            cnodm = dscom_result.cnodm;
+            sinim = dscom_result.sinim;
+            cosim = dscom_result.cosim;
+            sinomm = dscom_result.sinomm;
 
-            z23 = dscom_result[75];
-            z31 = dscom_result[76];
-            z32 = dscom_result[77];
-            z33 = dscom_result[78];
-            satrec.zmol = dscom_result[79];
-            satrec.zmos = dscom_result[80];
+            cosomm = dscom_result.cosomm;
+            day = dscom_result.day;
+            satrec.e3 = dscom_result.e3;
+            satrec.ee2 = dscom_result.ee2;
+            em = dscom_result.em;
 
-            var dpper_result = dpper(
-                   satrec, inclm, satrec.init,
-                   satrec.ecco, satrec.inclo, satrec.nodeo, satrec.argpo, satrec.mo,
-                   satrec.operationmode );
-            satrec.ecco = dpper_result[0];
-            satrec.inclo = dpper_result[1];
-            satrec.nodeo = dpper_result[2];
-            satrec.argpo = dpper_result[3];
-            satrec.mo = dpper_result[4];
+            emsq = dscom_result.emsq;
+            gam = dscom_result.gam;
+            satrec.peo = dscom_result.peo;
+            satrec.pgho = dscom_result.pgho;
+            satrec.pho = dscom_result.pho;
+
+            satrec.pinco = dscom_result.pinco;
+            satrec.plo = dscom_result.plo;
+            rtemsq = dscom_result.rtemsq;
+            satrec.se2 = dscom_result.se2;
+            satrec.se3 = dscom_result.se3;
+
+            satrec.sgh2 = dscom_result.sgh2;
+            satrec.sgh3 = dscom_result.sgh3;
+            satrec.sgh4 = dscom_result.sgh4;
+            satrec.sh2 = dscom_result.sh2;
+            satrec.sh3 = dscom_result.sh3;
+
+            satrec.si2 = dscom_result.si2;
+            satrec.si3 = dscom_result.si3;
+            satrec.sl2 = dscom_result.sl2;
+            satrec.sl3 = dscom_result.sl3;
+            satrec.sl4 = dscom_result.sl4;
+
+            s1 = dscom_result.s1;
+            s2 = dscom_result.s2;
+            s3 = dscom_result.s3;
+            s4 = dscom_result.s4;
+            s5 = dscom_result.s5;
+
+            s6 = dscom_result.s6;
+            s7 = dscom_result.s7;
+            ss1 = dscom_result.ss1;
+            ss2 = dscom_result.ss2;
+            ss3 = dscom_result.ss3;
+
+            ss4 = dscom_result.ss4;
+            ss5 = dscom_result.ss5;
+            ss6 = dscom_result.ss6;
+            ss7 = dscom_result.ss7;
+            sz1 = dscom_result.sz1;
+
+            sz2 = dscom_result.sz2;
+            sz3 = dscom_result.sz3;
+            sz11 = dscom_result.sz11;
+            sz12 = dscom_result.sz12;
+            sz13 = dscom_result.sz13;
+
+            sz21 = dscom_result.sz21;
+            sz22 = dscom_result.sz22;
+            sz23 = dscom_result.sz23;
+            sz31 = dscom_result.sz31;
+            sz32 = dscom_result.sz32;
+
+            sz33 = dscom_result.sz33;
+            satrec.xgh2 = dscom_result.xgh2;
+            satrec.xgh3 = dscom_result.xgh3;
+            satrec.xgh4 = dscom_result.xgh4;
+            satrec.xh2 = dscom_result.xh2;
+
+            satrec.xh3 = dscom_result.xh3;
+            satrec.xi2 = dscom_result.xi2;
+            satrec.xi3 = dscom_result.xi3;
+            satrec.xl2 = dscom_result.xl2;
+            satrec.xl3 = dscom_result.xl3;
+
+            satrec.xl4 = dscom_result.xl4;
+            nm = dscom_result.nm;
+            z1 = dscom_result.z1;
+            z2 = dscom_result.z2;
+            z3 = dscom_result.z3;
+
+            z11 = dscom_result.z11;
+            z12 = dscom_result.z12;
+            z13 = dscom_result.z13;
+            z21 = dscom_result.z21;
+            z22 = dscom_result.z22;
+
+            z23 = dscom_result.z23;
+            z31 = dscom_result.z31;
+            z32 = dscom_result.z32;
+            z33 = dscom_result.z33;
+            satrec.zmol = dscom_result.zmol;
+            satrec.zmos = dscom_result.zmos;
+
+            var dpper_parameters = {
+                inclo : inclm,
+                init : satrec.init,
+                ep : satrec.ecco,
+                inclp : satrec.inclo,
+                nodep : satrec.nodeo,
+                argpp : satrec.argpo,
+                mp : satrec.mo,
+                opsmode : satrec.operationmode,
+            };
+
+            var dpper_result = dpper(satrec, dpper_parameters);
+
+            satrec.ecco = dpper_result.ep;
+            satrec.inclo = dpper_result.inclp;
+            satrec.nodeo = dpper_result.nodep;
+            satrec.argpo = dpper_result.argpp;
+            satrec.mo = dpper_result.mp;
 
             argpm  = 0.0;
             nodem  = 0.0;
             mm     = 0.0;
 
-            var dsinit_result = dsinit(
-                   cosim, emsq, satrec.argpo, s1, s2, s3, s4, s5, sinim, ss1, ss2, ss3, ss4,
-                   ss5, sz1, sz3, sz11, sz13, sz21, sz23, sz31, sz33, satrec.t, tc,
-                   satrec.gsto, satrec.mo, satrec.mdot, satrec.no, satrec.nodeo,
-                   satrec.nodedot, xpidot, z1, z3, z11, z13, z21, z23, z31, z33,
-                   satrec.ecco, eccsq, em, argpm, inclm, mm, nm, nodem,
-                   satrec.irez,  satrec.atime,
-                   satrec.d2201, satrec.d2211, satrec.d3210, satrec.d3222 ,
-                   satrec.d4410, satrec.d4422, satrec.d5220, satrec.d5232,
-                   satrec.d5421, satrec.d5433, satrec.dedt,  satrec.didt,
-                   satrec.dmdt,  satrec.dnodt, satrec.domdt,
-                   satrec.del1,  satrec.del2,  satrec.del3,  satrec.xfact,
-                   satrec.xlamo, satrec.xli,   satrec.xni );
+            var dsinit_parameters = {
+                cosim : cosim,
+                emsq : emsq,
+                argpo : satrec.argpo,
+                s1 : s1,
+                s2 : s2,
+                s3 : s3,
+                s4 : s4,
+                s5 : s5,
+                sinim : sinim,
+                ss1 : ss1,
+                ss2 : ss2,
+                ss3 : ss3,
+                ss4 : ss4,
+                ss5 : ss5,
+                sz1 : sz1,
+                sz3 : sz3,
+                sz11 : sz11,
+                sz13 : sz13,
+                sz21 : sz21,
+                sz23 : sz23,
+                sz31 : sz31,
+                sz33 : sz33,
+                t : satrec.t,
+                tc : tc,
+                gsto : satrec.gsto,
+                mo : satrec.mo,
+                mdot : satrec.mdot,
+                no : satrec.no,
+                nodeo : satrec.nodeo,
+                nodedot : satrec.nodedot,
+                xpidot : xpidot,
+                z1 : z1,
+                z3 : z3,
+                z11 : z11,
+                z13 : z13,
+                z21 : z21,
+                z23 : z23,
+                z31 : z31,
+                z33 : z33,
+                ecco : satrec.ecco,
+                eccsq : eccsq,
+                em : em,
+                argpm : argpm,
+                inclm : inclm,
+                mm : mm,
+                nm : nm,
+                nodem : nodem,
+                irez : satrec.irez,
+                atime : satrec.atime,
+                d2201 : satrec.d2201,
+                d2211 : satrec.d2211,
+                d3210 : satrec.d3210,
+                d3222 : satrec.d3222 ,
+                d4410 : satrec.d4410,
+                d4422 : satrec.d4422,
+                d5220 : satrec.d5220,
+                d5232 : satrec.d5232,
+                d5421 : satrec.d5421,
+                d5433 : satrec.d5433,
+                dedt : satrec.dedt,
+                didt : satrec.didt,
+                dmdt : satrec.dmdt,
+                dnodt : satrec.dnodt,
+                domdt : satrec.domdt,
+                del1 : satrec.del1,
+                del2 : satrec.del2,
+                del3 : satrec.del3,
+                xfact : satrec.xfact,
+                xlamo : satrec.xlamo,
+                xli : satrec.xli,
+                xni : satrec.xni,
+            };
 
-            em              = dsinit_result[0];
-            argpm           = dsinit_result[1];
-            inclm           = dsinit_result[2];
-            mm              = dsinit_result[3];
-            nm              = dsinit_result[4];
+            var dsinit_result = dsinit( dsinit_parameters );
 
-            nodem           = dsinit_result[5];
-            satrec.irez     = dsinit_result[6];
-            satrec.atime    = dsinit_result[7];
-            satrec.d2201    = dsinit_result[8];
-            satrec.d2211    = dsinit_result[9];
+            em              = dsinit_result.em;
+            argpm           = dsinit_result.argpm;
+            inclm           = dsinit_result.inclm;
+            mm              = dsinit_result.mm;
+            nm              = dsinit_result.nm;
 
-            satrec.d3210    = dsinit_result[10];
-            satrec.d3222    = dsinit_result[11];
-            satrec.d4410    = dsinit_result[12];
-            satrec.d4422    = dsinit_result[13];
-            satrec.d5220    = dsinit_result[14];
+            nodem           = dsinit_result.nodem;
+            satrec.irez     = dsinit_result.irez;
+            satrec.atime    = dsinit_result.atime;
+            satrec.d2201    = dsinit_result.d2201;
+            satrec.d2211    = dsinit_result.d2211;
 
-            satrec.d5232    = dsinit_result[15];
-            satrec.d5421    = dsinit_result[16];
-            satrec.d5433    = dsinit_result[17];
-            satrec.dedt     = dsinit_result[18];
-            satrec.didt     = dsinit_result[19];
+            satrec.d3210    = dsinit_result.d3210;
+            satrec.d3222    = dsinit_result.d3222;
+            satrec.d4410    = dsinit_result.d4410;
+            satrec.d4422    = dsinit_result.d4422;
+            satrec.d5220    = dsinit_result.d5220;
 
-            satrec.dmdt     = dsinit_result[20];
-            dndt            = dsinit_result[21];
-            satrec.dnodt    = dsinit_result[22];
-            satrec.domdt    = dsinit_result[23];
-            satrec.del1     = dsinit_result[24];
+            satrec.d5232    = dsinit_result.d5232;
+            satrec.d5421    = dsinit_result.d5421;
+            satrec.d5433    = dsinit_result.d5433;
+            satrec.dedt     = dsinit_result.dedt;
+            satrec.didt     = dsinit_result.didt;
 
-            satrec.del2     = dsinit_result[25];
-            satrec.del3     = dsinit_result[26];
-            satrec.xfact    = dsinit_result[27];
-            satrec.xlamo    = dsinit_result[28];
-            satrec.xli      = dsinit_result[29];
+            satrec.dmdt     = dsinit_result.dmdt;
+            dndt            = dsinit_result.dndt;
+            satrec.dnodt    = dsinit_result.dnodt;
+            satrec.domdt    = dsinit_result.domdt;
+            satrec.del1     = dsinit_result.del1;
 
-            satrec.xni      = dsinit_result[30];
+            satrec.del2     = dsinit_result.del2;
+            satrec.del3     = dsinit_result.del3;
+            satrec.xfact    = dsinit_result.xfact;
+            satrec.xlamo    = dsinit_result.xlamo;
+            satrec.xli      = dsinit_result.xli;
+
+            satrec.xni      = dsinit_result.xni;
          }
 
          //----------- set variables if not deep space -----------
@@ -1904,17 +2295,32 @@ function twoline2rv(longstr1, longstr2){
 
 
    var mdhms_result = days2mdhms(year, satrec.epochdays);
-   var mon      = mdhms_result[0];
-   var day      = mdhms_result[1];
-   var hr       = mdhms_result[2];
-   var minute   = mdhms_result[3];
-   var sec      = mdhms_result[3];
-   satrec.jdsatepoch = jday(year,mon,day,hr,minute,sec);
+   var mon      = mdhms_result.mon;
+   var day      = mdhms_result.day;
+   var hr       = mdhms_result.hr;
+   var minute   = mdhms_result.minute;
+   var sec      = mdhms_result.sec;
+   satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
-   //  ---------------- initialize the orbit at sgp4epoch -------------------
-    sgp4init( opsmode, satrec.satnum, satrec.jdsatepoch-2433281.5, satrec.bstar,
-             satrec.ecco, satrec.argpo, satrec.inclo, satrec.mo, satrec.no,
-             satrec.nodeo, satrec);
+    //  ---------------- initialize the orbit at sgp4epoch -------------------
+    var sgp4init_parameters = {
+        opsmode : opsmode,
+        satn : satrec.satnum,
+        epoch : satrec.jdsatepoch-2433281.5,
+        xbstar : satrec.bstar,
+
+        xecco : satrec.ecco,
+        xargpo : satrec.argpo,
+        xinclo : satrec.inclo,
+        xmo : satrec.mo,
+        xno : satrec.no,
+
+        xnodeo : satrec.nodeo,
+    };
+
+
+
+    sgp4init(satrec, sgp4init_parameters );
 
     return satrec;
 }
@@ -2013,7 +2419,7 @@ function sgp4(satrec, tsince){
     *  coupling      :
     *    getgravconst-
     *    dpper
-    *    dpspace
+    *    dspace
     *
     *  references    :
     *    hoots, roehrich, norad spacetrack report //3 1980
@@ -2191,15 +2597,23 @@ function sgp4(satrec, tsince){
     cosip  = cosim;
     if (satrec.method === 'd'){
 
-        var dpper_result = dpper(
-               satrec, satrec.inclo,
-               'n', ep, xincp, nodep, argpp, mp, satrec.operationmode
-             );
-        ep      = dpper_result[0];
-        xincp   = dpper_result[1];
-        nodep   = dpper_result[2];
-        argpp   = dpper_result[3];
-        mp      = dpper_result[4];
+        var dpper_parameters = {
+            inclo : satrec.inclo,
+            init : 'n',
+            ep : ep,
+            inclp : xincp,
+            nodep : nodep,
+            argpp : argpp,
+            mp : mp,
+            opsmode : satrec.operationmod
+        };
+
+        var dpper_result = dpper(satrec, dpper_parameters);
+        ep      = dpper_result.ep;
+        xincp   = dpper_result.inclp;
+        nodep   = dpper_result.nodep;
+        argpp   = dpper_result.argpp;
+        mp      = dpper_result.mp;
 
         if (xincp < 0.0){
              xincp  = -xincp;

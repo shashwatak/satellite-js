@@ -100,7 +100,15 @@ function days2mdhms(year, days){
     var minute  = Math.floor(temp);
     var sec  = (temp - minute) * 60.0;
 
-    return [mon, day, hr, minute, sec];
+    var mdhms_result = {
+        mon : mon,
+        day : day,
+        hr : hr,
+        minute : minute,
+        sec : sec
+    };
+
+    return mdhms_result;
 }
 
 function jday(year, mon, day, hr, minute, sec){
