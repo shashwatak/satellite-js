@@ -181,24 +181,37 @@ function sgp4init(satrec, sgp4init_parameters){
     satrec.t    = 0.0;
 
 
-    var initl_result= initl( satn, satrec.ecco,
-                                epoch, satrec.inclo, satrec.no,
-                                satrec.method,  satrec.operationmode );
-    satrec.no       = initl_result[0];
-    var method      = initl_result[1];
-    var ainv        = initl_result[2];
-    var ao          = initl_result[3];
-    satrec.con41    = initl_result[4];
-    var con42       = initl_result[5];
-    var cosio       = initl_result[6];
-    var cosio2      = initl_result[7];
-    var eccsq       = initl_result[8];
-    var omeosq      = initl_result[9];
-    var posq        = initl_result[10];
-    var rp          = initl_result[11];
-    var rteosq      = initl_result[12];
-    var sinio       = initl_result[13];
-    satrec.gsto     = initl_result[14];
+    var initl_parameters = {
+        satn : satn,
+        ecco : satrec.ecco,
+
+        epoch : epoch,
+        inclo : satrec.inclo,
+        no : satrec.no,
+
+        method : satrec.method,
+        opsmode : satrec.operationmode
+    };
+
+
+
+    var initl_result= initl(initl_parameters);
+
+    satrec.no       = initl_result.no
+    var method      = initl_result.method
+    var ainv        = initl_result.ainv
+    var ao          = initl_result.ao
+    satrec.con41    = initl_result.con41
+    var con42       = initl_result.con42
+    var cosio       = initl_result.cosio
+    var cosio2      = initl_result.cosio2
+    var eccsq       = initl_result.eccsq
+    var omeosq      = initl_result.omeosq
+    var posq        = initl_result.posq
+    var rp          = initl_result.rp
+    var rteosq      = initl_result.rteosq
+    var sinio       = initl_result.sinio
+    satrec.gsto     = initl_result.gsto
 
     satrec.error = 0;
 

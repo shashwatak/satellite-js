@@ -1,9 +1,4 @@
-function initl(
-       satn,
-       ecco,   epoch,  inclo,   no,
-       method,
-       opsmode
-       ){
+function initl(initl_parameters){
     /*-----------------------------------------------------------------------------
     *
     *                           procedure initl
@@ -56,6 +51,14 @@ function initl(
       ----------------------------------------------------------------------------*/
 
     'use strict';
+    var satn    = initl_parameters.satn,
+        ecco    = initl_parameters.ecco,
+        epoch   = initl_parameters.epoch,
+        inclo   = initl_parameters.inclo,
+        no      = initl_parameters.no,
+        method  = initl_parameters.method,
+        opsmode = initl_parameters.opsmode;
+
     var ak, d1,  del,  adel, po, gsto;
 
     // sgp4fix use old way of finding gst
@@ -109,11 +112,26 @@ function initl(
        gsto = gstime(epoch + 2433281.5);
     }
 
-    return [
-       no,
-       method,
-       ainv,  ao,    con41,  con42, cosio,
-       cosio2,eccsq, omeosq, posq,
-       rp,    rteosq,sinio , gsto
-       ];
+    var initl_results = {
+        no : no,
+
+        method : method,
+
+        ainv : ainv,
+        ao : ao,
+        con41 : con41,
+        con42 : con42,
+        cosio : cosio,
+
+        cosio2 : cosio2,
+        eccsq : eccsq,
+        omeosq : omeosq,
+        posq : posq,
+
+        rp : rp,
+        rteosq : rteosq,
+        sinio : sinio ,
+        gsto : gsto
+    };
+    return initl_results;
 }
