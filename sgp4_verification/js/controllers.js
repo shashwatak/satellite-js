@@ -187,7 +187,7 @@ function TestCtrl($scope) {
                 var test_look_angles = satellite.ecf_to_look_angles (my_location_gd, test_position_ecf);
 
                 var known_position_ecf = satellite.eci_to_ecf (known_pos, gmst);
-                var known_look_angles = satellite.satellite.ecf_to_look_angles (my_location_gd, known_position_ecf);
+                var known_look_angles = satellite.ecf_to_look_angles (my_location_gd, known_position_ecf);
 
                 var look_angles_error = [Math.abs((known_look_angles[0] - test_look_angles[0]) / known_look_angles[0]),
                                          Math.abs((known_look_angles[1] - test_look_angles[1]) / known_look_angles[1]),
