@@ -103,16 +103,15 @@ satellite.ecf_to_topocentric(observer_coords_geodetic, satellite_coords_ecf)
 ```javascript
 satellite.topocentric_to_look_angles (topocentric)
 ```
-returns [Azimuth, Elevation, Range]. Az, El are in radians, Range is in km.
+Returns an array of [Azimuth, Elevation, Range]. Az, El are in radians, Range is in km.
 
 ####Latitude and Longitude
-These two functions will return human readable Latitude or Longitude
-(Ex: "125.35W" or "45.565N") from geodetic_coords.
+These two functions will return human readable Latitude or Longitude strings (Ex: "125.35W" or "45.565N") from geodetic_coords.
 ```javascript
-satellite.degrees_lat (geodetic_radians)
+var latitude_string = satellite.degrees_lat (geodetic_radians)
 ```
 ```javascript
-satellite.degrees_long (geodetic_radians)
+var longitude_string = satellite.degrees_long (geodetic_radians)
 ```
 
 Note about Code Conventions
