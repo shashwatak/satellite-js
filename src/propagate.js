@@ -23,7 +23,7 @@ function twoline2rv(longstr1, longstr2){
     satrec.error = 0;
 
     var cardnumb        = parseInt(longstr1.substring(0, 1), 10);
-    satrec.satnum       = parseInt(longstr1.substring(2, 7), 10);
+    satrec.satnum       = longstr1.substring(2, 7);
     var classification  = longstr1.substring(7, 8);
     var intldesg        = longstr1.substring(9, 11);
     satrec.epochyr      = parseInt(longstr1.substring(18, 20), 10);
@@ -34,7 +34,7 @@ function twoline2rv(longstr1, longstr2){
     var numb            = parseInt(longstr1.substring(62, 63), 10);
     elnum               = parseInt(longstr1.substring(64, 68), 10);
 
-    satrec.satnum   = parseInt(longstr2.substring(2, 7), 10);
+    //satrec.satnum   = longstr2.substring(2, 7);
     satrec.inclo    = parseFloat(longstr2.substring(8, 16));
     satrec.nodeo    = parseFloat(longstr2.substring(17, 25));
     satrec.ecco     = parseFloat("." + longstr2.substring(26, 33));
