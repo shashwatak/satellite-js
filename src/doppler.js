@@ -16,9 +16,11 @@ function doppler (my_location, position, velocity, frequency) {
 
     function sign (value) {if (value >= 0) {return 1;} else {return -1;}};
     range_rate *= sign(range_rate);
-    var c = 299792458; // Speed of light in km/s
-    var f = ((c / (c + range_rate)) * frequency);
+    var c = 299792.458; // Speed of light in km/s
+    var f = ((1 + range_rate/c) * frequency);
 
     return f;
 
 }
+
+satellite.doppler = doppler;
