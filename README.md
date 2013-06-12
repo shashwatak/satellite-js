@@ -1,14 +1,12 @@
 satellite.js v1.0
 ==============
 
-MAJOR TODOS:
-* Incorporate AC6P's method for determining range rate, to replace current doppler function.
-* Considering changing the name to satlib.js?
-
 Introduction
 --------------
 A library to make satellite propagation via TLEs possible in the web.
 Provides the functions necessary for SGP4/SDP4 calculations, as callable javascript. Also provides functions for coordinate transforms.
+
+The internals of this library are nearly identical to [Brandon Rhode's sgp4 python library](https://pypi.python.org/pypi/sgp4/). However, it is encapsulated in a standard JS library (self executing function), and exposes only the functionality needed to track satellites and propagate paths. The only changes I made to Brandon Rhode's code was to change the positional parameters of functions to key:value objects. This reduces the complexity of functions that require 50+ parameters, and doesn't require the parameters to be placed in the exact order.
 
 Start Here:
 * [TS Kelso's Columns for Satellite Times](http://celestrak.com/columns/), Orbital Propagation Parts I and II a must!
@@ -53,6 +51,62 @@ EX:
 var position_velocity = satellite.sgp4 (test_sat, test_time);
 ```
 
+Exposed Objects
+-----------------
+The `satrec` object comes from the original code by Rhodes as well as Vallado. It is immensely messy and complex, but the most important values it contains are the Keplerian Elements and the other values pulled from the TLEs.
+
+`satnum`
+
+Unique satellite number given in the TLE file.
+
+`epochyr`
+
+Full four-digit year of this element set's epoch moment.
+
+`epochdays`
+
+Fractional days into the year of the epoch moment.
+
+`jdsatepoch`
+
+Julian date of the epoch (computed from `epochyr` and `epochdays`).
+
+`ndot`
+
+First time derivative of the mean motion (ignored by SGP4).
+
+`nddot`
+
+Second time derivative of the mean motion (ignored by SGP4).
+
+`bstar`
+
+Ballistic drag coefficient B* in inverse earth radii.
+
+`inclo`
+
+Inclination in radians.
+
+`nodeo`
+
+Right ascension of ascending node in radians.
+
+`ecco`
+
+Eccentricity.
+
+`argpo`
+
+Argument of perigee in radians.
+
+`mo`
+
+Mean anomaly in radians.
+
+`no`
+
+Mean motion in radians per minute.
+
 Exposed Functions
 -----------------
 ###Initialization
@@ -75,10 +129,20 @@ position is in km, velocity is in km/s, both the ECI coordinate frame.
 var position_velocity = satellite.propagate(satrec, year, month, day, hour, minute, second)
 ```
 Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
+
 ```javascript
 var position_velocity = satellite.sgp4(satrec, time_since_epoch_seconds)
 ```
 Returns position and velocity, given a satrec and the time in seconds since epoch. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
+
+###Doppler
+You can get the satellites current Doppler factor, relative to your position, using:
+
+```javascript
+var doppler_factor = satellite.doppler_factor (observer_coords_ecf, position_ecf, velocity_ecf);
+```
+
+See the section on Coordinate Transforms to see how to get ECF/ECI/Geodetic coordinates.
 
 ###Coordinate Transforms
 ####Greenwich Mean Sidereal Time

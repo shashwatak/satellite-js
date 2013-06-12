@@ -1,5 +1,3 @@
-
-
 function doppler_factor (my_location, position, velocity) {
     var current_range = Math.sqrt(
                         Math.pow(position[0] - my_location[0], 2) +
@@ -18,9 +16,7 @@ function doppler_factor (my_location, position, velocity) {
     range_rate *= sign(range_rate);
     var c = 299792.458; // Speed of light in km/s
     var factor = (1 + range_rate/c);
-
     return factor;
-
 }
 
 satellite.doppler_factor = doppler_factor;
