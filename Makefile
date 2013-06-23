@@ -1,3 +1,10 @@
+#/*
+# * satellite-js v1.1
+# * (c) 2013 Shashwat Kandadai and UCSC
+# * https://github.com/shashwatak/satellite-js
+# * License: MIT
+# */
+
 SAT_HEADER  = src/satellite-head.js
 SGP4SOURCES = src/constants.js src/dpper.js src/dscom.js src/dsinit.js src/dspace.js src/gstime.js src/initl.js src/sgp4init.js src/propagate.js src/sgp4.js
 COORDINATES = src/coordinate-transforms.js

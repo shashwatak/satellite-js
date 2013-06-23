@@ -1,3 +1,11 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+
 satellite = (function () {
 
     var satellite = { version : "1.0" };
@@ -13,6 +21,13 @@ satellite = (function () {
     Consult the Makefile to see which files are going to be sandwiched.
 
 })() The footer is in satellite-tail.js */
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 var pi = Math.PI;
 var twopi = pi * 2;
 var deg2rad = pi / 180.0;
@@ -27,6 +42,13 @@ var j3     =  -0.00000253215306;
 var j4     =  -0.00000161098761;
 var j3oj2  =  j3 / j2;
 var x2o3   = 2.0 / 3.0;
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function dpper (satrec, dpper_parameters) {
     /* -----------------------------------------------------------------------------
     *
@@ -266,6 +288,13 @@ function dpper (satrec, dpper_parameters) {
     };
     return dpper_result;
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function dscom (dscom_parameters) {
     /*-----------------------------------------------------------------------------
     *
@@ -667,6 +696,13 @@ var epoch   = dscom_parameters.epoch,
     };
     return dscom_results;
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function dsinit(dsinit_parameters) {
    /*-----------------------------------------------------------------------------
     *
@@ -1064,6 +1100,13 @@ function dsinit(dsinit_parameters) {
     };
     return dsinit_results;
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function dspace (dspace_parameters){
     /*-----------------------------------------------------------------------------
     *
@@ -1311,6 +1354,13 @@ function dspace (dspace_parameters){
     }
     return dspace_results;
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function gstime (jdut1){
     /* -----------------------------------------------------------------------------
     *
@@ -1443,6 +1493,13 @@ satellite.gstime_from_date = function (year, mon, day, hr, minute, sec) {
     var julian_day = jday(year, mon, day, hr, minute, sec);
     return gstime (julian_day);
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function initl(initl_parameters){
     /*-----------------------------------------------------------------------------
     *
@@ -1580,6 +1637,13 @@ function initl(initl_parameters){
     };
     return initl_results;
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function sgp4init(satrec, sgp4init_parameters){
     /*-----------------------------------------------------------------------------
     *
@@ -2211,6 +2275,13 @@ function sgp4init(satrec, sgp4init_parameters){
     // sgp4fix return boolean. satrec.error contains any error codes
     return true;
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function twoline2rv(longstr1, longstr2){
     /*Return a Satellite imported from two lines of TLE data.
 
@@ -2340,6 +2411,13 @@ satellite.twoline2satrec = function (longstr1, longstr2) {
 satellite.propagate = function (satrec, year, month, day, hour, minute, second) {
     return propagate (satrec, year, month, day, hour, minute, second);
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function sgp4(satrec, tsince){
     /*-----------------------------------------------------------------------------
     *
@@ -2749,6 +2827,13 @@ function sgp4(satrec, tsince){
 satellite.sgp4 = function (satrec, tsince) {
     return sgp4 (satrec, tsince);
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function eci_to_geodetic (eci_coords, gmst) {
     'use strict';
     // http://www.celestrak.com/columns/v02n03/
@@ -2912,9 +2997,14 @@ satellite.ecf_to_eci = function (ecf_coords, gmst) {
 satellite.eci_to_ecf = function (eci_coords, gmst) {
     return eci_to_ecf (eci_coords, gmst);
 }
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
 
-
-function doppler (my_location, position, velocity, frequency) {
+function doppler_factor (my_location, position, velocity) {
     var current_range = Math.sqrt(
                         Math.pow(position[0] - my_location[0], 2) +
                         Math.pow(position[1] - my_location[1], 2) +
@@ -2922,22 +3012,27 @@ function doppler (my_location, position, velocity, frequency) {
     var next_pos   = [position[0] + velocity[0],
                       position[1] + velocity[1],
                       position[2] + velocity[2]];
-    var next_range = Math.sqrt(
+    var next_range =  Math.sqrt(
                       Math.pow(next_pos[0] - my_location[0], 2) +
                       Math.pow(next_pos[1] - my_location[1], 2) +
                       Math.pow(next_pos[2] - my_location[2], 2));
-    var range_rate = next_range - current_range;
+    var range_rate =  next_range - current_range;
 
     function sign (value) {if (value >= 0) {return 1;} else {return -1;}};
     range_rate *= sign(range_rate);
     var c = 299792.458; // Speed of light in km/s
-    var f = ((1 + range_rate/c) * frequency);
-
-    return f;
-
+    var factor = (1 + range_rate/c);
+    return factor;
 }
 
-satellite.doppler = doppler;
+satellite.doppler_factor = doppler_factor;
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 /*
 var satellite = (function () {
 

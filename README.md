@@ -1,4 +1,4 @@
-satellite.js v1.0
+satellite.js v1.1
 ==============
 
 Introduction
@@ -214,7 +214,7 @@ Major thanks go to Brandon Rhodes, TS Kelso, and David Vallado's team. Also, I'd
 
 License
 ----------------
-The entire contents of this package (all files) are protected by the MIT License.
+All files marked with the License header at the top are Licensed. Any files unmarked by me or others are unlicensed, and are kept only as a resource for [Shashwat Kandadai and other developers] for testing.
 
 I chose the MIT License because this library is a derivative work off [Brandon Rhodes sgp4](https://pypi.python.org/pypi/sgp4/), and that is licensed with MIT. It just seemed simpler this way, sub-licensing freedoms notwithstanding.
 

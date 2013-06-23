@@ -1,3 +1,10 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function twoline2rv(longstr1, longstr2){
     /*Return a Satellite imported from two lines of TLE data.
 

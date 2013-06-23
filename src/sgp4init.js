@@ -1,3 +1,10 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function sgp4init(satrec, sgp4init_parameters){
     /*-----------------------------------------------------------------------------
     *

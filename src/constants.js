@@ -1,3 +1,10 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 var pi = Math.PI;
 var twopi = pi * 2;
 var deg2rad = pi / 180.0;

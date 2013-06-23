@@ -1,3 +1,10 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function dscom (dscom_parameters) {
     /*-----------------------------------------------------------------------------
     *

@@ -1,4 +1,11 @@
 /*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+/*
 var satellite = (function () {
 
     satellite-head.js and satellite-tail.js sandwich the remaining

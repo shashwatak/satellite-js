@@ -1,3 +1,10 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function doppler_factor (my_location, position, velocity) {
     var current_range = Math.sqrt(
                         Math.pow(position[0] - my_location[0], 2) +

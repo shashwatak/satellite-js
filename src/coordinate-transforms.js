@@ -1,3 +1,10 @@
+/*
+ * satellite-js v1.1
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 function eci_to_geodetic (eci_coords, gmst) {
     'use strict';
     // http://www.celestrak.com/columns/v02n03/
