@@ -131,9 +131,9 @@ var position_velocity = satellite.propagate(satrec, year, month, day, hour, minu
 Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
 
 ```javascript
-var position_velocity = satellite.sgp4(satrec, time_since_epoch_seconds)
+var position_velocity = satellite.sgp4(satrec, time_since_epoch_minutes)
 ```
-Returns position and velocity, given a satrec and the time in seconds since epoch. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
+Returns position and velocity, given a satrec and the time in minutes since epoch. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
 
 ###Doppler
 You can get the satellites current Doppler factor, relative to your position, using:
