@@ -91,9 +91,9 @@ var position_velocity = satellite.sgp4 (test_sat, test_time);
 
 Exposed Objects
 -----------------
+###satrec
 The `satrec` object comes from the original code by Rhodes as well as Vallado. It is immense and complex, but the most important values it contains are the Keplerian Elements and the other values pulled from the TLEs. I do not suggest that anybody try to simplify it unless they have absolute understanding of Orbital Mechanics.
 
-`satrec` properties:
 
 `satnum`     Unique satellite number given in the TLE file.
 
