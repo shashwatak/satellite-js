@@ -1,39 +1,5 @@
 satellite.js v1.1
-==============
-
-Sample Usage
-----------------
-
-```javascript
-//  Sample TLE
-var tle_line_1              = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031'
-var tle_line_2              = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869'
-
-//  Set the Observer at 122.03 West by 36.96 North, in RADIANS
-var deg2rad = Math.PI / 180;
-var observer_coords_gd      = [(-122.0308)*deg2rad, (36.9613422)*deg2rad, .370];
-//  Get observer position in the ECF frame.
-var observer_coords_ecf     = satellite.geodetic_to_ecf (observer_coords_gd);
-
-//  Now to propagate a satellite's position and velocity.
-var satrec                  = satellite.twoline2satrec (tle_line_1, tle_line_2);
-var position_and_velocity   = satellite.sgp4 (satrec, time);
-// OR YOU CAN USE
-var position_and_velocity   = satellite.propagate (satrec, year, month, date_of_month, hour, minute, second);
-var position_eci            = position_and_velocity[0];
-var velocity_eci            = position_and_velocity[1];
-
-var gmst                    = satellite.gstime_from_date (year, month, date_of_month, hour, minute, second);
-var position_ecf            = satellite.eci_to_ecf (position_eci, gmst);
-var doppler_factor          = satellite.doppler_factor (observer_coords_ecf, position_ecf, velocity_ecf);
-var look_angles             = satellite.ecf_to_look_angles (observer_coords_gd, position_ecf);
-
-//  Convert the RADIANS to degrees longitude and degrees latitude
-var latitude                = satellite.degrees_long (position_gd[0]);
-var longitude               = satellite.degrees_lat (position_gd[1]);
-```
-
-
+==================
 Introduction
 --------------
 A library to make satellite propagation via TLEs possible in the web.
@@ -41,7 +7,7 @@ Provides the functions necessary for SGP4/SDP4 calculations, as callable javascr
 
 The internals of this library are nearly identical to [Brandon Rhode's sgp4 python library](https://pypi.python.org/pypi/sgp4/). However, it is encapsulated in a standard JS library (self executing function), and exposes only the functionality needed to track satellites and propagate paths. The only changes I made to Brandon Rhode's code was to change the positional parameters of functions to key:value objects. This reduces the complexity of functions that require 50+ parameters, and doesn't require the parameters to be placed in the exact order.
 
-Start Here:
+**Start Here:**
 * [TS Kelso's Columns for Satellite Times](http://celestrak.com/columns/), Orbital Propagation Parts I and II a must!
 * [Wikipedia: Simplified Perturbations Model](http://en.wikipedia.org/wiki/Simplified_perturbations_models)
 * [SpaceTrack Report #3, by Hoots and Roehrich](http://celestrak.com/NORAD/documentation/spacetrk.pdf).
@@ -63,6 +29,45 @@ And the coursework for UC Boulder's ASEN students
 I would recommend anybody interested in satellite tracking or orbital propagation to read [all of TS Kelso's columns](http://celestrak.com/columns/). Without his work, this project would not be possible.
 
 Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs for use with this library.
+
+Sample Usage
+----------------
+
+```javascript
+//  Sample TLE
+var tle_line_1              = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031'
+var tle_line_2              = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869'
+
+//  Set the Observer at 122.03 West by 36.96 North, in RADIANS
+var deg2rad = Math.PI / 180;
+var observer_coords_gd      = [(-122.0308)*deg2rad, (36.9613422)*deg2rad, .370];
+//  Get observer position in the ECF frame.
+var observer_coords_ecf     = satellite.geodetic_to_ecf (observer_coords_gd);
+
+//  Now to propagate a satellite's position and velocity.
+var satrec                  = satellite.twoline2satrec (tle_line_1, tle_line_2);
+var position_and_velocity   = satellite.sgp4 (satrec, time_since_tle_epoch_minutes);
+// OR YOU CAN USE
+var position_and_velocity   = satellite.propagate (satrec, year, month, date_of_month, hour, minute, second);
+var position_eci            = position_and_velocity[0];
+var velocity_eci            = position_and_velocity[1];
+
+var gmst                    = satellite.gstime_from_date (year, month, date_of_month, hour, minute, second);
+var position_ecf            = satellite.eci_to_ecf (position_eci, gmst);
+var doppler_factor          = satellite.doppler_factor (observer_coords_ecf, position_ecf, velocity_ecf);
+var look_angles             = satellite.ecf_to_look_angles (observer_coords_gd, position_ecf);
+
+//  Convert the RADIANS to degrees longitude and degrees latitude
+var position_gd             = satellite.eci_to_geodetic (position_eci, gmst);
+var longitude               = satellite.degrees_long (position_gd[0]);
+var latitude                = satellite.degrees_lat (position_gd[1]);
+```
+
+TODO
+------
+Replace the fixed-position numeric index arrays with key:value pairs.
+ex: position_gd[0] is longitude. replace this with position_gd["longitude"]
+Honestly, I should have been doing it that way.
 
 Makefile
 --------
@@ -88,57 +93,22 @@ Exposed Objects
 -----------------
 The `satrec` object comes from the original code by Rhodes as well as Vallado. It is immense and complex, but the most important values it contains are the Keplerian Elements and the other values pulled from the TLEs. I do not suggest that anybody try to simplify it unless they have absolute understanding of Orbital Mechanics.
 
-`satnum`
+`satrec` properties:
 
-Unique satellite number given in the TLE file.
+`satnum`        |  Unique satellite number given in the TLE file.
+`epochyr`       |  Full four-digit year of this element set's epoch moment.
+`epochdays`     |  Fractional days into the year of the epoch moment.
+`jdsatepoch`    |  Julian date of the epoch (computed from `epochyr` and `epochdays`).
+`ndot`          |  First time derivative of the mean motion (ignored by SGP4).
+`nddot`         |  Second time derivative of the mean motion (ignored by SGP4).
+`bstar`         |  Ballistic drag coefficient B* in inverse earth radii.
+`inclo`         |  Inclination in radians.
+`nodeo`         |  Right ascension of ascending node in radians.
+`ecco`          |  Eccentricity.
+`argpo`         |  Argument of perigee in radians.
+`mo`            |  Mean anomaly in radians.
+`no`            |  Mean motion in radians per minute.
 
-`epochyr`
-
-Full four-digit year of this element set's epoch moment.
-
-`epochdays`
-
-Fractional days into the year of the epoch moment.
-
-`jdsatepoch`
-
-Julian date of the epoch (computed from `epochyr` and `epochdays`).
-
-`ndot`
-
-First time derivative of the mean motion (ignored by SGP4).
-
-`nddot`
-
-Second time derivative of the mean motion (ignored by SGP4).
-
-`bstar`
-
-Ballistic drag coefficient B* in inverse earth radii.
-
-`inclo`
-
-Inclination in radians.
-
-`nodeo`
-
-Right ascension of ascending node in radians.
-
-`ecco`
-
-Eccentricity.
-
-`argpo`
-
-Argument of perigee in radians.
-
-`mo`
-
-Mean anomaly in radians.
-
-`no`
-
-Mean motion in radians per minute.
 
 Exposed Functions
 -----------------
