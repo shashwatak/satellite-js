@@ -95,20 +95,20 @@ The `satrec` object comes from the original code by Rhodes as well as Vallado. I
 
 `satrec` properties:
 
-----:| ----
-`satnum` | Unique satellite number given in the TLE file.
-`epochyr` | Full four-digit year of this element set's epoch moment.
-`epochdays` | Fractional days into the year of the epoch moment.
-`jdsatepoch` | Julian date of the epoch (computed from `epochyr` and `epochdays`).
-`ndot` | First time derivative of the mean motion (ignored by SGP4).
-`nddot` | Second time derivative of the mean motion (ignored by SGP4).
-`bstar` | Ballistic drag coefficient B* in inverse earth radii.
-`inclo` | Inclination in radians.
-`nodeo` | Right ascension of ascending node in radians.
-`ecco` | Eccentricity.
-`argpo` | Argument of perigee in radians.
-`mo` | Mean anomaly in radians.
-`no` | Mean motion in radians per minute.
+            ----:| ----
+    `satnum`     |  Unique satellite number given in the TLE file.
+    `epochyr`    |  Full four-digit year of this element set's epoch moment.
+    `epochdays`  |  Fractional days into the year of the epoch moment.
+    `jdsatepoch` |  Julian date of the epoch (computed from `epochyr` and `epochdays`).
+    `ndot`       |  First time derivative of the mean motion (ignored by SGP4).
+    `nddot`      |  Second time derivative of the mean motion (ignored by SGP4).
+    `bstar`      |  Ballistic drag coefficient B* in inverse earth radii.
+    `inclo`      |  Inclination in radians.
+    `nodeo`      |  Right ascension of ascending node in radians.
+    `ecco`       |  Eccentricity.
+    `argpo`      |  Argument of perigee in radians.
+    `mo`         |  Mean anomaly in radians.
+    `no`         |  Mean motion in radians per minute.
 
 
 Exposed Functions
