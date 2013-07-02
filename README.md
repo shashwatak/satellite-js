@@ -95,6 +95,7 @@ The `satrec` object comes from the original code by Rhodes as well as Vallado. I
 
 `satrec` properties:
 
+           ----:| ----
 `satnum`        |  Unique satellite number given in the TLE file.
 `epochyr`       |  Full four-digit year of this element set's epoch moment.
 `epochdays`     |  Fractional days into the year of the epoch moment.
