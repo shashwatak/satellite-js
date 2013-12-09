@@ -1,5 +1,23 @@
-satellite.js v1.1
+satellite.js v1.2
 ==================
+Updates
+--------------
+Replaced all positional arrays with key-value objects. Vastly improves code readability for users of this library. For example:
+
+```javascript
+// Before
+var x = position[0];
+var y = position[1];
+var z = position[2];
+
+// Now
+var x = position["x"];
+var y = position["y"];
+var z = position["z"];
+```
+See sample for more details.
+
+
 Introduction
 --------------
 A library to make satellite propagation via TLEs possible in the web.
