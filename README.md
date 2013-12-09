@@ -160,12 +160,12 @@ longstr1 and longstr2 are the two lines of the TLE, properly formatted by NASA a
 
 
 ###Propogation
-Both propagation functions return position_velocity as a dictionary:
+Both propagate() and sgp4() functions return position_velocity as a dictionary of the form:
 
 ```
 {
- position : { x : 1, y : 1, z : 1 },
- velocity : { x : 1, y : 1, z : 1 }
+ "position" : { "x" : 1, "y" : 1, "z" : 1 },
+ "velocity" : { "x" : 1, "y" : 1, "z" : 1 }
 }
 ```
 position is in km, velocity is in km/s, both the ECI coordinate frame.
@@ -173,7 +173,7 @@ position is in km, velocity is in km/s, both the ECI coordinate frame.
 ```javascript
 var position_velocity = satellite.propagate(satrec, year, month, day, hour, minute, second)
 ```
-Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
+Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to Julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
 
 ```javascript
 var position_velocity = satellite.sgp4(satrec, time_since_epoch_minutes)
@@ -181,11 +181,11 @@ var position_velocity = satellite.sgp4(satrec, time_since_epoch_minutes)
 Returns position and velocity, given a satrec and the time in minutes since epoch. Sometimes it's better to ask for position and velocity given the time elapsed since epoch.
 
 ###Doppler
-You can get the satellites current Doppler factor, relative to your position, using:
-
+You can get the satellites current Doppler factor, relative to your position, using the doppler_factor() function. Use either ECI or ECF coordinates, but don't mix them.
 ```javascript
-var doppler_factor = satellite.doppler_factor (observer_ecf, position_ecf, velocity_ecf);
+var doppler_factor = satellite.doppler_factor (observer, position, velocity);
 ```
+
 
 See the section on Coordinate Transforms to see how to get ECF/ECI/Geodetic coordinates.
 

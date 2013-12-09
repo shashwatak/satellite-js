@@ -10,10 +10,10 @@ function doppler_factor (my_location, position, velocity) {
                         Math.pow(position["x"] - my_location["x"], 2) +
                         Math.pow(position["y"] - my_location["y"], 2) +
                         Math.pow(position["z"] - my_location["z"], 2));
-    var next_pos   = { 
+    var next_pos   = {
                         x : position["x"] + velocity["x"],
                         y : position["y"] + velocity["y"],
-                        z : position["z"] + velocity["z"] 
+                        z : position["z"] + velocity["z"]
                     };
     var next_range =  Math.sqrt(
                       Math.pow(next_pos["x"] - my_location["x"], 2) +
