@@ -43,7 +43,7 @@ var satrec = satellite.twoline2satrec (tle_line_1, tle_line_2);
 
 //  Propagate satellite using time since epoch (in minutes).
 var position_and_velocity = satellite.sgp4 (satrec, time_since_tle_epoch_minutes);
-//  Or you can use a calendar date and time.
+//  Or you can use a calendar date and time (obtained from Javascript [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)).
 var position_and_velocity = satellite.propagate (satrec, year, month, date_of_month, hour, minute, second);
 
 // The position_velocity result is a key-value pair of ECI coordinates.
@@ -71,9 +71,9 @@ var doppler_factor = satellite.doppler_factor (observer_coords_ecf, position_ecf
 
 // The coordinates are all stored in key-value pairs.
 // ECI and ECF are accessed by "x", "y", "z".
-var x_pos = position_eci["x"];
-var y_pos = position_eci["y"];
-var z_pos = position_eci["z"];
+var satellite_x = position_eci["x"];
+var satellite_y = position_eci["y"];
+var satellite_z = position_eci["z"];
 
 // Look Angles may be accessed by "azimuth", "elevation", "range_sat".
 var azimuth   = look_angles["azimuth"];
@@ -85,9 +85,9 @@ var longitude = position_gd["longitude"];
 var latitude  = position_gd["latitude"];
 var height    = position_gd["height"];
 
-//  Convert the RADIANS to DEGREES for pretty printing.
-var longitude = satellite.degrees_long (longitude);
-var latitude  = satellite.degrees_lat  (latitude);
+//  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W". etc).
+var longitude_str = satellite.degrees_long (longitude);
+var latitude_str  = satellite.degrees_lat  (latitude);
 
 ```
 
@@ -152,7 +152,7 @@ Exposed Functions
 -----------------
 ###Initialization
 ```javascript
-var sat_rec = satellite.twoline2satrec(longstr1, longstr2)
+var satrec = satellite.twoline2satrec(longstr1, longstr2)
 ```
 returns satrec object, created from the TLEs passed in. The satrec object is vastly complicated, but you don't have to do anything with it, except pass it around.
 NOTE! You are responsible for providing TLEs. [Get your free Space Track account here.](https://www.space-track.org/auth/login)
@@ -160,10 +160,14 @@ longstr1 and longstr2 are the two lines of the TLE, properly formatted by NASA a
 
 
 ###Propogation
-Both propagation function return position_velocity in a 2D array of the form:
+Both propagation functions return position_velocity as a dictionary:
 
-```[[position_x, position_y, position_z], [velocity_x, velocity_y, velocity_z]]```
-
+```
+{
+ position : { x : 1, y : 1, z : 1 },
+ velocity : { x : 1, y : 1, z : 1 }
+}
+```
 position is in km, velocity is in km/s, both the ECI coordinate frame.
 
 ```javascript
@@ -180,7 +184,7 @@ Returns position and velocity, given a satrec and the time in minutes since epoc
 You can get the satellites current Doppler factor, relative to your position, using:
 
 ```javascript
-var doppler_factor = satellite.doppler_factor (observer_coords_ecf, position_ecf, velocity_ecf);
+var doppler_factor = satellite.doppler_factor (observer_ecf, position_ecf, velocity_ecf);
 ```
 
 See the section on Coordinate Transforms to see how to get ECF/ECI/Geodetic coordinates.
@@ -192,7 +196,7 @@ You'll need to provide some of the coordinate transform functions with your curr
 var gmst = satellite.gstime_from_jday(julian_day)
 ```
 ```javascript
-var gmst = satellite.gstime_from_date(year, mon, day, hr, minute, sec)
+var gmst = satellite.gstime_from_date(year, mon, date_of_month, hr, minute, sec)
 ```
 ####Transforms
 Most of these are self explanatory from their names. Coords are arrays of three floats EX: [1.1, 1.2, 1.3] in kilometers. Once again, read the following first:
@@ -220,9 +224,8 @@ var ecf_coords = satellite.geodetic_to_ecf(geodetic_coords)
 
 These function is used to compute the look angle, from your geodetic position to a satellite in ECF coordinates. Make sure you convert the ECI output from sgp4() and propagate() to ECF first.
 ```javascript
-var look_angles = satellite.ecf_to_look_angles = function (observer_coords_geodetic, satellite_coords_ecf)
+var look_angles = satellite.ecf_to_look_angles = function (observer_geodetic, satellite_ecf)
 ```
-Returns an array of [Azimuth, Elevation, Range]. Az, El are in radians, Range is in km.
 
 ####Latitude and Longitude
 These two functions will return human readable Latitude or Longitude strings (Ex: "125.35W" or "45.565N") from geodetic_coords.
