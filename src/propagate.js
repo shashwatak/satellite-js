@@ -81,10 +81,10 @@ function twoline2rv(longstr1, longstr2){
     // --------- correct fix will occur when year is 4-digit in tle ---------
 
    if (satrec.epochyr < 57){
-       year= satrec.epochyr + 2000;
+       year = satrec.epochyr + 2000;
    }
    else{
-       year= satrec.epochyr + 1900;
+       year = satrec.epochyr + 1900;
    }
 
 
@@ -112,8 +112,6 @@ function twoline2rv(longstr1, longstr2){
         xnodeo : satrec.nodeo,
     };
 
-
-
     sgp4init(satrec, sgp4init_parameters );
 
     return satrec;
@@ -134,3 +132,4 @@ satellite.twoline2satrec = function (longstr1, longstr2) {
 satellite.propagate = function (satrec, year, month, day, hour, minute, second) {
     return propagate (satrec, year, month, day, hour, minute, second);
 }
+

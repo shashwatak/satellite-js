@@ -393,22 +393,22 @@ function sgp4(satrec, tsince){
         vz    =  sini * cossu;
 
         //  --------- position and velocity (in km and km/sec) ----------
-        r = [0.0, 0.0, 0.0];
-        r[0] = (mrt * ux)* radiusearthkm;
-        r[1] = (mrt * uy)* radiusearthkm;
-        r[2] = (mrt * uz)* radiusearthkm;
-        v = [0.0, 0.0, 0.0];
-        v[0] = (mvt * ux + rvdot * vx) * vkmpersec;
-        v[1] = (mvt * uy + rvdot * vy) * vkmpersec;
-        v[2] = (mvt * uz + rvdot * vz) * vkmpersec;
+        r = { x : 0.0, y : 0.0, z : 0.0 };
+        r["x"] = (mrt * ux)* radiusearthkm;
+        r["y"] = (mrt * uy)* radiusearthkm;
+        r["z"] = (mrt * uz)* radiusearthkm;
+        v = { x : 0.0, y : 0.0, z : 0.0 };
+        v["x"] = (mvt * ux + rvdot * vx) * vkmpersec;
+        v["y"] = (mvt * uy + rvdot * vy) * vkmpersec;
+        v["z"] = (mvt * uz + rvdot * vz) * vkmpersec;
     }
     //  sgp4fix for decaying satellites
     if (mrt < 1.0) {
         // printf("// decay condition %11.6f \n",mrt);
         satrec.error = 6;
-        return [false, false];
+        return { position : false, velocity : false };
     }
-    return [r, v];
+    return { position : r, velocity : v };
 }
 
 satellite.sgp4 = function (satrec, tsince) {

@@ -99,7 +99,6 @@ function TestCtrl($scope) {
         $scope.tests.push(savage_time);
       };
 
-      console.log($scope.tests);
       var data  = $scope.tests;
       var w     = 700;
       var h     = 300;
@@ -124,7 +123,7 @@ function TestCtrl($scope) {
       var accepts = [{ extensions: ['json'] }];
       chrome.fileSystem.chooseEntry({type: 'openFile', accepts: accepts}, function(testJsonFile) {
         if (!testJsonFile) {
-          console.log ('No file selected.');
+          console.error ('No file selected.');
           return;
         }
         readAsText(testJsonFile, function (result) {
@@ -137,9 +136,7 @@ function TestCtrl($scope) {
       var config = {type: 'saveFile'};
       chrome.fileSystem.chooseEntry(config, function(writableEntry) {
         var blob = new Blob([angular.toJson($scope.tests)], {type: 'text/plain'});
-        writeFileEntry(writableEntry, blob, function(e) {
-          console.log("Write complete :)");
-        });
+        writeFileEntry(writableEntry, blob);
       });
     };
 
@@ -148,7 +145,11 @@ function TestCtrl($scope) {
         var deg2rad = Math.PI / 180.0;
         var rad2deg = 180 / Math.PI;
         for (var tests_itor = 0; tests_itor < $scope.tests.length; tests_itor++) {
-            var my_location_gd = [(-122.0308)*deg2rad, (36.9613422)*deg2rad, .5];
+            var my_location_gd = {
+                longitude : (-122.0308)*deg2rad,
+                latitude : (36.9613422)*deg2rad,
+                height : .5
+            };
             var test = $scope.tests[tests_itor];
             var tle_line_1 = test["tle_line_1"];
             var tle_line_2 = test["tle_line_2"];
@@ -165,35 +166,43 @@ function TestCtrl($scope) {
                 var r_v             = satellite.sgp4(test_sat, time);
                 var prpgtion_fin    = performance.now();
                 var prpgtion_time   = prpgtion_fin - prpgtion_start;
-                var test_pos        = r_v[0];
-                var test_vel        = r_v[1];
-                var pos_error = [Math.abs((known_pos[0] - test_pos[0]) / known_pos[0]),
-                                 Math.abs((known_pos[1] - test_pos[1]) / known_pos[1]),
-                                 Math.abs((known_pos[2] - test_pos[2]) / known_pos[2])];
-                var vel_error = [Math.abs((known_vel[0] - test_vel[0]) / known_vel[0]),
-                                 Math.abs((known_vel[1] - test_vel[1]) / known_vel[1]),
-                                 Math.abs((known_vel[2] - test_vel[2]) / known_vel[2])];
+                var test_pos        = r_v["position"];
+                var test_vel        = r_v["velocity"];
+                var pos_error = {
+                    x : Math.abs((known_pos["x"] - test_pos["x"]) / known_pos["x"]),
+                    y : Math.abs((known_pos["y"] - test_pos["y"]) / known_pos["y"]),
+                    z : Math.abs((known_pos["z"] - test_pos["z"]) / known_pos["z"])
+                };
+                var vel_error = {
+                    x : Math.abs((known_vel["x"] - test_vel["x"]) / known_vel["x"]),
+                    y : Math.abs((known_vel["y"] - test_vel["y"]) / known_vel["y"]),
+                    z : Math.abs((known_vel["z"] - test_vel["z"]) / known_vel["z"])
+                };
 
-                result["test_pos"]   = [test_pos[0], test_pos[1], test_pos[2]];
-                result["test_vel"]   = [test_vel[0], test_vel[1], test_vel[2]];
-                result["pos_error"]  = [pos_error[0], pos_error[1], pos_error[2]];
-                result["vel_error"]  = [vel_error[0], vel_error[1], vel_error[2]];
-                result["prpgtion_time"]  = prpgtion_time;
+                result["test_pos"]      = test_pos;
+                result["test_vel"]      = test_vel;
+                result["pos_error"]     = pos_error;
+                result["vel_error"]     = vel_error;
+                result["prpgtion_time"] = prpgtion_time;
 
                 var julian_day = test_sat.jdsatepoch + (time*60);
-                var gmst = satellite.gstime_from_jday (julian_day);
 
-                var test_position_ecf = satellite.eci_to_ecf (test_pos, gmst);
-                var test_look_angles = satellite.ecf_to_look_angles (my_location_gd, test_position_ecf);
+                var gmst = satellite.gstime_from_jday (julian_day);
 
                 var known_position_ecf = satellite.eci_to_ecf (known_pos, gmst);
                 var known_look_angles = satellite.ecf_to_look_angles (my_location_gd, known_position_ecf);
 
-                var look_angles_error = [Math.abs((known_look_angles[0] - test_look_angles[0]) / known_look_angles[0]),
-                                         Math.abs((known_look_angles[1] - test_look_angles[1]) / known_look_angles[1]),
-                                         Math.abs((known_look_angles[2] - test_look_angles[2]) / known_look_angles[2])];
-                result["look_angles_error"]  = [look_angles_error[0], look_angles_error[1], look_angles_error[2]];
+                var test_position_ecf = satellite.eci_to_ecf (test_pos, gmst);
+                var test_look_angles = satellite.ecf_to_look_angles (my_location_gd, test_position_ecf);
 
+                result["known_look"]  = known_look_angles;
+                result["test_look"]  = test_look_angles;
+                var look_angles_error = {
+                    azimuth : Math.abs((known_look_angles["azimuth"] - test_look_angles["azimuth"]) / known_look_angles["azimuth"]),
+                    elevation : Math.abs((known_look_angles["elevation"] - test_look_angles["elevation"]) / known_look_angles["elevation"]),
+                    range_sat : Math.abs((known_look_angles["range_sat"] - test_look_angles["range_sat"]) / known_look_angles["range_sat"])
+                };
+                result["look_error"]  = look_angles_error;
             };
         };
 
@@ -215,11 +224,9 @@ function TestCtrl($scope) {
             var total_prpgtion_time = 0;
             while (time < full_day) {
                 var prpgtion_start  = performance.now();
-                var r_v             = satellite.sgp4(test_sat, time);
+                satellite.sgp4(test_sat, time);
                 var prpgtion_fin    = performance.now();
                 var prpgtion_time   = prpgtion_fin - prpgtion_start;
-                var test_pos        = r_v[0];
-                var test_vel        = r_v[1];
                 var result          = {};
                 result["time"]      = time;
                 result["prpgtion_time"] = prpgtion_time;
@@ -228,11 +235,13 @@ function TestCtrl($scope) {
                 time += 1;
             };
             var test_finish = performance.now();
-            test["total_time_1440"] = total_prpgtion_time;
-            test["avg_prpgation_time"] = total_prpgtion_time / full_day;
-            test["test_time_span"] = test_finish - init_start;
-            test["prpgtion_time_pct"] = total_prpgtion_time / test["test_time_span"] * 100;
-            test["init_time_pct"] = test["init_time"] / test["test_time_span"] * 100;
+
+            test["total_time_1440"]     = total_prpgtion_time;
+            test["avg_prpgation_time"]  = total_prpgtion_time / full_day;
+            test["test_time_span"]      = test_finish - init_start;
+            test["prpgtion_time_pct"]   = total_prpgtion_time / test["test_time_span"] * 100;
+            test["init_time_pct"]       = test["init_time"] / test["test_time_span"] * 100;
+
             var total_time_variance = 0;
             var num_tests = test["results"].length;
             for (var i = 0; i < num_tests; i++) {

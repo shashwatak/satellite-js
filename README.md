@@ -35,39 +35,65 @@ Sample Usage
 
 ```javascript
 //  Sample TLE
-var tle_line_1              = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031'
-var tle_line_2              = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869'
+var tle_line_1 = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031'
+var tle_line_2 = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869'
 
-//  Set the Observer at 122.03 West by 36.96 North, in RADIANS
+// Initialize a satellite record
+var satrec = satellite.twoline2satrec (tle_line_1, tle_line_2);
+
+//  Propagate satellite using time since epoch (in minutes).
+var position_and_velocity = satellite.sgp4 (satrec, time_since_tle_epoch_minutes);
+//  Or you can use a calendar date and time.
+var position_and_velocity = satellite.propagate (satrec, year, month, date_of_month, hour, minute, second);
+
+// The position_velocity result is a key-value pair of ECI coordinates.
+// These are the base results from which all other coordinates are derived.
+var position_eci = position_and_velocity["position"];
+var velocity_eci = position_and_velocity["velocity"];
+
+// Set the Observer at 122.03 West by 36.96 North, in RADIANS
 var deg2rad = Math.PI / 180;
-var observer_coords_gd      = [(-122.0308)*deg2rad, (36.9613422)*deg2rad, .370];
-//  Get observer position in the ECF frame.
-var observer_coords_ecf     = satellite.geodetic_to_ecf (observer_coords_gd);
+var observer_gd = {
+    longitude : -122.0308  * deg2rad,
+    latitude  : 36.9613422 * deg2rad,
+    height    : .370
+};
 
-//  Now to propagate a satellite's position and velocity.
-var satrec                  = satellite.twoline2satrec (tle_line_1, tle_line_2);
-var position_and_velocity   = satellite.sgp4 (satrec, time_since_tle_epoch_minutes);
-// OR YOU CAN USE
-var position_and_velocity   = satellite.propagate (satrec, year, month, date_of_month, hour, minute, second);
-var position_eci            = position_and_velocity[0];
-var velocity_eci            = position_and_velocity[1];
+// You will need GMST for some of the coordinate transforms
+var gmst = satellite.gstime_from_date (year, month, date_of_month, hour, minute, second);
 
-var gmst                    = satellite.gstime_from_date (year, month, date_of_month, hour, minute, second);
-var position_ecf            = satellite.eci_to_ecf (position_eci, gmst);
-var doppler_factor          = satellite.doppler_factor (observer_coords_ecf, position_ecf, velocity_ecf);
-var look_angles             = satellite.ecf_to_look_angles (observer_coords_gd, position_ecf);
+// You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+var position_ecf   = satellite.eci_to_ecf (position_eci, gmst);
+var observer_ecf   = satellite.geodetic_to_ecf (observer_gd);
+var position_gd    = satellite.eci_to_geodetic (position_eci, gmst);
+var look_angles    = satellite.ecf_to_look_angles (observer_gd, position_ecf);
+var doppler_factor = satellite.doppler_factor (observer_coords_ecf, position_ecf, velocity_ecf);
 
-//  Convert the RADIANS to degrees longitude and degrees latitude
-var position_gd             = satellite.eci_to_geodetic (position_eci, gmst);
-var longitude               = satellite.degrees_long (position_gd[0]);
-var latitude                = satellite.degrees_lat (position_gd[1]);
+// The coordinates are all stored in key-value pairs.
+// ECI and ECF are accessed by "x", "y", "z".
+var x_pos = position_eci["x"];
+var y_pos = position_eci["y"];
+var z_pos = position_eci["z"];
+
+// Look Angles may be accessed by "azimuth", "elevation", "range_sat".
+var azimuth   = look_angles["azimuth"];
+var elevation = look_angles["elevation"];
+var rangeSat  = look_angles["rangeSat"];
+
+// Geodetic coords are accessed via "longitude", "latitude", "height".
+var longitude = position_gd["longitude"];
+var latitude  = position_gd["latitude"];
+var height    = position_gd["height"];
+
+//  Convert the RADIANS to DEGREES for pretty printing.
+var longitude = satellite.degrees_long (longitude);
+var latitude  = satellite.degrees_lat  (latitude);
+
 ```
 
 TODO
 ------
-Replace the fixed-position numeric index arrays with key:value pairs.
-ex: position_gd[0] is longitude. replace this with position_gd["longitude"]
-Honestly, I should have been doing it that way.
+Optional functions that utilize Worker Threads
 
 Makefile
 --------
