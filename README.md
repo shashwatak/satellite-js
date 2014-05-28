@@ -62,7 +62,16 @@ var satrec = satellite.twoline2satrec (tle_line_1, tle_line_2);
 //  Propagate satellite using time since epoch (in minutes).
 var position_and_velocity = satellite.sgp4 (satrec, time_since_tle_epoch_minutes);
 //  Or you can use a calendar date and time (obtained from Javascript [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)).
-var position_and_velocity = satellite.propagate (satrec, year, month, date_of_month, hour, minute, second);
+var now = new Date();
+
+// NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
+var position_and_velocity = satellite.propagate (satrec,
+                                                now.getUTCFullYear(), 
+                                                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                                now.getUTCDate(),
+                                                now.getUTCHours(), 
+                                                now.getUTCMinutes(), 
+                                                now.getUTCSeconds());
 
 // The position_velocity result is a key-value pair of ECI coordinates.
 // These are the base results from which all other coordinates are derived.
@@ -78,7 +87,14 @@ var observer_gd = {
 };
 
 // You will need GMST for some of the coordinate transforms
-var gmst = satellite.gstime_from_date (year, month, date_of_month, hour, minute, second);
+// Also, be aware that the month range is 1-12, not 0-11.
+var gmst = satellite.gstime_from_date (now.getUTCFullYear(), 
+                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                       now.getUTCDate(),
+                                       now.getUTCHours(), 
+                                       now.getUTCMinutes(), 
+                                       now.getUTCSeconds());
+
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
 var position_ecf   = satellite.eci_to_ecf (position_eci, gmst);
@@ -189,7 +205,16 @@ Both propagate() and sgp4() functions return position_velocity as a dictionary o
 position is in km, velocity is in km/s, both the ECI coordinate frame.
 
 ```javascript
-var position_velocity = satellite.propagate(satrec, year, month, day, hour, minute, second)
+var now = new Date();
+
+// NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
+var position_and_velocity = satellite.propagate (satrec,
+                                                now.getUTCFullYear(), 
+                                                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                                now.getUTCDate(),
+                                                now.getUTCHours(), 
+                                                now.getUTCMinutes(), 
+                                                now.getUTCSeconds());
 ```
 Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to Julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
 
@@ -214,7 +239,15 @@ You'll need to provide some of the coordinate transform functions with your curr
 var gmst = satellite.gstime_from_jday(julian_day)
 ```
 ```javascript
-var gmst = satellite.gstime_from_date(year, mon, date_of_month, hr, minute, sec)
+// Also, be aware that the month range is 1-12, not 0-11.
+var now = new Date();
+
+var gmst = satellite.gstime_from_date (now.getUTCFullYear(), 
+                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                       now.getUTCDate(),
+                                       now.getUTCHours(), 
+                                       now.getUTCMinutes(), 
+                                       now.getUTCSeconds());
 ```
 ####Transforms
 Most of these are self explanatory from their names. Coords are arrays of three floats EX: [1.1, 1.2, 1.3] in kilometers. Once again, read the following first:
