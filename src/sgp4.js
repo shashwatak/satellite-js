@@ -20,7 +20,7 @@ function sgp4(satrec, tsince){
     *
     *  inputs        :
     *    satrec  - initialised structure from sgp4init() call.
-    *    tsince  - time eince epoch (minutes)
+    *    tsince  - time since epoch (minutes)
     *
     *  outputs       :
     *    r           - position vector                     km
