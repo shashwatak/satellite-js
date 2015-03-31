@@ -37,7 +37,7 @@ function twoline2rv(longstr1, longstr2){
     satrec.epochdays    = parseFloat(longstr1.substring(20, 32));
     satrec.ndot         = parseFloat(longstr1.substring(33, 43));
     satrec.nddot        = parseFloat("." + parseInt(longstr1.substring(44, 50), 10) + "E" + longstr1.substring(50, 52));
-    satrec.bstar        = parseFloat("." + parseInt(longstr1.substring(53, 59), 10) + "E" + longstr1.substring(59, 61));
+    satrec.bstar        = parseFloat(longstr1.substring(53, 54) + "." + parseInt(longstr1.substring(54, 59), 10) + "E" + longstr1.substring(59, 61));
     var numb            = parseInt(longstr1.substring(62, 63), 10);
     elnum               = parseInt(longstr1.substring(64, 68), 10);
 
