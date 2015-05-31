@@ -4,7 +4,7 @@
   "description": "SGP4 and SDP4 in JavaScript",
   "main": "satellite.js",
   "scripts": {
-    "build":"node build.js --compress --commonjs",
+    "build":"node build.js --compress",
     "postinstall":"npm run build",
     "test": "test"
   },
