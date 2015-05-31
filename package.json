@@ -4,6 +4,7 @@
   "description": "SGP4 and SDP4 in JavaScript",
   "main": "satellite.js",
   "scripts": {
+    "build":"node build.js --compress --common",
     "test": "test"
   },
   "repository": {
@@ -19,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/TJKoury/satellite-js/issues"
   },
-  "homepage": "https://github.com/TJKoury/satellite-js"
+  "homepage": "https://github.com/TJKoury/satellite-js",
+  "dependencies": {
+    "node-minify": "^1.1.0"
+  },
+  "devDependencies": {
+    "node-minify": "^1.1.0"
+  }
 }
