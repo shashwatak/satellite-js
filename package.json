@@ -5,6 +5,7 @@
   "main": "satellite.js",
   "scripts": {
     "build":"node build.js --compress --common",
+    "postinstall":"npm run build",
     "test": "test"
   },
   "repository": {
@@ -16,13 +17,17 @@
     "tle"
   ],
   "author": "Shashwat Kandadai",
+  "contributors":[{
+    "name": "TJKoury",
+    "email":"tjkoury@gmail.com"
+  }],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/TJKoury/satellite-js/issues"
   },
   "homepage": "https://github.com/TJKoury/satellite-js",
   "dependencies": {
-    "node-minify": "^1.1.0"
+
   },
   "devDependencies": {
     "node-minify": "^1.1.0"
