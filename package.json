@@ -1,6 +1,6 @@
 {
   "name": "satellite-js",
-  "version": "1.0.0",
+  "version": "1.2",
   "description": "SGP4 and SDP4 in JavaScript",
   "main": "satellite.js",
   "scripts": {
