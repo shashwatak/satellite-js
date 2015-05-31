@@ -1,10 +1,10 @@
 {
   "name": "satellite-js",
-  "version": "1.2",
+  "version": "1.2.0",
   "description": "SGP4 and SDP4 in JavaScript",
   "main": "satellite.js",
   "scripts": {
-    "build":"node build.js --compress --common",
+    "build":"node build.js --compress --commonjs",
     "postinstall":"npm run build",
     "test": "test"
   },

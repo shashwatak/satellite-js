@@ -33,7 +33,10 @@ new compressor.minify({
     }else{
       if(common){
   
-        fs.writeFileSync(config.main, fs.readFileSync(config.main, {encoding:'utf8'}).replace(new RegExp(/^satellite/), 'module.exports'));
+        fs.writeFileSync(config.main, 
+        fs.readFileSync(config.main, {encoding:'utf8'})
+        .replace(/^satellite/, 'module.exports')
+        .replace(/[\r\n]{1,}/g, ''));
       }
       console.info('Build Complete.  Elapsed Time:');
       console.info((((new Date()) - start)/1000)+" seconds");
