@@ -66,11 +66,11 @@ var now = new Date();
 
 // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
 var position_and_velocity = satellite.propagate (satrec,
-                                                now.getUTCFullYear(), 
-                                                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                                now.getUTCFullYear(),
+                                                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                                                 now.getUTCDate(),
-                                                now.getUTCHours(), 
-                                                now.getUTCMinutes(), 
+                                                now.getUTCHours(),
+                                                now.getUTCMinutes(),
                                                 now.getUTCSeconds());
 
 // The position_velocity result is a key-value pair of ECI coordinates.
@@ -86,13 +86,15 @@ var observer_gd = {
     height    : .370
 };
 
-// You will need GMST for some of the coordinate transforms
+// You will need GMST for some of the coordinate transforms.
+// http://en.wikipedia.org/wiki/Sidereal_time#Definition
+// NOTE: GMST, though a measure of time, is defined as an angle in radians.
 // Also, be aware that the month range is 1-12, not 0-11.
-var gmst = satellite.gstime_from_date (now.getUTCFullYear(), 
-                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+var gmst = satellite.gstime_from_date (now.getUTCFullYear(),
+                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                                        now.getUTCDate(),
-                                       now.getUTCHours(), 
-                                       now.getUTCMinutes(), 
+                                       now.getUTCHours(),
+                                       now.getUTCMinutes(),
                                        now.getUTCSeconds());
 
 
@@ -209,11 +211,11 @@ var now = new Date();
 
 // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
 var position_and_velocity = satellite.propagate (satrec,
-                                                now.getUTCFullYear(), 
-                                                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+                                                now.getUTCFullYear(),
+                                                now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                                                 now.getUTCDate(),
-                                                now.getUTCHours(), 
-                                                now.getUTCMinutes(), 
+                                                now.getUTCHours(),
+                                                now.getUTCMinutes(),
                                                 now.getUTCSeconds());
 ```
 Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for sgp4(), converts the calendar day to Julian time since satellite epoch. Sometimes it's better to ask for position and velocity given a specific date.
@@ -242,11 +244,11 @@ var gmst = satellite.gstime_from_jday(julian_day)
 // Also, be aware that the month range is 1-12, not 0-11.
 var now = new Date();
 
-var gmst = satellite.gstime_from_date (now.getUTCFullYear(), 
-                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
+var gmst = satellite.gstime_from_date (now.getUTCFullYear(),
+                                       now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
                                        now.getUTCDate(),
-                                       now.getUTCHours(), 
-                                       now.getUTCMinutes(), 
+                                       now.getUTCHours(),
+                                       now.getUTCMinutes(),
                                        now.getUTCSeconds());
 ```
 ####Transforms
