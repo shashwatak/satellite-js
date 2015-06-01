@@ -1,0 +1,36 @@
+{
+  "name": "satellite-js",
+  "version": "1.2.0",
+  "description": "SGP4 and SDP4 in JavaScript",
+  "main": "satellite.js",
+  "scripts": {
+    "build":"node build.js --compress",
+    "postinstall":"npm run build",
+    "test": "test"
+  },
+  "engines": {"node":">=0.10.36"},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TJKoury/satellite-js.git"
+  },
+  "keywords": [
+    "satellite",
+    "tle"
+  ],
+  "author": "Shashwat Kandadai",
+  "contributors":[{
+    "name": "TJKoury",
+    "email":"tjkoury@gmail.com"
+  }],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TJKoury/satellite-js/issues"
+  },
+  "homepage": "https://github.com/TJKoury/satellite-js",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "node-minify": "^1.1.0"
+  }
+}
