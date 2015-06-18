@@ -1,4 +1,3 @@
-/* global window: false */
 define([
     './constants',
     './coordinate-transforms/degrees-lat',
@@ -15,7 +14,7 @@ define([
     './gstime/gstime',
     './gstime/jday',
     './propagate/propagate',
-    './propagate/twoline2rv',
+    './propagate/twoline2satrec',
     './sgp4'
 ], function(
     constants,
@@ -33,12 +32,12 @@ define([
     gstime,
     jday,
     propagate,
-    twoline2rv,
+    twoline2satrec,
     sgp4
 ) {
     'use strict';
 
-    var Satellite = {
+    return {
         version: '1.2.0',
         constants: constants,
 
@@ -57,13 +56,7 @@ define([
             return gstime(jday(year, mon, day, hr, minute, sec));
         },
         propagate: propagate,
-        twoline2satrec: twoline2rv,
+        twoline2satrec: twoline2satrec,
         sgp4: sgp4
     };
-
-    if (typeof window === 'object') {
-        window.Satellite = Satellite;
-    }
-
-    return Satellite;
 });

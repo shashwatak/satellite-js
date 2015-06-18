@@ -12,7 +12,8 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('build', [
-        'jshint'
+        'jshint',
+        'requirejs'
     ]);
 
     grunt.registerTask('rebuild', [

@@ -1485,11 +1485,11 @@ function jday(year, mon, day, hr, minute, sec){
           );
 }
 
-satellite.gstime_from_jday = function (julian_day) {
+satellite.gstimeFromJday = function (julian_day) {
     return gstime (julian_day);
 }
 
-satellite.gstime_from_date = function (year, mon, day, hr, minute, sec) {
+satellite.gstimeFromDate = function (year, mon, day, hr, minute, sec) {
     var julian_day = jday(year, mon, day, hr, minute, sec);
     return gstime (julian_day);
 }
@@ -2972,31 +2972,31 @@ function degrees_lat (radians){
     return degrees;
 }
 
-satellite.eci_to_geodetic = function (eci_coords, gmst) {
+satellite.eciToGeodetic = function (eci_coords, gmst) {
     return eci_to_geodetic (eci_coords, gmst);
 }
 
 
 
-satellite.ecf_to_look_angles = function (observer_coords_ecf, satellite_coords_ecf) {
+satellite.ecfToLookAngles = function (observer_coords_ecf, satellite_coords_ecf) {
     var topocentric_coords = topocentric (observer_coords_ecf, satellite_coords_ecf);
     return topocentric_to_look_angles (topocentric_coords);
 }
 
-satellite.geodetic_to_ecf = function (geodetic_coords) {
+satellite.geodeticToEcf = function (geodetic_coords) {
     return geodetic_to_ecf (geodetic_coords);
 }
-satellite.ecf_to_eci = function (ecf_coords, gmst) {
+satellite.ecfToEci = function (ecf_coords, gmst) {
     return ecf_to_eci (ecf_coords, gmst);
 }
-satellite.eci_to_ecf = function (eci_coords, gmst) {
+satellite.eciToEcf = function (eci_coords, gmst) {
     return eci_to_ecf (eci_coords, gmst);
 }
 
-satellite.degrees_lat = function (radians) {
+satellite.degreesLat = function (radians) {
     return degrees_lat (radians);
 }
-satellite.degrees_long = function (radians) {
+satellite.degreesLong = function (radians) {
     return degrees_long (radians);
 }
 /*
@@ -3029,7 +3029,7 @@ function doppler_factor (my_location, position, velocity) {
     return factor;
 }
 
-satellite.doppler_factor = doppler_factor;
+satellite.dopplerFactor = doppler_factor;
 /*
  * satellite-js v1.1
  * (c) 2013 Shashwat Kandadai and UCSC

@@ -187,13 +187,13 @@ function TestCtrl($scope) {
 
                 var julian_day = test_sat.jdsatepoch + (time*60);
 
-                var gmst = satellite.gstime_from_jday (julian_day);
+                var gmst = satellite.gstimeFromJday (julian_day);
 
-                var known_position_ecf = satellite.eci_to_ecf (known_pos, gmst);
-                var known_look_angles = satellite.ecf_to_look_angles (my_location_gd, known_position_ecf);
+                var known_position_ecf = satellite.eciToEcf (known_pos, gmst);
+                var known_look_angles = satellite.ecfToLookAngles (my_location_gd, known_position_ecf);
 
-                var test_position_ecf = satellite.eci_to_ecf (test_pos, gmst);
-                var test_look_angles = satellite.ecf_to_look_angles (my_location_gd, test_position_ecf);
+                var test_position_ecf = satellite.eciToEcf (test_pos, gmst);
+                var test_look_angles = satellite.ecfToLookAngles (my_location_gd, test_position_ecf);
 
                 result["known_look"]  = known_look_angles;
                 result["test_look"]  = test_look_angles;
