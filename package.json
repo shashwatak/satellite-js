@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/solarpatrol/satellite-js"
+    "url": "git://github.com/shashwatak/satellite-js"
   },
   "keywords": [
     "sgp4",
@@ -26,7 +26,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/solarpatrol/satellite-js/issues"
+    "url": "https://github.com/shashwatak/satellite-js/issues"
   },
   "dependencies": {},
   "devDependencies": {
