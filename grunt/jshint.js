@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         library: {
             files: {
                 src: [
-                    'src/**/*.js'
+                    'src-amd/**/*.js'
                 ]
             }
         }

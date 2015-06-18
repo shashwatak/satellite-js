@@ -36,6 +36,7 @@
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-jshint": "~0.11.2",
     "grunt-contrib-uglify": "~0.9.1",
-    "load-grunt-config": "~0.17.1"
+    "load-grunt-config": "~0.17.1",
+    "grunt-requirejs": "~0.4.2"
   }
 }
