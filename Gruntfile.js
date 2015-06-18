@@ -13,12 +13,13 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build', [
         'jshint',
-        'requirejs'
+        'requirejs',
+        'copy'
     ]);
 
     grunt.registerTask('rebuild', [
         'clean',
-        'build'
+        'build',
     ]);
 
     grunt.registerTask('default', [

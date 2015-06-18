@@ -28,15 +28,13 @@
   "bugs": {
     "url": "https://github.com/solarpatrol/satellite-js/issues"
   },
-  "dependencies": {
-    "requirejs": "~2.1.18"
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-jshint": "~0.11.2",
-    "grunt-contrib-uglify": "~0.9.1",
+    "grunt-requirejs": "~0.4.2",
     "load-grunt-config": "~0.17.1",
-    "grunt-requirejs": "~0.4.2"
+    "grunt-contrib-copy": "~0.8.0"
   }
 }
