@@ -1,5 +1,5 @@
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -22,7 +22,7 @@ satellite = (function () {
 
 })() The footer is in satellite-tail.js */
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -43,7 +43,7 @@ var j4     =  -0.00000161098761;
 var j3oj2  =  j3 / j2;
 var x2o3   = 2.0 / 3.0;
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -289,7 +289,7 @@ function dpper (satrec, dpper_parameters) {
     return dpper_result;
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -697,7 +697,7 @@ var epoch   = dscom_parameters.epoch,
     return dscom_results;
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1101,7 +1101,7 @@ function dsinit(dsinit_parameters) {
     return dsinit_results;
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1355,7 +1355,7 @@ function dspace (dspace_parameters){
     return dspace_results;
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1494,7 +1494,7 @@ satellite.gstimeFromDate = function (year, mon, day, hr, minute, sec) {
     return gstime (julian_day);
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1638,7 +1638,7 @@ function initl(initl_parameters){
     return initl_results;
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -2276,7 +2276,7 @@ function sgp4init(satrec, sgp4init_parameters){
     return true;
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -2411,7 +2411,7 @@ satellite.propagate = function (satrec, year, month, day, hour, minute, second) 
 }
 
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -2827,7 +2827,7 @@ satellite.sgp4 = function (satrec, tsince) {
     return sgp4 (satrec, tsince);
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -3000,7 +3000,7 @@ satellite.degreesLong = function (radians) {
     return degrees_long (radians);
 }
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -3031,7 +3031,7 @@ function doppler_factor (my_location, position, velocity) {
 
 satellite.dopplerFactor = doppler_factor;
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT

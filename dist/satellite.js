@@ -435,7 +435,7 @@ var requirejs, require, define;
 define("almond", function(){});
 
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -469,7 +469,7 @@ define('constants',[], function() {
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -497,7 +497,7 @@ define('coordinate-transforms/degrees-lat',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -522,7 +522,7 @@ define('coordinate-transforms/degrees-long',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -545,7 +545,7 @@ define('coordinate-transforms/ecf-to-eci',[], function() {
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -571,7 +571,7 @@ define('coordinate-transforms/geodetic-to-ecf',[], function() {
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -612,7 +612,7 @@ define('coordinate-transforms/topocentric',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -647,7 +647,7 @@ define('coordinate-transforms/topocentric-to-look-angles',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -668,7 +668,7 @@ define('coordinate-transforms/ecf-to-look-angles',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -697,7 +697,7 @@ define('coordinate-transforms/eci-to-ecf',[], function() {
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -730,7 +730,7 @@ define('coordinate-transforms/eci-to-geodetic',[], function() {
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -901,7 +901,7 @@ define('gstime/jday',[], function() {
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1158,7 +1158,7 @@ define('dpper',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1420,7 +1420,7 @@ define('dspace',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1852,7 +1852,7 @@ define('sgp4',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -1877,7 +1877,7 @@ define('propagate/propagate',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -2291,7 +2291,7 @@ define('dscom',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -2703,7 +2703,7 @@ define('dsinit',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -2861,7 +2861,7 @@ define('initl',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
@@ -3515,7 +3515,7 @@ define('sgp4init',[
     };
 });
 /*
- * satellite-js v1.1
+ * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
  * https://github.com/shashwatak/satellite-js
  * License: MIT
