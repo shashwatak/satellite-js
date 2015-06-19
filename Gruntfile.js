@@ -23,11 +23,6 @@ module.exports = function(grunt) {
         'copy'
     ]);
 
-    grunt.registerTask('rebuild', [
-        'clean',
-        'build'
-    ]);
-
     grunt.registerTask('default', [
         'build'
     ]);
