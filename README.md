@@ -1,4 +1,4 @@
-# satellite.js v1.2
+# satellite.js v1.2.0
 
 ## Introduction
 
@@ -41,6 +41,12 @@ I would recommend anybody interested in satellite tracking or orbital propagatio
 Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs
 for use with this library.
 
+## Installation
+
+Install the library with [Bower](http://bower.io/):
+
+    bower install satellitejs
+
 ## Usage
 
 Include `dist/satellite.min.js` as a script in your html or use as [Require.js](http://requirejs.org/) module.
@@ -69,9 +75,9 @@ a dependency of your module:
     
     //  Propagate satellite using time since epoch (in minutes).
     var positionAndVelocity = satellite.sgp4 (satrec, timeSinceTleEpochMinutes);
-    //  Or you can use a calendar date and time (obtained from Javascript [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)).
-    var now = new Date();
     
+    //  Or you can use a calendar date and time (obtained from Javascript Date).
+    var now = new Date();
     // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
     var positionAndVelocity = satellite.propagate(
         satrec,
@@ -85,8 +91,8 @@ a dependency of your module:
     
     // The position_velocity result is a key-value pair of ECI coordinates.
     // These are the base results from which all other coordinates are derived.
-    var positionEci = positionAndVelocity.position;
-    var velocityEci = positionAndVelocity.velocity;
+    var positionEci = positionAndVelocity.position,
+        velocityEci = positionAndVelocity.velocity;
     
     // Set the Observer at 122.03 West by 36.96 North, in RADIANS
     var observerGd = {
@@ -135,9 +141,9 @@ a dependency of your module:
     var longitudeStr = satellite.degreesLong(longitude),
         latitudeStr  = satellite.degreesLat(latitude);
         
-## Building & testing
+## Building
 
-The code is organized as [https://github.com/amdjs/amdjs-api/wiki/AMD](AMD) modules but it can be built into
+The code is organized as [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) modules but it can be built into
 a single file to use in production.
 
 The library uses [Grunt task runner](http://gruntjs.com/) for building and testing. It also relies on [Bower](http://bower.io)

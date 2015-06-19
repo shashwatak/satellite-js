@@ -200,7 +200,7 @@ function TestCtrl($scope) {
                 var look_angles_error = {
                     azimuth : Math.abs((known_look_angles["azimuth"] - test_look_angles["azimuth"]) / known_look_angles["azimuth"]),
                     elevation : Math.abs((known_look_angles["elevation"] - test_look_angles["elevation"]) / known_look_angles["elevation"]),
-                    range_sat : Math.abs((known_look_angles["range_sat"] - test_look_angles["range_sat"]) / known_look_angles["range_sat"])
+                    rangeSat : Math.abs((known_look_angles["rangeSat"] - test_look_angles["rangeSat"]) / known_look_angles["rangeSat"])
                 };
                 result["look_error"]  = look_angles_error;
             };
