@@ -11,15 +11,21 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('build', [
+    grunt.registerTask('test', [
         'jshint',
+        'karma'
+    ]);
+
+    grunt.registerTask('build', [
+        'jshint:gruntfile',
+        'jshint:library',
         'requirejs',
         'copy'
     ]);
 
     grunt.registerTask('rebuild', [
         'clean',
-        'build',
+        'build'
     ]);
 
     grunt.registerTask('default', [
