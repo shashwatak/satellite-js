@@ -13,6 +13,8 @@ propagate paths. The only changes I made to Brandon Rhode's code was to change t
 functions to key:value objects. This reduces the complexity of functions that require 50+ parameters,
 and doesn't require the parameters to be placed in the exact order.
 
+Special thanks to [ezze](https://github.com/ezze), for modernizing the code and greatly improving usability =)
+
 **Start Here:**
 
 - [TS Kelso's Columns for Satellite Times](http://celestrak.com/columns/), Orbital Propagation Parts I and II a must!
