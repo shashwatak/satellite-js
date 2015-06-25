@@ -335,7 +335,7 @@ just copied straight from Python. Brandon Rhodes did me the favor of including s
 code. JavaScript doesn't support multiple values returned per statement, so I had to rewrite the function calls.
 Absolutely none of the mathematical logic had to be rewritten.
 
-## Testing
+## Benchmarking
 
 I've included a small testing app, that provides some benchmarking tools and verifies SGP4 and SDP4 using the
 Test Criteria provided by SpaceTrack Report #3, and is based off
