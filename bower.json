@@ -7,7 +7,7 @@
     "Dmitriy Pushkov <ezze@ezze.org>"
   ],
   "description": "SGP4/SDP4 calculation library",
-  "main": "src/satellite.js",
+  "main": "dist/satellite.js",
   "keywords": [
     "sgp4"
   ],

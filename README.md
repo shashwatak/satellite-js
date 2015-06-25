@@ -159,7 +159,7 @@ package of Require.js plugins needed for test scripts. In order to run Grunt tas
 
         npm install -g bower
     
-- install all required packages with NPM and Bower by running the following command from repository's root directory:
+- install all required packages with NPM and Bower by running the following commands from repository's root directory:
 
         npm install
         bower install
@@ -303,7 +303,7 @@ km or km/s. Geodetic coords are in radians.
     
     var eciCoords = satellite.ecfToEci(ecfCoords, gmst);
 
-    var geodetic_coords = satellite.eciToGeodetic (eciCoords, gmst);
+    var geodeticCoords = satellite.eciToGeodetic(eciCoords, gmst);
 
     var ecfCoords = satellite.geodeticToEcf(geodeticCoords);
 
@@ -318,7 +318,7 @@ These two functions will return human readable Latitude or Longitude strings (Ex
 from `geodeticCoords`:
 
     var latitudeStr = satellite.degreesLat(geodeticRadians),
-        longitude_string = satellite.degreesLong(geodetic_radians);
+        longitudeStr = satellite.degreesLong(geodeticRadians);
 
 ## Note about Code Conventions
 
