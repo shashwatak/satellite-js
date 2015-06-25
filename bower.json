@@ -3,13 +3,17 @@
   "version": "1.2.0",
   "homepage": "https://github.com/shashwatak/satellite-js",
   "authors": [
-    "Shashwat Kandadai",
+    "Shashwat Kandadai <shashwatak@gmail.com>",
     "Dmitriy Pushkov <ezze@ezze.org>"
   ],
   "description": "SGP4/SDP4 calculation library",
   "main": "dist/satellite.js",
   "keywords": [
-    "sgp4"
+    "sgp4",
+    "sdp4",
+    "satellite",
+    "orbit",
+    "propagation"
   ],
   "license": "MIT",
   "ignore": [

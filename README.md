@@ -9,7 +9,7 @@ functions for coordinate transforms.
 The internals of this library are nearly identical to
 [Brandon Rhode's sgp4 python library](https://pypi.python.org/pypi/sgp4/). However, it is encapsulated in a
 standard JS library (self executing function), and exposes only the functionality needed to track satellites and
-propagate paths. The only changes I made to Brandon Rhode's code was to change the positional parameters of 
+propagate paths. The only changes I made to Brandon Rhode's code was to change the positional parameters of
 functions to key:value objects. This reduces the complexity of functions that require 50+ parameters,
 and doesn't require the parameters to be placed in the exact order.
 
@@ -71,13 +71,13 @@ a dependency of your module:
     // Sample TLE
     var tleLine1 = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031',
         tleLine2 = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869';
-    
+
     // Initialize a satellite record
     var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-    
+
     //  Propagate satellite using time since epoch (in minutes).
     var positionAndVelocity = satellite.sgp4 (satrec, timeSinceTleEpochMinutes);
-    
+
     //  Or you can use a calendar date and time (obtained from Javascript Date).
     var now = new Date();
     // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
@@ -90,19 +90,19 @@ a dependency of your module:
         now.getUTCMinutes(),
         now.getUTCSeconds()
     );
-    
+
     // The position_velocity result is a key-value pair of ECI coordinates.
     // These are the base results from which all other coordinates are derived.
     var positionEci = positionAndVelocity.position,
         velocityEci = positionAndVelocity.velocity;
-    
+
     // Set the Observer at 122.03 West by 36.96 North, in RADIANS
     var observerGd = {
         longitude: -122.0308 * deg2rad,
         latitude: 36.9613422 * deg2rad,
         height: 0.370
     };
-    
+
     // You will need GMST for some of the coordinate transforms.
     // http://en.wikipedia.org/wiki/Sidereal_time#Definition
     // NOTE: GMST, though a measure of time, is defined as an angle in radians.
@@ -115,34 +115,34 @@ a dependency of your module:
         now.getUTCMinutes(),
         now.getUTCSeconds()
     );
-    
+
     // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
     var positionEcf   = satellite.eciToEcf(positionEci, gmst),
         observerEcf   = satellite.geodeticToEcf(observerGd),
         positionGd    = satellite.eciToGeodetic(positionEci, gmst),
         lookAngles    = satellite.ecfToLookAngles(observerGd, positionEcf),
         dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
-    
+
     // The coordinates are all stored in key-value pairs.
     // ECI and ECF are accessed by `x`, `y`, `z` properties.
     var satelliteX = positionEci.x,
         satelliteY = positionEci.y,
         satelliteZ = positionEci.z;
-    
+
     // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
     var azimuth   = lookAngles.azimuth,
         elevation = lookAngles.elevation,
         rangeSat  = lookAngles.rangeSat;
-    
+
     // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
     var longitude = positionGd.longitude,
         latitude  = positionGd.latitude,
         height    = positionGd.height;
-    
+
     //  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W". etc).
     var longitudeStr = satellite.degreesLong(longitude),
         latitudeStr  = satellite.degreesLat(latitude);
-        
+
 ## Building
 
 The code is organized as [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) modules but it can be built into
@@ -156,27 +156,27 @@ package of Require.js plugins needed for test scripts. In order to run Grunt tas
 - install Grunt command line interface globally:
 
         npm install -g grunt-cli
-    
+
 - install Bower globally:
 
         npm install -g bower
-    
+
 - install all required packages with NPM and Bower by running the following commands from repository's root directory:
 
         npm install
         bower install
-        
+
 - run default Grunt task to build the library:
 
         grunt
-        
+
 - run the following Grunt task to run [Jasmine](http://jasmine.github.io/) specs located in `test/*.spec.js`
 files with [Karma](http://karma-runner.github.io/):
 
         grunt test
-        
+
 All configuration files for Grunt tasks are located in `grunt` directory.
-        
+
 These are main available Grunt tasks:
 
 - `build`       (default) validates, optimizies and minifies source code to `dist` directory;
@@ -275,7 +275,7 @@ Julian Day or a calendar date.
 
     // Also, be aware that the month range is 1-12, not 0-11.
     var now = new Date();
-    
+
     var gmst = satellite.gstimeFromDate(
         now.getUTCFullYear(),
         now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
@@ -302,7 +302,7 @@ These four are used to convert between ECI, ECF, and Geodetic, as you need them.
 km or km/s. Geodetic coords are in radians.
 
     var ecfCoords = satellite.eciToEcf(eciCoords, gmst);
-    
+
     var eciCoords = satellite.ecfToEci(ecfCoords, gmst);
 
     var geodeticCoords = satellite.eciToGeodetic(eciCoords, gmst);
