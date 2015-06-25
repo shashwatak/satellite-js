@@ -1,7 +1,7 @@
 {
-  "name": "satellitejs",
+  "name": "satellite.js",
   "version": "1.2.0",
-  "homepage": "https://github.com/solarpatrol/satellitejs",
+  "homepage": "https://github.com/shashwatak/satellite-js",
   "authors": [
     "Shashwat Kandadai",
     "Dmitriy Pushkov <ezze@ezze.org>"

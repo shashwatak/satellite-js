@@ -45,7 +45,7 @@ for use with this library.
 
 Install the library with [Bower](http://bower.io/):
 
-    bower install satellitejs
+    bower install satellite.js
 
 ## Usage
 
