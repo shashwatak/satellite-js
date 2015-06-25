@@ -1,0 +1,23 @@
+{
+  "name": "satellite.js",
+  "version": "1.2.0",
+  "homepage": "https://github.com/shashwatak/satellite-js",
+  "authors": [
+    "Shashwat Kandadai",
+    "Dmitriy Pushkov <ezze@ezze.org>"
+  ],
+  "description": "SGP4/SDP4 calculation library",
+  "main": "dist/satellite.js",
+  "keywords": [
+    "sgp4"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".gitignore",
+    "node_modules",
+    "sgp4_verification"
+  ],
+  "devDependencies": {
+    "requirejs-plugins": "~1.0.3"
+  }
+}
