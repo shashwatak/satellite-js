@@ -43,11 +43,16 @@ I would recommend anybody interested in satellite tracking or orbital propagatio
 Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs
 for use with this library.
 
-## Installation
+## Installation (Bower or NPM)
 
 Install the library with [Bower](http://bower.io/):
 
     bower install satellite.js
+
+Install the library with [NPM](https://www.npmjs.com/):
+
+    npm install satellite.js
+
 
 ## Usage
 
