@@ -80,7 +80,8 @@ a dependency of your module:
 
     //  Or you can use a calendar date and time (obtained from Javascript Date).
     var now = new Date();
-    // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
+    // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require
+    // months in range 1-12.
     var positionAndVelocity = satellite.propagate(
         satrec,
         now.getUTCFullYear(),
