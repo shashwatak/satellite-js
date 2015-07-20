@@ -14,17 +14,9 @@
     "sgp4",
     "satellite"
   ],
-  "author": {
-    "name": "Shashwat Kandadai",
-    "email": "shashwatak@gmail.com",
-    "url": "https://github.com/shashwatak"
-  },
+  "author": "Shashwat Kandadai <shashwatak@gmail.com> (https://github.com/shashwatak)",
   "contributors": [
-    {
-      "name": "Dmitriy Pushkov",
-      "email": "ezze@ezze.org",
-      "url": "http://www.ezze.org"
-    }
+    "Dmitriy Pushkov <ezze@ezze.org> (http://www.ezze.org)"
   ],
   "license": "MIT",
   "bugs": {
@@ -46,5 +38,9 @@
     "load-grunt-config": "~0.17.1",
     "phantomjs": "~1.9.17",
     "requirejs": "~2.1.18"
+  },
+  "homepage": "https://github.com/shashwatak/satellite-js",
+  "directories": {
+    "test": "test"
   }
 }
