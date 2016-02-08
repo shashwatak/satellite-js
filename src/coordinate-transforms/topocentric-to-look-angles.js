@@ -14,9 +14,10 @@ define([
 
     /**
      * @param {Object} topocentric
-     * @param {Number} topocentric.topS
-     * @param {Number} topocentric.topE
-     * @param {Number} topocentric.topZ
+     * @param {Number} topocentric.topS Positive horizontal vector S due south.
+     * @param {Number} topocentric.topE Positive horizontal vector E due east.
+     * @param {Number} topocentric.topZ Vector Z normal to the surface of the earth (up).
+     * @returns {Object}
      */
     return function(topocentric) {
         var topS = topocentric.topS;
@@ -29,7 +30,7 @@ define([
         return {
             azimuth : Az,
             elevation : El,
-            rangeSat : rangeSat
+            rangeSat : rangeSat  // Range in km.
         };
     };
 });
