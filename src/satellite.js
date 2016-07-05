@@ -56,7 +56,9 @@ define([
             return gstime(jday(year, mon, day, hr, minute, sec));
         },
         propagate: propagate,
-        twoline2satrec: twoline2satrec,
+        parseTwoline: twoline2satrec.parseTwoline,
+        prepareSatrec: twoline2satrec.prepareSatrec,
+        twoline2satrec: twoline2satrec.twoline2rv,
         sgp4: sgp4
     };
 });

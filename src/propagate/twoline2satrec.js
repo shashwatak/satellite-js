@@ -18,34 +18,15 @@ define([
 ) {
     'use strict';
 
-    return function twoline2rv(longstr1, longstr2){
-        /*Return a Satellite imported from two lines of TLE data.
-
-         Provide the two TLE lines as strings `longstr1` and `longstr2`,
-         and select which standard set of gravitational constants you want
-         by providing `gravity_constants`:
-
-         `sgp4.propagation.wgs72` - Standard WGS 72 model
-         `sgp4.propagation.wgs84` - More recent WGS 84 model
-         `sgp4.propagation.wgs72old` - Legacy support for old SGP4 behavior
-
-         Normally, computations are made using various recent improvements
-         to the algorithm.  If you want to turn some of these off and go
-         back into "afspc" mode, then set `afspc_mode` to `True`. */
-
-        var opsmode = 'i';
-        var xpdotp   =  1440.0 / (2.0 *constants.pi);  //  229.1831180523293;
-        var revnum = 0;
-        var elnum = 0;
-        var year = 0;
-
+    function parseTwoline(longstr1, longstr2) {
         var satrec = {};
-        satrec.error = 0;
+        var elnum = 0;
+        var revnum = 0;
 
         // TODO: defined but never used
         //var cardnumb        = parseInt(longstr1.substring(0, 1), 10);
 
-        satrec.satnum       = longstr1.substring(2, 7);
+        satrec.satnum       = parseInt(longstr1.substring(2, 7), 10);
 
         // TODO: defined but never used
         //var classification  = longstr1.substring(7, 8);
@@ -69,7 +50,6 @@ define([
 
         elnum               = parseInt(longstr1.substring(64, 68), 10);
 
-        //satrec.satnum   = longstr2.substring(2, 7);
         satrec.inclo    = parseFloat(longstr2.substring(8, 16));
         satrec.nodeo    = parseFloat(longstr2.substring(17, 25));
         satrec.ecco     = parseFloat('.' + longstr2.substring(26, 33));
@@ -78,6 +58,29 @@ define([
         satrec.no       = parseFloat(longstr2.substring(52, 63));
         revnum          = parseFloat(longstr2.substring(63, 68));
 
+        return satrec;
+    }
+
+    function prepareSatrec(satrec) {
+        /*Return a Satellite imported from two lines of TLE data.
+
+          Provide the two TLE lines as strings `longstr1` and `longstr2`,
+          and select which standard set of gravitational constants you want
+          by providing `gravity_constants`:
+
+          `sgp4.propagation.wgs72` - Standard WGS 72 model
+          `sgp4.propagation.wgs84` - More recent WGS 84 model
+          `sgp4.propagation.wgs72old` - Legacy support for old SGP4 behavior
+
+          Normally, computations are made using various recent improvements
+          to the algorithm.  If you want to turn some of these off and go
+          back into "afspc" mode, then set `afspc_mode` to `True`. */
+
+        var opsmode = 'i';
+        var xpdotp   =  1440.0 / (2.0 *constants.pi);  //  229.1831180523293;
+        var year = 0;
+
+        satrec.error = 0;
 
         //  ---- find no, ndot, nddot ----
         satrec.no   = satrec.no / xpdotp; //   rad/min
@@ -124,7 +127,6 @@ define([
         var sec      = mdhmsResult.sec;
         satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
-        //  ---------------- initialize the orbit at sgp4epoch -------------------
         var sgp4initParameters = {
             opsmode : opsmode,
             satn : satrec.satnum,
@@ -140,8 +142,18 @@ define([
             xnodeo : satrec.nodeo
         };
 
-        sgp4init(satrec, sgp4initParameters );
+        sgp4init(satrec, sgp4initParameters);
+    }
 
+    function twoline2rv(longstr1, longstr2) {
+        var satrec = parseTwoline(longstr1, longstr2);
+        prepareSatrec(satrec);
         return satrec;
+    }
+
+    return {
+        parseTwoline: parseTwoline,
+        prepareSatrec: prepareSatrec,
+        twoline2rv: twoline2rv
     };
 });
