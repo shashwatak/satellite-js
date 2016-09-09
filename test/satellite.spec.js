@@ -32,6 +32,14 @@ define([
                 now.getUTCMinutes(),
                 now.getUTCSeconds()
             ));
+            expect(satellite.gstimeFromDate(now)).toBe(satellite.gstimeFromDate(
+                now.getUTCFullYear(),
+                now.getUTCMonth() + 1,
+                now.getUTCDate(),
+                now.getUTCHours(),
+                now.getUTCMinutes(),
+                now.getUTCSeconds()
+            ));
 
             var date = new Date(2016, 7, 22),
                 tleLine1 = '1 27424U 02022A   16235.86686911  .00000105  00000-0  33296-4 0  9990',
