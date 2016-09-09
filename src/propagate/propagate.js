@@ -16,10 +16,12 @@ define([
 ) {
     'use strict';
 
-    return function propagate(satrec, year, month, day, hour, minute, second){
+    return function propagate() {
         //Return a position and velocity vector for a given date and time.
-        var j = jday(year, month, day, hour, minute, second);
-        var m = (j - satrec.jdsatepoch) * constants.minutesPerDay;
+        var satrec = arguments[0],
+            date = Array.prototype.slice.call(arguments, 1),
+            j = jday.apply(null, date),
+            m = (j - satrec.jdsatepoch) * constants.minutesPerDay;
         return sgp4(satrec, m);
     };
 });

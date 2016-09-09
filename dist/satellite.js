@@ -627,9 +627,10 @@ define('coordinate-transforms/topocentric-to-look-angles',[
 
     /**
      * @param {Object} topocentric
-     * @param {Number} topocentric.topS
-     * @param {Number} topocentric.topE
-     * @param {Number} topocentric.topZ
+     * @param {Number} topocentric.topS Positive horizontal vector S due south.
+     * @param {Number} topocentric.topE Positive horizontal vector E due east.
+     * @param {Number} topocentric.topZ Vector Z normal to the surface of the earth (up).
+     * @returns {Object}
      */
     return function(topocentric) {
         var topS = topocentric.topS;
@@ -642,10 +643,11 @@ define('coordinate-transforms/topocentric-to-look-angles',[
         return {
             azimuth : Az,
             elevation : El,
-            rangeSat : rangeSat
+            rangeSat : rangeSat  // Range in km.
         };
     };
 });
+
 /*
  * satellite-js v1.2
  * (c) 2013 Shashwat Kandadai and UCSC
@@ -891,6 +893,16 @@ define('gstime/jday',[], function() {
     'use strict';
 
     return function(year, mon, day, hr, minute, sec) {
+        if (year instanceof Date) {
+            var date = year;
+            year = date.getUTCFullYear();
+            mon = date.getUTCMonth() + 1;   // Note, this function requires months in range 1-12.
+            day = date.getUTCDate();
+            hr = date.getUTCHours();
+            minute = date.getUTCMinutes();
+            sec = date.getUTCSeconds();
+        }
+
         return (367.0 * year -
         Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
         Math.floor( 275 * mon / 9.0 ) +
@@ -1869,10 +1881,12 @@ define('propagate/propagate',[
 ) {
     'use strict';
 
-    return function propagate(satrec, year, month, day, hour, minute, second){
+    return function propagate() {
         //Return a position and velocity vector for a given date and time.
-        var j = jday(year, month, day, hour, minute, second);
-        var m = (j - satrec.jdsatepoch) * constants.minutesPerDay;
+        var satrec = arguments[0],
+            date = Array.prototype.slice.call(arguments, 1),
+            j = jday.apply(null, date),
+            m = (j - satrec.jdsatepoch) * constants.minutesPerDay;
         return sgp4(satrec, m);
     };
 });
@@ -3715,9 +3729,10 @@ define('satellite',[
 
         dopplerFactor: dopplerFactor,
         gstimeFromJday: gstime,
-        gstimeFromDate: function(year, mon, day, hr, minute, sec) {
-            return gstime(jday(year, mon, day, hr, minute, sec));
+        gstimeFromDate: function() {
+            return gstime(jday.apply(null, arguments));
         },
+        jday: jday,
         propagate: propagate,
         twoline2satrec: twoline2satrec,
         sgp4: sgp4

@@ -52,9 +52,10 @@ define([
 
         dopplerFactor: dopplerFactor,
         gstimeFromJday: gstime,
-        gstimeFromDate: function(year, mon, day, hr, minute, sec) {
-            return gstime(jday(year, mon, day, hr, minute, sec));
+        gstimeFromDate: function() {
+            return gstime(jday.apply(null, arguments));
         },
+        jday: jday,
         propagate: propagate,
         twoline2satrec: twoline2satrec,
         sgp4: sgp4
