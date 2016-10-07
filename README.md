@@ -53,7 +53,6 @@ Install the library with [NPM](https://www.npmjs.com/):
 
     npm install satellite.js
 
-
 ## Usage
 
 Include `dist/satellite.min.js` as a script in your html or use as [Require.js](http://requirejs.org/) module.
@@ -62,98 +61,77 @@ When you include `satellite.min.js` as a script, the object `satellite` is defin
 You use this object to access all the functions in the satellite library:
 
 ```js
-    var positionAndVelocity = satellite.sgp4(satrec, time);
+var positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
 When you use it as Require.js module `satellite` object is not defined in global scope, you should use it as
 a dependency of your module:
 
 ```js
-    define(['path/to/satellite'], function(satellite) {
-        ...
-        var positionAndVelocity = satellite.sgp4(satrec, time);
-    });
+define(['path/to/satellite'], function(satellite) {
+    ...
+    var positionAndVelocity = satellite.sgp4(satrec, time);
+});
 ```
 
 ## Sample Usage
     
 ```js
-    // Sample TLE
-    
-    var tleLine1 = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031',
-        tleLine2 = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869';
-    
-    // Initialize a satellite record
-    var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+// Sample TLE
+var tleLine1 = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031',
+    tleLine2 = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869';
 
-    //  Propagate satellite using time since epoch (in minutes).
-    var positionAndVelocity = satellite.sgp4 (satrec, timeSinceTleEpochMinutes);
+// Initialize a satellite record
+var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
 
-    //  Or you can use a calendar date and time (obtained from Javascript Date).
-    var now = new Date();
-    // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require
-    // months in range 1-12.
-    var positionAndVelocity = satellite.propagate(
-        satrec,
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds()
-    );
+//  Propagate satellite using time since epoch (in minutes).
+var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
 
-    // The position_velocity result is a key-value pair of ECI coordinates.
-    // These are the base results from which all other coordinates are derived.
-    var positionEci = positionAndVelocity.position,
-        velocityEci = positionAndVelocity.velocity;
+//  Or you can use a JavaScript Date
+var positionAndVelocity = satellite.propagate(satrec, new Date());
 
-    // Set the Observer at 122.03 West by 36.96 North, in RADIANS
-    var observerGd = {
-        longitude: -122.0308 * deg2rad,
-        latitude: 36.9613422 * deg2rad,
-        height: 0.370
-    };
+// The position_velocity result is a key-value pair of ECI coordinates.
+// These are the base results from which all other coordinates are derived.
+var positionEci = positionAndVelocity.position,
+    velocityEci = positionAndVelocity.velocity;
 
-    // You will need GMST for some of the coordinate transforms.
-    // http://en.wikipedia.org/wiki/Sidereal_time#Definition
-    // NOTE: GMST, though a measure of time, is defined as an angle in radians.
-    // Also, be aware that the month range is 1-12, not 0-11.
-    var gmst = satellite.gstimeFromDate(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds()
-    );
+// Set the Observer at 122.03 West by 36.96 North, in RADIANS
+var observerGd = {
+    longitude: -122.0308 * deg2rad,
+    latitude: 36.9613422 * deg2rad,
+    height: 0.370
+};
 
-    // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
-    var positionEcf   = satellite.eciToEcf(positionEci, gmst),
-        observerEcf   = satellite.geodeticToEcf(observerGd),
-        positionGd    = satellite.eciToGeodetic(positionEci, gmst),
-        lookAngles    = satellite.ecfToLookAngles(observerGd, positionEcf),
-        dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
+// You will need GMST for some of the coordinate transforms.
+// http://en.wikipedia.org/wiki/Sidereal_time#Definition
+var gmst = satellite.gstimeFromDate(new Date()));
 
-    // The coordinates are all stored in key-value pairs.
-    // ECI and ECF are accessed by `x`, `y`, `z` properties.
-    var satelliteX = positionEci.x,
-        satelliteY = positionEci.y,
-        satelliteZ = positionEci.z;
+// You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+var positionEcf   = satellite.eciToEcf(positionEci, gmst),
+    observerEcf   = satellite.geodeticToEcf(observerGd),
+    positionGd    = satellite.eciToGeodetic(positionEci, gmst),
+    lookAngles    = satellite.ecfToLookAngles(observerGd, positionEcf),
+    dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
 
-    // Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
-    var azimuth   = lookAngles.azimuth,
-        elevation = lookAngles.elevation,
-        rangeSat  = lookAngles.rangeSat;
+// The coordinates are all stored in key-value pairs.
+// ECI and ECF are accessed by `x`, `y`, `z` properties.
+var satelliteX = positionEci.x,
+    satelliteY = positionEci.y,
+    satelliteZ = positionEci.z;
 
-    // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
-    var longitude = positionGd.longitude,
-        latitude  = positionGd.latitude,
-        height    = positionGd.height;
+// Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
+var azimuth   = lookAngles.azimuth,
+    elevation = lookAngles.elevation,
+    rangeSat  = lookAngles.rangeSat;
 
-    //  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W". etc).
-    var longitudeStr = satellite.degreesLong(longitude),
-        latitudeStr  = satellite.degreesLat(latitude);
+// Geodetic coords are accessed via `longitude`, `latitude`, `height`.
+var longitude = positionGd.longitude,
+    latitude  = positionGd.latitude,
+    height    = positionGd.height;
+
+//  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W", etc).
+var longitudeStr = satellite.degreesLong(longitude),
+    latitudeStr  = satellite.degreesLat(latitude);
 ```
     
 ## Building
@@ -227,7 +205,7 @@ suggest that anybody try to simplify it unless they have absolute understanding 
 ### Initialization
 
 ```js
-    var satrec = satellite.twoline2satrec(longstr1, longstr2)
+var satrec = satellite.twoline2satrec(longstr1, longstr2);
 ```
 
 returns satrec object, created from the TLEs passed in. The satrec object is vastly complicated, but you don't have
@@ -242,27 +220,16 @@ Space Track, there should be no problem.
 Both `propagate()` and `sgp4()` functions return position and velocity as a dictionary of the form:
 
 ```js
-    {
-     "position" : { "x" : 1, "y" : 1, "z" : 1 },
-     "velocity" : { "x" : 1, "y" : 1, "z" : 1 }
-    }
+{
+  "position" : { "x" : 1, "y" : 1, "z" : 1 },
+  "velocity" : { "x" : 1, "y" : 1, "z" : 1 }
+}
 ```
 
 position is in km, velocity is in km/s, both the ECI coordinate frame.
 
 ```js
-    var now = new Date();
-
-    // NOTE: while Javascript Date returns months in range 0-11, all satellite.js methods require months in range 1-12.
-    var positionAndVelocity = satellite.propagate(
-        satrec,
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds()
-    );
+var positionAndVelocity = satellite.propagate(satrec, new Date());
 ```
 
 Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for `sgp4()`, converts the
@@ -270,7 +237,7 @@ calendar day to Julian time since satellite epoch. Sometimes it's better to ask 
 a specific date.
 
 ```js
-    var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes)
+var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
 ```
 
 Returns position and velocity, given a satrec and the time in minutes since epoch. Sometimes it's better to ask for
@@ -282,7 +249,7 @@ You can get the satellites current Doppler factor, relative to your position, us
 Use either ECI or ECF coordinates, but don't mix them.
 
 ```js
-    var dopplerFactor = satellite.dopplerFactor(observer, position, velocity);
+var dopplerFactor = satellite.dopplerFactor(observer, position, velocity);
 ```
 
 See the section on Coordinate Transforms to see how to get ECF/ECI/Geodetic coordinates.
@@ -292,22 +259,16 @@ See the section on Coordinate Transforms to see how to get ECF/ECI/Geodetic coor
 #### Greenwich Mean Sidereal Time
 
 You'll need to provide some of the coordinate transform functions with your current GMST aka GSTIME. You can use
-Julian Day or a calendar date.
+Julian Day:
 
 ```js
-    var gmst = satellite.gstimeFromJday(julianDay)
+var gmst = satellite.gstimeFromJday(julianDay);
+```
 
-    // Also, be aware that the month range is 1-12, not 0-11.
-    var now = new Date();
+or a JavaScript Date:
 
-    var gmst = satellite.gstimeFromDate(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds()
-    );
+```js
+var gmst = satellite.gstimeFromDate(new Date());
 ```
 
 #### Transforms
@@ -327,20 +288,26 @@ These four are used to convert between ECI, ECF, and Geodetic, as you need them.
 km or km/s. Geodetic coords are in radians.
 
 ```js
-    var ecfCoords = satellite.eciToEcf(eciCoords, gmst);
+var ecfCoords = satellite.eciToEcf(eciCoords, gmst);
+```
 
-    var eciCoords = satellite.ecfToEci(ecfCoords, gmst);
+```js
+var eciCoords = satellite.ecfToEci(ecfCoords, gmst);
+```
 
-    var geodeticCoords = satellite.eciToGeodetic(eciCoords, gmst);
+```js
+var geodeticCoords = satellite.eciToGeodetic(eciCoords, gmst);
+```
 
-    var ecfCoords = satellite.geodeticToEcf(geodeticCoords);
+```js
+var ecfCoords = satellite.geodeticToEcf(geodeticCoords);
 ```
 
 These function is used to compute the look angle, from your geodetic position to a satellite in ECF coordinates.
 Make sure you convert the ECI output from sgp4() and propagate() to ECF first.
 
 ```js
-    var lookAngles = satellite.ecfToLookAngles = function(observerGeodetic, satelliteEcf);
+var lookAngles = satellite.ecfToLookAngles(observerGeodetic, satelliteEcf);
 ```
 
 #### Latitude and Longitude
@@ -349,8 +316,8 @@ These two functions will return human readable Latitude or Longitude strings (Ex
 from `geodeticCoords`:
 
 ```js
-    var latitudeStr = satellite.degreesLat(geodeticRadians),
-        longitudeStr = satellite.degreesLong(geodeticRadians);
+var latitudeStr = satellite.degreesLat(geodeticRadians),
+    longitudeStr = satellite.degreesLong(geodeticRadians);
 ```
 
 ## Note about Code Conventions
