@@ -74,6 +74,22 @@ define(['path/to/satellite'], function(satellite) {
 });
 ```
 
+It's also possible to use the library in [Node.js](https://nodejs.org) or CommonJS-like environments:
+
+```js
+var satellite = require('satellite.js');
+...
+var positionAndVelocity = satellite.sgp4(satrec, time);
+```
+
+or with ES6 syntax:
+
+```js
+import satellite from 'satellite.js';
+...
+const positionAndVelocity = satellite.sgp4(satrec, time);
+```
+
 ## Sample Usage
     
 ```js
