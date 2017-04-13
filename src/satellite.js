@@ -38,7 +38,7 @@ define([
     'use strict';
 
     return {
-        version: '1.2.0',
+        version: '1.4.0',
         constants: constants,
 
         // Coordinate transforms

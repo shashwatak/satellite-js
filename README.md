@@ -1,4 +1,4 @@
-# satellite.js v1.2.0
+# satellite.js v1.4.0
 
 ## Introduction
 
