@@ -266,7 +266,7 @@ export default function dsinit(options) {
 
   // -------------- initialize the resonance terms -------------
   if (irez !== 0) {
-    aonv = Math.pow(nm / xke, x2o3);
+    aonv = ((nm / xke) ** x2o3);
 
     // ---------- geopotential resonance for 12 hour orbits ------
     if (irez === 2) {

@@ -76,7 +76,7 @@ export default function initl(options) {
   const cosio2 = cosio * cosio;
 
   // ------------------ un-kozai the mean motion -----------------
-  const ak = Math.pow(xke / no, x2o3);
+  const ak = ((xke / no) ** x2o3);
   const d1 = (0.75 * j2 * ((3.0 * cosio2) - 1.0)) / (rteosq * omeosq);
   let delPrime = d1 / (ak * ak);
   const adel = ak * (1.0 - (delPrime * delPrime) -
@@ -84,7 +84,7 @@ export default function initl(options) {
   delPrime = d1 / (adel * adel);
   no /= (1.0 + delPrime);
 
-  const ao = Math.pow(xke / no, x2o3);
+  const ao = ((xke / no) ** x2o3);
   const sinio = Math.sin(inclo);
   const po = ao * omeosq;
   const con42 = 1.0 - (5.0 * cosio2);

@@ -219,22 +219,22 @@ export default function sgp4(satrec, tsince) {
   }
 
   if (nm <= 0.0) {
-      //  printf("// error nm %f\n", nm);
+    // printf("// error nm %f\n", nm);
     rec.error = 2;
-      //  sgp4fix add return
+    // sgp4fix add return
     return [false, false];
   }
 
-  const am = Math.pow((xke / nm), x2o3) * tempa * tempa;
-  nm = xke / Math.pow(am, 1.5);
+  const am = ((xke / nm) ** x2o3) * tempa * tempa;
+  nm = xke / (am ** 1.5);
   em -= tempe;
 
   // fix tolerance for error recognition
   // sgp4fix am is fixed from the previous nm check
   if (em >= 1.0 || em < -0.001) {  // || (am < 0.95)
-      //  printf("// error em %f\n", em);
+    // printf("// error em %f\n", em);
     rec.error = 1;
-      //  sgp4fix to return if there is an error in eccentricity
+    // sgp4fix to return if there is an error in eccentricity
     return [false, false];
   }
     //  sgp4fix fix tolerance to avoid a divide by zero
@@ -243,19 +243,17 @@ export default function sgp4(satrec, tsince) {
   }
   mm += rec.no * templ;
   xlm = mm + argpm + nodem;
-  const emsq = em * em;
-  temp = 1.0 - emsq;
 
   nodem %= twoPi;
   argpm %= twoPi;
   xlm %= twoPi;
   mm = (xlm - argpm - nodem) % twoPi;
 
-    //  ----------------- compute extra mean quantities -------------
+  // ----------------- compute extra mean quantities -------------
   const sinim = Math.sin(inclm);
   const cosim = Math.cos(inclm);
 
-    //  -------------------- add lunar-solar periodics --------------
+  // -------------------- add lunar-solar periodics --------------
   let ep = em;
   xincp = inclm;
   argpp = argpm;

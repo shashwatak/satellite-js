@@ -46,7 +46,7 @@ export default function twoline2satrec(longstr1, longstr2) {
     }E${longstr1.substring(59, 61)}`,
   );
 
-  // satrec.satnum   = longstr2.substring(2, 7);
+  // satrec.satnum = longstr2.substring(2, 7);
   satrec.inclo = parseFloat(longstr2.substring(8, 16));
   satrec.nodeo = parseFloat(longstr2.substring(17, 25));
   satrec.ecco = parseFloat(`.${longstr2.substring(26, 33)}`);
@@ -54,17 +54,17 @@ export default function twoline2satrec(longstr1, longstr2) {
   satrec.mo = parseFloat(longstr2.substring(43, 51));
   satrec.no = parseFloat(longstr2.substring(52, 63));
 
-  //  ---- find no, ndot, nddot ----
+  // ---- find no, ndot, nddot ----
   satrec.no /= xpdotp; //   rad/min
   // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
-  //  ---- convert to sgp4 units ----
-  satrec.a = Math.pow(satrec.no * tumin, (-2.0 / 3.0));
+  // ---- convert to sgp4 units ----
+  satrec.a = ((satrec.no * tumin) ** (-2.0 / 3.0));
   satrec.ndot /= (xpdotp * 1440.0);  //   ? * minperday
   satrec.nddot /= (xpdotp * 1440.0 * 1440);
 
-  //  ---- find standard orbital elements ----
+  // ---- find standard orbital elements ----
   satrec.inclo *= deg2rad;
   satrec.nodeo *= deg2rad;
   satrec.argpo *= deg2rad;

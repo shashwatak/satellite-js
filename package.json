@@ -12,7 +12,7 @@
     "build": "npm run transpile && npm run dist:development && npm run dist:production",
     "rebuild": "npm run clean && npm run build",
     "lint": "eslint ./src",
-    "lint:test": "eslint -c .eslintrc.test.json ./test",
+    "lint:test": "eslint ./test",
     "test": "mocha --recursive --require babel-register test",
     "prepublish": "npm run lint && npm run lint:test && npm test && npm run rebuild"
   },
@@ -39,6 +39,7 @@
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-exponentiation-operator": "^6.24.1",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",

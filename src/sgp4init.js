@@ -296,8 +296,8 @@ export default function sgp4init(satrec, options) {
     etasq = rec.eta * rec.eta;
     eeta = rec.ecco * rec.eta;
     psisq = Math.abs(1.0 - etasq);
-    coef = qzms24 * Math.pow(tsi, 4.0);
-    coef1 = coef / Math.pow(psisq, 3.5);
+    coef = qzms24 * (tsi ** 4.0);
+    coef1 = coef / (psisq ** 3.5);
     cc2 = coef1 * rec.no * ((ao * (1.0 + (1.5 * etasq) + (eeta * (4.0 + etasq)))) +
       (((0.375 * j2 * tsi) / psisq) * rec.con41 *
       (8.0 + (3.0 * etasq * (8.0 + etasq)))));
@@ -337,14 +337,16 @@ export default function sgp4init(satrec, options) {
     }
     rec.nodecf = 3.5 * omeosq * xhdot1 * rec.cc1;
     rec.t2cof = 1.5 * rec.cc1;
-      //  sgp4fix for divide by zero with xinco = 180 deg
+
+    // sgp4fix for divide by zero with xinco = 180 deg
     if (Math.abs(cosio + 1.0) > 1.5e-12) {
       rec.xlcof = (-0.25 * j3oj2 * sinio * (3.0 + (5.0 * cosio))) / (1.0 + cosio);
     } else {
       rec.xlcof = (-0.25 * j3oj2 * sinio * (3.0 + (5.0 * cosio))) / temp4;
     }
     rec.aycof = -0.5 * j3oj2 * sinio;
-      //  sgp4fix use multiply for speed instead of pow
+
+    // sgp4fix use multiply for speed instead of pow
     const delmotemp = 1.0 + (rec.eta * Math.cos(rec.mo));
     rec.delmo = delmotemp * delmotemp * delmotemp;
     rec.sinmao = Math.sin(rec.mo);
@@ -619,7 +621,7 @@ export default function sgp4init(satrec, options) {
       rec.xni = dsinitResult.xni;
     }
 
-      // ----------- set variables if not deep space -----------
+    // ----------- set variables if not deep space -----------
     if (rec.isimp !== 1) {
       cc1sq = rec.cc1 * rec.cc1;
       rec.d2 = 4.0 * ao * tsi * cc1sq;
