@@ -1,0 +1,11 @@
+.idea
+/sgp4_verification
+/src
+/test
+.babelrc
+.eslintignore
+.eslintrc.json
+.eslintrc.test.json
+.npmignore
+bower.json
+webpack.config.babel.js
