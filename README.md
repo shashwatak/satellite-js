@@ -43,7 +43,7 @@ I would recommend anybody interested in satellite tracking or orbital propagatio
 Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs
 for use with this library.
 
-## Installation (Bower or NPM)
+## Installation (NPM or Bower)
 
 Install the library with [NPM](https://www.npmjs.com/):
 
