@@ -13,6 +13,7 @@ import { pi, earthRadius, j2, j4, j3oj2 } from './constants';
  *  this procedure initializes variables for sgp4.
  *
  *  author        : david vallado                  719-573-2600   28 jun 2005
+ *  author        : david vallado                  719-573-2600   28 jun 2005
  *
  *  inputs        :
  *    opsmode     - mode of operation afspc or improved 'a', 'i'
@@ -238,7 +239,6 @@ export default function sgp4init(satrec, options) {
   //  ------------------------ earth constants -----------------------
   //  sgp4fix identify constants and allow alternate values
 
-
   const ss = 78.0 / earthRadius + 1.0;
     //  sgp4fix use multiply for speed instead of pow
   const qzms2ttemp = (120.0 - 78.0) / earthRadius;
@@ -248,7 +248,7 @@ export default function sgp4init(satrec, options) {
   satrec.init = 'y';
   satrec.t = 0.0;
 
-  const initlParameters = {
+  const initlOptions = {
     satn,
     ecco: satrec.ecco,
 
@@ -260,7 +260,7 @@ export default function sgp4init(satrec, options) {
     opsmode: satrec.operationmode,
   };
 
-  const initlResult = initl(initlParameters);
+  const initlResult = initl(initlOptions);
 
   satrec.no = initlResult.no;
 
@@ -379,7 +379,7 @@ export default function sgp4init(satrec, options) {
       tc = 0.0;
       inclm = satrec.inclo;
 
-      const dscomParameters = {
+      const dscomOptions = {
         epoch,
         ep: satrec.ecco,
         argpp: satrec.argpo,
@@ -431,7 +431,7 @@ export default function sgp4init(satrec, options) {
         zmos: satrec.zmos,
       };
 
-      const dscomResult = dscom(dscomParameters);
+      const dscomResult = dscom(dscomOptions);
 
       snodm = dscomResult.snodm;
       cnodm = dscomResult.cnodm;
@@ -530,7 +530,7 @@ export default function sgp4init(satrec, options) {
       satrec.zmol = dscomResult.zmol;
       satrec.zmos = dscomResult.zmos;
 
-      const dpperParameters = {
+      const dpperOptions = {
         inclo: inclm,
         init: satrec.init,
         ep: satrec.ecco,
@@ -541,7 +541,7 @@ export default function sgp4init(satrec, options) {
         opsmode: satrec.operationmode,
       };
 
-      const dpperResult = dpper(satrec, dpperParameters);
+      const dpperResult = dpper(satrec, dpperOptions);
 
       satrec.ecco = dpperResult.ep;
       satrec.inclo = dpperResult.inclp;

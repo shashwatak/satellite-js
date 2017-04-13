@@ -71,7 +71,7 @@ export default function twoline2satrec(longstr1, longstr2) {
   satrec.mo *= deg2rad;
 
   satrec.alta = (satrec.a * (1.0 + satrec.ecco)) - 1.0;
-  satrec.altp = satrec.a * ((1.0 - satrec.ecco)) - 1.0;
+  satrec.altp = (satrec.a * (1.0 - satrec.ecco)) - 1.0;
 
 
   // ----------------------------------------------------------------

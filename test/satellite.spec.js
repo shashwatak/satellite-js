@@ -9,7 +9,7 @@ import sgp4 from '../src/sgp4';
 
 chai.should();
 
-describe('Satellite test suite', () => {
+describe('SGP4', () => {
   it('sgp4', () => {
     const delta = 1e-7;
 
