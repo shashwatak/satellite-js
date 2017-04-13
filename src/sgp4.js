@@ -1,3 +1,5 @@
+import assign from 'object-assign';
+
 import dpper from './dpper';
 import dspace from './dspace';
 
@@ -90,210 +92,148 @@ import { pi, twoPi, earthRadius, xke, x2o3, j2, j3oj2 } from './constants';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4(satrec, tsince) {
-  let am,
-    axnl,
-    aynl,
-    betal,
-    cosim,
-    sinim,
-    cnod,
-    snod,
-    cos2u,
-    sin2u,
-    coseo1,
-    sineo1,
-    cosi,
-    sini,
-    cosip,
-    sinip,
-    cosisq,
-    cossu,
-    sinsu,
-    cosu,
-    sinu,
-    delm,
-    delomg,
-    dndt,
-    emsq,
-    ecose,
-    el2,
-    eo1,
-    esine,
-    argpm,
-    argpp,
-    pl,
-    r,
-    v,
-    rdotl,
-    rl,
-    rvdot,
-    rvdotl,
-    su,
-    t2,
-    t3,
-    t4,
-    tc,
-    tem5,
-    temp,
-    temp1,
-    temp2,
-    tempa,
-    tempe,
-    templ,
-    u,
-    ux,
-    uy,
-    uz,
-    vx,
-    vy,
-    vz,
-    inclm,
-    mm,
-    nm,
-    nodem,
-    xinc,
-    xincp,
-    xl,
-    xlm,
-    mp,
-    xmdf,
-    xmx,
-    xmy,
-    nodedf,
-    xnode,
-    nodep;
+  const rec = assign({}, satrec);
 
-    // TODO: defined but never used
-    // var cosomm, sinomm, eccm, eccp, omgadf, rtemsq, np;
+  let coseo1;
+  let sineo1;
+  let cosip;
+  let sinip;
+  let cosisq;
+  let delm;
+  let delomg;
+  let eo1;
+  let argpm;
+  let argpp;
+  let su;
+  let t3;
+  let t4;
+  let tc;
+  let tem5;
+  let temp;
+  let tempa;
+  let tempe;
+  let templ;
+  let inclm;
+  let mm;
+  let nm;
+  let nodem;
+  let xincp;
+  let xlm;
+  let mp;
+  let nodep;
 
-  let mrt = 0.0;
-
-      /* ------------------ set mathematical constants --------------- */
-    // sgp4fix divisor for divide by zero check on inclination
-    // the old check used 1.0 + cos(pi-1.0e-9), but then compared it to
-    // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
+  /* ------------------ set mathematical constants --------------- */
+  // sgp4fix divisor for divide by zero check on inclination
+  // the old check used 1.0 + cos(pi-1.0e-9), but then compared it to
+  // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
 
   const temp4 = 1.5e-12;
 
-  const vkmpersec = earthRadius * xke / 60.0;
+  const vkmpersec = (earthRadius * xke) / 60.0;
 
-    //  --------------------- clear sgp4 error flag -----------------
-  satrec.t = tsince;
-  satrec.error = 0;
+  // --------------------- clear sgp4 error flag -----------------
+  rec.t = tsince;
+  rec.error = 0;
 
     //  ------- update for secular gravity and atmospheric drag -----
-  xmdf = satrec.mo + satrec.mdot * satrec.t;
-  const argpdf = satrec.argpo + satrec.argpdot * satrec.t;
-  nodedf = satrec.nodeo + satrec.nodedot * satrec.t;
+  const xmdf = rec.mo + (rec.mdot * rec.t);
+  const argpdf = rec.argpo + (rec.argpdot * rec.t);
+  const nodedf = rec.nodeo + (rec.nodedot * rec.t);
   argpm = argpdf;
   mm = xmdf;
-  t2 = satrec.t * satrec.t;
-  nodem = nodedf + satrec.nodecf * t2;
-  tempa = 1.0 - satrec.cc1 * satrec.t;
-  tempe = satrec.bstar * satrec.cc4 * satrec.t;
-  templ = satrec.t2cof * t2;
+  const t2 = rec.t * rec.t;
+  nodem = nodedf + (rec.nodecf * t2);
+  tempa = 1.0 - (rec.cc1 * rec.t);
+  tempe = rec.bstar * rec.cc4 * rec.t;
+  templ = rec.t2cof * t2;
 
-  if (satrec.isimp !== 1) {
-    delomg = satrec.omgcof * satrec.t;
+  if (rec.isimp !== 1) {
+    delomg = rec.omgcof * rec.t;
       //  sgp4fix use mutliply for speed instead of pow
-    const delmtemp = 1.0 + satrec.eta * Math.cos(xmdf);
-    delm = satrec.xmcof *
-        (delmtemp * delmtemp * delmtemp -
-        satrec.delmo);
+    const delmtemp = 1.0 + (rec.eta * Math.cos(xmdf));
+    delm = rec.xmcof * ((delmtemp * delmtemp * delmtemp) - rec.delmo);
     temp = delomg + delm;
     mm = xmdf + temp;
     argpm = argpdf - temp;
-    t3 = t2 * satrec.t;
-    t4 = t3 * satrec.t;
-    tempa = tempa - satrec.d2 * t2 - satrec.d3 * t3 -
-        satrec.d4 * t4;
-    tempe += satrec.bstar * satrec.cc5 * (Math.sin(mm) -
-        satrec.sinmao);
-    templ = templ + satrec.t3cof * t3 + t4 * (satrec.t4cof +
-        satrec.t * satrec.t5cof);
+    t3 = t2 * rec.t;
+    t4 = t3 * rec.t;
+    tempa = tempa - (rec.d2 * t2) - (rec.d3 * t3) - (rec.d4 * t4);
+    tempe += rec.bstar * rec.cc5 * (Math.sin(mm) - rec.sinmao);
+    templ = templ + (rec.t3cof * t3) + (t4 * (rec.t4cof + (rec.t * rec.t5cof)));
   }
-  nm = satrec.no;
-  let em = satrec.ecco;
-  inclm = satrec.inclo;
-  if (satrec.method === 'd') {
-    tc = satrec.t;
+  nm = rec.no;
+  let em = rec.ecco;
+  inclm = rec.inclo;
+  if (rec.method === 'd') {
+    tc = rec.t;
 
-    const dspaceParameters = {
-      irez: satrec.irez,
-      d2201: satrec.d2201,
-      d2211: satrec.d2211,
-      d3210: satrec.d3210,
-      d3222: satrec.d3222,
-      d4410: satrec.d4410,
-      d4422: satrec.d4422,
-      d5220: satrec.d5220,
-      d5232: satrec.d5232,
-      d5421: satrec.d5421,
-      d5433: satrec.d5433,
-      dedt: satrec.dedt,
-      del1: satrec.del1,
-      del2: satrec.del2,
-      del3: satrec.del3,
-      didt: satrec.didt,
-      dmdt: satrec.dmdt,
-      dnodt: satrec.dnodt,
-      domdt: satrec.domdt,
-      argpo: satrec.argpo,
-      argpdot: satrec.argpdot,
-      t: satrec.t,
+    const dspaceOptions = {
+      irez: rec.irez,
+      d2201: rec.d2201,
+      d2211: rec.d2211,
+      d3210: rec.d3210,
+      d3222: rec.d3222,
+      d4410: rec.d4410,
+      d4422: rec.d4422,
+      d5220: rec.d5220,
+      d5232: rec.d5232,
+      d5421: rec.d5421,
+      d5433: rec.d5433,
+      dedt: rec.dedt,
+      del1: rec.del1,
+      del2: rec.del2,
+      del3: rec.del3,
+      didt: rec.didt,
+      dmdt: rec.dmdt,
+      dnodt: rec.dnodt,
+      domdt: rec.domdt,
+      argpo: rec.argpo,
+      argpdot: rec.argpdot,
+      t: rec.t,
       tc,
-      gsto: satrec.gsto,
-      xfact: satrec.xfact,
-      xlamo: satrec.xlamo,
-      no: satrec.no,
-      atime: satrec.atime,
+      gsto: rec.gsto,
+      xfact: rec.xfact,
+      xlamo: rec.xlamo,
+      no: rec.no,
+      atime: rec.atime,
       em,
       argpm,
       inclm,
-      xli: satrec.xli,
+      xli: rec.xli,
       mm,
-      xni: satrec.xni,
+      xni: rec.xni,
       nodem,
       nm,
     };
 
-    const dspaceResult = dspace(dspaceParameters);
-
-      // TODO: defined but never used
-      // var atime = dspaceResult.atime;
+    const dspaceResult = dspace(dspaceOptions);
 
     em = dspaceResult.em;
     argpm = dspaceResult.argpm;
     inclm = dspaceResult.inclm;
 
-      // TODO: defined but never used
-      // var xli = dspaceResult.xli;
-
     mm = dspaceResult.mm;
 
-      // TODO: defined but never used
-      // var xni = dspaceResult.xni;
-
     nodem = dspaceResult.nodem;
-    dndt = dspaceResult.dndt;
     nm = dspaceResult.nm;
   }
 
   if (nm <= 0.0) {
       //  printf("// error nm %f\n", nm);
-    satrec.error = 2;
+    rec.error = 2;
       //  sgp4fix add return
     return [false, false];
   }
-  am = Math.pow((xke / nm), x2o3) * tempa * tempa;
+
+  const am = Math.pow((xke / nm), x2o3) * tempa * tempa;
   nm = xke / Math.pow(am, 1.5);
   em -= tempe;
 
-    //  fix tolerance for error recognition
-    //  sgp4fix am is fixed from the previous nm check
+  // fix tolerance for error recognition
+  // sgp4fix am is fixed from the previous nm check
   if (em >= 1.0 || em < -0.001) {  // || (am < 0.95)
       //  printf("// error em %f\n", em);
-    satrec.error = 1;
+    rec.error = 1;
       //  sgp4fix to return if there is an error in eccentricity
     return [false, false];
   }
@@ -301,9 +241,9 @@ export default function sgp4(satrec, tsince) {
   if (em < 1.0e-6) {
     em = 1.0e-6;
   }
-  mm += satrec.no * templ;
+  mm += rec.no * templ;
   xlm = mm + argpm + nodem;
-  emsq = em * em;
+  const emsq = em * em;
   temp = 1.0 - emsq;
 
   nodem %= twoPi;
@@ -312,8 +252,8 @@ export default function sgp4(satrec, tsince) {
   mm = (xlm - argpm - nodem) % twoPi;
 
     //  ----------------- compute extra mean quantities -------------
-  sinim = Math.sin(inclm);
-  cosim = Math.cos(inclm);
+  const sinim = Math.sin(inclm);
+  const cosim = Math.cos(inclm);
 
     //  -------------------- add lunar-solar periodics --------------
   let ep = em;
@@ -323,19 +263,19 @@ export default function sgp4(satrec, tsince) {
   mp = mm;
   sinip = sinim;
   cosip = cosim;
-  if (satrec.method === 'd') {
+  if (rec.method === 'd') {
     const dpperParameters = {
-      inclo: satrec.inclo,
+      inclo: rec.inclo,
       init: 'n',
       ep,
       inclp: xincp,
       nodep,
       argpp,
       mp,
-      opsmode: satrec.operationmod,
+      opsmode: rec.operationmod,
     };
 
-    const dpperResult = dpper(satrec, dpperParameters);
+    const dpperResult = dpper(rec, dpperParameters);
     ep = dpperResult.ep;
     xincp = dpperResult.inclp;
     nodep = dpperResult.nodep;
@@ -349,30 +289,30 @@ export default function sgp4(satrec, tsince) {
     }
     if (ep < 0.0 || ep > 1.0) {
         //  printf("// error ep %f\n", ep);
-      satrec.error = 3;
+      rec.error = 3;
         //  sgp4fix add return
       return [false, false];
     }
   }
     //  -------------------- long period periodics ------------------
-  if (satrec.method === 'd') {
+  if (rec.method === 'd') {
     sinip = Math.sin(xincp);
     cosip = Math.cos(xincp);
-    satrec.aycof = -0.5 * j3oj2 * sinip;
+    rec.aycof = -0.5 * j3oj2 * sinip;
       //  sgp4fix for divide by zero for xincp = 180 deg
     if (Math.abs(cosip + 1.0) > 1.5e-12) {
-      satrec.xlcof = -0.25 * j3oj2 * sinip * (3.0 + 5.0 * cosip) / (1.0 + cosip);
+      rec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / (1.0 + cosip);
     } else {
-      satrec.xlcof = -0.25 * j3oj2 * sinip * (3.0 + 5.0 * cosip) / temp4;
+      rec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / temp4;
     }
   }
-  axnl = ep * Math.cos(argpp);
-  temp = 1.0 / (am * (1.0 - ep * ep));
-  aynl = ep * Math.sin(argpp) + temp * satrec.aycof;
-  xl = mp + argpp + nodep + temp * satrec.xlcof * axnl;
+  const axnl = ep * Math.cos(argpp);
+  temp = 1.0 / (am * (1.0 - (ep * ep)));
+  const aynl = (ep * Math.sin(argpp)) + (temp * rec.aycof);
+  const xl = mp + argpp + nodep + (temp * rec.xlcof * axnl);
 
-    //  --------------------- solve kepler's equation ---------------
-  u = (xl - nodep) % twoPi;
+  // --------------------- solve kepler's equation ---------------
+  const u = (xl - nodep) % twoPi;
   eo1 = u;
   tem5 = 9999.9;
   let ktr = 1;
@@ -381,8 +321,8 @@ export default function sgp4(satrec, tsince) {
   while (Math.abs(tem5) >= 1.0e-12 && ktr <= 10) {
     sineo1 = Math.sin(eo1);
     coseo1 = Math.cos(eo1);
-    tem5 = 1.0 - coseo1 * axnl - sineo1 * aynl;
-    tem5 = (u - aynl * coseo1 + axnl * sineo1 - eo1) / tem5;
+    tem5 = 1.0 - (coseo1 * axnl) - (sineo1 * aynl);
+    tem5 = (((u - (aynl * coseo1)) + (axnl * sineo1)) - eo1) / tem5;
     if (Math.abs(tem5) >= 0.95) {
       if (tem5 > 0.0) {
         tem5 = 0.95;
@@ -394,78 +334,89 @@ export default function sgp4(satrec, tsince) {
     ktr += 1;
   }
     //  ------------- short period preliminary quantities -----------
-  ecose = axnl * coseo1 + aynl * sineo1;
-  esine = axnl * sineo1 - aynl * coseo1;
-  el2 = axnl * axnl + aynl * aynl;
-  pl = am * (1.0 - el2);
+  const ecose = (axnl * coseo1) + (aynl * sineo1);
+  const esine = (axnl * sineo1) - (aynl * coseo1);
+  const el2 = (axnl * axnl) + (aynl * aynl);
+  const pl = am * (1.0 - el2);
   if (pl < 0.0) {
       //  printf("// error pl %f\n", pl);
-    satrec.error = 4;
+    rec.error = 4;
       //  sgp4fix add return
     return [false, false];
   }
 
-  rl = am * (1.0 - ecose);
-  rdotl = Math.sqrt(am) * esine / rl;
-  rvdotl = Math.sqrt(pl) / rl;
-  betal = Math.sqrt(1.0 - el2);
+  const rl = am * (1.0 - ecose);
+  const rdotl = (Math.sqrt(am) * esine) / rl;
+  const rvdotl = Math.sqrt(pl) / rl;
+  const betal = Math.sqrt(1.0 - el2);
   temp = esine / (1.0 + betal);
-  sinu = am / rl * (sineo1 - aynl - axnl * temp);
-  cosu = am / rl * (coseo1 - axnl + aynl * temp);
+  const sinu = (am / rl) * (sineo1 - aynl - (axnl * temp));
+  const cosu = (am / rl) * ((coseo1 - axnl) + (aynl * temp));
   su = Math.atan2(sinu, cosu);
-  sin2u = (cosu + cosu) * sinu;
-  cos2u = 1.0 - 2.0 * sinu * sinu;
+  const sin2u = (cosu + cosu) * sinu;
+  const cos2u = 1.0 - (2.0 * sinu * sinu);
   temp = 1.0 / pl;
-  temp1 = 0.5 * j2 * temp;
-  temp2 = temp1 * temp;
+  const temp1 = 0.5 * j2 * temp;
+  const temp2 = temp1 * temp;
 
-      //  -------------- update for short period periodics ------------
-  if (satrec.method === 'd') {
+  // -------------- update for short period periodics ------------
+  if (rec.method === 'd') {
     cosisq = cosip * cosip;
-    satrec.con41 = 3.0 * cosisq - 1.0;
-    satrec.x1mth2 = 1.0 - cosisq;
-    satrec.x7thm1 = 7.0 * cosisq - 1.0;
+    rec.con41 = (3.0 * cosisq) - 1.0;
+    rec.x1mth2 = 1.0 - cosisq;
+    rec.x7thm1 = (7.0 * cosisq) - 1.0;
   }
-  mrt = rl * (1.0 - 1.5 * temp2 * betal * satrec.con41) +
-        0.5 * temp1 * satrec.x1mth2 * cos2u;
-  su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;
-  xnode = nodep + 1.5 * temp2 * cosip * sin2u;
-  xinc = xincp + 1.5 * temp2 * cosip * sinip * cos2u;
-  const mvt = rdotl - nm * temp1 * satrec.x1mth2 * sin2u / xke;
-  rvdot = rvdotl + nm * temp1 * (satrec.x1mth2 * cos2u +
-        1.5 * satrec.con41) / xke;
 
-      //  --------------------- orientation vectors -------------------
-  sinsu = Math.sin(su);
-  cossu = Math.cos(su);
-  snod = Math.sin(xnode);
-  cnod = Math.cos(xnode);
-  sini = Math.sin(xinc);
-  cosi = Math.cos(xinc);
-  xmx = -snod * cosi;
-  xmy = cnod * cosi;
-  ux = xmx * sinsu + cnod * cossu;
-  uy = xmy * sinsu + snod * cossu;
-  uz = sini * sinsu;
-  vx = xmx * cossu - cnod * sinsu;
-  vy = xmy * cossu - snod * sinsu;
-  vz = sini * cossu;
+  const mrt = (rl * (1.0 - (1.5 * temp2 * betal * rec.con41))) +
+    (0.5 * temp1 * rec.x1mth2 * cos2u);
+  su -= 0.25 * temp2 * rec.x7thm1 * sin2u;
+  const xnode = nodep + (1.5 * temp2 * cosip * sin2u);
+  const xinc = xincp + (1.5 * temp2 * cosip * sinip * cos2u);
+  const mvt = rdotl - ((nm * temp1 * rec.x1mth2 * sin2u) / xke);
+  const rvdot = rvdotl + ((nm * temp1 * ((rec.x1mth2 * cos2u) + (1.5 * rec.con41))) / xke);
 
-      //  --------- position and velocity (in km and km/sec) ----------
-  r = { x: 0.0, y: 0.0, z: 0.0 };
-  r.x = (mrt * ux) * earthRadius;
-  r.y = (mrt * uy) * earthRadius;
-  r.z = (mrt * uz) * earthRadius;
-  v = { x: 0.0, y: 0.0, z: 0.0 };
-  v.x = (mvt * ux + rvdot * vx) * vkmpersec;
-  v.y = (mvt * uy + rvdot * vy) * vkmpersec;
-  v.z = (mvt * uz + rvdot * vz) * vkmpersec;
+  // --------------------- orientation vectors -------------------
+  const sinsu = Math.sin(su);
+  const cossu = Math.cos(su);
+  const snod = Math.sin(xnode);
+  const cnod = Math.cos(xnode);
+  const sini = Math.sin(xinc);
+  const cosi = Math.cos(xinc);
+  const xmx = -snod * cosi;
+  const xmy = cnod * cosi;
+  const ux = (xmx * sinsu) + (cnod * cossu);
+  const uy = (xmy * sinsu) + (snod * cossu);
+  const uz = sini * sinsu;
+  const vx = (xmx * cossu) - (cnod * sinsu);
+  const vy = (xmy * cossu) - (snod * sinsu);
+  const vz = sini * cossu;
 
-    //  sgp4fix for decaying satellites
+  // --------- position and velocity (in km and km/sec) ----------
+  const r = {
+    x: (mrt * ux) * earthRadius,
+    y: (mrt * uy) * earthRadius,
+    z: (mrt * uz) * earthRadius,
+  };
+  const v = {
+    x: ((mvt * ux) + (rvdot * vx)) * vkmpersec,
+    y: ((mvt * uy) + (rvdot * vy)) * vkmpersec,
+    z: ((mvt * uz) + (rvdot * vz)) * vkmpersec,
+  };
+
+  // sgp4fix for decaying satellites
   if (mrt < 1.0) {
-      // printf("// decay condition %11.6f \n",mrt);
-    satrec.error = 6;
-    return { position: false, velocity: false };
+    // printf("// decay condition %11.6f \n",mrt);
+    rec.error = 6;
+    return {
+      position: false,
+      velocity: false,
+      satrec: rec,
+    };
   }
-  return { position: r, velocity: v };
+
+  return {
+    position: r,
+    velocity: v,
+    satrec: rec,
+  };
 }
