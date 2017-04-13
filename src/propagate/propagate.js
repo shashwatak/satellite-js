@@ -1,27 +1,12 @@
-/*
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
+import sgp4 from '../sgp4';
+import jday from '../gstime/jday';
+import { minutesPerDay } from '../constants';
 
-define([
-    '../constants',
-    '../gstime/jday',
-    '../sgp4'
-], function(
-    constants,
-    jday,
-    sgp4
-) {
-    'use strict';
-
-    return function propagate() {
-        //Return a position and velocity vector for a given date and time.
-        var satrec = arguments[0],
-            date = Array.prototype.slice.call(arguments, 1),
-            j = jday.apply(null, date),
-            m = (j - satrec.jdsatepoch) * constants.minutesPerDay;
-        return sgp4(satrec, m);
-    };
-});
+export default function propagate(...args) {
+  // Return a position and velocity vector for a given date and time.
+  const satrec = args[0];
+  const date = Array.prototype.slice.call(args, 1);
+  const j = jday(...date);
+  const m = (j - satrec.jdsatepoch) * minutesPerDay;
+  return sgp4(satrec, m);
+}
