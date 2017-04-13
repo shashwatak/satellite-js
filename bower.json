@@ -25,9 +25,11 @@
     ".npmignore",
     "package.json",
     "webpack.config.babel.js",
+    "commands",
     "lib",
     "node_modules",
     "sgp4_verification",
+    "src",
     "test"
   ]
 }

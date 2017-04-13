@@ -1,3 +1,10 @@
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -73,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -81,6 +88,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -94,6 +108,7 @@ var minutesPerDay = exports.minutesPerDay = 1440.0;
 var mu = exports.mu = 398600.5; // in km3 / s2
 var earthRadius = exports.earthRadius = 6378.137; // in km
 var xke = exports.xke = 60.0 / Math.sqrt(earthRadius * earthRadius * earthRadius / mu);
+var tumin = exports.tumin = 1.0 / xke;
 var j2 = exports.j2 = 0.00108262998905;
 var j3 = exports.j3 = -0.00000253215306;
 var j4 = exports.j4 = -0.00000161098761;
@@ -109,6 +124,7 @@ exports.default = {
   mu: mu,
   earthRadius: earthRadius,
   xke: xke,
+  tumin: tumin,
   j2: j2,
   j3: j3,
   j4: j4,
@@ -121,6 +137,13 @@ exports.default = {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -128,19 +151,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = jday;
 function jdayInternal(year, mon, day, hr, minute, sec) {
-  /*
-  return (
-    (367.0 * year) -
-    (Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-    Math.floor((275 * mon) / 9.0) +
-    day + 1721013.5 +
-    (((((sec / 60.0) + minute) / 60.0) + hr) / 24.0)) // ut in days
-    // # - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
-  );
-  */
-
-  return 367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor(275 * mon / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
-  //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
+  return 367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor(275 * mon / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 // ut in days
+  // # - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
   ;
 }
 
@@ -160,6 +172,13 @@ module.exports = exports["default"];
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -167,11 +186,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = sgp4;
 
+var _objectAssign = __webpack_require__(6);
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
 var _dpper = __webpack_require__(5);
 
 var _dpper2 = _interopRequireDefault(_dpper);
 
-var _dspace = __webpack_require__(17);
+var _dspace = __webpack_require__(18);
 
 var _dspace2 = _interopRequireDefault(_dspace);
 
@@ -266,83 +289,35 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 function sgp4(satrec, tsince) {
-  var am = void 0,
-      axnl = void 0,
-      aynl = void 0,
-      betal = void 0,
-      cosim = void 0,
-      sinim = void 0,
-      cnod = void 0,
-      snod = void 0,
-      cos2u = void 0,
-      sin2u = void 0,
-      coseo1 = void 0,
-      sineo1 = void 0,
-      cosi = void 0,
-      sini = void 0,
-      cosip = void 0,
-      sinip = void 0,
-      cosisq = void 0,
-      cossu = void 0,
-      sinsu = void 0,
-      cosu = void 0,
-      sinu = void 0,
-      delm = void 0,
-      delomg = void 0,
-      dndt = void 0,
-      emsq = void 0,
-      ecose = void 0,
-      el2 = void 0,
-      eo1 = void 0,
-      esine = void 0,
-      argpm = void 0,
-      argpp = void 0,
-      pl = void 0,
-      r = void 0,
-      v = void 0,
-      rdotl = void 0,
-      rl = void 0,
-      rvdot = void 0,
-      rvdotl = void 0,
-      su = void 0,
-      t2 = void 0,
-      t3 = void 0,
-      t4 = void 0,
-      tc = void 0,
-      tem5 = void 0,
-      temp = void 0,
-      temp1 = void 0,
-      temp2 = void 0,
-      tempa = void 0,
-      tempe = void 0,
-      templ = void 0,
-      u = void 0,
-      ux = void 0,
-      uy = void 0,
-      uz = void 0,
-      vx = void 0,
-      vy = void 0,
-      vz = void 0,
-      inclm = void 0,
-      mm = void 0,
-      nm = void 0,
-      nodem = void 0,
-      xinc = void 0,
-      xincp = void 0,
-      xl = void 0,
-      xlm = void 0,
-      mp = void 0,
-      xmdf = void 0,
-      xmx = void 0,
-      xmy = void 0,
-      nodedf = void 0,
-      xnode = void 0,
-      nodep = void 0;
+  var rec = (0, _objectAssign2.default)({}, satrec);
 
-  // TODO: defined but never used
-  // var cosomm, sinomm, eccm, eccp, omgadf, rtemsq, np;
-
-  var mrt = 0.0;
+  var coseo1 = void 0;
+  var sineo1 = void 0;
+  var cosip = void 0;
+  var sinip = void 0;
+  var cosisq = void 0;
+  var delm = void 0;
+  var delomg = void 0;
+  var eo1 = void 0;
+  var argpm = void 0;
+  var argpp = void 0;
+  var su = void 0;
+  var t3 = void 0;
+  var t4 = void 0;
+  var tc = void 0;
+  var tem5 = void 0;
+  var temp = void 0;
+  var tempa = void 0;
+  var tempe = void 0;
+  var templ = void 0;
+  var inclm = void 0;
+  var mm = void 0;
+  var nm = void 0;
+  var nodem = void 0;
+  var xincp = void 0;
+  var xlm = void 0;
+  var mp = void 0;
+  var nodep = void 0;
 
   /* ------------------ set mathematical constants --------------- */
   // sgp4fix divisor for divide by zero check on inclination
@@ -353,141 +328,130 @@ function sgp4(satrec, tsince) {
 
   var vkmpersec = _constants.earthRadius * _constants.xke / 60.0;
 
-  //  --------------------- clear sgp4 error flag -----------------
-  satrec.t = tsince;
-  satrec.error = 0;
+  // --------------------- clear sgp4 error flag -----------------
+  rec.t = tsince;
+  rec.error = 0;
 
   //  ------- update for secular gravity and atmospheric drag -----
-  xmdf = satrec.mo + satrec.mdot * satrec.t;
-  var argpdf = satrec.argpo + satrec.argpdot * satrec.t;
-  nodedf = satrec.nodeo + satrec.nodedot * satrec.t;
+  var xmdf = rec.mo + rec.mdot * rec.t;
+  var argpdf = rec.argpo + rec.argpdot * rec.t;
+  var nodedf = rec.nodeo + rec.nodedot * rec.t;
   argpm = argpdf;
   mm = xmdf;
-  t2 = satrec.t * satrec.t;
-  nodem = nodedf + satrec.nodecf * t2;
-  tempa = 1.0 - satrec.cc1 * satrec.t;
-  tempe = satrec.bstar * satrec.cc4 * satrec.t;
-  templ = satrec.t2cof * t2;
+  var t2 = rec.t * rec.t;
+  nodem = nodedf + rec.nodecf * t2;
+  tempa = 1.0 - rec.cc1 * rec.t;
+  tempe = rec.bstar * rec.cc4 * rec.t;
+  templ = rec.t2cof * t2;
 
-  if (satrec.isimp !== 1) {
-    delomg = satrec.omgcof * satrec.t;
+  if (rec.isimp !== 1) {
+    delomg = rec.omgcof * rec.t;
     //  sgp4fix use mutliply for speed instead of pow
-    var delmtemp = 1.0 + satrec.eta * Math.cos(xmdf);
-    delm = satrec.xmcof * (delmtemp * delmtemp * delmtemp - satrec.delmo);
+    var delmtemp = 1.0 + rec.eta * Math.cos(xmdf);
+    delm = rec.xmcof * (delmtemp * delmtemp * delmtemp - rec.delmo);
     temp = delomg + delm;
     mm = xmdf + temp;
     argpm = argpdf - temp;
-    t3 = t2 * satrec.t;
-    t4 = t3 * satrec.t;
-    tempa = tempa - satrec.d2 * t2 - satrec.d3 * t3 - satrec.d4 * t4;
-    tempe += satrec.bstar * satrec.cc5 * (Math.sin(mm) - satrec.sinmao);
-    templ = templ + satrec.t3cof * t3 + t4 * (satrec.t4cof + satrec.t * satrec.t5cof);
+    t3 = t2 * rec.t;
+    t4 = t3 * rec.t;
+    tempa = tempa - rec.d2 * t2 - rec.d3 * t3 - rec.d4 * t4;
+    tempe += rec.bstar * rec.cc5 * (Math.sin(mm) - rec.sinmao);
+    templ = templ + rec.t3cof * t3 + t4 * (rec.t4cof + rec.t * rec.t5cof);
   }
-  nm = satrec.no;
-  var em = satrec.ecco;
-  inclm = satrec.inclo;
-  if (satrec.method === 'd') {
-    tc = satrec.t;
+  nm = rec.no;
+  var em = rec.ecco;
+  inclm = rec.inclo;
+  if (rec.method === 'd') {
+    tc = rec.t;
 
-    var dspaceParameters = {
-      irez: satrec.irez,
-      d2201: satrec.d2201,
-      d2211: satrec.d2211,
-      d3210: satrec.d3210,
-      d3222: satrec.d3222,
-      d4410: satrec.d4410,
-      d4422: satrec.d4422,
-      d5220: satrec.d5220,
-      d5232: satrec.d5232,
-      d5421: satrec.d5421,
-      d5433: satrec.d5433,
-      dedt: satrec.dedt,
-      del1: satrec.del1,
-      del2: satrec.del2,
-      del3: satrec.del3,
-      didt: satrec.didt,
-      dmdt: satrec.dmdt,
-      dnodt: satrec.dnodt,
-      domdt: satrec.domdt,
-      argpo: satrec.argpo,
-      argpdot: satrec.argpdot,
-      t: satrec.t,
+    var dspaceOptions = {
+      irez: rec.irez,
+      d2201: rec.d2201,
+      d2211: rec.d2211,
+      d3210: rec.d3210,
+      d3222: rec.d3222,
+      d4410: rec.d4410,
+      d4422: rec.d4422,
+      d5220: rec.d5220,
+      d5232: rec.d5232,
+      d5421: rec.d5421,
+      d5433: rec.d5433,
+      dedt: rec.dedt,
+      del1: rec.del1,
+      del2: rec.del2,
+      del3: rec.del3,
+      didt: rec.didt,
+      dmdt: rec.dmdt,
+      dnodt: rec.dnodt,
+      domdt: rec.domdt,
+      argpo: rec.argpo,
+      argpdot: rec.argpdot,
+      t: rec.t,
       tc: tc,
-      gsto: satrec.gsto,
-      xfact: satrec.xfact,
-      xlamo: satrec.xlamo,
-      no: satrec.no,
-      atime: satrec.atime,
+      gsto: rec.gsto,
+      xfact: rec.xfact,
+      xlamo: rec.xlamo,
+      no: rec.no,
+      atime: rec.atime,
       em: em,
       argpm: argpm,
       inclm: inclm,
-      xli: satrec.xli,
+      xli: rec.xli,
       mm: mm,
-      xni: satrec.xni,
+      xni: rec.xni,
       nodem: nodem,
       nm: nm
     };
 
-    var dspaceResult = (0, _dspace2.default)(dspaceParameters);
-
-    // TODO: defined but never used
-    // var atime = dspaceResult.atime;
+    var dspaceResult = (0, _dspace2.default)(dspaceOptions);
 
     em = dspaceResult.em;
     argpm = dspaceResult.argpm;
     inclm = dspaceResult.inclm;
 
-    // TODO: defined but never used
-    // var xli = dspaceResult.xli;
-
     mm = dspaceResult.mm;
 
-    // TODO: defined but never used
-    // var xni = dspaceResult.xni;
-
     nodem = dspaceResult.nodem;
-    dndt = dspaceResult.dndt;
     nm = dspaceResult.nm;
   }
 
   if (nm <= 0.0) {
-    //  printf("// error nm %f\n", nm);
-    satrec.error = 2;
-    //  sgp4fix add return
+    // printf("// error nm %f\n", nm);
+    rec.error = 2;
+    // sgp4fix add return
     return [false, false];
   }
-  am = Math.pow(_constants.xke / nm, _constants.x2o3) * tempa * tempa;
+
+  var am = Math.pow(_constants.xke / nm, _constants.x2o3) * tempa * tempa;
   nm = _constants.xke / Math.pow(am, 1.5);
   em -= tempe;
 
-  //  fix tolerance for error recognition
-  //  sgp4fix am is fixed from the previous nm check
+  // fix tolerance for error recognition
+  // sgp4fix am is fixed from the previous nm check
   if (em >= 1.0 || em < -0.001) {
     // || (am < 0.95)
-    //  printf("// error em %f\n", em);
-    satrec.error = 1;
-    //  sgp4fix to return if there is an error in eccentricity
+    // printf("// error em %f\n", em);
+    rec.error = 1;
+    // sgp4fix to return if there is an error in eccentricity
     return [false, false];
   }
   //  sgp4fix fix tolerance to avoid a divide by zero
   if (em < 1.0e-6) {
     em = 1.0e-6;
   }
-  mm += satrec.no * templ;
+  mm += rec.no * templ;
   xlm = mm + argpm + nodem;
-  emsq = em * em;
-  temp = 1.0 - emsq;
 
   nodem %= _constants.twoPi;
   argpm %= _constants.twoPi;
   xlm %= _constants.twoPi;
   mm = (xlm - argpm - nodem) % _constants.twoPi;
 
-  //  ----------------- compute extra mean quantities -------------
-  sinim = Math.sin(inclm);
-  cosim = Math.cos(inclm);
+  // ----------------- compute extra mean quantities -------------
+  var sinim = Math.sin(inclm);
+  var cosim = Math.cos(inclm);
 
-  //  -------------------- add lunar-solar periodics --------------
+  // -------------------- add lunar-solar periodics --------------
   var ep = em;
   xincp = inclm;
   argpp = argpm;
@@ -495,19 +459,19 @@ function sgp4(satrec, tsince) {
   mp = mm;
   sinip = sinim;
   cosip = cosim;
-  if (satrec.method === 'd') {
+  if (rec.method === 'd') {
     var dpperParameters = {
-      inclo: satrec.inclo,
+      inclo: rec.inclo,
       init: 'n',
       ep: ep,
       inclp: xincp,
       nodep: nodep,
       argpp: argpp,
       mp: mp,
-      opsmode: satrec.operationmod
+      opsmode: rec.operationmod
     };
 
-    var dpperResult = (0, _dpper2.default)(satrec, dpperParameters);
+    var dpperResult = (0, _dpper2.default)(rec, dpperParameters);
     ep = dpperResult.ep;
     xincp = dpperResult.inclp;
     nodep = dpperResult.nodep;
@@ -521,30 +485,30 @@ function sgp4(satrec, tsince) {
     }
     if (ep < 0.0 || ep > 1.0) {
       //  printf("// error ep %f\n", ep);
-      satrec.error = 3;
+      rec.error = 3;
       //  sgp4fix add return
       return [false, false];
     }
   }
   //  -------------------- long period periodics ------------------
-  if (satrec.method === 'd') {
+  if (rec.method === 'd') {
     sinip = Math.sin(xincp);
     cosip = Math.cos(xincp);
-    satrec.aycof = -0.5 * _constants.j3oj2 * sinip;
+    rec.aycof = -0.5 * _constants.j3oj2 * sinip;
     //  sgp4fix for divide by zero for xincp = 180 deg
     if (Math.abs(cosip + 1.0) > 1.5e-12) {
-      satrec.xlcof = -0.25 * _constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / (1.0 + cosip);
+      rec.xlcof = -0.25 * _constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / (1.0 + cosip);
     } else {
-      satrec.xlcof = -0.25 * _constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / temp4;
+      rec.xlcof = -0.25 * _constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / temp4;
     }
   }
-  axnl = ep * Math.cos(argpp);
+  var axnl = ep * Math.cos(argpp);
   temp = 1.0 / (am * (1.0 - ep * ep));
-  aynl = ep * Math.sin(argpp) + temp * satrec.aycof;
-  xl = mp + argpp + nodep + temp * satrec.xlcof * axnl;
+  var aynl = ep * Math.sin(argpp) + temp * rec.aycof;
+  var xl = mp + argpp + nodep + temp * rec.xlcof * axnl;
 
-  //  --------------------- solve kepler's equation ---------------
-  u = (xl - nodep) % _constants.twoPi;
+  // --------------------- solve kepler's equation ---------------
+  var u = (xl - nodep) % _constants.twoPi;
   eo1 = u;
   tem5 = 9999.9;
   var ktr = 1;
@@ -566,78 +530,90 @@ function sgp4(satrec, tsince) {
     ktr += 1;
   }
   //  ------------- short period preliminary quantities -----------
-  ecose = axnl * coseo1 + aynl * sineo1;
-  esine = axnl * sineo1 - aynl * coseo1;
-  el2 = axnl * axnl + aynl * aynl;
-  pl = am * (1.0 - el2);
+  var ecose = axnl * coseo1 + aynl * sineo1;
+  var esine = axnl * sineo1 - aynl * coseo1;
+  var el2 = axnl * axnl + aynl * aynl;
+  var pl = am * (1.0 - el2);
   if (pl < 0.0) {
     //  printf("// error pl %f\n", pl);
-    satrec.error = 4;
+    rec.error = 4;
     //  sgp4fix add return
     return [false, false];
   }
 
-  rl = am * (1.0 - ecose);
-  rdotl = Math.sqrt(am) * esine / rl;
-  rvdotl = Math.sqrt(pl) / rl;
-  betal = Math.sqrt(1.0 - el2);
+  var rl = am * (1.0 - ecose);
+  var rdotl = Math.sqrt(am) * esine / rl;
+  var rvdotl = Math.sqrt(pl) / rl;
+  var betal = Math.sqrt(1.0 - el2);
   temp = esine / (1.0 + betal);
-  sinu = am / rl * (sineo1 - aynl - axnl * temp);
-  cosu = am / rl * (coseo1 - axnl + aynl * temp);
+  var sinu = am / rl * (sineo1 - aynl - axnl * temp);
+  var cosu = am / rl * (coseo1 - axnl + aynl * temp);
   su = Math.atan2(sinu, cosu);
-  sin2u = (cosu + cosu) * sinu;
-  cos2u = 1.0 - 2.0 * sinu * sinu;
+  var sin2u = (cosu + cosu) * sinu;
+  var cos2u = 1.0 - 2.0 * sinu * sinu;
   temp = 1.0 / pl;
-  temp1 = 0.5 * _constants.j2 * temp;
-  temp2 = temp1 * temp;
+  var temp1 = 0.5 * _constants.j2 * temp;
+  var temp2 = temp1 * temp;
 
-  //  -------------- update for short period periodics ------------
-  if (satrec.method === 'd') {
+  // -------------- update for short period periodics ------------
+  if (rec.method === 'd') {
     cosisq = cosip * cosip;
-    satrec.con41 = 3.0 * cosisq - 1.0;
-    satrec.x1mth2 = 1.0 - cosisq;
-    satrec.x7thm1 = 7.0 * cosisq - 1.0;
+    rec.con41 = 3.0 * cosisq - 1.0;
+    rec.x1mth2 = 1.0 - cosisq;
+    rec.x7thm1 = 7.0 * cosisq - 1.0;
   }
-  mrt = rl * (1.0 - 1.5 * temp2 * betal * satrec.con41) + 0.5 * temp1 * satrec.x1mth2 * cos2u;
-  su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;
-  xnode = nodep + 1.5 * temp2 * cosip * sin2u;
-  xinc = xincp + 1.5 * temp2 * cosip * sinip * cos2u;
-  var mvt = rdotl - nm * temp1 * satrec.x1mth2 * sin2u / _constants.xke;
-  rvdot = rvdotl + nm * temp1 * (satrec.x1mth2 * cos2u + 1.5 * satrec.con41) / _constants.xke;
 
-  //  --------------------- orientation vectors -------------------
-  sinsu = Math.sin(su);
-  cossu = Math.cos(su);
-  snod = Math.sin(xnode);
-  cnod = Math.cos(xnode);
-  sini = Math.sin(xinc);
-  cosi = Math.cos(xinc);
-  xmx = -snod * cosi;
-  xmy = cnod * cosi;
-  ux = xmx * sinsu + cnod * cossu;
-  uy = xmy * sinsu + snod * cossu;
-  uz = sini * sinsu;
-  vx = xmx * cossu - cnod * sinsu;
-  vy = xmy * cossu - snod * sinsu;
-  vz = sini * cossu;
+  var mrt = rl * (1.0 - 1.5 * temp2 * betal * rec.con41) + 0.5 * temp1 * rec.x1mth2 * cos2u;
+  su -= 0.25 * temp2 * rec.x7thm1 * sin2u;
+  var xnode = nodep + 1.5 * temp2 * cosip * sin2u;
+  var xinc = xincp + 1.5 * temp2 * cosip * sinip * cos2u;
+  var mvt = rdotl - nm * temp1 * rec.x1mth2 * sin2u / _constants.xke;
+  var rvdot = rvdotl + nm * temp1 * (rec.x1mth2 * cos2u + 1.5 * rec.con41) / _constants.xke;
 
-  //  --------- position and velocity (in km and km/sec) ----------
-  r = { x: 0.0, y: 0.0, z: 0.0 };
-  r.x = mrt * ux * _constants.earthRadius;
-  r.y = mrt * uy * _constants.earthRadius;
-  r.z = mrt * uz * _constants.earthRadius;
-  v = { x: 0.0, y: 0.0, z: 0.0 };
-  v.x = (mvt * ux + rvdot * vx) * vkmpersec;
-  v.y = (mvt * uy + rvdot * vy) * vkmpersec;
-  v.z = (mvt * uz + rvdot * vz) * vkmpersec;
+  // --------------------- orientation vectors -------------------
+  var sinsu = Math.sin(su);
+  var cossu = Math.cos(su);
+  var snod = Math.sin(xnode);
+  var cnod = Math.cos(xnode);
+  var sini = Math.sin(xinc);
+  var cosi = Math.cos(xinc);
+  var xmx = -snod * cosi;
+  var xmy = cnod * cosi;
+  var ux = xmx * sinsu + cnod * cossu;
+  var uy = xmy * sinsu + snod * cossu;
+  var uz = sini * sinsu;
+  var vx = xmx * cossu - cnod * sinsu;
+  var vy = xmy * cossu - snod * sinsu;
+  var vz = sini * cossu;
 
-  //  sgp4fix for decaying satellites
+  // --------- position and velocity (in km and km/sec) ----------
+  var r = {
+    x: mrt * ux * _constants.earthRadius,
+    y: mrt * uy * _constants.earthRadius,
+    z: mrt * uz * _constants.earthRadius
+  };
+  var v = {
+    x: (mvt * ux + rvdot * vx) * vkmpersec,
+    y: (mvt * uy + rvdot * vy) * vkmpersec,
+    z: (mvt * uz + rvdot * vz) * vkmpersec
+  };
+
+  // sgp4fix for decaying satellites
   if (mrt < 1.0) {
     // printf("// decay condition %11.6f \n",mrt);
-    satrec.error = 6;
-    return { position: false, velocity: false };
+    rec.error = 6;
+    return {
+      position: false,
+      velocity: false,
+      satrec: rec
+    };
   }
-  return { position: r, velocity: v };
+
+  return {
+    position: r,
+    velocity: v,
+    satrec: rec
+  };
 }
 module.exports = exports['default'];
 
@@ -646,6 +622,13 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -700,6 +683,13 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -733,6 +723,13 @@ module.exports = exports["default"];
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1001,6 +998,110 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1031,10 +1132,17 @@ function dopplerFactor(location, position, velocity) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1071,10 +1179,17 @@ function propagate() {
 module.exports = exports['default'];
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1084,11 +1199,11 @@ exports.default = twoline2satrec;
 
 var _constants = __webpack_require__(0);
 
-var _sgp4init = __webpack_require__(21);
+var _sgp4init = __webpack_require__(22);
 
 var _sgp4init2 = _interopRequireDefault(_sgp4init);
 
-var _days2mdhms = __webpack_require__(18);
+var _days2mdhms = __webpack_require__(19);
 
 var _days2mdhms2 = _interopRequireDefault(_days2mdhms);
 
@@ -1129,7 +1244,7 @@ function twoline2satrec(longstr1, longstr2) {
   satrec.nddot = parseFloat('.' + parseInt(longstr1.substring(44, 50), 10) + 'E' + longstr1.substring(50, 52));
   satrec.bstar = parseFloat(longstr1.substring(53, 54) + '.' + parseInt(longstr1.substring(54, 59), 10) + 'E' + longstr1.substring(59, 61));
 
-  // satrec.satnum   = longstr2.substring(2, 7);
+  // satrec.satnum = longstr2.substring(2, 7);
   satrec.inclo = parseFloat(longstr2.substring(8, 16));
   satrec.nodeo = parseFloat(longstr2.substring(17, 25));
   satrec.ecco = parseFloat('.' + longstr2.substring(26, 33));
@@ -1137,17 +1252,17 @@ function twoline2satrec(longstr1, longstr2) {
   satrec.mo = parseFloat(longstr2.substring(43, 51));
   satrec.no = parseFloat(longstr2.substring(52, 63));
 
-  //  ---- find no, ndot, nddot ----
+  // ---- find no, ndot, nddot ----
   satrec.no /= xpdotp; //   rad/min
   // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
-  //  ---- convert to sgp4 units ----
+  // ---- convert to sgp4 units ----
   satrec.a = Math.pow(satrec.no * _constants.tumin, -2.0 / 3.0);
   satrec.ndot /= xpdotp * 1440.0; //   ? * minperday
   satrec.nddot /= xpdotp * 1440.0 * 1440;
 
-  //  ---- find standard orbital elements ----
+  // ---- find standard orbital elements ----
   satrec.inclo *= _constants.deg2rad;
   satrec.nodeo *= _constants.deg2rad;
   satrec.argpo *= _constants.deg2rad;
@@ -1180,30 +1295,33 @@ function twoline2satrec(longstr1, longstr2) {
   satrec.jdsatepoch = (0, _jday2.default)(year, mon, day, hr, minute, sec);
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
-  (0, _sgp4init2.default)(satrec, {
+  return (0, _sgp4init2.default)(satrec, {
     opsmode: opsmode,
     satn: satrec.satnum,
     epoch: satrec.jdsatepoch - 2433281.5,
     xbstar: satrec.bstar,
-
     xecco: satrec.ecco,
     xargpo: satrec.argpo,
     xinclo: satrec.inclo,
     xmo: satrec.mo,
     xno: satrec.no,
-
     xnodeo: satrec.nodeo
   });
-
-  return satrec;
 }
 module.exports = exports['default'];
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1222,10 +1340,17 @@ function degreesLat(radians) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1247,10 +1372,17 @@ function degreesLong(radians) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1272,10 +1404,17 @@ function ecfToEci(ecfCoords, gmst) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1283,11 +1422,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = ecfToLookAngles;
 
-var _topocentric = __webpack_require__(22);
+var _topocentric = __webpack_require__(23);
 
 var _topocentric2 = _interopRequireDefault(_topocentric);
 
-var _topocentricToLookAngles = __webpack_require__(23);
+var _topocentricToLookAngles = __webpack_require__(24);
 
 var _topocentricToLookAngles2 = _interopRequireDefault(_topocentricToLookAngles);
 
@@ -1300,10 +1439,17 @@ function ecfToLookAngles(observerCoordsEcf, satelliteCoordsEcf) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1336,10 +1482,17 @@ function eciToEcf(eciCoords, gmst) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1369,10 +1522,17 @@ function eciToGeodetic(eciCoords, gmst) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -1611,11 +1771,12 @@ function dscom(options) {
     z3 = 3.0 * (a3 * a3 + a4 * a4) + z33 * emsq;
 
     z11 = -6.0 * a1 * a5 + emsq * (-24.0 * x1 * x7 - 6.0 * x3 * x5);
-    z12 = -6.0 * (a1 * a6 + a3 * a5) + emsq * (-24.0 * (x2 * x7 + x1 * x8)) + -6.0 * (x3 * x6 + x4 * x5);
+    z12 = -6.0 * (a1 * a6 + a3 * a5) + emsq * (-24.0 * (x2 * x7 + x1 * x8) + -6.0 * (x3 * x6 + x4 * x5));
+
     z13 = -6.0 * a3 * a6 + emsq * (-24.0 * x2 * x8 - 6.0 * x4 * x6);
 
     z21 = 6.0 * a2 * a5 + emsq * (24.0 * x1 * x5 - 6.0 * x3 * x7);
-    z22 = 6.0 * (a4 * a5 + a2 * a6) + emsq * 24.0 * (x2 * x5 + x1 * x6) - 6.0 * (x4 * x7 + x3 * x8);
+    z22 = 6.0 * (a4 * a5 + a2 * a6) + emsq * (24.0 * (x2 * x5 + x1 * x6) - 6.0 * (x4 * x7 + x3 * x8));
     z23 = 6.0 * a4 * a6 + emsq * (24.0 * x2 * x6 - 6.0 * x4 * x8);
 
     z1 = z1 + z1 + betasq * z31;
@@ -1794,16 +1955,26 @@ function dscom(options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = dsinit;
+
+var _constants = __webpack_require__(0);
+
 /*-----------------------------------------------------------------------------
  *
  *                           procedure dsinit
@@ -1885,7 +2056,6 @@ exports.default = dsinit;
  ----------------------------------------------------------------------------*/
 function dsinit(options) {
   var cosim = options.cosim,
-      emsq = options.emsq,
       argpo = options.argpo,
       s1 = options.s1,
       s2 = options.s2,
@@ -1924,7 +2094,8 @@ function dsinit(options) {
       z31 = options.z31,
       z33 = options.z33,
       ecco = options.ecco,
-      eccsq = options.eccsq,
+      eccsq = options.eccsq;
+  var emsq = options.emsq,
       em = options.em,
       argpm = options.argpm,
       inclm = options.inclm,
@@ -1956,39 +2127,39 @@ function dsinit(options) {
       xli = options.xli,
       xni = options.xni;
 
-  var f220 = void 0,
-      f221 = void 0,
-      f311 = void 0,
-      f321 = void 0,
-      f322 = void 0,
-      f330 = void 0,
-      f441 = void 0,
-      f442 = void 0,
-      f522 = void 0,
-      f523 = void 0,
-      f542 = void 0,
-      f543 = void 0;
-  var g200 = void 0,
-      g201 = void 0,
-      g211 = void 0,
-      g300 = void 0,
-      g310 = void 0,
-      g322 = void 0,
-      g410 = void 0,
-      g422 = void 0,
-      g520 = void 0,
-      g521 = void 0,
-      g532 = void 0,
-      g533 = void 0;
-  var sini2 = void 0,
-      temp = void 0,
-      temp1 = void 0,
-      theta = void 0,
-      xno2 = void 0,
-      ainv2 = void 0,
-      aonv = void 0,
-      cosisq = void 0,
-      eoc = void 0;
+
+  var f220 = void 0;
+  var f221 = void 0;
+  var f311 = void 0;
+  var f321 = void 0;
+  var f322 = void 0;
+  var f330 = void 0;
+  var f441 = void 0;
+  var f442 = void 0;
+  var f522 = void 0;
+  var f523 = void 0;
+  var f542 = void 0;
+  var f543 = void 0;
+  var g200 = void 0;
+  var g201 = void 0;
+  var g211 = void 0;
+  var g300 = void 0;
+  var g310 = void 0;
+  var g322 = void 0;
+  var g410 = void 0;
+  var g422 = void 0;
+  var g520 = void 0;
+  var g521 = void 0;
+  var g532 = void 0;
+  var g533 = void 0;
+  var sini2 = void 0;
+  var temp = void 0;
+  var temp1 = void 0;
+  var xno2 = void 0;
+  var ainv2 = void 0;
+  var aonv = void 0;
+  var cosisq = void 0;
+  var eoc = void 0;
 
   var q22 = 1.7891679e-6;
   var q31 = 2.1460748e-6;
@@ -2003,24 +2174,26 @@ function dsinit(options) {
   var znl = 1.5835218e-4;
   var zns = 1.19459e-5;
 
-  //  -------------------- deep space initialization ------------
+  // -------------------- deep space initialization ------------
   irez = 0;
   if (nm > 0.0034906585 < 0.0052359877) {
+    // eslint-disable-line
     irez = 1;
   }
   if (nm >= 8.26e-3 <= 9.24e-3 && em >= 0.5) {
+    // eslint-disable-line
     irez = 2;
   }
 
-  //  ------------------------ do solar terms -------------------
+  // ------------------------ do solar terms -------------------
   var ses = ss1 * zns * ss5;
   var sis = ss2 * zns * (sz11 + sz13);
   var sls = -zns * ss3 * (sz1 + sz3 - 14.0 - 6.0 * emsq);
   var sghs = ss4 * zns * (sz31 + sz33 - 6.0);
   var shs = -zns * ss2 * (sz21 + sz23);
 
-  //  sgp4fix for 180 deg incl
-  if (inclm < 5.2359877e-2 || inclm > constants.pi - 5.2359877e-2) {
+  // sgp4fix for 180 deg incl
+  if (inclm < 5.2359877e-2 || inclm > _constants.pi - 5.2359877e-2) {
     shs = 0.0;
   }
   if (sinim !== 0.0) {
@@ -2028,14 +2201,15 @@ function dsinit(options) {
   }
   var sgs = sghs - cosim * shs;
 
-  //  ------------------------- do lunar terms ------------------
+  // ------------------------- do lunar terms ------------------
   dedt = ses + s1 * znl * s5;
   didt = sis + s2 * znl * (z11 + z13);
   dmdt = sls - znl * s3 * (z1 + z3 - 14.0 - 6.0 * emsq);
   var sghl = s4 * znl * (z31 + z33 - 6.0);
   var shll = -znl * s2 * (z21 + z23);
-  //  sgp4fix for 180 deg incl
-  if (inclm < 5.2359877e-2 || inclm > constants.pi - 5.2359877e-2) {
+
+  // sgp4fix for 180 deg incl
+  if (inclm < 5.2359877e-2 || inclm > _constants.pi - 5.2359877e-2) {
     shll = 0.0;
   }
   domdt = sgs + sghl;
@@ -2045,29 +2219,29 @@ function dsinit(options) {
     dnodt += shll / sinim;
   }
 
-  //  ----------- calculate deep space resonance effects --------
+  // ----------- calculate deep space resonance effects --------
   var dndt = 0.0;
-  theta = (gsto + tc * rptim) % constants.twoPi;
+  var theta = (gsto + tc * rptim) % _constants.twoPi;
   em += dedt * t;
   inclm += didt * t;
   argpm += domdt * t;
   nodem += dnodt * t;
   mm += dmdt * t;
 
-  //   sgp4fix for negative inclinations
-  //   the following if statement should be commented out
+  // sgp4fix for negative inclinations
+  // the following if statement should be commented out
   // if (inclm < 0.0)
-  //  {
-  //    inclm  = -inclm;
-  //    argpm  = argpm - pi;
-  //    nodem = nodem + pi;
-  //  }
+  // {
+  //   inclm  = -inclm;
+  //   argpm  = argpm - pi;
+  //   nodem = nodem + pi;
+  // }
 
-
-  //  -------------- initialize the resonance terms -------------
+  // -------------- initialize the resonance terms -------------
   if (irez !== 0) {
-    aonv = Math.pow(nm / constants.xke, x2o3);
-    //  ---------- geopotential resonance for 12 hour orbits ------
+    aonv = Math.pow(nm / _constants.xke, x2o3);
+
+    // ---------- geopotential resonance for 12 hour orbits ------
     if (irez === 2) {
       cosisq = cosim * cosim;
       var emo = em;
@@ -2112,6 +2286,7 @@ function dsinit(options) {
       f322 = -1.875 * sinim * (1.0 + 2.0 * cosim - 3.0 * cosisq);
       f441 = 35.0 * sini2 * f220;
       f442 = 39.3750 * sini2 * sini2;
+
       f522 = 9.84375 * sinim * (sini2 * (1.0 - 2.0 * cosim - 5.0 * cosisq) + 0.33333333 * (-2.0 + 4.0 * cosim + 6.0 * cosisq));
       f523 = sinim * (4.92187512 * sini2 * (-2.0 - 4.0 * cosim + 10.0 * cosisq) + 6.56250012 * (1.0 + 2.0 * cosim - 3.0 * cosisq));
       f542 = 29.53125 * sinim * (2.0 - 8.0 * cosim + cosisq * (-12.0 + 8.0 * cosim + 10.0 * cosisq));
@@ -2138,7 +2313,7 @@ function dsinit(options) {
       temp = 2.0 * temp1 * root54;
       d5421 = temp * f542 * g521;
       d5433 = temp * f543 * g533;
-      xlamo = (mo + nodeo + nodeo - theta - theta) % constants.twoPi;
+      xlamo = (mo + nodeo + nodeo - (theta + theta)) % _constants.twoPi;
       xfact = mdot + dmdt + 2.0 * (nodedot + dnodt - rptim) - no;
       em = emo;
       emsq = emsqo;
@@ -2151,13 +2326,13 @@ function dsinit(options) {
       f220 = 0.75 * (1.0 + cosim) * (1.0 + cosim);
       f311 = 0.9375 * sinim * sinim * (1.0 + 3.0 * cosim) - 0.75 * (1.0 + cosim);
       f330 = 1.0 + cosim;
-      f330 = 1.875 * f330 * f330 * f330;
+      f330 *= 1.875 * f330 * f330;
       del1 = 3.0 * nm * nm * aonv * aonv;
       del2 = 2.0 * del1 * f220 * g200 * q22;
       del3 = 3.0 * del1 * f330 * g300 * q33 * aonv;
       del1 = del1 * f311 * g310 * q31 * aonv;
-      xlamo = (mo + nodeo + argpo - theta) % constants.twoPi;
-      xfact = mdot + xpidot - rptim + dmdt + domdt + dnodt - no;
+      xlamo = (mo + nodeo + argpo - theta) % _constants.twoPi;
+      xfact = mdot + xpidot + dmdt + domdt + dnodt - (no + rptim);
     }
     //  ------------ for sgp4, initialize the integrator ----------
     xli = xlamo;
@@ -2206,13 +2381,20 @@ function dsinit(options) {
     xni: xni
   };
 }
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2462,10 +2644,17 @@ function dspace(options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2541,10 +2730,17 @@ function days2mdhms(year, days) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2555,27 +2751,27 @@ var _constants = __webpack_require__(0);
 
 var _constants2 = _interopRequireDefault(_constants);
 
-var _degreesLat = __webpack_require__(9);
+var _degreesLat = __webpack_require__(10);
 
 var _degreesLat2 = _interopRequireDefault(_degreesLat);
 
-var _degreesLong = __webpack_require__(10);
+var _degreesLong = __webpack_require__(11);
 
 var _degreesLong2 = _interopRequireDefault(_degreesLong);
 
-var _eciToEcf = __webpack_require__(13);
+var _eciToEcf = __webpack_require__(14);
 
 var _eciToEcf2 = _interopRequireDefault(_eciToEcf);
 
-var _ecfToEci = __webpack_require__(11);
+var _ecfToEci = __webpack_require__(12);
 
 var _ecfToEci2 = _interopRequireDefault(_ecfToEci);
 
-var _eciToGeodetic = __webpack_require__(14);
+var _eciToGeodetic = __webpack_require__(15);
 
 var _eciToGeodetic2 = _interopRequireDefault(_eciToGeodetic);
 
-var _ecfToLookAngles = __webpack_require__(12);
+var _ecfToLookAngles = __webpack_require__(13);
 
 var _ecfToLookAngles2 = _interopRequireDefault(_ecfToLookAngles);
 
@@ -2583,7 +2779,7 @@ var _geodeticToEcf = __webpack_require__(4);
 
 var _geodeticToEcf2 = _interopRequireDefault(_geodeticToEcf);
 
-var _dopplerFactor = __webpack_require__(6);
+var _dopplerFactor = __webpack_require__(7);
 
 var _dopplerFactor2 = _interopRequireDefault(_dopplerFactor);
 
@@ -2595,11 +2791,11 @@ var _jday = __webpack_require__(1);
 
 var _jday2 = _interopRequireDefault(_jday);
 
-var _propagate = __webpack_require__(7);
+var _propagate = __webpack_require__(8);
 
 var _propagate2 = _interopRequireDefault(_propagate);
 
-var _twoline2satrec = __webpack_require__(8);
+var _twoline2satrec = __webpack_require__(9);
 
 var _twoline2satrec2 = _interopRequireDefault(_twoline2satrec);
 
@@ -2637,10 +2833,17 @@ exports.default = {
 module.exports = exports['default'];
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2706,50 +2909,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-function initl(initlParameters) {
-  var ecco = initlParameters.ecco,
-      epoch = initlParameters.epoch,
-      inclo = initlParameters.inclo,
-      no = initlParameters.no,
-      method = initlParameters.method,
-      opsmode = initlParameters.opsmode;
-
-  var ak = void 0,
-      d1 = void 0,
-      adel = void 0,
-      po = void 0,
-      gsto = void 0;
+function initl(options) {
+  var ecco = options.ecco,
+      epoch = options.epoch,
+      inclo = options.inclo,
+      opsmode = options.opsmode;
+  var no = options.no;
 
   // sgp4fix use old way of finding gst
-  //  ----------------------- earth constants ----------------------
-  //  sgp4fix identify constants and allow alternate values
+  // ----------------------- earth constants ---------------------
+  // sgp4fix identify constants and allow alternate values
 
-  //  ------------- calculate auxillary epoch quantities ----------
+  // ------------- calculate auxillary epoch quantities ----------
+
   var eccsq = ecco * ecco;
   var omeosq = 1.0 - eccsq;
   var rteosq = Math.sqrt(omeosq);
   var cosio = Math.cos(inclo);
   var cosio2 = cosio * cosio;
 
-  //  ------------------ un-kozai the mean motion -----------------
-  ak = Math.pow(_constants.xke / no, _constants.x2o3);
-  d1 = 0.75 * _constants.j2 * (3.0 * cosio2 - 1.0) / (rteosq * omeosq);
+  // ------------------ un-kozai the mean motion -----------------
+  var ak = Math.pow(_constants.xke / no, _constants.x2o3);
+  var d1 = 0.75 * _constants.j2 * (3.0 * cosio2 - 1.0) / (rteosq * omeosq);
   var delPrime = d1 / (ak * ak);
-  adel = ak * (1.0 - delPrime * delPrime - delPrime * (1.0 / 3.0 + 134.0 * delPrime * delPrime / 81.0));
+  var adel = ak * (1.0 - delPrime * delPrime - delPrime * (1.0 / 3.0 + 134.0 * delPrime * delPrime / 81.0));
   delPrime = d1 / (adel * adel);
   no /= 1.0 + delPrime;
 
   var ao = Math.pow(_constants.xke / no, _constants.x2o3);
   var sinio = Math.sin(inclo);
-  po = ao * omeosq;
+  var po = ao * omeosq;
   var con42 = 1.0 - 5.0 * cosio2;
   var con41 = -con42 - cosio2 - cosio2;
   var ainv = 1.0 / ao;
   var posq = po * po;
   var rp = ao * (1.0 - ecco);
-  method = 'n';
+  var method = 'n';
 
   //  sgp4fix modern approach to finding sidereal time
+  var gsto = void 0;
   if (opsmode === 'a') {
     //  sgp4fix use old way of finding gst
     //  count integer number of days from 0 jan 1970
@@ -2794,10 +2992,17 @@ function initl(initlParameters) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2805,19 +3010,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = sgp4init;
 
+var _objectAssign = __webpack_require__(6);
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
 var _dpper = __webpack_require__(5);
 
 var _dpper2 = _interopRequireDefault(_dpper);
 
-var _dscom = __webpack_require__(15);
+var _dscom = __webpack_require__(16);
 
 var _dscom2 = _interopRequireDefault(_dscom);
 
-var _dsinit = __webpack_require__(16);
+var _dsinit = __webpack_require__(17);
 
 var _dsinit2 = _interopRequireDefault(_dsinit);
 
-var _initl = __webpack_require__(20);
+var _initl = __webpack_require__(21);
 
 var _initl2 = _interopRequireDefault(_initl);
 
@@ -2836,6 +3045,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *  this procedure initializes variables for sgp4.
  *
  *  author        : david vallado                  719-573-2600   28 jun 2005
+ *  author        : david vallado                  719-573-2600   28 jun 2005
  *
  *  inputs        :
  *    opsmode     - mode of operation afspc or improved 'a', 'i'
@@ -2850,7 +3060,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    nodeo       - right ascension of ascending node
  *
  *  outputs       :
- *    satrec      - common values for subsequent calls
+ *    rec      - common values for subsequent calls
  *    return code - non-zero on error.
  *                   1 - mean elements, ecc >= 1.0 or ecc < -0.001 or a < 0.95 er
  *                   2 - mean motion less than 0.0
@@ -2910,6 +3120,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 function sgp4init(satrec, options) {
+  var rec = (0, _objectAssign2.default)({}, satrec);
+
   var opsmode = options.opsmode,
       satn = options.satn,
       epoch = options.epoch,
@@ -2921,173 +3133,148 @@ function sgp4init(satrec, options) {
       xno = options.xno,
       xnodeo = options.xnodeo;
 
-  var cnodm = void 0,
-      snodm = void 0,
-      cosim = void 0,
-      sinim = void 0,
-      cosomm = void 0,
-      sinomm = void 0,
-      cc1sq = void 0,
-      cc2 = void 0,
-      cc3 = void 0,
-      coef = void 0,
-      coef1 = void 0,
-      cosio4 = void 0,
-      day = void 0,
-      dndt = void 0,
-      em = void 0,
-      emsq = void 0,
-      eeta = void 0,
-      etasq = void 0,
-      gam = void 0,
-      argpm = void 0,
-      nodem = void 0,
-      inclm = void 0,
-      mm = void 0,
-      nm = void 0,
-      perige = void 0,
-      pinvsq = void 0,
-      psisq = void 0,
-      qzms24 = void 0,
-      rtemsq = void 0,
-      s1 = void 0,
-      s2 = void 0,
-      s3 = void 0,
-      s4 = void 0,
-      s5 = void 0,
-      s6 = void 0,
-      s7 = void 0,
-      sfour = void 0,
-      ss1 = void 0,
-      ss2 = void 0,
-      ss3 = void 0,
-      ss4 = void 0,
-      ss5 = void 0,
-      ss6 = void 0,
-      ss7 = void 0,
-      sz1 = void 0,
-      sz2 = void 0,
-      sz3 = void 0,
-      sz11 = void 0,
-      sz12 = void 0,
-      sz13 = void 0,
-      sz21 = void 0,
-      sz22 = void 0,
-      sz23 = void 0,
-      sz31 = void 0,
-      sz32 = void 0,
-      sz33 = void 0,
-      tc = void 0,
-      temp = void 0,
-      temp1 = void 0,
-      temp2 = void 0,
-      temp3 = void 0,
-      temp4 = void 0,
-      tsi = void 0,
-      xpidot = void 0,
-      xhdot1 = void 0,
-      z1 = void 0,
-      z2 = void 0,
-      z3 = void 0,
-      z11 = void 0,
-      z12 = void 0,
-      z13 = void 0,
-      z21 = void 0,
-      z22 = void 0,
-      z23 = void 0,
-      z31 = void 0,
-      z32 = void 0,
-      z33 = void 0;
+
+  var cosim = void 0;
+  var sinim = void 0;
+  var cc1sq = void 0;
+  var cc2 = void 0;
+  var cc3 = void 0;
+  var coef = void 0;
+  var coef1 = void 0;
+  var cosio4 = void 0;
+  var em = void 0;
+  var emsq = void 0;
+  var eeta = void 0;
+  var etasq = void 0;
+  var argpm = void 0;
+  var nodem = void 0;
+  var inclm = void 0;
+  var mm = void 0;
+  var nm = void 0;
+  var perige = void 0;
+  var pinvsq = void 0;
+  var psisq = void 0;
+  var qzms24 = void 0;
+  var s1 = void 0;
+  var s2 = void 0;
+  var s3 = void 0;
+  var s4 = void 0;
+  var s5 = void 0;
+  var sfour = void 0;
+  var ss1 = void 0;
+  var ss2 = void 0;
+  var ss3 = void 0;
+  var ss4 = void 0;
+  var ss5 = void 0;
+  var sz1 = void 0;
+  var sz3 = void 0;
+  var sz11 = void 0;
+  var sz13 = void 0;
+  var sz21 = void 0;
+  var sz23 = void 0;
+  var sz31 = void 0;
+  var sz33 = void 0;
+  var tc = void 0;
+  var temp = void 0;
+  var temp1 = void 0;
+  var temp2 = void 0;
+  var temp3 = void 0;
+  var tsi = void 0;
+  var xpidot = void 0;
+  var xhdot1 = void 0;
+  var z1 = void 0;
+  var z3 = void 0;
+  var z11 = void 0;
+  var z13 = void 0;
+  var z21 = void 0;
+  var z23 = void 0;
+  var z31 = void 0;
+  var z33 = void 0;
+
   /* ------------------------ initialization --------------------- */
   // sgp4fix divisor for divide by zero check on inclination
   // the old check used 1.0 + Math.cos(pi-1.0e-9), but then compared it to
   // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
+  var temp4 = 1.5e-12;
 
-  temp4 = 1.5e-12;
+  // ----------- set all near earth variables to zero ------------
+  rec.isimp = 0;rec.method = 'n';rec.aycof = 0.0;
+  rec.con41 = 0.0;rec.cc1 = 0.0;rec.cc4 = 0.0;
+  rec.cc5 = 0.0;rec.d2 = 0.0;rec.d3 = 0.0;
+  rec.d4 = 0.0;rec.delmo = 0.0;rec.eta = 0.0;
+  rec.argpdot = 0.0;rec.omgcof = 0.0;rec.sinmao = 0.0;
+  rec.t = 0.0;rec.t2cof = 0.0;rec.t3cof = 0.0;
+  rec.t4cof = 0.0;rec.t5cof = 0.0;rec.x1mth2 = 0.0;
+  rec.x7thm1 = 0.0;rec.mdot = 0.0;rec.nodedot = 0.0;
+  rec.xlcof = 0.0;rec.xmcof = 0.0;rec.nodecf = 0.0;
 
-  //  ----------- set all near earth variables to zero ------------
-  satrec.isimp = 0;satrec.method = 'n';satrec.aycof = 0.0;
-  satrec.con41 = 0.0;satrec.cc1 = 0.0;satrec.cc4 = 0.0;
-  satrec.cc5 = 0.0;satrec.d2 = 0.0;satrec.d3 = 0.0;
-  satrec.d4 = 0.0;satrec.delmo = 0.0;satrec.eta = 0.0;
-  satrec.argpdot = 0.0;satrec.omgcof = 0.0;satrec.sinmao = 0.0;
-  satrec.t = 0.0;satrec.t2cof = 0.0;satrec.t3cof = 0.0;
-  satrec.t4cof = 0.0;satrec.t5cof = 0.0;satrec.x1mth2 = 0.0;
-  satrec.x7thm1 = 0.0;satrec.mdot = 0.0;satrec.nodedot = 0.0;
-  satrec.xlcof = 0.0;satrec.xmcof = 0.0;satrec.nodecf = 0.0;
+  // ----------- set all deep space variables to zero ------------
+  rec.irez = 0;rec.d2201 = 0.0;rec.d2211 = 0.0;
+  rec.d3210 = 0.0;rec.d3222 = 0.0;rec.d4410 = 0.0;
+  rec.d4422 = 0.0;rec.d5220 = 0.0;rec.d5232 = 0.0;
+  rec.d5421 = 0.0;rec.d5433 = 0.0;rec.dedt = 0.0;
+  rec.del1 = 0.0;rec.del2 = 0.0;rec.del3 = 0.0;
+  rec.didt = 0.0;rec.dmdt = 0.0;rec.dnodt = 0.0;
+  rec.domdt = 0.0;rec.e3 = 0.0;rec.ee2 = 0.0;
+  rec.peo = 0.0;rec.pgho = 0.0;rec.pho = 0.0;
+  rec.pinco = 0.0;rec.plo = 0.0;rec.se2 = 0.0;
+  rec.se3 = 0.0;rec.sgh2 = 0.0;rec.sgh3 = 0.0;
+  rec.sgh4 = 0.0;rec.sh2 = 0.0;rec.sh3 = 0.0;
+  rec.si2 = 0.0;rec.si3 = 0.0;rec.sl2 = 0.0;
+  rec.sl3 = 0.0;rec.sl4 = 0.0;rec.gsto = 0.0;
+  rec.xfact = 0.0;rec.xgh2 = 0.0;rec.xgh3 = 0.0;
+  rec.xgh4 = 0.0;rec.xh2 = 0.0;rec.xh3 = 0.0;
+  rec.xi2 = 0.0;rec.xi3 = 0.0;rec.xl2 = 0.0;
+  rec.xl3 = 0.0;rec.xl4 = 0.0;rec.xlamo = 0.0;
+  rec.zmol = 0.0;rec.zmos = 0.0;rec.atime = 0.0;
+  rec.xli = 0.0;rec.xni = 0.0;
 
-  //  ----------- set all deep space variables to zero ------------
-  satrec.irez = 0;satrec.d2201 = 0.0;satrec.d2211 = 0.0;
-  satrec.d3210 = 0.0;satrec.d3222 = 0.0;satrec.d4410 = 0.0;
-  satrec.d4422 = 0.0;satrec.d5220 = 0.0;satrec.d5232 = 0.0;
-  satrec.d5421 = 0.0;satrec.d5433 = 0.0;satrec.dedt = 0.0;
-  satrec.del1 = 0.0;satrec.del2 = 0.0;satrec.del3 = 0.0;
-  satrec.didt = 0.0;satrec.dmdt = 0.0;satrec.dnodt = 0.0;
-  satrec.domdt = 0.0;satrec.e3 = 0.0;satrec.ee2 = 0.0;
-  satrec.peo = 0.0;satrec.pgho = 0.0;satrec.pho = 0.0;
-  satrec.pinco = 0.0;satrec.plo = 0.0;satrec.se2 = 0.0;
-  satrec.se3 = 0.0;satrec.sgh2 = 0.0;satrec.sgh3 = 0.0;
-  satrec.sgh4 = 0.0;satrec.sh2 = 0.0;satrec.sh3 = 0.0;
-  satrec.si2 = 0.0;satrec.si3 = 0.0;satrec.sl2 = 0.0;
-  satrec.sl3 = 0.0;satrec.sl4 = 0.0;satrec.gsto = 0.0;
-  satrec.xfact = 0.0;satrec.xgh2 = 0.0;satrec.xgh3 = 0.0;
-  satrec.xgh4 = 0.0;satrec.xh2 = 0.0;satrec.xh3 = 0.0;
-  satrec.xi2 = 0.0;satrec.xi3 = 0.0;satrec.xl2 = 0.0;
-  satrec.xl3 = 0.0;satrec.xl4 = 0.0;satrec.xlamo = 0.0;
-  satrec.zmol = 0.0;satrec.zmos = 0.0;satrec.atime = 0.0;
-  satrec.xli = 0.0;satrec.xni = 0.0;
-
-  // sgp4fix - note the following variables are also passed directly via satrec.
+  // sgp4fix - note the following variables are also passed directly via rec.
   // it is possible to streamline the sgp4init call by deleting the "x"
-  // variables, but the user would need to set the satrec.* values first. we
+  // variables, but the user would need to set the rec.* values first. we
   // include the additional assignments in case twoline2rv is not used.
 
-  satrec.bstar = xbstar;
-  satrec.ecco = xecco;
-  satrec.argpo = xargpo;
-  satrec.inclo = xinclo;
-  satrec.mo = xmo;
-  satrec.no = xno;
-  satrec.nodeo = xnodeo;
+  rec.bstar = xbstar;
+  rec.ecco = xecco;
+  rec.argpo = xargpo;
+  rec.inclo = xinclo;
+  rec.mo = xmo;
+  rec.no = xno;
+  rec.nodeo = xnodeo;
 
   //  sgp4fix add opsmode
-  satrec.operationmode = opsmode;
+  rec.operationmode = opsmode;
 
-  //  ------------------------ earth constants -----------------------
-  //  sgp4fix identify constants and allow alternate values
-
+  // ------------------------ earth constants -----------------------
+  // sgp4fix identify constants and allow alternate values
 
   var ss = 78.0 / _constants.earthRadius + 1.0;
-  //  sgp4fix use multiply for speed instead of pow
+  // sgp4fix use multiply for speed instead of pow
   var qzms2ttemp = (120.0 - 78.0) / _constants.earthRadius;
   var qzms2t = qzms2ttemp * qzms2ttemp * qzms2ttemp * qzms2ttemp;
   var x2o3 = 2.0 / 3.0;
 
-  satrec.init = 'y';
-  satrec.t = 0.0;
+  rec.init = 'y';
+  rec.t = 0.0;
 
-  var initlParameters = {
+  var initlOptions = {
     satn: satn,
-    ecco: satrec.ecco,
+    ecco: rec.ecco,
 
     epoch: epoch,
-    inclo: satrec.inclo,
-    no: satrec.no,
+    inclo: rec.inclo,
+    no: rec.no,
 
-    method: satrec.method,
-    opsmode: satrec.operationmode
+    method: rec.method,
+    opsmode: rec.operationmode
   };
 
-  var initlResult = (0, _initl2.default)(initlParameters);
+  var initlResult = (0, _initl2.default)(initlOptions);
 
-  satrec.no = initlResult.no;
-
-  // TODO: defined but never used
-  // var method      = initlResult.method;
-  // var ainv        = initlResult.ainv;
+  rec.no = initlResult.no;
 
   var ao = initlResult.ao;
-  satrec.con41 = initlResult.con41;
+  rec.con41 = initlResult.con41;
   var con42 = initlResult.con42;
   var cosio = initlResult.cosio;
   var cosio2 = initlResult.cosio2;
@@ -3097,36 +3284,36 @@ function sgp4init(satrec, options) {
   var rp = initlResult.rp;
   var rteosq = initlResult.rteosq;
   var sinio = initlResult.sinio;
-  satrec.gsto = initlResult.gsto;
+  rec.gsto = initlResult.gsto;
 
-  satrec.error = 0;
+  rec.error = 0;
 
   // sgp4fix remove this check as it is unnecessary
   // the mrt check in sgp4 handles decaying satellite cases even if the starting
   // condition is below the surface of te earth
-  //     if (rp < 1.0)
-  //       {
-  //         printf("// *** satn%d epoch elts sub-orbital ***\n", satn);
-  //         satrec.error = 5;
-  //       }
+  // if (rp < 1.0)
+  // {
+  //   printf("// *** satn%d epoch elts sub-orbital ***\n", satn);
+  //   rec.error = 5;
+  // }
 
-
-  if (omeosq >= 0.0 || satrec.no >= 0.0) {
-    satrec.isimp = 0;
-    if (rp < 220.0 / _constants.earthRadius + 1.0) {
-      satrec.isimp = 1;
+  if (omeosq >= 0.0 || rec.no >= 0.0) {
+    rec.isimp = 0;
+    if ((rp < 220.0 / _constants.earthRadius) + 1.0) {
+      rec.isimp = 1;
     }
     sfour = ss;
     qzms24 = qzms2t;
     perige = (rp - 1.0) * _constants.earthRadius;
 
-    //  - for perigees below 156 km, s and qoms2t are altered -
+    // - for perigees below 156 km, s and qoms2t are altered -
     if (perige < 156.0) {
       sfour = perige - 78.0;
       if (perige < 98.0) {
         sfour = 20.0;
       }
-      //  sgp4fix use multiply for speed instead of pow
+
+      // sgp4fix use multiply for speed instead of pow
       var qzms24temp = (120.0 - sfour) / _constants.earthRadius;
       qzms24 = qzms24temp * qzms24temp * qzms24temp * qzms24temp;
       sfour = sfour / _constants.earthRadius + 1.0;
@@ -3134,146 +3321,141 @@ function sgp4init(satrec, options) {
     pinvsq = 1.0 / posq;
 
     tsi = 1.0 / (ao - sfour);
-    satrec.eta = ao * satrec.ecco * tsi;
-    etasq = satrec.eta * satrec.eta;
-    eeta = satrec.ecco * satrec.eta;
+    rec.eta = ao * rec.ecco * tsi;
+    etasq = rec.eta * rec.eta;
+    eeta = rec.ecco * rec.eta;
     psisq = Math.abs(1.0 - etasq);
     coef = qzms24 * Math.pow(tsi, 4.0);
     coef1 = coef / Math.pow(psisq, 3.5);
-    cc2 = coef1 * satrec.no * (ao * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq)) + 0.375 * _constants.j2 * tsi / psisq * satrec.con41 * (8.0 + 3.0 * etasq * (8.0 + etasq)));
-    satrec.cc1 = satrec.bstar * cc2;
+    cc2 = coef1 * rec.no * (ao * (1.0 + 1.5 * etasq + eeta * (4.0 + etasq)) + 0.375 * _constants.j2 * tsi / psisq * rec.con41 * (8.0 + 3.0 * etasq * (8.0 + etasq)));
+    rec.cc1 = rec.bstar * cc2;
     cc3 = 0.0;
-    if (satrec.ecco > 1.0e-4) {
-      cc3 = -2.0 * coef * tsi * _constants.j3oj2 * satrec.no * sinio / satrec.ecco;
+    if (rec.ecco > 1.0e-4) {
+      cc3 = -2.0 * coef * tsi * _constants.j3oj2 * rec.no * sinio / rec.ecco;
     }
-    satrec.x1mth2 = 1.0 - cosio2;
-    satrec.cc4 = 2.0 * satrec.no * coef1 * ao * omeosq * (satrec.eta * (2.0 + 0.5 * etasq) + satrec.ecco * (0.5 + 2.0 * etasq) - _constants.j2 * tsi / (ao * psisq) * (-3.0 * satrec.con41 * (1.0 - 2.0 * eeta + etasq * (1.5 - 0.5 * eeta)) + 0.75 * satrec.x1mth2 * (2.0 * etasq - eeta * (1.0 + etasq)) * Math.cos(2.0 * satrec.argpo)));
-    satrec.cc5 = 2.0 * coef1 * ao * omeosq * (1.0 + 2.75 * (etasq + eeta) + eeta * etasq);
+    rec.x1mth2 = 1.0 - cosio2;
+    rec.cc4 = 2.0 * rec.no * coef1 * ao * omeosq * (rec.eta * (2.0 + 0.5 * etasq) + rec.ecco * (0.5 + 2.0 * etasq) - _constants.j2 * tsi / (ao * psisq) * (-3.0 * rec.con41 * (1.0 - 2.0 * eeta + etasq * (1.5 - 0.5 * eeta)) + 0.75 * rec.x1mth2 * (2.0 * etasq - eeta * (1.0 + etasq)) * Math.cos(2.0 * rec.argpo)));
+    rec.cc5 = 2.0 * coef1 * ao * omeosq * (1.0 + 2.75 * (etasq + eeta) + eeta * etasq);
     cosio4 = cosio2 * cosio2;
-    temp1 = 1.5 * _constants.j2 * pinvsq * satrec.no;
+    temp1 = 1.5 * _constants.j2 * pinvsq * rec.no;
     temp2 = 0.5 * temp1 * _constants.j2 * pinvsq;
-    temp3 = -0.46875 * _constants.j4 * pinvsq * pinvsq * satrec.no;
-    satrec.mdot = satrec.no + 0.5 * temp1 * rteosq * satrec.con41 + 0.0625 * temp2 * rteosq * (13.0 - 78.0 * cosio2 + 137.0 * cosio4);
-    satrec.argpdot = -0.5 * temp1 * con42 + 0.0625 * temp2 * (7.0 - 114.0 * cosio2 + 395.0 * cosio4) + temp3 * (3.0 - 36.0 * cosio2 + 49.0 * cosio4);
+    temp3 = -0.46875 * _constants.j4 * pinvsq * pinvsq * rec.no;
+    rec.mdot = rec.no + 0.5 * temp1 * rteosq * rec.con41 + 0.0625 * temp2 * rteosq * (13.0 - 78.0 * cosio2 + 137.0 * cosio4);
+    rec.argpdot = -0.5 * temp1 * con42 + 0.0625 * temp2 * (7.0 - 114.0 * cosio2 + 395.0 * cosio4) + temp3 * (3.0 - 36.0 * cosio2 + 49.0 * cosio4);
     xhdot1 = -temp1 * cosio;
-    satrec.nodedot = xhdot1 + (0.5 * temp2 * (4.0 - 19.0 * cosio2) + 2.0 * temp3 * (3.0 - 7.0 * cosio2)) * cosio;
-    xpidot = satrec.argpdot + satrec.nodedot;
-    satrec.omgcof = satrec.bstar * cc3 * Math.cos(satrec.argpo);
-    satrec.xmcof = 0.0;
-    if (satrec.ecco > 1.0e-4) {
-      satrec.xmcof = -x2o3 * coef * satrec.bstar / eeta;
+    rec.nodedot = xhdot1 + (0.5 * temp2 * (4.0 - 19.0 * cosio2) + 2.0 * temp3 * (3.0 - 7.0 * cosio2)) * cosio;
+    xpidot = rec.argpdot + rec.nodedot;
+    rec.omgcof = rec.bstar * cc3 * Math.cos(rec.argpo);
+    rec.xmcof = 0.0;
+    if (rec.ecco > 1.0e-4) {
+      rec.xmcof = -x2o3 * coef * rec.bstar / eeta;
     }
-    satrec.nodecf = 3.5 * omeosq * xhdot1 * satrec.cc1;
-    satrec.t2cof = 1.5 * satrec.cc1;
-    //  sgp4fix for divide by zero with xinco = 180 deg
+    rec.nodecf = 3.5 * omeosq * xhdot1 * rec.cc1;
+    rec.t2cof = 1.5 * rec.cc1;
+
+    // sgp4fix for divide by zero with xinco = 180 deg
     if (Math.abs(cosio + 1.0) > 1.5e-12) {
-      satrec.xlcof = -0.25 * _constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / (1.0 + cosio);
+      rec.xlcof = -0.25 * _constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / (1.0 + cosio);
     } else {
-      satrec.xlcof = -0.25 * _constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / temp4;
+      rec.xlcof = -0.25 * _constants.j3oj2 * sinio * (3.0 + 5.0 * cosio) / temp4;
     }
-    satrec.aycof = -0.5 * _constants.j3oj2 * sinio;
-    //  sgp4fix use multiply for speed instead of pow
-    var delmotemp = 1.0 + satrec.eta * Math.cos(satrec.mo);
-    satrec.delmo = delmotemp * delmotemp * delmotemp;
-    satrec.sinmao = Math.sin(satrec.mo);
-    satrec.x7thm1 = 7.0 * cosio2 - 1.0;
+    rec.aycof = -0.5 * _constants.j3oj2 * sinio;
 
-    //  --------------- deep space initialization -------------
-    if (2 * _constants.pi / satrec.no >= 225.0) {
-      satrec.method = 'd';
-      satrec.isimp = 1;
+    // sgp4fix use multiply for speed instead of pow
+    var delmotemp = 1.0 + rec.eta * Math.cos(rec.mo);
+    rec.delmo = delmotemp * delmotemp * delmotemp;
+    rec.sinmao = Math.sin(rec.mo);
+    rec.x7thm1 = 7.0 * cosio2 - 1.0;
+
+    // --------------- deep space initialization -------------
+    if (2 * _constants.pi / rec.no >= 225.0) {
+      rec.method = 'd';
+      rec.isimp = 1;
       tc = 0.0;
-      inclm = satrec.inclo;
+      inclm = rec.inclo;
 
-      var dscomParameters = {
+      var dscomOptions = {
         epoch: epoch,
-        ep: satrec.ecco,
-        argpp: satrec.argpo,
+        ep: rec.ecco,
+        argpp: rec.argpo,
         tc: tc,
-        inclp: satrec.inclo,
-        nodep: satrec.nodeo,
+        inclp: rec.inclo,
+        nodep: rec.nodeo,
 
-        np: satrec.no,
+        np: rec.no,
 
-        e3: satrec.e3,
-        ee2: satrec.ee2,
+        e3: rec.e3,
+        ee2: rec.ee2,
 
-        peo: satrec.peo,
-        pgho: satrec.pgho,
-        pho: satrec.pho,
-        pinco: satrec.pinco,
+        peo: rec.peo,
+        pgho: rec.pgho,
+        pho: rec.pho,
+        pinco: rec.pinco,
 
-        plo: satrec.plo,
-        se2: satrec.se2,
-        se3: satrec.se3,
+        plo: rec.plo,
+        se2: rec.se2,
+        se3: rec.se3,
 
-        sgh2: satrec.sgh2,
-        sgh3: satrec.sgh3,
-        sgh4: satrec.sgh4,
+        sgh2: rec.sgh2,
+        sgh3: rec.sgh3,
+        sgh4: rec.sgh4,
 
-        sh2: satrec.sh2,
-        sh3: satrec.sh3,
-        si2: satrec.si2,
-        si3: satrec.si3,
+        sh2: rec.sh2,
+        sh3: rec.sh3,
+        si2: rec.si2,
+        si3: rec.si3,
 
-        sl2: satrec.sl2,
-        sl3: satrec.sl3,
-        sl4: satrec.sl4,
+        sl2: rec.sl2,
+        sl3: rec.sl3,
+        sl4: rec.sl4,
 
-        xgh2: satrec.xgh2,
-        xgh3: satrec.xgh3,
-        xgh4: satrec.xgh4,
-        xh2: satrec.xh2,
+        xgh2: rec.xgh2,
+        xgh3: rec.xgh3,
+        xgh4: rec.xgh4,
+        xh2: rec.xh2,
 
-        xh3: satrec.xh3,
-        xi2: satrec.xi2,
-        xi3: satrec.xi3,
-        xl2: satrec.xl2,
+        xh3: rec.xh3,
+        xi2: rec.xi2,
+        xi3: rec.xi3,
+        xl2: rec.xl2,
 
-        xl3: satrec.xl3,
-        xl4: satrec.xl4,
+        xl3: rec.xl3,
+        xl4: rec.xl4,
 
-        zmol: satrec.zmol,
-        zmos: satrec.zmos
+        zmol: rec.zmol,
+        zmos: rec.zmos
       };
 
-      var dscomResult = (0, _dscom2.default)(dscomParameters);
+      var dscomResult = (0, _dscom2.default)(dscomOptions);
 
-      snodm = dscomResult.snodm;
-      cnodm = dscomResult.cnodm;
       sinim = dscomResult.sinim;
       cosim = dscomResult.cosim;
-      sinomm = dscomResult.sinomm;
 
-      cosomm = dscomResult.cosomm;
-      day = dscomResult.day;
-      satrec.e3 = dscomResult.e3;
-      satrec.ee2 = dscomResult.ee2;
+      rec.e3 = dscomResult.e3;
+      rec.ee2 = dscomResult.ee2;
       em = dscomResult.em;
 
       emsq = dscomResult.emsq;
-      gam = dscomResult.gam;
-      satrec.peo = dscomResult.peo;
-      satrec.pgho = dscomResult.pgho;
-      satrec.pho = dscomResult.pho;
+      rec.peo = dscomResult.peo;
+      rec.pgho = dscomResult.pgho;
+      rec.pho = dscomResult.pho;
 
-      satrec.pinco = dscomResult.pinco;
-      satrec.plo = dscomResult.plo;
-      rtemsq = dscomResult.rtemsq;
-      satrec.se2 = dscomResult.se2;
-      satrec.se3 = dscomResult.se3;
+      rec.pinco = dscomResult.pinco;
+      rec.plo = dscomResult.plo;
+      rec.se2 = dscomResult.se2;
+      rec.se3 = dscomResult.se3;
 
-      satrec.sgh2 = dscomResult.sgh2;
-      satrec.sgh3 = dscomResult.sgh3;
-      satrec.sgh4 = dscomResult.sgh4;
-      satrec.sh2 = dscomResult.sh2;
-      satrec.sh3 = dscomResult.sh3;
+      rec.sgh2 = dscomResult.sgh2;
+      rec.sgh3 = dscomResult.sgh3;
+      rec.sgh4 = dscomResult.sgh4;
+      rec.sh2 = dscomResult.sh2;
+      rec.sh3 = dscomResult.sh3;
 
-      satrec.si2 = dscomResult.si2;
-      satrec.si3 = dscomResult.si3;
-      satrec.sl2 = dscomResult.sl2;
-      satrec.sl3 = dscomResult.sl3;
-      satrec.sl4 = dscomResult.sl4;
+      rec.si2 = dscomResult.si2;
+      rec.si3 = dscomResult.si3;
+      rec.sl2 = dscomResult.sl2;
+      rec.sl3 = dscomResult.sl3;
+      rec.sl4 = dscomResult.sl4;
 
       s1 = dscomResult.s1;
       s2 = dscomResult.s2;
@@ -3281,88 +3463,76 @@ function sgp4init(satrec, options) {
       s4 = dscomResult.s4;
       s5 = dscomResult.s5;
 
-      s6 = dscomResult.s6;
-      s7 = dscomResult.s7;
       ss1 = dscomResult.ss1;
       ss2 = dscomResult.ss2;
       ss3 = dscomResult.ss3;
 
       ss4 = dscomResult.ss4;
       ss5 = dscomResult.ss5;
-      ss6 = dscomResult.ss6;
-      ss7 = dscomResult.ss7;
       sz1 = dscomResult.sz1;
 
-      sz2 = dscomResult.sz2;
       sz3 = dscomResult.sz3;
       sz11 = dscomResult.sz11;
-      sz12 = dscomResult.sz12;
       sz13 = dscomResult.sz13;
 
       sz21 = dscomResult.sz21;
-      sz22 = dscomResult.sz22;
       sz23 = dscomResult.sz23;
       sz31 = dscomResult.sz31;
-      sz32 = dscomResult.sz32;
 
       sz33 = dscomResult.sz33;
-      satrec.xgh2 = dscomResult.xgh2;
-      satrec.xgh3 = dscomResult.xgh3;
-      satrec.xgh4 = dscomResult.xgh4;
-      satrec.xh2 = dscomResult.xh2;
+      rec.xgh2 = dscomResult.xgh2;
+      rec.xgh3 = dscomResult.xgh3;
+      rec.xgh4 = dscomResult.xgh4;
+      rec.xh2 = dscomResult.xh2;
 
-      satrec.xh3 = dscomResult.xh3;
-      satrec.xi2 = dscomResult.xi2;
-      satrec.xi3 = dscomResult.xi3;
-      satrec.xl2 = dscomResult.xl2;
-      satrec.xl3 = dscomResult.xl3;
+      rec.xh3 = dscomResult.xh3;
+      rec.xi2 = dscomResult.xi2;
+      rec.xi3 = dscomResult.xi3;
+      rec.xl2 = dscomResult.xl2;
+      rec.xl3 = dscomResult.xl3;
 
-      satrec.xl4 = dscomResult.xl4;
+      rec.xl4 = dscomResult.xl4;
       nm = dscomResult.nm;
       z1 = dscomResult.z1;
-      z2 = dscomResult.z2;
       z3 = dscomResult.z3;
 
       z11 = dscomResult.z11;
-      z12 = dscomResult.z12;
       z13 = dscomResult.z13;
       z21 = dscomResult.z21;
-      z22 = dscomResult.z22;
 
       z23 = dscomResult.z23;
       z31 = dscomResult.z31;
-      z32 = dscomResult.z32;
       z33 = dscomResult.z33;
-      satrec.zmol = dscomResult.zmol;
-      satrec.zmos = dscomResult.zmos;
+      rec.zmol = dscomResult.zmol;
+      rec.zmos = dscomResult.zmos;
 
-      var dpperParameters = {
+      var dpperOptions = {
         inclo: inclm,
-        init: satrec.init,
-        ep: satrec.ecco,
-        inclp: satrec.inclo,
-        nodep: satrec.nodeo,
-        argpp: satrec.argpo,
-        mp: satrec.mo,
-        opsmode: satrec.operationmode
+        init: rec.init,
+        ep: rec.ecco,
+        inclp: rec.inclo,
+        nodep: rec.nodeo,
+        argpp: rec.argpo,
+        mp: rec.mo,
+        opsmode: rec.operationmode
       };
 
-      var dpperResult = (0, _dpper2.default)(satrec, dpperParameters);
+      var dpperResult = (0, _dpper2.default)(rec, dpperOptions);
 
-      satrec.ecco = dpperResult.ep;
-      satrec.inclo = dpperResult.inclp;
-      satrec.nodeo = dpperResult.nodep;
-      satrec.argpo = dpperResult.argpp;
-      satrec.mo = dpperResult.mp;
+      rec.ecco = dpperResult.ep;
+      rec.inclo = dpperResult.inclp;
+      rec.nodeo = dpperResult.nodep;
+      rec.argpo = dpperResult.argpp;
+      rec.mo = dpperResult.mp;
 
       argpm = 0.0;
       nodem = 0.0;
       mm = 0.0;
 
-      var dsinitParameters = {
+      var dsinitOptions = {
         cosim: cosim,
         emsq: emsq,
-        argpo: satrec.argpo,
+        argpo: rec.argpo,
         s1: s1,
         s2: s2,
         s3: s3,
@@ -3382,14 +3552,14 @@ function sgp4init(satrec, options) {
         sz23: sz23,
         sz31: sz31,
         sz33: sz33,
-        t: satrec.t,
+        t: rec.t,
         tc: tc,
-        gsto: satrec.gsto,
-        mo: satrec.mo,
-        mdot: satrec.mdot,
-        no: satrec.no,
-        nodeo: satrec.nodeo,
-        nodedot: satrec.nodedot,
+        gsto: rec.gsto,
+        mo: rec.mo,
+        mdot: rec.mdot,
+        no: rec.no,
+        nodeo: rec.nodeo,
+        nodedot: rec.nodedot,
         xpidot: xpidot,
         z1: z1,
         z3: z3,
@@ -3399,7 +3569,7 @@ function sgp4init(satrec, options) {
         z23: z23,
         z31: z31,
         z33: z33,
-        ecco: satrec.ecco,
+        ecco: rec.ecco,
         eccsq: eccsq,
         em: em,
         argpm: argpm,
@@ -3407,103 +3577,102 @@ function sgp4init(satrec, options) {
         mm: mm,
         nm: nm,
         nodem: nodem,
-        irez: satrec.irez,
-        atime: satrec.atime,
-        d2201: satrec.d2201,
-        d2211: satrec.d2211,
-        d3210: satrec.d3210,
-        d3222: satrec.d3222,
-        d4410: satrec.d4410,
-        d4422: satrec.d4422,
-        d5220: satrec.d5220,
-        d5232: satrec.d5232,
-        d5421: satrec.d5421,
-        d5433: satrec.d5433,
-        dedt: satrec.dedt,
-        didt: satrec.didt,
-        dmdt: satrec.dmdt,
-        dnodt: satrec.dnodt,
-        domdt: satrec.domdt,
-        del1: satrec.del1,
-        del2: satrec.del2,
-        del3: satrec.del3,
-        xfact: satrec.xfact,
-        xlamo: satrec.xlamo,
-        xli: satrec.xli,
-        xni: satrec.xni
+        irez: rec.irez,
+        atime: rec.atime,
+        d2201: rec.d2201,
+        d2211: rec.d2211,
+        d3210: rec.d3210,
+        d3222: rec.d3222,
+        d4410: rec.d4410,
+        d4422: rec.d4422,
+        d5220: rec.d5220,
+        d5232: rec.d5232,
+        d5421: rec.d5421,
+        d5433: rec.d5433,
+        dedt: rec.dedt,
+        didt: rec.didt,
+        dmdt: rec.dmdt,
+        dnodt: rec.dnodt,
+        domdt: rec.domdt,
+        del1: rec.del1,
+        del2: rec.del2,
+        del3: rec.del3,
+        xfact: rec.xfact,
+        xlamo: rec.xlamo,
+        xli: rec.xli,
+        xni: rec.xni
       };
 
-      var dsinitResult = (0, _dsinit2.default)(dsinitParameters);
+      var dsinitResult = (0, _dsinit2.default)(dsinitOptions);
 
-      em = dsinitResult.em;
-      argpm = dsinitResult.argpm;
-      inclm = dsinitResult.inclm;
-      mm = dsinitResult.mm;
-      nm = dsinitResult.nm;
+      rec.irez = dsinitResult.irez;
+      rec.atime = dsinitResult.atime;
+      rec.d2201 = dsinitResult.d2201;
+      rec.d2211 = dsinitResult.d2211;
 
-      nodem = dsinitResult.nodem;
-      satrec.irez = dsinitResult.irez;
-      satrec.atime = dsinitResult.atime;
-      satrec.d2201 = dsinitResult.d2201;
-      satrec.d2211 = dsinitResult.d2211;
+      rec.d3210 = dsinitResult.d3210;
+      rec.d3222 = dsinitResult.d3222;
+      rec.d4410 = dsinitResult.d4410;
+      rec.d4422 = dsinitResult.d4422;
+      rec.d5220 = dsinitResult.d5220;
 
-      satrec.d3210 = dsinitResult.d3210;
-      satrec.d3222 = dsinitResult.d3222;
-      satrec.d4410 = dsinitResult.d4410;
-      satrec.d4422 = dsinitResult.d4422;
-      satrec.d5220 = dsinitResult.d5220;
+      rec.d5232 = dsinitResult.d5232;
+      rec.d5421 = dsinitResult.d5421;
+      rec.d5433 = dsinitResult.d5433;
+      rec.dedt = dsinitResult.dedt;
+      rec.didt = dsinitResult.didt;
 
-      satrec.d5232 = dsinitResult.d5232;
-      satrec.d5421 = dsinitResult.d5421;
-      satrec.d5433 = dsinitResult.d5433;
-      satrec.dedt = dsinitResult.dedt;
-      satrec.didt = dsinitResult.didt;
+      rec.dmdt = dsinitResult.dmdt;
+      rec.dnodt = dsinitResult.dnodt;
+      rec.domdt = dsinitResult.domdt;
+      rec.del1 = dsinitResult.del1;
 
-      satrec.dmdt = dsinitResult.dmdt;
-      dndt = dsinitResult.dndt;
-      satrec.dnodt = dsinitResult.dnodt;
-      satrec.domdt = dsinitResult.domdt;
-      satrec.del1 = dsinitResult.del1;
+      rec.del2 = dsinitResult.del2;
+      rec.del3 = dsinitResult.del3;
+      rec.xfact = dsinitResult.xfact;
+      rec.xlamo = dsinitResult.xlamo;
+      rec.xli = dsinitResult.xli;
 
-      satrec.del2 = dsinitResult.del2;
-      satrec.del3 = dsinitResult.del3;
-      satrec.xfact = dsinitResult.xfact;
-      satrec.xlamo = dsinitResult.xlamo;
-      satrec.xli = dsinitResult.xli;
-
-      satrec.xni = dsinitResult.xni;
+      rec.xni = dsinitResult.xni;
     }
 
     // ----------- set variables if not deep space -----------
-    if (satrec.isimp !== 1) {
-      cc1sq = satrec.cc1 * satrec.cc1;
-      satrec.d2 = 4.0 * ao * tsi * cc1sq;
-      temp = satrec.d2 * tsi * satrec.cc1 / 3.0;
-      satrec.d3 = (17.0 * ao + sfour) * temp;
-      satrec.d4 = 0.5 * temp * ao * tsi * (221.0 * ao + 31.0 * sfour) * satrec.cc1;
-      satrec.t3cof = satrec.d2 + 2.0 * cc1sq;
-      satrec.t4cof = 0.25 * (3.0 * satrec.d3 + satrec.cc1 * (12.0 * satrec.d2 + 10.0 * cc1sq));
-      satrec.t5cof = 0.2 * (3.0 * satrec.d4 + 12.0 * satrec.cc1 * satrec.d3 + 6.0 * satrec.d2 * satrec.d2 + 15.0 * cc1sq * (2.0 * satrec.d2 + cc1sq));
+    if (rec.isimp !== 1) {
+      cc1sq = rec.cc1 * rec.cc1;
+      rec.d2 = 4.0 * ao * tsi * cc1sq;
+      temp = rec.d2 * tsi * rec.cc1 / 3.0;
+      rec.d3 = (17.0 * ao + sfour) * temp;
+      rec.d4 = 0.5 * temp * ao * tsi * (221.0 * ao + 31.0 * sfour) * rec.cc1;
+      rec.t3cof = rec.d2 + 2.0 * cc1sq;
+      rec.t4cof = 0.25 * (3.0 * rec.d3 + rec.cc1 * (12.0 * rec.d2 + 10.0 * cc1sq));
+      rec.t5cof = 0.2 * (3.0 * rec.d4 + 12.0 * rec.cc1 * rec.d3 + 6.0 * rec.d2 * rec.d2 + 15.0 * cc1sq * (2.0 * rec.d2 + cc1sq));
     }
 
     /* finally propogate to zero epoch to initialize all others. */
     // sgp4fix take out check to let satellites process until they are actually below earth surface
-    //  if(satrec.error == 0)
+    // if(rec.error == 0)
   }
-  (0, _sgp2.default)(satrec, 0.0);
+  (0, _sgp2.default)(rec, 0.0);
 
-  satrec.init = 'n';
+  rec.init = 'n';
 
-  // sgp4fix return boolean. satrec.error contains any error codes
-  return true;
+  // rec.error contains any error codes
+  return rec;
 }
 module.exports = exports['default'];
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -3542,10 +3711,17 @@ function topocentric(observerCoords, satelliteCoords) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
 
 
 Object.defineProperty(exports, "__esModule", {
