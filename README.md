@@ -1,4 +1,6 @@
-# satellite.js v1.4.0
+# satellite.js
+
+[![npm version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
 
 ## Introduction
 
