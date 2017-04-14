@@ -1,6 +1,7 @@
 # satellite.js
 
-[![npm version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
+[![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
+[![Bower version](https://badge.fury.io/bo/satellite.js.svg)](https://badge.fury.io/bo/satellite.js)
 
 ## Introduction
 
