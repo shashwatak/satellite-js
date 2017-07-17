@@ -4,7 +4,12 @@
   "description": "SGP4/SDP4 calculation library",
   "main": "dist/satellite.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "grunt build",
+    "webpack": "webpack"
+  },
+  "engines": {
+    "node": ">=0.10.36"
   },
   "repository": {
     "type": "git",
@@ -22,16 +27,19 @@
   "bugs": {
     "url": "https://github.com/shashwatak/satellite-js/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "node-minify": "^2.1.1",
+    "webpack": "^3.3.0"
+  },
   "devDependencies": {
-    "grunt": "~0.4.5",
+    "karma": "^1.7.0",
+    "grunt": "^1.0.1",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-copy": "~0.8.0",
     "grunt-contrib-jshint": "~0.11.2",
-    "grunt-karma": "~0.11.0",
+    "grunt-karma": "^2.0.0",
     "grunt-requirejs": "~0.4.2",
     "jasmine-core": "~2.3.4",
-    "karma": "~0.12.36",
     "karma-jasmine": "~0.3.5",
     "karma-phantomjs-launcher": "~0.2.0",
     "karma-requirejs": "~0.2.2",
