@@ -7,9 +7,9 @@ var uglify = process.argv.indexOf('--compress')>-1;
 var start = new Date();
 
 
-new compressor.minify({
-  type:(uglify)?'uglifyjs':'no-compress',
-  fileIn: [
+compressor.minify({
+  compressor:(uglify)?'uglifyjs':'no-compress',
+  input: [
      './src/satellite-head.js',
      './src/constants.js',
      './src/dpper.js',
@@ -25,7 +25,7 @@ new compressor.minify({
      './src/doppler.js',
      './src/satellite-tail.js'
   ],
-  fileOut: config.main,
+  output: config.main,
   callback: function(err,min){
     if(err){
       console.error(err);
