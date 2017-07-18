@@ -50,11 +50,15 @@ for use with this library.
 
 Install the library with [NPM](https://www.npmjs.com/):
 
-    npm install satellite.js
+```bash
+npm install satellite.js
+```
 
 Install the library with [Bower](http://bower.io/):
 
-    bower install satellite.js
+```bash
+bower install satellite.js
+```
 
 ## Usage
 
@@ -167,15 +171,21 @@ In order to build the library follow these steps:
 
 - install all required packages with NPM by running the following command from repository's root directory:
 
-        npm install
+    ```bash
+    npm install
+    ```
 
 - run the following NPM script to build everything:
 
-        npm run build
+    ```bash
+    npm run build
+    ```
 
 - run the following NPM script to run test specs `test/*.spec.js` files with [Mocha](https://mochajs.org/):
 
-        npm test
+    ```bash
+    npm test
+    ```
 
 These is a full list of all available NPM scripts:
 
