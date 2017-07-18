@@ -16,6 +16,7 @@
     "lint:test": "eslint -c .eslintrc.test.json ./test",
     "test": "mocha --recursive --require babel-register test",
     "verify": "static sgp4_verification",
+    "postinstall": "npm run build",
     "prepublish": "npm run lint && npm run lint:test && npm test && npm run rebuild"
   },
   "repository": {
