@@ -104,7 +104,7 @@ var observerGd = {
 
 // You will need GMST for some of the coordinate transforms.
 // http://en.wikipedia.org/wiki/Sidereal_time#Definition
-var gmst = satellite.gstimeFromDate(new Date()));
+var gmst = satellite.gstimeFromDate(new Date());
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
 var positionEcf   = satellite.eciToEcf(positionEci, gmst),
