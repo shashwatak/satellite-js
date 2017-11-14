@@ -135,7 +135,7 @@ export default function sgp4(satrec, tsince) {
   rec.t = tsince;
   rec.error = 0;
 
-    //  ------- update for secular gravity and atmospheric drag -----
+  //  ------- update for secular gravity and atmospheric drag -----
   const xmdf = rec.mo + (rec.mdot * rec.t);
   const argpdf = rec.argpo + (rec.argpdot * rec.t);
   const nodedf = rec.nodeo + (rec.nodedot * rec.t);
@@ -149,7 +149,7 @@ export default function sgp4(satrec, tsince) {
 
   if (rec.isimp !== 1) {
     delomg = rec.omgcof * rec.t;
-      //  sgp4fix use mutliply for speed instead of pow
+    //  sgp4fix use mutliply for speed instead of pow
     const delmtemp = 1.0 + (rec.eta * Math.cos(xmdf));
     delm = rec.xmcof * ((delmtemp * delmtemp * delmtemp) - rec.delmo);
     temp = delomg + delm;
@@ -208,14 +208,14 @@ export default function sgp4(satrec, tsince) {
 
     const dspaceResult = dspace(dspaceOptions);
 
-    em = dspaceResult.em;
-    argpm = dspaceResult.argpm;
-    inclm = dspaceResult.inclm;
-
-    mm = dspaceResult.mm;
-
-    nodem = dspaceResult.nodem;
-    nm = dspaceResult.nm;
+    ({
+      em,
+      argpm,
+      inclm,
+      mm,
+      nodem,
+      nm,
+    } = dspaceResult);
   }
 
   if (nm <= 0.0) {
@@ -231,13 +231,14 @@ export default function sgp4(satrec, tsince) {
 
   // fix tolerance for error recognition
   // sgp4fix am is fixed from the previous nm check
-  if (em >= 1.0 || em < -0.001) {  // || (am < 0.95)
+  if (em >= 1.0 || em < -0.001) { // || (am < 0.95)
     // printf("// error em %f\n", em);
     rec.error = 1;
     // sgp4fix to return if there is an error in eccentricity
     return [false, false];
   }
-    //  sgp4fix fix tolerance to avoid a divide by zero
+
+  //  sgp4fix fix tolerance to avoid a divide by zero
   if (em < 1.0e-6) {
     em = 1.0e-6;
   }
@@ -274,11 +275,15 @@ export default function sgp4(satrec, tsince) {
     };
 
     const dpperResult = dpper(rec, dpperParameters);
-    ep = dpperResult.ep;
+
+    ({
+      ep,
+      nodep,
+      argpp,
+      mp,
+    } = dpperResult);
+
     xincp = dpperResult.inclp;
-    nodep = dpperResult.nodep;
-    argpp = dpperResult.argpp;
-    mp = dpperResult.mp;
 
     if (xincp < 0.0) {
       xincp = -xincp;
@@ -286,24 +291,27 @@ export default function sgp4(satrec, tsince) {
       argpp -= pi;
     }
     if (ep < 0.0 || ep > 1.0) {
-        //  printf("// error ep %f\n", ep);
+      //  printf("// error ep %f\n", ep);
       rec.error = 3;
-        //  sgp4fix add return
+      //  sgp4fix add return
       return [false, false];
     }
   }
-    //  -------------------- long period periodics ------------------
+
+  //  -------------------- long period periodics ------------------
   if (rec.method === 'd') {
     sinip = Math.sin(xincp);
     cosip = Math.cos(xincp);
     rec.aycof = -0.5 * j3oj2 * sinip;
-      //  sgp4fix for divide by zero for xincp = 180 deg
+
+    //  sgp4fix for divide by zero for xincp = 180 deg
     if (Math.abs(cosip + 1.0) > 1.5e-12) {
       rec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / (1.0 + cosip);
     } else {
       rec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / temp4;
     }
   }
+
   const axnl = ep * Math.cos(argpp);
   temp = 1.0 / (am * (1.0 - (ep * ep)));
   const aynl = (ep * Math.sin(argpp)) + (temp * rec.aycof);
@@ -314,8 +322,9 @@ export default function sgp4(satrec, tsince) {
   eo1 = u;
   tem5 = 9999.9;
   let ktr = 1;
-    //    sgp4fix for kepler iteration
-    //    the following iteration needs better limits on corrections
+
+  //    sgp4fix for kepler iteration
+  //    the following iteration needs better limits on corrections
   while (Math.abs(tem5) >= 1.0e-12 && ktr <= 10) {
     sineo1 = Math.sin(eo1);
     coseo1 = Math.cos(eo1);
@@ -331,15 +340,16 @@ export default function sgp4(satrec, tsince) {
     eo1 += tem5;
     ktr += 1;
   }
-    //  ------------- short period preliminary quantities -----------
+
+  //  ------------- short period preliminary quantities -----------
   const ecose = (axnl * coseo1) + (aynl * sineo1);
   const esine = (axnl * sineo1) - (aynl * coseo1);
   const el2 = (axnl * axnl) + (aynl * aynl);
   const pl = am * (1.0 - el2);
   if (pl < 0.0) {
-      //  printf("// error pl %f\n", pl);
+    //  printf("// error pl %f\n", pl);
     rec.error = 4;
-      //  sgp4fix add return
+    //  sgp4fix add return
     return [false, false];
   }
 

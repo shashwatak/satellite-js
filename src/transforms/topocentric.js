@@ -5,8 +5,10 @@ export default function topocentric(observerCoords, satelliteCoords) {
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
 
-  const longitude = observerCoords.longitude;
-  const latitude = observerCoords.latitude;
+  const {
+    longitude,
+    latitude,
+  } = observerCoords;
 
   const observerEcf = geodeticToEcf(observerCoords);
 

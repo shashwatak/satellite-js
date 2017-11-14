@@ -13,7 +13,7 @@ export default function eciToEcf(eciCoords, gmst) {
 
   const x = (eciCoords.x * Math.cos(gmst)) + (eciCoords.y * Math.sin(gmst));
   const y = (eciCoords.x * (-Math.sin(gmst))) + (eciCoords.y * Math.cos(gmst));
-  const z = eciCoords.z;
+  const { z } = eciCoords;
 
   return {
     x,

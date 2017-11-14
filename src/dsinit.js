@@ -349,7 +349,8 @@ export default function dsinit(options) {
       em = emo;
       emsq = emsqo;
     }
-      //  ---------------- synchronous resonance terms --------------
+
+    //  ---------------- synchronous resonance terms --------------
     if (irez === 1) {
       g200 = 1.0 + (emsq * (-2.5 + (0.8125 * emsq)));
       g310 = 1.0 + (2.0 * emsq);
@@ -365,7 +366,8 @@ export default function dsinit(options) {
       xlamo = ((mo + nodeo + argpo) - theta) % twoPi;
       xfact = (mdot + xpidot + dmdt + domdt + dnodt) - (no + rptim);
     }
-      //  ------------ for sgp4, initialize the integrator ----------
+
+    //  ------------ for sgp4, initialize the integrator ----------
     xli = xlamo;
     xni = no;
     atime = 0.0;

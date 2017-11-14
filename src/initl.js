@@ -102,7 +102,8 @@ export default function initl(options) {
     const ts70 = epoch - 7305.0;
     const ds70 = Math.floor(ts70 + 1.0e-8);
     const tfrac = ts70 - ds70;
-      //  find greenwich location at epoch
+
+    //  find greenwich location at epoch
     const c1 = 1.72027916940703639e-2;
     const thgr70 = 1.7321343856509374;
     const fk5r = 5.07551419432269442e-15;

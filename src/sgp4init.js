@@ -242,21 +242,22 @@ export default function sgp4init(satrec, options) {
 
   const initlResult = initl(initlOptions);
 
+  const {
+    ao,
+    con42,
+    cosio,
+    cosio2,
+    eccsq,
+    omeosq,
+    posq,
+    rp,
+    rteosq,
+    sinio,
+  } = initlResult;
+
   rec.no = initlResult.no;
-
-  const ao = initlResult.ao;
   rec.con41 = initlResult.con41;
-  const con42 = initlResult.con42;
-  const cosio = initlResult.cosio;
-  const cosio2 = initlResult.cosio2;
-  const eccsq = initlResult.eccsq;
-  const omeosq = initlResult.omeosq;
-  const posq = initlResult.posq;
-  const rp = initlResult.rp;
-  const rteosq = initlResult.rteosq;
-  const sinio = initlResult.sinio;
   rec.gsto = initlResult.gsto;
-
   rec.error = 0;
 
   // sgp4fix remove this check as it is unnecessary
@@ -308,13 +309,13 @@ export default function sgp4init(satrec, options) {
     }
     rec.x1mth2 = 1.0 - cosio2;
     rec.cc4 = 2.0 * rec.no * coef1 * ao * omeosq * (
-        ((rec.eta * (2.0 + (0.5 * etasq))) +
-        (rec.ecco * (0.5 + (2.0 * etasq)))) -
-        (((j2 * tsi) / (ao * psisq)) *
-        ((-3.0 * rec.con41 * ((1.0 - (2.0 * eeta)) + (etasq * (1.5 - (0.5 * eeta))))) +
-        (0.75 * rec.x1mth2 *
-        ((2.0 * etasq) - (eeta * (1.0 + etasq))) *
-        Math.cos(2.0 * rec.argpo))))
+      ((rec.eta * (2.0 + (0.5 * etasq))) +
+      (rec.ecco * (0.5 + (2.0 * etasq)))) -
+      (((j2 * tsi) / (ao * psisq)) *
+      ((-3.0 * rec.con41 * ((1.0 - (2.0 * eeta)) + (etasq * (1.5 - (0.5 * eeta))))) +
+      (0.75 * rec.x1mth2 *
+      ((2.0 * etasq) - (eeta * (1.0 + etasq))) *
+      Math.cos(2.0 * rec.argpo))))
     );
     rec.cc5 = 2.0 * coef1 * ao * omeosq * (1.0 + (2.75 * (etasq + eeta)) + (eeta * etasq));
     cosio4 = cosio2 * cosio2;
@@ -413,14 +414,9 @@ export default function sgp4init(satrec, options) {
 
       const dscomResult = dscom(dscomOptions);
 
-      sinim = dscomResult.sinim;
-      cosim = dscomResult.cosim;
-
       rec.e3 = dscomResult.e3;
       rec.ee2 = dscomResult.ee2;
-      em = dscomResult.em;
 
-      emsq = dscomResult.emsq;
       rec.peo = dscomResult.peo;
       rec.pgho = dscomResult.pgho;
       rec.pho = dscomResult.pho;
@@ -442,54 +438,55 @@ export default function sgp4init(satrec, options) {
       rec.sl3 = dscomResult.sl3;
       rec.sl4 = dscomResult.sl4;
 
-      s1 = dscomResult.s1;
-      s2 = dscomResult.s2;
-      s3 = dscomResult.s3;
-      s4 = dscomResult.s4;
-      s5 = dscomResult.s5;
+      ({
+        sinim,
+        cosim,
+        em,
+        emsq,
+        s1,
+        s2,
+        s3,
+        s4,
+        s5,
+        ss1,
+        ss2,
+        ss3,
+        ss4,
+        ss5,
+        sz1,
+        sz3,
+        sz11,
+        sz13,
+        sz21,
+        sz23,
+        sz31,
+        sz33,
+      } = dscomResult);
 
-      ss1 = dscomResult.ss1;
-      ss2 = dscomResult.ss2;
-      ss3 = dscomResult.ss3;
-
-      ss4 = dscomResult.ss4;
-      ss5 = dscomResult.ss5;
-      sz1 = dscomResult.sz1;
-
-      sz3 = dscomResult.sz3;
-      sz11 = dscomResult.sz11;
-      sz13 = dscomResult.sz13;
-
-      sz21 = dscomResult.sz21;
-      sz23 = dscomResult.sz23;
-      sz31 = dscomResult.sz31;
-
-      sz33 = dscomResult.sz33;
       rec.xgh2 = dscomResult.xgh2;
       rec.xgh3 = dscomResult.xgh3;
       rec.xgh4 = dscomResult.xgh4;
       rec.xh2 = dscomResult.xh2;
-
       rec.xh3 = dscomResult.xh3;
       rec.xi2 = dscomResult.xi2;
       rec.xi3 = dscomResult.xi3;
       rec.xl2 = dscomResult.xl2;
       rec.xl3 = dscomResult.xl3;
-
       rec.xl4 = dscomResult.xl4;
-      nm = dscomResult.nm;
-      z1 = dscomResult.z1;
-      z3 = dscomResult.z3;
-
-      z11 = dscomResult.z11;
-      z13 = dscomResult.z13;
-      z21 = dscomResult.z21;
-
-      z23 = dscomResult.z23;
-      z31 = dscomResult.z31;
-      z33 = dscomResult.z33;
       rec.zmol = dscomResult.zmol;
       rec.zmos = dscomResult.zmos;
+
+      ({
+        nm,
+        z1,
+        z3,
+        z11,
+        z13,
+        z21,
+        z23,
+        z31,
+        z33,
+      } = dscomResult);
 
       const dpperOptions = {
         inclo: inclm,
@@ -631,10 +628,10 @@ export default function sgp4init(satrec, options) {
       rec.t3cof = rec.d2 + (2.0 * cc1sq);
       rec.t4cof = 0.25 * ((3.0 * rec.d3) + (rec.cc1 * ((12.0 * rec.d2) + (10.0 * cc1sq))));
       rec.t5cof = 0.2 * (
-          (3.0 * rec.d4) +
-          (12.0 * rec.cc1 * rec.d3) +
-          (6.0 * rec.d2 * rec.d2) +
-          (15.0 * cc1sq * ((2.0 * rec.d2) + cc1sq))
+        (3.0 * rec.d4) +
+        (12.0 * rec.cc1 * rec.d3) +
+        (6.0 * rec.d2 * rec.d2) +
+        (15.0 * cc1sq * ((2.0 * rec.d2) + cc1sq))
       );
     }
 

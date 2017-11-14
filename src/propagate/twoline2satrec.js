@@ -61,7 +61,7 @@ export default function twoline2satrec(longstr1, longstr2) {
 
   // ---- convert to sgp4 units ----
   satrec.a = ((satrec.no * tumin) ** (-2.0 / 3.0));
-  satrec.ndot /= (xpdotp * 1440.0);  //   ? * minperday
+  satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
   satrec.nddot /= (xpdotp * 1440.0 * 1440);
 
   // ---- find standard orbital elements ----
@@ -90,11 +90,14 @@ export default function twoline2satrec(longstr1, longstr2) {
   }
 
   const mdhmsResult = days2mdhms(year, satrec.epochdays);
-  const mon = mdhmsResult.mon;
-  const day = mdhmsResult.day;
-  const hr = mdhmsResult.hr;
-  const minute = mdhmsResult.minute;
-  const sec = mdhmsResult.sec;
+
+  const {
+    mon,
+    day,
+    hr,
+    minute,
+    sec,
+  } = mdhmsResult;
   satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------

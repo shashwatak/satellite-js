@@ -13,7 +13,7 @@ export default function jday(year, mon, day, hr, minute, sec) {
     const date = year;
     return jdayInternal(
       date.getUTCFullYear(),
-      date.getUTCMonth() + 1,   // Note, this function requires months in range 1-12.
+      date.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
       date.getUTCDate(),
       date.getUTCHours(),
       date.getUTCMinutes(),

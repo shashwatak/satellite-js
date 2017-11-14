@@ -1,6 +1,9 @@
 {
-  "extends": "airbnb",
+  "extends": "airbnb-base",
   "env": {
     "mocha": true
+  },
+  "rules": {
+    "function-paren-newline": "off"
   }
 }

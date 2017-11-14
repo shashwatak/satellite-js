@@ -1,7 +1,10 @@
 export default function geodeticToEcf(geodeticCoords) {
-  const longitude = geodeticCoords.longitude;
-  const latitude = geodeticCoords.latitude;
-  const height = geodeticCoords.height;
+  const {
+    longitude,
+    latitude,
+    height,
+  } = geodeticCoords;
+
   const a = 6378.137;
   const b = 6356.7523142;
   const f = (a - b) / a;
