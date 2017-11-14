@@ -1,4 +1,7 @@
-# satellite.js v1.2.0
+# satellite.js
+
+[![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
+[![Bower version](https://badge.fury.io/bo/satellite.js.svg)](https://badge.fury.io/bo/satellite.js)
 
 ## Introduction
 
@@ -43,35 +46,59 @@ I would recommend anybody interested in satellite tracking or orbital propagatio
 Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs
 for use with this library.
 
-## Installation (Bower or NPM)
-
-Install the library with [Bower](http://bower.io/):
-
-    bower install satellite.js
+## Installation (NPM or Bower)
 
 Install the library with [NPM](https://www.npmjs.com/):
 
-    npm install satellite.js
+```bash
+npm install satellite.js
+```
+
+Install the library with [Bower](http://bower.io/):
+
+```bash
+bower install satellite.js
+```
 
 ## Usage
 
-Include `dist/satellite.min.js` as a script in your html or use as [Require.js](http://requirejs.org/) module.
-
-When you include `satellite.min.js` as a script, the object `satellite` is defined in global scope.
-You use this object to access all the functions in the satellite library:
+### [Node.js](https://nodejs.org)
 
 ```js
+var satellite = require('satellite.js');
+...
 var positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
-When you use it as Require.js module `satellite` object is not defined in global scope, you should use it as
-a dependency of your module:
+or with ES6 syntax:
 
 ```js
-define(['path/to/satellite'], function(satellite) {
+import satellite from 'satellite.js';
+...
+const positionAndVelocity = satellite.sgp4(satrec, time);
+```
+
+### [Require.js](http://requirejs.org/)
+
+```js
+define(['path/to/dist/satellite'], function(satellite) {
     ...
     var positionAndVelocity = satellite.sgp4(satrec, time);
 });
+```
+
+### Script tag
+
+Include `dist/satellite.min.js` as a script in your html:
+
+```html
+<script src="path/to/dist/satellite.min.js"></script>
+```
+
+`satellite` object will be available in global scope:
+
+```js
+var positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
 ## Sample Usage
@@ -104,7 +131,7 @@ var observerGd = {
 
 // You will need GMST for some of the coordinate transforms.
 // http://en.wikipedia.org/wiki/Sidereal_time#Definition
-var gmst = satellite.gstimeFromDate(new Date()));
+var gmst = satellite.gstimeFromDate(new Date());
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
 var positionEcf   = satellite.eciToEcf(positionEci, gmst),
@@ -136,43 +163,45 @@ var longitudeStr = satellite.degreesLong(longitude),
     
 ## Building
 
-The code is organized as [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) modules but it can be built into
-a single file to use in production.
+The source code is organized as Common.js modules and uses [ES6 syntax](http://es6-features.org/).
 
-The library uses [Grunt task runner](http://gruntjs.com/) for building and testing. It also relies on [Bower](http://bower.io)
-package of Require.js plugins needed for test scripts. In order to run Grunt tasks follow these steps:
+In order to build the library follow these steps:
 
 - install [Node.js](https://nodejs.org/) and [Node Package Manager](https://www.npmjs.com/);
 
-- install Grunt command line interface globally:
+- install all required packages with NPM by running the following command from repository's root directory:
 
-        npm install -g grunt-cli
+    ```bash
+    npm install
+    ```
 
-- install Bower globally:
+- run the following NPM script to build everything:
 
-        npm install -g bower
+    ```bash
+    npm run build
+    ```
 
-- install all required packages with NPM and Bower by running the following commands from repository's root directory:
+- run the following NPM script to run test specs `test/*.spec.js` files with [Mocha](https://mochajs.org/):
 
-        npm install
-        bower install
+    ```bash
+    npm test
+    ```
 
-- run default Grunt task to build the library:
+These is a full list of all available NPM scripts:
 
-        grunt
-
-- run the following Grunt task to run [Jasmine](http://jasmine.github.io/) specs located in `test/*.spec.js`
-files with [Karma](http://karma-runner.github.io/):
-
-        grunt test
-
-All configuration files for Grunt tasks are located in `grunt` directory.
-
-These are main available Grunt tasks:
-
-- `build`       (default) validates, optimizies and minifies source code to `dist` directory;
-- `clean`       removes all built files;
-- `test`        tests the library by running Jasmine specs.
+- `clean`       removes all built files in `lib` and `dist` directories;
+- `transpile`   transpiles ES6 source files located in `src` directory to ES5 and saves the resulting files
+                in `lib` directory;
+- `dist`        builds a single [UMD](https://github.com/umdjs/umd) module located in `dist` directory from
+                transpiled library `lib`;
+- `copy`        copies built library from `dist` to `sgp4_verification/lib/sgp4`;
+- `build`       builds everything (`transpile` > `dist` > `copy`);
+- `rebuild`     rebuilds everything (`clean` > `build`);
+- `lint`        lints sources code located in `src` directory with [ESLint](http://eslint.org/) with
+                [Airbnb shared configuration]((https://www.npmjs.com/package/eslint-config-airbnb));
+- `lint:test`   lints tests located in `test` directory with ESLint;
+- `test`        runs tests;
+- `verify`      starts a local web server to host `sgp4_verification` application;
 
 ## TODO
 
