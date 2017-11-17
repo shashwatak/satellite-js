@@ -3,6 +3,7 @@
 [![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
 [![Bower version](https://badge.fury.io/bo/satellite.js.svg)](https://badge.fury.io/bo/satellite.js)
 [![Build Status](https://travis-ci.org/shashwatak/satellite-js.svg?branch=develop)](https://travis-ci.org/shashwatak/satellite-js)
+[![Coverage Status](https://coveralls.io/repos/github/shashwatak/satellite-js/badge.svg?branch=develop)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
 [![Gitter chat](https://badges.gitter.im/shashwatak/satellite-js.png)](https://gitter.im/satellite-js/Lobby)
 
 ## Introduction
@@ -199,19 +200,28 @@ In order to build the library follow these steps:
 
 These is a full list of all available NPM scripts:
 
-- `clean`       removes all built files in `lib` and `dist` directories;
-- `transpile`   transpiles ES6 source files located in `src` directory to ES5 and saves the resulting files
-                in `lib` directory;
-- `dist`        builds a single [UMD](https://github.com/umdjs/umd) module located in `dist` directory from
-                transpiled library `lib`;
-- `copy`        copies built library from `dist` to `sgp4_verification/lib/sgp4`;
-- `build`       builds everything (`transpile` > `dist` > `copy`);
-- `rebuild`     rebuilds everything (`clean` > `build`);
-- `lint`        lints sources code located in `src` directory with [ESLint](http://eslint.org/) with
-                [Airbnb shared configuration]((https://www.npmjs.com/package/eslint-config-airbnb));
-- `lint:test`   lints tests located in `test` directory with ESLint;
-- `test`        runs tests;
-- `verify`      starts a local web server to host `sgp4_verification` application;
+- `clean`           removes all built files in `lib` and `dist` directories;
+- `transpile`       transpiles ES6 source files located in `src` directory to ES5 and saves the resulting files
+                    in `lib` directory;
+- `dist`            builds a single [UMD](https://github.com/umdjs/umd) module located in `dist` directory from
+                    transpiled library `lib`;
+- `copy`            copies built library from `dist` to `sgp4_verification/lib/sgp4`;
+- `build`           builds everything (`transpile` > `dist` > `copy`);
+- `rebuild`         rebuilds everything (`clean` > `build`);
+- `lint`            lints sources code located in `src` directory with [ESLint](http://eslint.org/) with
+                    [Airbnb shared configuration]((https://www.npmjs.com/package/eslint-config-airbnb));
+- `lint:test`       lints tests located in `test` directory with ESLint;
+- `test`            runs tests;
+- `test:coverage`   runs tests with [Istanbul](https://github.com/gotwarlost/istanbul) coverage summary;
+- `test:coveralls`  runs tests with Istanbul coverage summary and aggregates the results by
+                    [Coveralls](https://coveralls.io/github/shashwatak/satellite-js); in order to run it locally
+                    `COVERALLS_REPO_TOKEN` is required:
+                    
+    ```
+    COVERALLS_REPO_TOKEN=<token> npm run test:coveralls
+    ```
+                    
+- `verify`          starts a local web server to host `sgp4_verification` application;
 
 ## TODO
 

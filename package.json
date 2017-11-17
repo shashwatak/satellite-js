@@ -15,7 +15,8 @@
     "lint": "eslint ./src",
     "lint:test": "eslint -c .eslintrc.test.json ./test",
     "test": "mocha --recursive --require babel-register test",
-    "test:coverage": "istanbul cover _mocha -- --recursive --require babel-register test && cat ./coverage/lcov.info | coveralls",
+    "test:coverage": "rimraf coverage && istanbul cover _mocha -- --recursive --require babel-register test",
+    "test:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
     "verify": "static sgp4_verification",
     "prepublish": "npm run lint && npm run lint:test && npm test && npm run rebuild"
   },
