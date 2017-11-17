@@ -1,4 +1,5 @@
 .idea
-node_modules
+/coverage
+/node_modules
 /lib
 /sgp4_verification/lib/sgp4

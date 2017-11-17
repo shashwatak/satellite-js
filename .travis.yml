@@ -15,5 +15,5 @@ before_script:
   - npm test
 script:
   - npm run build
-#after_success:
-#  - npm run test:coverage
+after_success:
+  - npm run test:coverage
