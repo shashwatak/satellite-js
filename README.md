@@ -18,7 +18,15 @@ propagate paths. The only changes I made to Brandon Rhode's code was to change t
 functions to key:value objects. This reduces the complexity of functions that require 50+ parameters,
 and doesn't require the parameters to be placed in the exact order.
 
-Special thanks to [ezze](https://github.com/ezze), for modernizing the code and greatly improving usability =)
+Special thanks to all contributors for improving usability and bug fixes :)
+
+- [ezze (Dmitriy Pushkov)](https://github.com/ezze)
+- [davidcalhoun (David Calhoun)](https://github.com/davidcalhoun)
+- [tikhonovits (Nikos Sagias)](https://github.com/tikhonovits)
+- [bakercp (Christopher Baker)](https://github.com/bakercp)
+- [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
+- [owntheweb](https://github.com/owntheweb)
+- [Zigone](https://github.com/Zigone)
 
 **Start Here:**
 
