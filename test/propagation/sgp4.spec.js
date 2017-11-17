@@ -1,12 +1,13 @@
 import chai from 'chai';
 
-import './jday.spec';
+import '../ext.spec';
 
-import compareVectors from './compareVectors';
+import compareVectors from '../compareVectors';
+
+import twoline2satrec from '../../src/io';
+import sgp4 from '../../src/propagation/sgp4';
+
 import sgp4data from './sgp4.json';
-
-import twoline2satrec from '../src/io';
-import sgp4 from '../src/propagation/sgp4';
 
 chai.should();
 

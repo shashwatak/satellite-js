@@ -8,7 +8,7 @@ import { propagate, gstime } from '../src/propagation';
 
 chai.should();
 
-describe('Julian day', () => {
+describe('Julian date / time', () => {
   it('jday gives the same result with different arguments describing the same time', () => {
     const now = new Date();
     jday(now).should.equal(jday(
