@@ -405,9 +405,7 @@ function sgp4(satrec, tsince) {
     em = dspaceResult.em;
     argpm = dspaceResult.argpm;
     inclm = dspaceResult.inclm;
-
     mm = dspaceResult.mm;
-
     nodem = dspaceResult.nodem;
     nm = dspaceResult.nm;
   }
@@ -432,6 +430,7 @@ function sgp4(satrec, tsince) {
     // sgp4fix to return if there is an error in eccentricity
     return [false, false];
   }
+
   //  sgp4fix fix tolerance to avoid a divide by zero
   if (em < 1.0e-6) {
     em = 1.0e-6;
@@ -469,11 +468,14 @@ function sgp4(satrec, tsince) {
     };
 
     var dpperResult = (0, _dpper2.default)(rec, dpperParameters);
+
     ep = dpperResult.ep;
-    xincp = dpperResult.inclp;
     nodep = dpperResult.nodep;
     argpp = dpperResult.argpp;
     mp = dpperResult.mp;
+
+
+    xincp = dpperResult.inclp;
 
     if (xincp < 0.0) {
       xincp = -xincp;
@@ -487,11 +489,13 @@ function sgp4(satrec, tsince) {
       return [false, false];
     }
   }
+
   //  -------------------- long period periodics ------------------
   if (rec.method === 'd') {
     sinip = Math.sin(xincp);
     cosip = Math.cos(xincp);
     rec.aycof = -0.5 * _constants.j3oj2 * sinip;
+
     //  sgp4fix for divide by zero for xincp = 180 deg
     if (Math.abs(cosip + 1.0) > 1.5e-12) {
       rec.xlcof = -0.25 * _constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / (1.0 + cosip);
@@ -499,6 +503,7 @@ function sgp4(satrec, tsince) {
       rec.xlcof = -0.25 * _constants.j3oj2 * sinip * (3.0 + 5.0 * cosip) / temp4;
     }
   }
+
   var axnl = ep * Math.cos(argpp);
   temp = 1.0 / (am * (1.0 - ep * ep));
   var aynl = ep * Math.sin(argpp) + temp * rec.aycof;
@@ -509,6 +514,7 @@ function sgp4(satrec, tsince) {
   eo1 = u;
   tem5 = 9999.9;
   var ktr = 1;
+
   //    sgp4fix for kepler iteration
   //    the following iteration needs better limits on corrections
   while (Math.abs(tem5) >= 1.0e-12 && ktr <= 10) {
@@ -526,6 +532,7 @@ function sgp4(satrec, tsince) {
     eo1 += tem5;
     ktr += 1;
   }
+
   //  ------------- short period preliminary quantities -----------
   var ecose = axnl * coseo1 + aynl * sineo1;
   var esine = axnl * sineo1 - aynl * coseo1;
@@ -633,9 +640,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = geodeticToEcf;
 function geodeticToEcf(geodeticCoords) {
-  var longitude = geodeticCoords.longitude;
-  var latitude = geodeticCoords.latitude;
-  var height = geodeticCoords.height;
+  var longitude = geodeticCoords.longitude,
+      latitude = geodeticCoords.latitude,
+      height = geodeticCoords.height;
+
+
   var a = 6378.137;
   var b = 6356.7523142;
   var f = (a - b) / a;
@@ -1286,6 +1295,7 @@ function eciToEcf(eciCoords, gmst) {
   var y = eciCoords.x * -Math.sin(gmst) + eciCoords.y * Math.cos(gmst);
   var z = eciCoords.z;
 
+
   return {
     x: x,
     y: y,
@@ -1431,8 +1441,9 @@ function topocentric(observerCoords, satelliteCoords) {
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
 
-  var longitude = observerCoords.longitude;
-  var latitude = observerCoords.latitude;
+  var longitude = observerCoords.longitude,
+      latitude = observerCoords.latitude;
+
 
   var observerEcf = (0, _geodeticToEcf2.default)(observerCoords);
 
@@ -1925,7 +1936,7 @@ function twoline2satrec(longstr1, longstr2) {
 
   // ---- convert to sgp4 units ----
   satrec.a = Math.pow(satrec.no * _constants.tumin, -2.0 / 3.0);
-  satrec.ndot /= xpdotp * 1440.0; //   ? * minperday
+  satrec.ndot /= xpdotp * 1440.0; // ? * minperday
   satrec.nddot /= xpdotp * 1440.0 * 1440;
 
   // ---- find standard orbital elements ----
@@ -1953,11 +1964,13 @@ function twoline2satrec(longstr1, longstr2) {
   }
 
   var mdhmsResult = (0, _days2mdhms2.default)(year, satrec.epochdays);
-  var mon = mdhmsResult.mon;
-  var day = mdhmsResult.day;
-  var hr = mdhmsResult.hr;
-  var minute = mdhmsResult.minute;
-  var sec = mdhmsResult.sec;
+
+  var mon = mdhmsResult.mon,
+      day = mdhmsResult.day,
+      hr = mdhmsResult.hr,
+      minute = mdhmsResult.minute,
+      sec = mdhmsResult.sec;
+
   satrec.jdsatepoch = (0, _jday2.default)(year, mon, day, hr, minute, sec);
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
@@ -2256,21 +2269,21 @@ function sgp4init(satrec, options) {
 
   var initlResult = (0, _initl2.default)(initlOptions);
 
+  var ao = initlResult.ao,
+      con42 = initlResult.con42,
+      cosio = initlResult.cosio,
+      cosio2 = initlResult.cosio2,
+      eccsq = initlResult.eccsq,
+      omeosq = initlResult.omeosq,
+      posq = initlResult.posq,
+      rp = initlResult.rp,
+      rteosq = initlResult.rteosq,
+      sinio = initlResult.sinio;
+
+
   rec.no = initlResult.no;
-
-  var ao = initlResult.ao;
   rec.con41 = initlResult.con41;
-  var con42 = initlResult.con42;
-  var cosio = initlResult.cosio;
-  var cosio2 = initlResult.cosio2;
-  var eccsq = initlResult.eccsq;
-  var omeosq = initlResult.omeosq;
-  var posq = initlResult.posq;
-  var rp = initlResult.rp;
-  var rteosq = initlResult.rteosq;
-  var sinio = initlResult.sinio;
   rec.gsto = initlResult.gsto;
-
   rec.error = 0;
 
   // sgp4fix remove this check as it is unnecessary
@@ -2413,14 +2426,9 @@ function sgp4init(satrec, options) {
 
       var dscomResult = (0, _dscom2.default)(dscomOptions);
 
-      sinim = dscomResult.sinim;
-      cosim = dscomResult.cosim;
-
       rec.e3 = dscomResult.e3;
       rec.ee2 = dscomResult.ee2;
-      em = dscomResult.em;
 
-      emsq = dscomResult.emsq;
       rec.peo = dscomResult.peo;
       rec.pgho = dscomResult.pgho;
       rec.pho = dscomResult.pho;
@@ -2442,54 +2450,53 @@ function sgp4init(satrec, options) {
       rec.sl3 = dscomResult.sl3;
       rec.sl4 = dscomResult.sl4;
 
+      sinim = dscomResult.sinim;
+      cosim = dscomResult.cosim;
+      em = dscomResult.em;
+      emsq = dscomResult.emsq;
       s1 = dscomResult.s1;
       s2 = dscomResult.s2;
       s3 = dscomResult.s3;
       s4 = dscomResult.s4;
       s5 = dscomResult.s5;
-
       ss1 = dscomResult.ss1;
       ss2 = dscomResult.ss2;
       ss3 = dscomResult.ss3;
-
       ss4 = dscomResult.ss4;
       ss5 = dscomResult.ss5;
       sz1 = dscomResult.sz1;
-
       sz3 = dscomResult.sz3;
       sz11 = dscomResult.sz11;
       sz13 = dscomResult.sz13;
-
       sz21 = dscomResult.sz21;
       sz23 = dscomResult.sz23;
       sz31 = dscomResult.sz31;
-
       sz33 = dscomResult.sz33;
+
+
       rec.xgh2 = dscomResult.xgh2;
       rec.xgh3 = dscomResult.xgh3;
       rec.xgh4 = dscomResult.xgh4;
       rec.xh2 = dscomResult.xh2;
-
       rec.xh3 = dscomResult.xh3;
       rec.xi2 = dscomResult.xi2;
       rec.xi3 = dscomResult.xi3;
       rec.xl2 = dscomResult.xl2;
       rec.xl3 = dscomResult.xl3;
-
       rec.xl4 = dscomResult.xl4;
+      rec.zmol = dscomResult.zmol;
+      rec.zmos = dscomResult.zmos;
+
       nm = dscomResult.nm;
       z1 = dscomResult.z1;
       z3 = dscomResult.z3;
-
       z11 = dscomResult.z11;
       z13 = dscomResult.z13;
       z21 = dscomResult.z21;
-
       z23 = dscomResult.z23;
       z31 = dscomResult.z31;
       z33 = dscomResult.z33;
-      rec.zmol = dscomResult.zmol;
-      rec.zmos = dscomResult.zmos;
+
 
       var dpperOptions = {
         inclo: inclm,
@@ -3443,6 +3450,7 @@ function dsinit(options) {
       em = emo;
       emsq = emsqo;
     }
+
     //  ---------------- synchronous resonance terms --------------
     if (irez === 1) {
       g200 = 1.0 + emsq * (-2.5 + 0.8125 * emsq);
@@ -3459,6 +3467,7 @@ function dsinit(options) {
       xlamo = (mo + nodeo + argpo - theta) % _constants.twoPi;
       xfact = mdot + xpidot + dmdt + domdt + dnodt - (no + rptim);
     }
+
     //  ------------ for sgp4, initialize the integrator ----------
     xli = xlamo;
     xni = no;
@@ -3630,6 +3639,7 @@ function initl(options) {
     var ts70 = epoch - 7305.0;
     var ds70 = Math.floor(ts70 + 1.0e-8);
     var tfrac = ts70 - ds70;
+
     //  find greenwich location at epoch
     var c1 = 1.72027916940703639e-2;
     var thgr70 = 1.7321343856509374;
