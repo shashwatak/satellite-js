@@ -12,20 +12,3 @@ export const j3 = -0.00000253215306;
 export const j4 = -0.00000161098761;
 export const j3oj2 = j3 / j2;
 export const x2o3 = 2.0 / 3.0;
-
-export default {
-  pi,
-  twoPi,
-  deg2rad,
-  rad2deg,
-  minutesPerDay,
-  mu,
-  earthRadius,
-  xke,
-  tumin,
-  j2,
-  j3,
-  j4,
-  j3oj2,
-  x2o3,
-};

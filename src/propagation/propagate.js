@@ -1,6 +1,8 @@
-import sgp4 from '../sgp4';
-import jday from '../gstime/jday';
 import { minutesPerDay } from '../constants';
+
+import { jday } from '../ext';
+
+import sgp4 from './sgp4';
 
 export default function propagate(...args) {
   // Return a position and velocity vector for a given date and time.

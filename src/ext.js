@@ -1,5 +1,63 @@
 /* -----------------------------------------------------------------------------
  *
+ *                           procedure jday
+ *
+ *  this procedure finds the julian date given the year, month, day, and time.
+ *    the julian date is defined by each elapsed day since noon, jan 1, 4713 bc.
+ *
+ *  algorithm     : calculate the answer in one step for efficiency
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs          description                    range / units
+ *    year        - year                           1900 .. 2100
+ *    mon         - month                          1 .. 12
+ *    day         - day                            1 .. 28,29,30,31
+ *    hr          - universal time hour            0 .. 23
+ *    min         - universal time min             0 .. 59
+ *    sec         - universal time sec             0.0 .. 59.999
+ *
+ *  outputs       :
+ *    jd          - julian date                    days from 4713 bc
+ *
+ *  locals        :
+ *    none.
+ *
+ *  coupling      :
+ *    none.
+ *
+ *  references    :
+ *    vallado       2007, 189, alg 14, ex 3-14
+ *
+ * --------------------------------------------------------------------------- */
+function jdayInternal(year, mon, day, hr, minute, sec) {
+  return (
+    ((367.0 * year) - Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25)) +
+    Math.floor((275 * mon) / 9.0) +
+    day + 1721013.5 +
+    (((((sec / 60.0) + minute) / 60.0) + hr) / 24.0) // ut in days
+    // # - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
+  );
+}
+
+export function jday(year, mon, day, hr, minute, sec) {
+  if (year instanceof Date) {
+    const date = year;
+    return jdayInternal(
+      date.getUTCFullYear(),
+      date.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+      date.getUTCDate(),
+      date.getUTCHours(),
+      date.getUTCMinutes(),
+      date.getUTCSeconds(),
+    );
+  }
+
+  return jdayInternal(year, mon, day, hr, minute, sec);
+}
+
+/* -----------------------------------------------------------------------------
+ *
  *                           procedure days2mdhms
  *
  *  this procedure converts the day of the year, days, to the equivalent month
@@ -34,7 +92,7 @@
  *  coupling      :
  *    none.
  * --------------------------------------------------------------------------- */
-export default function days2mdhms(year, days) {
+export function days2mdhms(year, days) {
   const lmonth = [31, (year % 4) === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   const dayofyr = Math.floor(days);
 
@@ -64,3 +122,4 @@ export default function days2mdhms(year, days) {
     sec,
   };
 }
+

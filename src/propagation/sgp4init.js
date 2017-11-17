@@ -1,12 +1,19 @@
 import assign from 'object-assign';
 
+import {
+  pi,
+  earthRadius,
+  j2,
+  j4,
+  j3oj2,
+  x2o3,
+} from '../constants';
+
 import dpper from './dpper';
 import dscom from './dscom';
 import dsinit from './dsinit';
 import initl from './initl';
 import sgp4 from './sgp4';
-
-import { pi, earthRadius, j2, j4, j3oj2 } from './constants';
 
 /*-----------------------------------------------------------------------------
  *
@@ -223,7 +230,6 @@ export default function sgp4init(satrec, options) {
   // sgp4fix use multiply for speed instead of pow
   const qzms2ttemp = (120.0 - 78.0) / earthRadius;
   const qzms2t = qzms2ttemp * qzms2ttemp * qzms2ttemp * qzms2ttemp;
-  const x2o3 = 2.0 / 3.0;
 
   rec.init = 'y';
   rec.t = 0.0;
@@ -301,7 +307,7 @@ export default function sgp4init(satrec, options) {
     coef1 = coef / (psisq ** 3.5);
     cc2 = coef1 * rec.no * ((ao * (1.0 + (1.5 * etasq) + (eeta * (4.0 + etasq)))) +
       (((0.375 * j2 * tsi) / psisq) * rec.con41 *
-      (8.0 + (3.0 * etasq * (8.0 + etasq)))));
+        (8.0 + (3.0 * etasq * (8.0 + etasq)))));
     rec.cc1 = rec.bstar * cc2;
     cc3 = 0.0;
     if (rec.ecco > 1.0e-4) {
@@ -310,12 +316,12 @@ export default function sgp4init(satrec, options) {
     rec.x1mth2 = 1.0 - cosio2;
     rec.cc4 = 2.0 * rec.no * coef1 * ao * omeosq * (
       ((rec.eta * (2.0 + (0.5 * etasq))) +
-      (rec.ecco * (0.5 + (2.0 * etasq)))) -
+        (rec.ecco * (0.5 + (2.0 * etasq)))) -
       (((j2 * tsi) / (ao * psisq)) *
-      ((-3.0 * rec.con41 * ((1.0 - (2.0 * eeta)) + (etasq * (1.5 - (0.5 * eeta))))) +
-      (0.75 * rec.x1mth2 *
-      ((2.0 * etasq) - (eeta * (1.0 + etasq))) *
-      Math.cos(2.0 * rec.argpo))))
+        ((-3.0 * rec.con41 * ((1.0 - (2.0 * eeta)) + (etasq * (1.5 - (0.5 * eeta))))) +
+          (0.75 * rec.x1mth2 *
+            ((2.0 * etasq) - (eeta * (1.0 + etasq))) *
+            Math.cos(2.0 * rec.argpo))))
     );
     rec.cc5 = 2.0 * coef1 * ao * omeosq * (1.0 + (2.75 * (etasq + eeta)) + (eeta * etasq));
     cosio4 = cosio2 * cosio2;

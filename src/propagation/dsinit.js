@@ -1,4 +1,9 @@
-import { pi, twoPi, xke } from './constants';
+import {
+  pi,
+  twoPi,
+  xke,
+  x2o3,
+} from '../constants';
 
 /*-----------------------------------------------------------------------------
  *
@@ -199,7 +204,6 @@ export default function dsinit(options) {
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const root32 = 3.7393792e-7;
   const root52 = 1.1428639e-7;
-  const x2o3 = 2.0 / 3.0;
   const znl = 1.5835218e-4;
   const zns = 1.19459e-5;
 

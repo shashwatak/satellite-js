@@ -1,4 +1,7 @@
-import { pi, twoPi } from './constants';
+import {
+  pi,
+  twoPi,
+} from '../constants';
 
 /* -----------------------------------------------------------------------------
  *

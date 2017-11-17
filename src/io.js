@@ -2,11 +2,54 @@ import {
   pi,
   tumin,
   deg2rad,
-} from '../constants';
+} from './constants';
 
-import sgp4init from '../sgp4init';
-import days2mdhms from '../gstime/days2mdhms';
-import jday from '../gstime/jday';
+import {
+  jday,
+  days2mdhms,
+} from './ext';
+
+import sgp4init from './propagation/sgp4init';
+
+/* -----------------------------------------------------------------------------
+ *
+ *                           function twoline2rv
+ *
+ *  this function converts the two line element set character string data to
+ *    variables and initializes the sgp4 variables. several intermediate varaibles
+ *    and quantities are determined. note that the result is a structure so multiple
+ *    satellites can be processed simultaneously without having to reinitialize. the
+ *    verification mode is an important option that permits quick checks of any
+ *    changes to the underlying technical theory. this option works using a
+ *    modified tle file in which the start, stop, and delta time values are
+ *    included at the end of the second line of data. this only works with the
+ *    verification mode. the catalog mode simply propagates from -1440 to 1440 min
+ *    from epoch and is useful when performing entire catalog runs.
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs        :
+ *    longstr1    - first line of the tle
+ *    longstr2    - second line of the tle
+ *    typerun     - type of run                    verification 'v', catalog 'c',
+ *                                                 manual 'm'
+ *    typeinput   - type of manual input           mfe 'm', epoch 'e', dayofyr 'd'
+ *    opsmode     - mode of operation afspc or improved 'a', 'i'
+ *    whichconst  - which set of constants to use  72, 84
+ *
+ *  outputs       :
+ *    satrec      - structure containing all the sgp4 satellite information
+ *
+ *  coupling      :
+ *    getgravconst-
+ *    days2mdhms  - conversion of days to month, day, hour, minute, second
+ *    jday        - convert day month year hour minute second into julian date
+ *    sgp4init    - initialize the sgp4 variables
+ *
+ *  references    :
+ *    norad spacetrack report #3
+ *    vallado, crawford, hujsak, kelso  2006
+ --------------------------------------------------------------------------- */
 
 /**
  * Return a Satellite imported from two lines of TLE data.

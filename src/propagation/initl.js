@@ -1,6 +1,11 @@
-import gstime from './gstime/gstime';
+import {
+  twoPi,
+  xke,
+  j2,
+  x2o3,
+} from '../constants';
 
-import { twoPi, x2o3, xke, j2 } from './constants';
+import gstime from './gstime';
 
 /*-----------------------------------------------------------------------------
  *

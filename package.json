@@ -13,7 +13,7 @@
     "build": "npm run transpile && npm run dist:development && npm run dist:production && npm run copy",
     "rebuild": "npm run clean && npm run build",
     "lint": "eslint ./src",
-    "lint:test": "eslint -c .eslintrc.test.json ./test",
+    "lint:test": "eslint -c test/.eslintrc.json ./test",
     "test": "mocha --recursive --require babel-register test",
     "test:coverage": "rimraf coverage && istanbul cover _mocha -- --recursive --require babel-register test",
     "test:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",

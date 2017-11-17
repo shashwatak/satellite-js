@@ -1,25 +1,36 @@
-import constants from './constants';
+import * as constants from './constants';
 
-import degreesLat from './transforms/degreesLat';
-import degreesLong from './transforms/degreesLong';
-import eciToEcf from './transforms/eciToEcf';
-import ecfToEci from './transforms/ecfToEci';
-import eciToGeodetic from './transforms/eciToGeodetic';
-import ecfToLookAngles from './transforms/ecfToLookAngles';
-import geodeticToEcf from './transforms/geodeticToEcf';
+import { jday } from './ext';
+import twoline2satrec from './io';
+import { propagate, sgp4, gstime } from './propagation';
 
 import dopplerFactor from './dopplerFactor';
 
-import gstime from './gstime/gstime';
-import jday from './gstime/jday';
-
-import propagate from './propagate/propagate';
-import twoline2satrec from './propagate/twoline2satrec';
-import sgp4 from './sgp4';
+import {
+  degreesLat,
+  degreesLong,
+  eciToEcf,
+  ecfToEci,
+  eciToGeodetic,
+  ecfToLookAngles,
+  geodeticToEcf,
+} from './transforms';
 
 export default {
   version: '1.4.0',
   constants,
+
+  // Propagation
+  propagate,
+  sgp4,
+  twoline2satrec,
+
+  gstime,
+  gstimeFromJday: gstime, // TODO: deprecate
+  gstimeFromDate: gstime, // TODO: deprecate
+  jday,
+
+  dopplerFactor,
 
   // Coordinate transforms
   degreesLat,
@@ -29,14 +40,4 @@ export default {
   eciToGeodetic,
   ecfToLookAngles,
   geodeticToEcf,
-
-  dopplerFactor,
-
-  gstimeFromJday: gstime,
-  gstimeFromDate: (...args) => gstime(jday(...args)),
-  jday,
-
-  propagate,
-  twoline2satrec,
-  sgp4,
 };
