@@ -2,6 +2,8 @@
 
 [![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
 [![Bower version](https://badge.fury.io/bo/satellite.js.svg)](https://badge.fury.io/bo/satellite.js)
+[![Build Status](https://travis-ci.org/shashwatak/satellite-js.svg?branch=develop)](https://travis-ci.org/shashwatak/satellite-js)
+[![Gitter chat](https://badges.gitter.im/shashwatak/satellite-js.png)](https://gitter.im/satellite-js/Lobby)
 
 ## Introduction
 
@@ -248,10 +250,10 @@ Space Track, there should be no problem.
 
 Both `propagate()` and `sgp4()` functions return position and velocity as a dictionary of the form:
 
-```js
+```json
 {
-  "position" : { "x" : 1, "y" : 1, "z" : 1 },
-  "velocity" : { "x" : 1, "y" : 1, "z" : 1 }
+  "position": { "x" : 1, "y" : 1, "z" : 1 },
+  "velocity": { "x" : 1, "y" : 1, "z" : 1 }
 }
 ```
 
