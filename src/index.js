@@ -2,18 +2,22 @@ import * as constants from './constants';
 
 import { jday } from './ext';
 import twoline2satrec from './io';
-import { propagate, sgp4, gstime } from './propagation';
+import {
+  propagate,
+  sgp4,
+  gstime,
+} from './propagation';
 
 import dopplerFactor from './dopplerFactor';
 
 import {
   degreesLat,
   degreesLong,
+  geodeticToEcf,
+  eciToGeodetic,
   eciToEcf,
   ecfToEci,
-  eciToGeodetic,
   ecfToLookAngles,
-  geodeticToEcf,
 } from './transforms';
 
 export default {
@@ -35,9 +39,9 @@ export default {
   // Coordinate transforms
   degreesLat,
   degreesLong,
+  geodeticToEcf,
+  eciToGeodetic,
   eciToEcf,
   ecfToEci,
-  eciToGeodetic,
   ecfToLookAngles,
-  geodeticToEcf,
 };

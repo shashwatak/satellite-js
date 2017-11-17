@@ -21,7 +21,7 @@ describe('Julian date / time', () => {
     ));
   });
 
-  it('gstimeFromDate gives the same result with different arguments describing the same time', () => {
+  it('gstime gives the same result with different arguments describing the same time', () => {
     const now = new Date();
     gstime(now).should.equal(gstime(
       now.getUTCFullYear(),

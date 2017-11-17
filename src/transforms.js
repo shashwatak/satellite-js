@@ -45,7 +45,68 @@ export function geodeticToEcf(geodeticCoords) {
   };
 }
 
-export function topocentric(observerCoords, satelliteCoords) {
+export function eciToGeodetic(eciCoords, gmst) {
+  // http://www.celestrak.com/columns/v02n03/
+  const a = 6378.137;
+  const b = 6356.7523142;
+  const R = Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y));
+  const f = (a - b) / a;
+  const e2 = ((2 * f) - (f * f));
+  const longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
+  const kmax = 20;
+  let k = 0;
+  let latitude = Math.atan2(
+    eciCoords.z,
+    Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y)),
+  );
+  let C;
+  while (k < kmax) {
+    C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
+    latitude = Math.atan2(eciCoords.z + (a * C * e2 * Math.sin(latitude)), R);
+    k += 1;
+  }
+  const height = (R / Math.cos(latitude)) - (a * C);
+  return { longitude, latitude, height };
+}
+
+export function ecfToEci(ecfCoords, gmst) {
+  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
+  //
+  // [X]     [C -S  0][X]
+  // [Y]  =  [S  C  0][Y]
+  // [Z]eci  [0  0  1][Z]ecf
+  //
+  const X = (ecfCoords.x * Math.cos(gmst)) - (ecfCoords.y * Math.sin(gmst));
+  const Y = (ecfCoords.x * (Math.sin(gmst))) + (ecfCoords.y * Math.cos(gmst));
+  const Z = ecfCoords.z;
+  return { x: X, y: Y, z: Z };
+}
+
+export function eciToEcf(eciCoords, gmst) {
+  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
+  //
+  // [X]     [C -S  0][X]
+  // [Y]  =  [S  C  0][Y]
+  // [Z]eci  [0  0  1][Z]ecf
+  //
+  //
+  // Inverse:
+  // [X]     [C  S  0][X]
+  // [Y]  =  [-S C  0][Y]
+  // [Z]ecf  [0  0  1][Z]eci
+
+  const x = (eciCoords.x * Math.cos(gmst)) + (eciCoords.y * Math.sin(gmst));
+  const y = (eciCoords.x * (-Math.sin(gmst))) + (eciCoords.y * Math.cos(gmst));
+  const { z } = eciCoords;
+
+  return {
+    x,
+    y,
+    z,
+  };
+}
+
+function topocentric(observerCoords, satelliteCoords) {
   // http://www.celestrak.com/columns/v02n02/
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
@@ -85,7 +146,7 @@ export function topocentric(observerCoords, satelliteCoords) {
  * @param {Number} tc.topZ Vector Z normal to the surface of the earth (up).
  * @returns {Object}
  */
-export function topocentricToLookAngles(tc) {
+function topocentricToLookAngles(tc) {
   const { topS, topE, topZ } = tc;
   const rangeSat = Math.sqrt((topS * topS) + (topE * topE) + (topZ * topZ));
   const El = Math.asin(topZ / rangeSat);
@@ -98,68 +159,7 @@ export function topocentricToLookAngles(tc) {
   };
 }
 
-export function ecfToEci(ecfCoords, gmst) {
-  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
-  //
-  // [X]     [C -S  0][X]
-  // [Y]  =  [S  C  0][Y]
-  // [Z]eci  [0  0  1][Z]ecf
-  //
-  const X = (ecfCoords.x * Math.cos(gmst)) - (ecfCoords.y * Math.sin(gmst));
-  const Y = (ecfCoords.x * (Math.sin(gmst))) + (ecfCoords.y * Math.cos(gmst));
-  const Z = ecfCoords.z;
-  return { x: X, y: Y, z: Z };
-}
-
 export function ecfToLookAngles(observerCoordsEcf, satelliteCoordsEcf) {
   const topocentricCoords = topocentric(observerCoordsEcf, satelliteCoordsEcf);
   return topocentricToLookAngles(topocentricCoords);
-}
-
-export function eciToEcf(eciCoords, gmst) {
-  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
-  //
-  // [X]     [C -S  0][X]
-  // [Y]  =  [S  C  0][Y]
-  // [Z]eci  [0  0  1][Z]ecf
-  //
-  //
-  // Inverse:
-  // [X]     [C  S  0][X]
-  // [Y]  =  [-S C  0][Y]
-  // [Z]ecf  [0  0  1][Z]eci
-
-  const x = (eciCoords.x * Math.cos(gmst)) + (eciCoords.y * Math.sin(gmst));
-  const y = (eciCoords.x * (-Math.sin(gmst))) + (eciCoords.y * Math.cos(gmst));
-  const { z } = eciCoords;
-
-  return {
-    x,
-    y,
-    z,
-  };
-}
-
-export function eciToGeodetic(eciCoords, gmst) {
-  // http://www.celestrak.com/columns/v02n03/
-  const a = 6378.137;
-  const b = 6356.7523142;
-  const R = Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y));
-  const f = (a - b) / a;
-  const e2 = ((2 * f) - (f * f));
-  const longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
-  const kmax = 20;
-  let k = 0;
-  let latitude = Math.atan2(
-    eciCoords.z,
-    Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y)),
-  );
-  let C;
-  while (k < kmax) {
-    C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
-    latitude = Math.atan2(eciCoords.z + (a * C * e2 * Math.sin(latitude)), R);
-    k += 1;
-  }
-  const height = (R / Math.cos(latitude)) - (a * C);
-  return { longitude, latitude, height };
 }
