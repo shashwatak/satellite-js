@@ -1,4 +1,4 @@
-import { twoPi } from './constants';
+import { twoPi } from '../constants';
 
 /*-----------------------------------------------------------------------------
  *

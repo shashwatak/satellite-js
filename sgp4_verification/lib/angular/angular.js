@@ -7634,7 +7634,7 @@ function $RootScopeProvider(){
        * @description
        * Creates a new child {@link ng.$rootScope.Scope scope}.
        *
-       * The parent scope will propagate the {@link ng.$rootScope.Scope#$digest $digest()} and
+       * The parent scope will propagation the {@link ng.$rootScope.Scope#$digest $digest()} and
        * {@link ng.$rootScope.Scope#$digest $digest()} events. The scope can be removed from the scope
        * hierarchy using {@link ng.$rootScope.Scope#$destroy $destroy()}.
        *
@@ -7932,7 +7932,7 @@ function $RootScopeProvider(){
        * @description
        * Removes the current scope (and all of its children) from the parent scope. Removal implies
        * that calls to {@link ng.$rootScope.Scope#$digest $digest()} will no longer
-       * propagate to the current scope and its children. Removal also implies that the current
+       * propagation to the current scope and its children. Removal also implies that the current
        * scope is eligible for garbage collection.
        *
        * The `$destroy()` is usually used by directives such as
@@ -12864,7 +12864,7 @@ var ngCspDirective = ['$sniffer', function($sniffer) {
  * A directive that allows creation of custom onclick handlers that are defined as angular
  * expressions and are compiled and executed within the current scope.
  *
- * Events that are handled via these handler are always configured not to propagate further.
+ * Events that are handled via these handler are always configured not to propagation further.
  */
 var ngEventDirectives = {};
 forEach(

@@ -1,11 +1,19 @@
 import assign from 'object-assign';
 
+import {
+  pi,
+  twoPi,
+  earthRadius,
+  xke,
+  j2,
+  j3oj2,
+  x2o3,
+} from '../constants';
+
 import dpper from './dpper';
 import dspace from './dspace';
 
-import { pi, twoPi, earthRadius, xke, x2o3, j2, j3oj2 } from './constants';
-
-/*-----------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
  *
  *                             procedure sgp4
  *

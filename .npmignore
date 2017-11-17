@@ -7,7 +7,7 @@
 .babelrc
 .eslintignore
 .eslintrc.json
-.eslintrc.test.json
+test/.eslintrc.json
 .npmignore
 bower.json
 webpack.config.babel.js

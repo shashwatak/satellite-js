@@ -2,10 +2,10 @@ import chai from 'chai';
 
 import compareVectors from './compareVectors';
 
-import jday from '../src/gstime/jday';
 import { gstimeFromDate } from '../src/index';
-import twoline2satrec from '../src/propagate/twoline2satrec';
-import propagate from '../src/propagate/propagate';
+import { jday } from '../src/ext';
+import twoline2satrec from '../src/io';
+import { propagate } from '../src/propagation';
 
 chai.should();
 
@@ -34,7 +34,7 @@ describe('Julian day', () => {
     ));
   });
 
-  it('propagate gives the same result with different arguments describing the same time', () => {
+  it('propagation gives the same result with different arguments describing the same time', () => {
     const date = new Date(2016, 7, 22);
     const tleLine1 = '1 27424U 02022A   16235.86686911  .00000105  00000-0  33296-4 0  9990';
     const tleLine2 = '2 27424  98.2022 175.3843 0001285  39.9183  23.2024 14.57119903760831';

@@ -3,6 +3,8 @@ import {
   twoPi,
 } from '../constants';
 
+import { jday } from '../ext';
+
 /* -----------------------------------------------------------------------------
  *
  *                           function gstime
@@ -28,7 +30,7 @@ import {
  *  references    :
  *    vallado       2004, 191, eq 3-45
  * --------------------------------------------------------------------------- */
-export default function gstime(jdut1) {
+function gstimeInternal(jdut1) {
   const tut1 = (jdut1 - 2451545.0) / 36525.0;
 
   let temp =
@@ -43,4 +45,11 @@ export default function gstime(jdut1) {
   }
 
   return temp;
+}
+
+export default function gstime(...args) {
+  if (args[0] instanceof Date || args.length > 1) {
+    return gstimeInternal(jday(...args));
+  }
+  return gstimeInternal(...args);
 }
