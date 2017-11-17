@@ -2,10 +2,9 @@ import chai from 'chai';
 
 import compareVectors from './compareVectors';
 
-import { gstimeFromDate } from '../src/index';
 import { jday } from '../src/ext';
 import twoline2satrec from '../src/io';
-import { propagate } from '../src/propagation';
+import { propagate, gstime } from '../src/propagation';
 
 chai.should();
 
@@ -24,7 +23,7 @@ describe('Julian day', () => {
 
   it('gstimeFromDate gives the same result with different arguments describing the same time', () => {
     const now = new Date();
-    gstimeFromDate(now).should.equal(gstimeFromDate(
+    gstime(now).should.equal(gstime(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1,
       now.getUTCDate(),
