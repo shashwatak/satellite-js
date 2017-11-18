@@ -77,7 +77,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -112,23 +112,6 @@ var j4 = exports.j4 = -0.00000161098761;
 var j3oj2 = exports.j3oj2 = j3 / j2;
 var x2o3 = exports.x2o3 = 2.0 / 3.0;
 
-exports.default = {
-  pi: pi,
-  twoPi: twoPi,
-  deg2rad: deg2rad,
-  rad2deg: rad2deg,
-  minutesPerDay: minutesPerDay,
-  mu: mu,
-  earthRadius: earthRadius,
-  xke: xke,
-  tumin: tumin,
-  j2: j2,
-  j3: j3,
-  j4: j4,
-  j3oj2: j3oj2,
-  x2o3: x2o3
-};
-
 /***/ }),
 /* 1 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -146,7 +129,40 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = jday;
+exports.jday = jday;
+exports.days2mdhms = days2mdhms;
+/* -----------------------------------------------------------------------------
+ *
+ *                           procedure jday
+ *
+ *  this procedure finds the julian date given the year, month, day, and time.
+ *    the julian date is defined by each elapsed day since noon, jan 1, 4713 bc.
+ *
+ *  algorithm     : calculate the answer in one step for efficiency
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs          description                    range / units
+ *    year        - year                           1900 .. 2100
+ *    mon         - month                          1 .. 12
+ *    day         - day                            1 .. 28,29,30,31
+ *    hr          - universal time hour            0 .. 23
+ *    min         - universal time min             0 .. 59
+ *    sec         - universal time sec             0.0 .. 59.999
+ *
+ *  outputs       :
+ *    jd          - julian date                    days from 4713 bc
+ *
+ *  locals        :
+ *    none.
+ *
+ *  coupling      :
+ *    none.
+ *
+ *  references    :
+ *    vallado       2007, 189, alg 14, ex 3-14
+ *
+ * --------------------------------------------------------------------------- */
 function jdayInternal(year, mon, day, hr, minute, sec) {
   return 367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor(275 * mon / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 // ut in days
   // # - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
@@ -162,7 +178,73 @@ function jday(year, mon, day, hr, minute, sec) {
 
   return jdayInternal(year, mon, day, hr, minute, sec);
 }
-module.exports = exports["default"];
+
+/* -----------------------------------------------------------------------------
+ *
+ *                           procedure days2mdhms
+ *
+ *  this procedure converts the day of the year, days, to the equivalent month
+ *    day, hour, minute and second.
+ *
+ *  algorithm     : set up array for the number of days per month
+ *                  find leap year - use 1900 because 2000 is a leap year
+ *                  loop through a temp value while the value is < the days
+ *                  perform int conversions to the correct day and month
+ *                  convert remainder into h m s using type conversions
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs          description                    range / units
+ *    year        - year                           1900 .. 2100
+ *    days        - julian day of the year         0.0  .. 366.0
+ *
+ *  outputs       :
+ *    mon         - month                          1 .. 12
+ *    day         - day                            1 .. 28,29,30,31
+ *    hr          - hour                           0 .. 23
+ *    min         - minute                         0 .. 59
+ *    sec         - second                         0.0 .. 59.999
+ *
+ *  locals        :
+ *    dayofyr     - day of year
+ *    temp        - temporary extended values
+ *    inttemp     - temporary int value
+ *    i           - index
+ *    lmonth[12]  - int array containing the number of days per month
+ *
+ *  coupling      :
+ *    none.
+ * --------------------------------------------------------------------------- */
+function days2mdhms(year, days) {
+  var lmonth = [31, year % 4 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  var dayofyr = Math.floor(days);
+
+  //  ----------------- find month and day of month ----------------
+  var i = 1;
+  var inttemp = 0;
+  while (dayofyr > inttemp + lmonth[i - 1] && i < 12) {
+    inttemp += lmonth[i - 1];
+    i += 1;
+  }
+
+  var mon = i;
+  var day = dayofyr - inttemp;
+
+  //  ----------------- find hours minutes and seconds -------------
+  var temp = (days - dayofyr) * 24.0;
+  var hr = Math.floor(temp);
+  temp = (temp - hr) * 60.0;
+  var minute = Math.floor(temp);
+  var sec = (temp - minute) * 60.0;
+
+  return {
+    mon: mon,
+    day: day,
+    hr: hr,
+    minute: minute,
+    sec: sec
+  };
+}
 
 /***/ }),
 /* 2 */
@@ -183,23 +265,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = sgp4;
 
-var _objectAssign = __webpack_require__(5);
+var _objectAssign = __webpack_require__(3);
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var _dpper = __webpack_require__(6);
+var _constants = __webpack_require__(0);
+
+var _dpper = __webpack_require__(4);
 
 var _dpper2 = _interopRequireDefault(_dpper);
 
-var _dspace = __webpack_require__(18);
+var _dspace = __webpack_require__(12);
 
 var _dspace2 = _interopRequireDefault(_dspace);
 
-var _constants = __webpack_require__(0);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/*-----------------------------------------------------------------------------
+/*----------------------------------------------------------------------------
  *
  *                             procedure sgp4
  *
@@ -626,109 +708,6 @@ module.exports = exports['default'];
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = geodeticToEcf;
-function geodeticToEcf(geodeticCoords) {
-  var longitude = geodeticCoords.longitude,
-      latitude = geodeticCoords.latitude,
-      height = geodeticCoords.height;
-
-
-  var a = 6378.137;
-  var b = 6356.7523142;
-  var f = (a - b) / a;
-  var e2 = 2 * f - f * f;
-  var normal = a / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
-
-  var x = (normal + height) * Math.cos(latitude) * Math.cos(longitude);
-  var y = (normal + height) * Math.cos(latitude) * Math.sin(longitude);
-  var z = (normal * (1 - e2) + height) * Math.sin(latitude);
-
-  return {
-    x: x,
-    y: y,
-    z: z
-  };
-}
-module.exports = exports["default"];
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = gstime;
-
-var _constants = __webpack_require__(0);
-
-/* -----------------------------------------------------------------------------
- *
- *                           function gstime
- *
- *  this function finds the greenwich sidereal time.
- *
- *  author        : david vallado                  719-573-2600    1 mar 2001
- *
- *  inputs          description                    range / units
- *    jdut1       - julian date in ut1             days from 4713 bc
- *
- *  outputs       :
- *    gstime      - greenwich sidereal time        0 to 2pi rad
- *
- *  locals        :
- *    temp        - temporary variable for doubles   rad
- *    tut1        - julian centuries from the
- *                  jan 1, 2000 12 h epoch (ut1)
- *
- *  coupling      :
- *    none
- *
- *  references    :
- *    vallado       2004, 191, eq 3-45
- * --------------------------------------------------------------------------- */
-function gstime(jdut1) {
-  var tut1 = (jdut1 - 2451545.0) / 36525.0;
-
-  var temp = -6.2e-6 * tut1 * tut1 * tut1 + 0.093104 * tut1 * tut1 + (876600.0 * 3600 + 8640184.812866) * tut1 + 67310.54841; // # sec
-  temp = temp * _constants.deg2rad / 240.0 % _constants.twoPi; // 360/86400 = 1/240, to deg, to rad
-
-  //  ------------------------ check quadrants ---------------------
-  if (temp < 0.0) {
-    temp += _constants.twoPi;
-  }
-
-  return temp;
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /*
 object-assign
 (c) Sindre Sorhus
@@ -822,7 +801,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 
 
 /***/ }),
-/* 6 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1097,7 +1076,77 @@ function dpper(satrec, options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 7 */
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = gstime;
+
+var _constants = __webpack_require__(0);
+
+var _ext = __webpack_require__(1);
+
+/* -----------------------------------------------------------------------------
+ *
+ *                           function gstime
+ *
+ *  this function finds the greenwich sidereal time.
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs          description                    range / units
+ *    jdut1       - julian date in ut1             days from 4713 bc
+ *
+ *  outputs       :
+ *    gstime      - greenwich sidereal time        0 to 2pi rad
+ *
+ *  locals        :
+ *    temp        - temporary variable for doubles   rad
+ *    tut1        - julian centuries from the
+ *                  jan 1, 2000 12 h epoch (ut1)
+ *
+ *  coupling      :
+ *    none
+ *
+ *  references    :
+ *    vallado       2004, 191, eq 3-45
+ * --------------------------------------------------------------------------- */
+function gstimeInternal(jdut1) {
+  var tut1 = (jdut1 - 2451545.0) / 36525.0;
+
+  var temp = -6.2e-6 * tut1 * tut1 * tut1 + 0.093104 * tut1 * tut1 + (876600.0 * 3600 + 8640184.812866) * tut1 + 67310.54841; // # sec
+  temp = temp * _constants.deg2rad / 240.0 % _constants.twoPi; // 360/86400 = 1/240, to deg, to rad
+
+  //  ------------------------ check quadrants ---------------------
+  if (temp < 0.0) {
+    temp += _constants.twoPi;
+  }
+
+  return temp;
+}
+
+function gstime() {
+  if ((arguments.length <= 0 ? undefined : arguments[0]) instanceof Date || arguments.length > 1) {
+    return gstimeInternal(_ext.jday.apply(undefined, arguments));
+  }
+  return gstimeInternal.apply(undefined, arguments);
+}
+module.exports = exports['default'];
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1116,747 +1165,55 @@ Object.defineProperty(exports, "__esModule", {
 
 var _constants = __webpack_require__(0);
 
-var _constants2 = _interopRequireDefault(_constants);
+var constants = _interopRequireWildcard(_constants);
 
-var _degreesLat = __webpack_require__(8);
+var _ext = __webpack_require__(1);
 
-var _degreesLat2 = _interopRequireDefault(_degreesLat);
+var _io = __webpack_require__(7);
 
-var _degreesLong = __webpack_require__(9);
+var _io2 = _interopRequireDefault(_io);
 
-var _degreesLong2 = _interopRequireDefault(_degreesLong);
+var _propagation = __webpack_require__(13);
 
-var _eciToEcf = __webpack_require__(10);
-
-var _eciToEcf2 = _interopRequireDefault(_eciToEcf);
-
-var _ecfToEci = __webpack_require__(11);
-
-var _ecfToEci2 = _interopRequireDefault(_ecfToEci);
-
-var _eciToGeodetic = __webpack_require__(12);
-
-var _eciToGeodetic2 = _interopRequireDefault(_eciToGeodetic);
-
-var _ecfToLookAngles = __webpack_require__(13);
-
-var _ecfToLookAngles2 = _interopRequireDefault(_ecfToLookAngles);
-
-var _geodeticToEcf = __webpack_require__(3);
-
-var _geodeticToEcf2 = _interopRequireDefault(_geodeticToEcf);
-
-var _dopplerFactor = __webpack_require__(16);
+var _dopplerFactor = __webpack_require__(15);
 
 var _dopplerFactor2 = _interopRequireDefault(_dopplerFactor);
 
-var _gstime = __webpack_require__(4);
-
-var _gstime2 = _interopRequireDefault(_gstime);
-
-var _jday = __webpack_require__(1);
-
-var _jday2 = _interopRequireDefault(_jday);
-
-var _propagate = __webpack_require__(17);
-
-var _propagate2 = _interopRequireDefault(_propagate);
-
-var _twoline2satrec = __webpack_require__(19);
-
-var _twoline2satrec2 = _interopRequireDefault(_twoline2satrec);
-
-var _sgp = __webpack_require__(2);
-
-var _sgp2 = _interopRequireDefault(_sgp);
+var _transforms = __webpack_require__(16);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 exports.default = {
   version: '1.4.0',
-  constants: _constants2.default,
+  constants: constants,
 
-  // Coordinate transforms
-  degreesLat: _degreesLat2.default,
-  degreesLong: _degreesLong2.default,
-  eciToEcf: _eciToEcf2.default,
-  ecfToEci: _ecfToEci2.default,
-  eciToGeodetic: _eciToGeodetic2.default,
-  ecfToLookAngles: _ecfToLookAngles2.default,
-  geodeticToEcf: _geodeticToEcf2.default,
+  // Propagation
+  propagate: _propagation.propagate,
+  sgp4: _propagation.sgp4,
+  twoline2satrec: _io2.default,
+
+  gstime: _propagation.gstime,
+  gstimeFromJday: _propagation.gstime, // TODO: deprecate
+  gstimeFromDate: _propagation.gstime, // TODO: deprecate
+  jday: _ext.jday,
 
   dopplerFactor: _dopplerFactor2.default,
 
-  gstimeFromJday: _gstime2.default,
-  gstimeFromDate: function gstimeFromDate() {
-    return (0, _gstime2.default)(_jday2.default.apply(undefined, arguments));
-  },
-  jday: _jday2.default,
-
-  propagate: _propagate2.default,
-  twoline2satrec: _twoline2satrec2.default,
-  sgp4: _sgp2.default
+  // Coordinate transforms
+  degreesLat: _transforms.degreesLat,
+  degreesLong: _transforms.degreesLong,
+  geodeticToEcf: _transforms.geodeticToEcf,
+  eciToGeodetic: _transforms.eciToGeodetic,
+  eciToEcf: _transforms.eciToEcf,
+  ecfToEci: _transforms.ecfToEci,
+  ecfToLookAngles: _transforms.ecfToLookAngles
 };
 module.exports = exports['default'];
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = degreesLat;
-
-var _constants = __webpack_require__(0);
-
-function degreesLat(radians) {
-  if (radians > _constants.pi / 2 || radians < -_constants.pi / 2) {
-    return 'Err';
-  }
-  return radians / (_constants.pi * 180);
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = degreesLong;
-
-var _constants = __webpack_require__(0);
-
-function degreesLong(radians) {
-  var degrees = radians / (_constants.pi * 180) % 360;
-  if (degrees > 180) {
-    degrees = 360 - degrees;
-  } else if (degrees < -180) {
-    degrees = 360 + degrees;
-  }
-  return degrees;
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = eciToEcf;
-function eciToEcf(eciCoords, gmst) {
-  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
-  //
-  // [X]     [C -S  0][X]
-  // [Y]  =  [S  C  0][Y]
-  // [Z]eci  [0  0  1][Z]ecf
-  //
-  //
-  // Inverse:
-  // [X]     [C  S  0][X]
-  // [Y]  =  [-S C  0][Y]
-  // [Z]ecf  [0  0  1][Z]eci
-
-  var x = eciCoords.x * Math.cos(gmst) + eciCoords.y * Math.sin(gmst);
-  var y = eciCoords.x * -Math.sin(gmst) + eciCoords.y * Math.cos(gmst);
-  var z = eciCoords.z;
-
-
-  return {
-    x: x,
-    y: y,
-    z: z
-  };
-}
-module.exports = exports["default"];
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = ecfToEci;
-function ecfToEci(ecfCoords, gmst) {
-  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
-  //
-  // [X]     [C -S  0][X]
-  // [Y]  =  [S  C  0][Y]
-  // [Z]eci  [0  0  1][Z]ecf
-  //
-  var X = ecfCoords.x * Math.cos(gmst) - ecfCoords.y * Math.sin(gmst);
-  var Y = ecfCoords.x * Math.sin(gmst) + ecfCoords.y * Math.cos(gmst);
-  var Z = ecfCoords.z;
-  return { x: X, y: Y, z: Z };
-}
-module.exports = exports["default"];
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = eciToGeodetic;
-function eciToGeodetic(eciCoords, gmst) {
-  // http://www.celestrak.com/columns/v02n03/
-  var a = 6378.137;
-  var b = 6356.7523142;
-  var R = Math.sqrt(eciCoords.x * eciCoords.x + eciCoords.y * eciCoords.y);
-  var f = (a - b) / a;
-  var e2 = 2 * f - f * f;
-  var longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
-  var kmax = 20;
-  var k = 0;
-  var latitude = Math.atan2(eciCoords.z, Math.sqrt(eciCoords.x * eciCoords.x + eciCoords.y * eciCoords.y));
-  var C = void 0;
-  while (k < kmax) {
-    C = 1 / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
-    latitude = Math.atan2(eciCoords.z + a * C * e2 * Math.sin(latitude), R);
-    k += 1;
-  }
-  var height = R / Math.cos(latitude) - a * C;
-  return { longitude: longitude, latitude: latitude, height: height };
-}
-module.exports = exports["default"];
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = ecfToLookAngles;
-
-var _topocentric = __webpack_require__(14);
-
-var _topocentric2 = _interopRequireDefault(_topocentric);
-
-var _topocentricToLookAngles = __webpack_require__(15);
-
-var _topocentricToLookAngles2 = _interopRequireDefault(_topocentricToLookAngles);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ecfToLookAngles(observerCoordsEcf, satelliteCoordsEcf) {
-  var topocentricCoords = (0, _topocentric2.default)(observerCoordsEcf, satelliteCoordsEcf);
-  return (0, _topocentricToLookAngles2.default)(topocentricCoords);
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = topocentric;
-
-var _geodeticToEcf = __webpack_require__(3);
-
-var _geodeticToEcf2 = _interopRequireDefault(_geodeticToEcf);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function topocentric(observerCoords, satelliteCoords) {
-  // http://www.celestrak.com/columns/v02n02/
-  // TS Kelso's method, except I'm using ECF frame
-  // and he uses ECI.
-
-  var longitude = observerCoords.longitude,
-      latitude = observerCoords.latitude;
-
-
-  var observerEcf = (0, _geodeticToEcf2.default)(observerCoords);
-
-  var rx = satelliteCoords.x - observerEcf.x;
-  var ry = satelliteCoords.y - observerEcf.y;
-  var rz = satelliteCoords.z - observerEcf.z;
-
-  var topS = Math.sin(latitude) * Math.cos(longitude) * rx + Math.sin(latitude) * Math.sin(longitude) * ry - Math.cos(latitude) * rz;
-
-  var topE = -Math.sin(longitude) * rx + Math.cos(longitude) * ry;
-
-  var topZ = Math.cos(latitude) * Math.cos(longitude) * rx + Math.cos(latitude) * Math.sin(longitude) * ry + Math.sin(latitude) * rz;
-
-  return { topS: topS, topE: topE, topZ: topZ };
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports.default = function (topocentric) {
-  var topS = topocentric.topS,
-      topE = topocentric.topE,
-      topZ = topocentric.topZ;
-
-  var rangeSat = Math.sqrt(topS * topS + topE * topE + topZ * topZ);
-  var El = Math.asin(topZ / rangeSat);
-  var Az = Math.atan2(-topE, topS) + _constants.pi;
-
-  return {
-    azimuth: Az,
-    elevation: El,
-    rangeSat: rangeSat // Range in km
-  };
-};
-
-var _constants = __webpack_require__(0);
-
-module.exports = exports['default'];
-
-/**
- * @param {Object} topocentric
- * @param {Number} topocentric.topS Positive horizontal vector S due south.
- * @param {Number} topocentric.topE Positive horizontal vector E due east.
- * @param {Number} topocentric.topZ Vector Z normal to the surface of the earth (up).
- * @returns {Object}
- */
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = dopplerFactor;
-function dopplerFactor(location, position, velocity) {
-  var currentRange = Math.sqrt(Math.pow(position.x - location.x, 2) + Math.pow(position.y - location.y, 2) + Math.pow(position.z - location.z, 2));
-
-  var nextPos = {
-    x: position.x + velocity.x,
-    y: position.y + velocity.y,
-    z: position.z + velocity.z
-  };
-
-  var nextRange = Math.sqrt(Math.pow(nextPos.x - location.x, 2) + Math.pow(nextPos.y - location.y, 2) + Math.pow(nextPos.z - location.z, 2));
-
-  var rangeRate = nextRange - currentRange;
-
-  function sign(value) {
-    return value >= 0 ? 1 : -1;
-  }
-
-  rangeRate *= sign(rangeRate);
-  var c = 299792.458; // Speed of light in km/s
-  return 1 + rangeRate / c;
-}
-module.exports = exports["default"];
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = propagate;
-
-var _sgp = __webpack_require__(2);
-
-var _sgp2 = _interopRequireDefault(_sgp);
-
-var _jday = __webpack_require__(1);
-
-var _jday2 = _interopRequireDefault(_jday);
-
-var _constants = __webpack_require__(0);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function propagate() {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  // Return a position and velocity vector for a given date and time.
-  var satrec = args[0];
-  var date = Array.prototype.slice.call(args, 1);
-  var j = _jday2.default.apply(undefined, _toConsumableArray(date));
-  var m = (j - satrec.jdsatepoch) * _constants.minutesPerDay;
-  return (0, _sgp2.default)(satrec, m);
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*!
- * satellite-js v1.4.0
- * (c) 2013 Shashwat Kandadai and UCSC
- * https://github.com/shashwatak/satellite-js
- * License: MIT
- */
-
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = dspace;
-
-var _constants = __webpack_require__(0);
-
-/*-----------------------------------------------------------------------------
- *
- *                           procedure dspace
- *
- *  this procedure provides deep space contributions to mean elements for
- *    perturbing third body.  these effects have been averaged over one
- *    revolution of the sun and moon.  for earth resonance effects, the
- *    effects have been averaged over no revolutions of the satellite.
- *    (mean motion)
- *
- *  author        : david vallado                  719-573-2600   28 jun 2005
- *
- *  inputs        :
- *    d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421, d5433 -
- *    dedt        -
- *    del1, del2, del3  -
- *    didt        -
- *    dmdt        -
- *    dnodt       -
- *    domdt       -
- *    irez        - flag for resonance           0-none, 1-one day, 2-half day
- *    argpo       - argument of perigee
- *    argpdot     - argument of perigee dot (rate)
- *    t           - time
- *    tc          -
- *    gsto        - gst
- *    xfact       -
- *    xlamo       -
- *    no          - mean motion
- *    atime       -
- *    em          - eccentricity
- *    ft          -
- *    argpm       - argument of perigee
- *    inclm       - inclination
- *    xli         -
- *    mm          - mean anomaly
- *    xni         - mean motion
- *    nodem       - right ascension of ascending node
- *
- *  outputs       :
- *    atime       -
- *    em          - eccentricity
- *    argpm       - argument of perigee
- *    inclm       - inclination
- *    xli         -
- *    mm          - mean anomaly
- *    xni         -
- *    nodem       - right ascension of ascending node
- *    dndt        -
- *    nm          - mean motion
- *
- *  locals        :
- *    delt        -
- *    ft          -
- *    theta       -
- *    x2li        -
- *    x2omi       -
- *    xl          -
- *    xldot       -
- *    xnddt       -
- *    xndt        -
- *    xomi        -
- *
- *  coupling      :
- *    none        -
- *
- *  references    :
- *    hoots, roehrich, norad spacetrack report #3 1980
- *    hoots, norad spacetrack report #6 1986
- *    hoots, schumacher and glover 2004
- *    vallado, crawford, hujsak, kelso  2006
- ----------------------------------------------------------------------------*/
-function dspace(options) {
-  var irez = options.irez,
-      d2201 = options.d2201,
-      d2211 = options.d2211,
-      d3210 = options.d3210,
-      d3222 = options.d3222,
-      d4410 = options.d4410,
-      d4422 = options.d4422,
-      d5220 = options.d5220,
-      d5232 = options.d5232,
-      d5421 = options.d5421,
-      d5433 = options.d5433,
-      dedt = options.dedt,
-      del1 = options.del1,
-      del2 = options.del2,
-      del3 = options.del3,
-      didt = options.didt,
-      dmdt = options.dmdt,
-      dnodt = options.dnodt,
-      domdt = options.domdt,
-      argpo = options.argpo,
-      argpdot = options.argpdot,
-      t = options.t,
-      tc = options.tc,
-      gsto = options.gsto,
-      xfact = options.xfact,
-      xlamo = options.xlamo,
-      no = options.no;
-  var atime = options.atime,
-      em = options.em,
-      argpm = options.argpm,
-      inclm = options.inclm,
-      xli = options.xli,
-      mm = options.mm,
-      xni = options.xni,
-      nodem = options.nodem,
-      nm = options.nm;
-
-
-  var fasx2 = 0.13130908;
-  var fasx4 = 2.8843198;
-  var fasx6 = 0.37448087;
-  var g22 = 5.7686396;
-  var g32 = 0.95240898;
-  var g44 = 1.8014998;
-  var g52 = 1.0508330;
-  var g54 = 4.4108898;
-  var rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
-  var stepp = 720.0;
-  var stepn = -720.0;
-  var step2 = 259200.0;
-
-  var delt = void 0;
-  var x2li = void 0;
-  var x2omi = void 0;
-  var xl = void 0;
-  var xldot = void 0;
-  var xnddt = void 0;
-  var xndt = void 0;
-  var xomi = void 0;
-  var dndt = 0.0;
-  var ft = 0.0;
-
-  //  ----------- calculate deep space resonance effects -----------
-  var theta = (gsto + tc * rptim) % _constants.twoPi;
-  em += dedt * t;
-
-  inclm += didt * t;
-  argpm += domdt * t;
-  nodem += dnodt * t;
-  mm += dmdt * t;
-
-  // sgp4fix for negative inclinations
-  // the following if statement should be commented out
-  // if (inclm < 0.0)
-  // {
-  //   inclm = -inclm;
-  //   argpm = argpm - pi;
-  //   nodem = nodem + pi;
-  // }
-
-  /* - update resonances : numerical (euler-maclaurin) integration - */
-  /* ------------------------- epoch restart ----------------------  */
-  //   sgp4fix for propagator problems
-  //   the following integration works for negative time steps and periods
-  //   the specific changes are unknown because the original code was so convoluted
-
-  // sgp4fix take out atime = 0.0 and fix for faster operation
-
-  if (irez !== 0) {
-    //  sgp4fix streamline check
-    if (atime === 0.0 || t * atime <= 0.0 || Math.abs(t) < Math.abs(atime)) {
-      atime = 0.0;
-      xni = no;
-      xli = xlamo;
-    }
-
-    // sgp4fix move check outside loop
-    if (t > 0.0) {
-      delt = stepp;
-    } else {
-      delt = stepn;
-    }
-
-    var iretn = 381; // added for do loop
-    while (iretn === 381) {
-      //  ------------------- dot terms calculated -------------
-      //  ----------- near - synchronous resonance terms -------
-      if (irez !== 2) {
-        xndt = del1 * Math.sin(xli - fasx2) + del2 * Math.sin(2.0 * (xli - fasx4)) + del3 * Math.sin(3.0 * (xli - fasx6));
-        xldot = xni + xfact;
-        xnddt = del1 * Math.cos(xli - fasx2) + 2.0 * del2 * Math.cos(2.0 * (xli - fasx4)) + 3.0 * del3 * Math.cos(3.0 * (xli - fasx6));
-        xnddt *= xldot;
-      } else {
-        // --------- near - half-day resonance terms --------
-        xomi = argpo + argpdot * atime;
-        x2omi = xomi + xomi;
-        x2li = xli + xli;
-        xndt = d2201 * Math.sin(x2omi + xli - g22) + d2211 * Math.sin(xli - g22) + d3210 * Math.sin(xomi + xli - g32) + d3222 * Math.sin(-xomi + xli - g32) + d4410 * Math.sin(x2omi + x2li - g44) + d4422 * Math.sin(x2li - g44) + d5220 * Math.sin(xomi + xli - g52) + d5232 * Math.sin(-xomi + xli - g52) + d5421 * Math.sin(xomi + x2li - g54) + d5433 * Math.sin(-xomi + x2li - g54);
-        xldot = xni + xfact;
-        xnddt = d2201 * Math.cos(x2omi + xli - g22) + d2211 * Math.cos(xli - g22) + d3210 * Math.cos(xomi + xli - g32) + d3222 * Math.cos(-xomi + xli - g32) + d5220 * Math.cos(xomi + xli - g52) + d5232 * Math.cos(-xomi + xli - g52) + 2.0 * d4410 * Math.cos(x2omi + x2li - g44) + d4422 * Math.cos(x2li - g44) + d5421 * Math.cos(xomi + x2li - g54) + d5433 * Math.cos(-xomi + x2li - g54);
-        xnddt *= xldot;
-      }
-
-      //  ----------------------- integrator -------------------
-      //  sgp4fix move end checks to end of routine
-      if (Math.abs(t - atime) >= stepp) {
-        iretn = 381;
-      } else {
-        ft = t - atime;
-        iretn = 0;
-      }
-
-      if (iretn === 381) {
-        xli += xldot * delt + xndt * step2;
-        xni += xndt * delt + xnddt * step2;
-        atime += delt;
-      }
-    }
-
-    nm = xni + xndt * ft + xnddt * ft * ft * 0.5;
-    xl = xli + xldot * ft + xndt * ft * ft * 0.5;
-    if (irez !== 1) {
-      mm = xl - (2.0 * nodem + 2.0 * theta);
-      dndt = nm - no;
-    } else {
-      mm = xl - nodem - argpm + theta;
-      dndt = nm - no;
-    }
-    nm = no + dndt;
-  }
-
-  return {
-    atime: atime,
-    em: em,
-    argpm: argpm,
-    inclm: inclm,
-    xli: xli,
-    mm: mm,
-    xni: xni,
-    nodem: nodem,
-    dndt: dndt,
-    nm: nm
-  };
-}
-module.exports = exports['default'];
-
-/***/ }),
-/* 19 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1876,19 +1233,53 @@ exports.default = twoline2satrec;
 
 var _constants = __webpack_require__(0);
 
-var _sgp4init = __webpack_require__(20);
+var _ext = __webpack_require__(1);
+
+var _sgp4init = __webpack_require__(8);
 
 var _sgp4init2 = _interopRequireDefault(_sgp4init);
 
-var _days2mdhms = __webpack_require__(24);
-
-var _days2mdhms2 = _interopRequireDefault(_days2mdhms);
-
-var _jday = __webpack_require__(1);
-
-var _jday2 = _interopRequireDefault(_jday);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* -----------------------------------------------------------------------------
+ *
+ *                           function twoline2rv
+ *
+ *  this function converts the two line element set character string data to
+ *    variables and initializes the sgp4 variables. several intermediate varaibles
+ *    and quantities are determined. note that the result is a structure so multiple
+ *    satellites can be processed simultaneously without having to reinitialize. the
+ *    verification mode is an important option that permits quick checks of any
+ *    changes to the underlying technical theory. this option works using a
+ *    modified tle file in which the start, stop, and delta time values are
+ *    included at the end of the second line of data. this only works with the
+ *    verification mode. the catalog mode simply propagates from -1440 to 1440 min
+ *    from epoch and is useful when performing entire catalog runs.
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs        :
+ *    longstr1    - first line of the tle
+ *    longstr2    - second line of the tle
+ *    typerun     - type of run                    verification 'v', catalog 'c',
+ *                                                 manual 'm'
+ *    typeinput   - type of manual input           mfe 'm', epoch 'e', dayofyr 'd'
+ *    opsmode     - mode of operation afspc or improved 'a', 'i'
+ *    whichconst  - which set of constants to use  72, 84
+ *
+ *  outputs       :
+ *    satrec      - structure containing all the sgp4 satellite information
+ *
+ *  coupling      :
+ *    getgravconst-
+ *    days2mdhms  - conversion of days to month, day, hour, minute, second
+ *    jday        - convert day month year hour minute second into julian date
+ *    sgp4init    - initialize the sgp4 variables
+ *
+ *  references    :
+ *    norad spacetrack report #3
+ *    vallado, crawford, hujsak, kelso  2006
+ --------------------------------------------------------------------------- */
 
 /**
  * Return a Satellite imported from two lines of TLE data.
@@ -1963,7 +1354,7 @@ function twoline2satrec(longstr1, longstr2) {
     year = satrec.epochyr + 1900;
   }
 
-  var mdhmsResult = (0, _days2mdhms2.default)(year, satrec.epochdays);
+  var mdhmsResult = (0, _ext.days2mdhms)(year, satrec.epochdays);
 
   var mon = mdhmsResult.mon,
       day = mdhmsResult.day,
@@ -1971,7 +1362,7 @@ function twoline2satrec(longstr1, longstr2) {
       minute = mdhmsResult.minute,
       sec = mdhmsResult.sec;
 
-  satrec.jdsatepoch = (0, _jday2.default)(year, mon, day, hr, minute, sec);
+  satrec.jdsatepoch = (0, _ext.jday)(year, mon, day, hr, minute, sec);
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
   return (0, _sgp4init2.default)(satrec, {
@@ -1990,7 +1381,7 @@ function twoline2satrec(longstr1, longstr2) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 20 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2008,31 +1399,31 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = sgp4init;
 
-var _objectAssign = __webpack_require__(5);
+var _objectAssign = __webpack_require__(3);
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var _dpper = __webpack_require__(6);
+var _constants = __webpack_require__(0);
+
+var _dpper = __webpack_require__(4);
 
 var _dpper2 = _interopRequireDefault(_dpper);
 
-var _dscom = __webpack_require__(21);
+var _dscom = __webpack_require__(9);
 
 var _dscom2 = _interopRequireDefault(_dscom);
 
-var _dsinit = __webpack_require__(22);
+var _dsinit = __webpack_require__(10);
 
 var _dsinit2 = _interopRequireDefault(_dsinit);
 
-var _initl = __webpack_require__(23);
+var _initl = __webpack_require__(11);
 
 var _initl2 = _interopRequireDefault(_initl);
 
 var _sgp = __webpack_require__(2);
 
 var _sgp2 = _interopRequireDefault(_sgp);
-
-var _constants = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2250,7 +1641,6 @@ function sgp4init(satrec, options) {
   // sgp4fix use multiply for speed instead of pow
   var qzms2ttemp = (120.0 - 78.0) / _constants.earthRadius;
   var qzms2t = qzms2ttemp * qzms2ttemp * qzms2ttemp * qzms2ttemp;
-  var x2o3 = 2.0 / 3.0;
 
   rec.init = 'y';
   rec.t = 0.0;
@@ -2346,7 +1736,7 @@ function sgp4init(satrec, options) {
     rec.omgcof = rec.bstar * cc3 * Math.cos(rec.argpo);
     rec.xmcof = 0.0;
     if (rec.ecco > 1.0e-4) {
-      rec.xmcof = -x2o3 * coef * rec.bstar / eeta;
+      rec.xmcof = -_constants.x2o3 * coef * rec.bstar / eeta;
     }
     rec.nodecf = 3.5 * omeosq * xhdot1 * rec.cc1;
     rec.t2cof = 1.5 * rec.cc1;
@@ -2654,7 +2044,7 @@ function sgp4init(satrec, options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 21 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3087,7 +2477,7 @@ function dscom(options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 22 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3302,18 +2692,15 @@ function dsinit(options) {
   var rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   var root32 = 3.7393792e-7;
   var root52 = 1.1428639e-7;
-  var x2o3 = 2.0 / 3.0;
   var znl = 1.5835218e-4;
   var zns = 1.19459e-5;
 
   // -------------------- deep space initialization ------------
   irez = 0;
-  if (nm > 0.0034906585 < 0.0052359877) {
-    // eslint-disable-line
+  if (nm < 0.0052359877 && nm > 0.0034906585) {
     irez = 1;
   }
-  if (nm >= 8.26e-3 <= 9.24e-3 && em >= 0.5) {
-    // eslint-disable-line
+  if (nm >= 8.26e-3 && nm <= 9.24e-3 && em >= 0.5) {
     irez = 2;
   }
 
@@ -3371,7 +2758,7 @@ function dsinit(options) {
 
   // -------------- initialize the resonance terms -------------
   if (irez !== 0) {
-    aonv = Math.pow(nm / _constants.xke, x2o3);
+    aonv = Math.pow(nm / _constants.xke, _constants.x2o3);
 
     // ---------- geopotential resonance for 12 hour orbits ------
     if (irez === 2) {
@@ -3518,7 +2905,7 @@ function dsinit(options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 23 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3536,11 +2923,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = initl;
 
-var _gstime = __webpack_require__(4);
+var _constants = __webpack_require__(0);
+
+var _gstime = __webpack_require__(5);
 
 var _gstime2 = _interopRequireDefault(_gstime);
-
-var _constants = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3548,7 +2935,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *
  *                           procedure initl
  *
- *  this procedure initializes the spg4 propagator. all the initialization is
+ *  this procedure initializes the sgp4 propagator. all the initialization is
  *    consolidated here instead of having multiple loops inside other routines.
  *
  *  author        : david vallado                  719-573-2600   28 jun 2005
@@ -3678,7 +3065,7 @@ function initl(options) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 24 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3694,74 +3081,560 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = days2mdhms;
-/* -----------------------------------------------------------------------------
+exports.default = dspace;
+
+var _constants = __webpack_require__(0);
+
+/*-----------------------------------------------------------------------------
  *
- *                           procedure days2mdhms
+ *                           procedure dspace
  *
- *  this procedure converts the day of the year, days, to the equivalent month
- *    day, hour, minute and second.
+ *  this procedure provides deep space contributions to mean elements for
+ *    perturbing third body.  these effects have been averaged over one
+ *    revolution of the sun and moon.  for earth resonance effects, the
+ *    effects have been averaged over no revolutions of the satellite.
+ *    (mean motion)
  *
- *  algorithm     : set up array for the number of days per month
- *                  find leap year - use 1900 because 2000 is a leap year
- *                  loop through a temp value while the value is < the days
- *                  perform int conversions to the correct day and month
- *                  convert remainder into h m s using type conversions
+ *  author        : david vallado                  719-573-2600   28 jun 2005
  *
- *  author        : david vallado                  719-573-2600    1 mar 2001
- *
- *  inputs          description                    range / units
- *    year        - year                           1900 .. 2100
- *    days        - julian day of the year         0.0  .. 366.0
+ *  inputs        :
+ *    d2201, d2211, d3210, d3222, d4410, d4422, d5220, d5232, d5421, d5433 -
+ *    dedt        -
+ *    del1, del2, del3  -
+ *    didt        -
+ *    dmdt        -
+ *    dnodt       -
+ *    domdt       -
+ *    irez        - flag for resonance           0-none, 1-one day, 2-half day
+ *    argpo       - argument of perigee
+ *    argpdot     - argument of perigee dot (rate)
+ *    t           - time
+ *    tc          -
+ *    gsto        - gst
+ *    xfact       -
+ *    xlamo       -
+ *    no          - mean motion
+ *    atime       -
+ *    em          - eccentricity
+ *    ft          -
+ *    argpm       - argument of perigee
+ *    inclm       - inclination
+ *    xli         -
+ *    mm          - mean anomaly
+ *    xni         - mean motion
+ *    nodem       - right ascension of ascending node
  *
  *  outputs       :
- *    mon         - month                          1 .. 12
- *    day         - day                            1 .. 28,29,30,31
- *    hr          - hour                           0 .. 23
- *    min         - minute                         0 .. 59
- *    sec         - second                         0.0 .. 59.999
+ *    atime       -
+ *    em          - eccentricity
+ *    argpm       - argument of perigee
+ *    inclm       - inclination
+ *    xli         -
+ *    mm          - mean anomaly
+ *    xni         -
+ *    nodem       - right ascension of ascending node
+ *    dndt        -
+ *    nm          - mean motion
  *
  *  locals        :
- *    dayofyr     - day of year
- *    temp        - temporary extended values
- *    inttemp     - temporary int value
- *    i           - index
- *    lmonth[12]  - int array containing the number of days per month
+ *    delt        -
+ *    ft          -
+ *    theta       -
+ *    x2li        -
+ *    x2omi       -
+ *    xl          -
+ *    xldot       -
+ *    xnddt       -
+ *    xndt        -
+ *    xomi        -
  *
  *  coupling      :
- *    none.
- * --------------------------------------------------------------------------- */
-function days2mdhms(year, days) {
-  var lmonth = [31, year % 4 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  var dayofyr = Math.floor(days);
+ *    none        -
+ *
+ *  references    :
+ *    hoots, roehrich, norad spacetrack report #3 1980
+ *    hoots, norad spacetrack report #6 1986
+ *    hoots, schumacher and glover 2004
+ *    vallado, crawford, hujsak, kelso  2006
+ ----------------------------------------------------------------------------*/
+function dspace(options) {
+  var irez = options.irez,
+      d2201 = options.d2201,
+      d2211 = options.d2211,
+      d3210 = options.d3210,
+      d3222 = options.d3222,
+      d4410 = options.d4410,
+      d4422 = options.d4422,
+      d5220 = options.d5220,
+      d5232 = options.d5232,
+      d5421 = options.d5421,
+      d5433 = options.d5433,
+      dedt = options.dedt,
+      del1 = options.del1,
+      del2 = options.del2,
+      del3 = options.del3,
+      didt = options.didt,
+      dmdt = options.dmdt,
+      dnodt = options.dnodt,
+      domdt = options.domdt,
+      argpo = options.argpo,
+      argpdot = options.argpdot,
+      t = options.t,
+      tc = options.tc,
+      gsto = options.gsto,
+      xfact = options.xfact,
+      xlamo = options.xlamo,
+      no = options.no;
+  var atime = options.atime,
+      em = options.em,
+      argpm = options.argpm,
+      inclm = options.inclm,
+      xli = options.xli,
+      mm = options.mm,
+      xni = options.xni,
+      nodem = options.nodem,
+      nm = options.nm;
 
-  //  ----------------- find month and day of month ----------------
-  var i = 1;
-  var inttemp = 0;
-  while (dayofyr > inttemp + lmonth[i - 1] && i < 12) {
-    inttemp += lmonth[i - 1];
-    i += 1;
+
+  var fasx2 = 0.13130908;
+  var fasx4 = 2.8843198;
+  var fasx6 = 0.37448087;
+  var g22 = 5.7686396;
+  var g32 = 0.95240898;
+  var g44 = 1.8014998;
+  var g52 = 1.0508330;
+  var g54 = 4.4108898;
+  var rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
+  var stepp = 720.0;
+  var stepn = -720.0;
+  var step2 = 259200.0;
+
+  var delt = void 0;
+  var x2li = void 0;
+  var x2omi = void 0;
+  var xl = void 0;
+  var xldot = void 0;
+  var xnddt = void 0;
+  var xndt = void 0;
+  var xomi = void 0;
+  var dndt = 0.0;
+  var ft = 0.0;
+
+  //  ----------- calculate deep space resonance effects -----------
+  var theta = (gsto + tc * rptim) % _constants.twoPi;
+  em += dedt * t;
+
+  inclm += didt * t;
+  argpm += domdt * t;
+  nodem += dnodt * t;
+  mm += dmdt * t;
+
+  // sgp4fix for negative inclinations
+  // the following if statement should be commented out
+  // if (inclm < 0.0)
+  // {
+  //   inclm = -inclm;
+  //   argpm = argpm - pi;
+  //   nodem = nodem + pi;
+  // }
+
+  /* - update resonances : numerical (euler-maclaurin) integration - */
+  /* ------------------------- epoch restart ----------------------  */
+  //   sgp4fix for propagator problems
+  //   the following integration works for negative time steps and periods
+  //   the specific changes are unknown because the original code was so convoluted
+
+  // sgp4fix take out atime = 0.0 and fix for faster operation
+
+  if (irez !== 0) {
+    //  sgp4fix streamline check
+    if (atime === 0.0 || t * atime <= 0.0 || Math.abs(t) < Math.abs(atime)) {
+      atime = 0.0;
+      xni = no;
+      xli = xlamo;
+    }
+
+    // sgp4fix move check outside loop
+    if (t > 0.0) {
+      delt = stepp;
+    } else {
+      delt = stepn;
+    }
+
+    var iretn = 381; // added for do loop
+    while (iretn === 381) {
+      //  ------------------- dot terms calculated -------------
+      //  ----------- near - synchronous resonance terms -------
+      if (irez !== 2) {
+        xndt = del1 * Math.sin(xli - fasx2) + del2 * Math.sin(2.0 * (xli - fasx4)) + del3 * Math.sin(3.0 * (xli - fasx6));
+        xldot = xni + xfact;
+        xnddt = del1 * Math.cos(xli - fasx2) + 2.0 * del2 * Math.cos(2.0 * (xli - fasx4)) + 3.0 * del3 * Math.cos(3.0 * (xli - fasx6));
+        xnddt *= xldot;
+      } else {
+        // --------- near - half-day resonance terms --------
+        xomi = argpo + argpdot * atime;
+        x2omi = xomi + xomi;
+        x2li = xli + xli;
+        xndt = d2201 * Math.sin(x2omi + xli - g22) + d2211 * Math.sin(xli - g22) + d3210 * Math.sin(xomi + xli - g32) + d3222 * Math.sin(-xomi + xli - g32) + d4410 * Math.sin(x2omi + x2li - g44) + d4422 * Math.sin(x2li - g44) + d5220 * Math.sin(xomi + xli - g52) + d5232 * Math.sin(-xomi + xli - g52) + d5421 * Math.sin(xomi + x2li - g54) + d5433 * Math.sin(-xomi + x2li - g54);
+        xldot = xni + xfact;
+        xnddt = d2201 * Math.cos(x2omi + xli - g22) + d2211 * Math.cos(xli - g22) + d3210 * Math.cos(xomi + xli - g32) + d3222 * Math.cos(-xomi + xli - g32) + d5220 * Math.cos(xomi + xli - g52) + d5232 * Math.cos(-xomi + xli - g52) + 2.0 * d4410 * Math.cos(x2omi + x2li - g44) + d4422 * Math.cos(x2li - g44) + d5421 * Math.cos(xomi + x2li - g54) + d5433 * Math.cos(-xomi + x2li - g54);
+        xnddt *= xldot;
+      }
+
+      //  ----------------------- integrator -------------------
+      //  sgp4fix move end checks to end of routine
+      if (Math.abs(t - atime) >= stepp) {
+        iretn = 381;
+      } else {
+        ft = t - atime;
+        iretn = 0;
+      }
+
+      if (iretn === 381) {
+        xli += xldot * delt + xndt * step2;
+        xni += xndt * delt + xnddt * step2;
+        atime += delt;
+      }
+    }
+
+    nm = xni + xndt * ft + xnddt * ft * ft * 0.5;
+    xl = xli + xldot * ft + xndt * ft * ft * 0.5;
+    if (irez !== 1) {
+      mm = xl - (2.0 * nodem + 2.0 * theta);
+      dndt = nm - no;
+    } else {
+      mm = xl - nodem - argpm + theta;
+      dndt = nm - no;
+    }
+    nm = no + dndt;
   }
 
-  var mon = i;
-  var day = dayofyr - inttemp;
-
-  //  ----------------- find hours minutes and seconds -------------
-  var temp = (days - dayofyr) * 24.0;
-  var hr = Math.floor(temp);
-  temp = (temp - hr) * 60.0;
-  var minute = Math.floor(temp);
-  var sec = (temp - minute) * 60.0;
-
   return {
-    mon: mon,
-    day: day,
-    hr: hr,
-    minute: minute,
-    sec: sec
+    atime: atime,
+    em: em,
+    argpm: argpm,
+    inclm: inclm,
+    xli: xli,
+    mm: mm,
+    xni: xni,
+    nodem: nodem,
+    dndt: dndt,
+    nm: nm
   };
 }
+module.exports = exports['default'];
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _propagate = __webpack_require__(14);
+
+Object.defineProperty(exports, 'propagate', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_propagate).default;
+  }
+});
+
+var _sgp = __webpack_require__(2);
+
+Object.defineProperty(exports, 'sgp4', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_sgp).default;
+  }
+});
+
+var _gstime = __webpack_require__(5);
+
+Object.defineProperty(exports, 'gstime', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_gstime).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = propagate;
+
+var _constants = __webpack_require__(0);
+
+var _ext = __webpack_require__(1);
+
+var _sgp = __webpack_require__(2);
+
+var _sgp2 = _interopRequireDefault(_sgp);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function propagate() {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  // Return a position and velocity vector for a given date and time.
+  var satrec = args[0];
+  var date = Array.prototype.slice.call(args, 1);
+  var j = _ext.jday.apply(undefined, _toConsumableArray(date));
+  var m = (j - satrec.jdsatepoch) * _constants.minutesPerDay;
+  return (0, _sgp2.default)(satrec, m);
+}
+module.exports = exports['default'];
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = dopplerFactor;
+function dopplerFactor(location, position, velocity) {
+  var currentRange = Math.sqrt(Math.pow(position.x - location.x, 2) + Math.pow(position.y - location.y, 2) + Math.pow(position.z - location.z, 2));
+
+  var nextPos = {
+    x: position.x + velocity.x,
+    y: position.y + velocity.y,
+    z: position.z + velocity.z
+  };
+
+  var nextRange = Math.sqrt(Math.pow(nextPos.x - location.x, 2) + Math.pow(nextPos.y - location.y, 2) + Math.pow(nextPos.z - location.z, 2));
+
+  var rangeRate = nextRange - currentRange;
+
+  function sign(value) {
+    return value >= 0 ? 1 : -1;
+  }
+
+  rangeRate *= sign(rangeRate);
+  var c = 299792.458; // Speed of light in km/s
+  return 1 + rangeRate / c;
+}
 module.exports = exports["default"];
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * satellite-js v1.4.0
+ * (c) 2013 Shashwat Kandadai and UCSC
+ * https://github.com/shashwatak/satellite-js
+ * License: MIT
+ */
+
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.degreesLat = degreesLat;
+exports.degreesLong = degreesLong;
+exports.geodeticToEcf = geodeticToEcf;
+exports.eciToGeodetic = eciToGeodetic;
+exports.ecfToEci = ecfToEci;
+exports.eciToEcf = eciToEcf;
+exports.ecfToLookAngles = ecfToLookAngles;
+
+var _constants = __webpack_require__(0);
+
+function radiansToDegrees(radians) {
+  return radians / _constants.rad2deg;
+}
+
+function degreesLat(radians) {
+  if (radians < -_constants.pi / 2 || radians > _constants.pi / 2) {
+    throw new TypeError('Latitude radians must be in range [-pi/2; pi/2].');
+  }
+  return radiansToDegrees(radians);
+}
+
+function degreesLong(radians) {
+  if (radians < -_constants.pi || radians > _constants.pi) {
+    throw new TypeError('Longitude radians must be in range [-pi; pi].');
+  }
+  return radiansToDegrees(radians);
+}
+
+function geodeticToEcf(geodeticCoords) {
+  var longitude = geodeticCoords.longitude,
+      latitude = geodeticCoords.latitude,
+      height = geodeticCoords.height;
+
+
+  var a = 6378.137;
+  var b = 6356.7523142;
+  var f = (a - b) / a;
+  var e2 = 2 * f - f * f;
+  var normal = a / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
+
+  var x = (normal + height) * Math.cos(latitude) * Math.cos(longitude);
+  var y = (normal + height) * Math.cos(latitude) * Math.sin(longitude);
+  var z = (normal * (1 - e2) + height) * Math.sin(latitude);
+
+  return {
+    x: x,
+    y: y,
+    z: z
+  };
+}
+
+function eciToGeodetic(eciCoords, gmst) {
+  // http://www.celestrak.com/columns/v02n03/
+  var a = 6378.137;
+  var b = 6356.7523142;
+  var R = Math.sqrt(eciCoords.x * eciCoords.x + eciCoords.y * eciCoords.y);
+  var f = (a - b) / a;
+  var e2 = 2 * f - f * f;
+  var longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
+  var kmax = 20;
+  var k = 0;
+  var latitude = Math.atan2(eciCoords.z, Math.sqrt(eciCoords.x * eciCoords.x + eciCoords.y * eciCoords.y));
+  var C = void 0;
+  while (k < kmax) {
+    C = 1 / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
+    latitude = Math.atan2(eciCoords.z + a * C * e2 * Math.sin(latitude), R);
+    k += 1;
+  }
+  var height = R / Math.cos(latitude) - a * C;
+  return { longitude: longitude, latitude: latitude, height: height };
+}
+
+function ecfToEci(ecfCoords, gmst) {
+  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
+  //
+  // [X]     [C -S  0][X]
+  // [Y]  =  [S  C  0][Y]
+  // [Z]eci  [0  0  1][Z]ecf
+  //
+  var X = ecfCoords.x * Math.cos(gmst) - ecfCoords.y * Math.sin(gmst);
+  var Y = ecfCoords.x * Math.sin(gmst) + ecfCoords.y * Math.cos(gmst);
+  var Z = ecfCoords.z;
+  return { x: X, y: Y, z: Z };
+}
+
+function eciToEcf(eciCoords, gmst) {
+  // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
+  //
+  // [X]     [C -S  0][X]
+  // [Y]  =  [S  C  0][Y]
+  // [Z]eci  [0  0  1][Z]ecf
+  //
+  //
+  // Inverse:
+  // [X]     [C  S  0][X]
+  // [Y]  =  [-S C  0][Y]
+  // [Z]ecf  [0  0  1][Z]eci
+
+  var x = eciCoords.x * Math.cos(gmst) + eciCoords.y * Math.sin(gmst);
+  var y = eciCoords.x * -Math.sin(gmst) + eciCoords.y * Math.cos(gmst);
+  var z = eciCoords.z;
+
+
+  return {
+    x: x,
+    y: y,
+    z: z
+  };
+}
+
+function topocentric(observerCoords, satelliteCoords) {
+  // http://www.celestrak.com/columns/v02n02/
+  // TS Kelso's method, except I'm using ECF frame
+  // and he uses ECI.
+
+  var longitude = observerCoords.longitude,
+      latitude = observerCoords.latitude;
+
+
+  var observerEcf = geodeticToEcf(observerCoords);
+
+  var rx = satelliteCoords.x - observerEcf.x;
+  var ry = satelliteCoords.y - observerEcf.y;
+  var rz = satelliteCoords.z - observerEcf.z;
+
+  var topS = Math.sin(latitude) * Math.cos(longitude) * rx + Math.sin(latitude) * Math.sin(longitude) * ry - Math.cos(latitude) * rz;
+
+  var topE = -Math.sin(longitude) * rx + Math.cos(longitude) * ry;
+
+  var topZ = Math.cos(latitude) * Math.cos(longitude) * rx + Math.cos(latitude) * Math.sin(longitude) * ry + Math.sin(latitude) * rz;
+
+  return { topS: topS, topE: topE, topZ: topZ };
+}
+
+/**
+ * @param {Object} tc
+ * @param {Number} tc.topS Positive horizontal vector S due south.
+ * @param {Number} tc.topE Positive horizontal vector E due east.
+ * @param {Number} tc.topZ Vector Z normal to the surface of the earth (up).
+ * @returns {Object}
+ */
+function topocentricToLookAngles(tc) {
+  var topS = tc.topS,
+      topE = tc.topE,
+      topZ = tc.topZ;
+
+  var rangeSat = Math.sqrt(topS * topS + topE * topE + topZ * topZ);
+  var El = Math.asin(topZ / rangeSat);
+  var Az = Math.atan2(-topE, topS) + _constants.pi;
+
+  return {
+    azimuth: Az,
+    elevation: El,
+    rangeSat: rangeSat // Range in km
+  };
+}
+
+function ecfToLookAngles(observerCoordsEcf, satelliteCoordsEcf) {
+  var topocentricCoords = topocentric(observerCoordsEcf, satelliteCoordsEcf);
+  return topocentricToLookAngles(topocentricCoords);
+}
 
 /***/ })
 /******/ ]);

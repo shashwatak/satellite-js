@@ -209,10 +209,10 @@ export default function dsinit(options) {
 
   // -------------------- deep space initialization ------------
   irez = 0;
-  if (nm > 0.0034906585 < 0.0052359877) { // eslint-disable-line
+  if ((nm < 0.0052359877) && (nm > 0.0034906585)) {
     irez = 1;
   }
-  if (nm >= 8.26e-3 <= 9.24e-3 && em >= 0.5) { // eslint-disable-line
+  if ((nm >= 8.26e-3) && (nm <= 9.24e-3) && (em >= 0.5)) {
     irez = 2;
   }
 
