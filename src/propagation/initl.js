@@ -11,7 +11,7 @@ import gstime from './gstime';
  *
  *                           procedure initl
  *
- *  this procedure initializes the spg4 propagator. all the initialization is
+ *  this procedure initializes the sgp4 propagator. all the initialization is
  *    consolidated here instead of having multiple loops inside other routines.
  *
  *  author        : david vallado                  719-573-2600   28 jun 2005
