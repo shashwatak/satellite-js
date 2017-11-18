@@ -11,7 +11,7 @@ import sgp4Data from './sgp4.json';
 
 chai.should();
 
-const epsilon = 1e-7;
+const epsilon = 1e-6;
 
 describe('SGP4', () => {
   sgp4Data.forEach((sgp4DataItem, i) => {
