@@ -2,7 +2,10 @@ import chai from 'chai';
 
 import compareVectors from './compareVectors';
 
-import { jday } from '../src/ext';
+import {
+  jday,
+  invjday,
+} from '../src/ext';
 import twoline2satrec from '../src/io';
 import { propagate, gstime } from '../src/propagation';
 
@@ -19,6 +22,26 @@ describe('Julian date / time', () => {
       now.getUTCMinutes(),
       now.getUTCSeconds(),
     ));
+  });
+
+  it('invjday gives the same result as date and array', () => {
+    const now = new Date();
+    const jd = jday(now);
+    const date = invjday(jd);
+    const dateArray = invjday(jd, true);
+    date.getUTCFullYear().should.equal(dateArray[0]);
+    (date.getUTCMonth() + 1).should.equal(dateArray[1]);
+    date.getUTCDate().should.equal(dateArray[2]);
+    date.getUTCHours().should.equal(dateArray[3]);
+    date.getUTCMinutes().should.equal(dateArray[4]);
+    date.getUTCSeconds().should.equal(dateArray[5]);
+  });
+
+  it('date to jday and inverse conversion', () => {
+    const now = new Date();
+    const jd = jday(now);
+    (invjday(jd).getTime() / 1000).should.be.closeTo(
+      ((now.getTime() - now.getMilliseconds()) / 1000), 1);
   });
 
   it('gstime gives the same result with different arguments describing the same time', () => {

@@ -1,6 +1,9 @@
 import * as constants from './constants';
 
-import { jday } from './ext';
+import {
+  jday,
+  invjday,
+} from './ext';
 import twoline2satrec from './io';
 import {
   propagate,
@@ -33,6 +36,7 @@ export default {
   gstimeFromJday: gstime, // TODO: deprecate
   gstimeFromDate: gstime, // TODO: deprecate
   jday,
+  invjday,
 
   dopplerFactor,
 

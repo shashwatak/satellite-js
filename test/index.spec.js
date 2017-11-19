@@ -19,7 +19,10 @@ import {
   x2o3,
 } from '../src/constants';
 
-import { jday } from '../src/ext';
+import {
+  jday,
+  invjday,
+} from '../src/ext';
 import twoline2satrec from '../src/io';
 import {
   propagate,
@@ -65,6 +68,7 @@ describe('Library export', () => {
   it('sgp4', () => lib.sgp4.should.equal(sgp4));
   it('gstime', () => lib.gstime.should.equal(gstime));
   it('jday', () => lib.jday.should.equal(jday));
+  it('invjday', () => lib.invjday.should.equal(invjday));
   it('dopplerFactor', () => lib.dopplerFactor.should.equal(dopplerFactor));
 
   it('transforms', () => {
