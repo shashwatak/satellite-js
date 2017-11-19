@@ -12,7 +12,7 @@ import {
 } from '../src/transforms';
 /* eslint-enable */
 
-import extData from './ext.json';
+import transformData from './transforms.json';
 
 chai.should();
 
@@ -24,7 +24,7 @@ describe('Latitude & longitude conversions', () => {
     validLongitudes,
     invalidLatitudes,
     invalidLongitudes,
-  } = extData;
+  } = transformData;
 
   validLatitudes.forEach((item) => {
     it(`convert valid latitude value (${item.radians} radians) to degrees`, () => {
