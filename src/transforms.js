@@ -4,19 +4,19 @@ import {
 } from './constants';
 
 function radiansToDegrees(radians) {
-  return radians / rad2deg;
+  return radians * rad2deg;
 }
 
 export function degreesLat(radians) {
   if (radians < (-pi / 2) || radians > (pi / 2)) {
-    throw new TypeError('Latitude radians must be in range [-pi/2; pi/2].');
+    throw new RangeError('Latitude radians must be in range [-pi/2; pi/2].');
   }
   return radiansToDegrees(radians);
 }
 
 export function degreesLong(radians) {
   if (radians < -pi || radians > pi) {
-    throw new TypeError('Longitude radians must be in range [-pi; pi].');
+    throw new RangeError('Longitude radians must be in range [-pi; pi].');
   }
   return radiansToDegrees(radians);
 }

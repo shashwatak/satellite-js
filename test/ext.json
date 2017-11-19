@@ -1,0 +1,54 @@
+{
+  "validLatitudes": [{
+    "radians": 0,
+    "degrees": 0
+  }, {
+    "radians": 1.0471975511965976,
+    "degrees": 60
+  }, {
+    "radians": 1.5707963267948966,
+    "degrees": 90
+  }, {
+    "radians": -1.0471975511965976,
+    "degrees": -60
+  }, {
+    "radians": -1.5707963267948966,
+    "degrees": -90
+  }],
+  "validLongitudes": [{
+    "radians": 0,
+    "degrees": 0
+  }, {
+    "radians": 1.0471975511965976,
+    "degrees": 60
+  }, {
+    "radians": 2.356194490192345,
+    "degrees": 135
+  }, {
+    "radians": 3.141592653589793,
+    "degrees": 180
+  }, {
+    "radians": -1.0471975511965976,
+    "degrees": -60
+  }, {
+    "radians": -2.356194490192345,
+    "degrees": -135
+  }, {
+    "radians": -3.141592653589793,
+    "degrees": -180
+  }],
+  "invalidLatitudes": [{
+    "radians": 2.0943951023931953,
+    "degrees": 120
+  }, {
+    "radians": -2.0943951023931953,
+    "degrees": -120
+  }],
+  "invalidLongitudes": [{
+    "radians": 4.71238898038469,
+    "degrees": 270
+  }, {
+    "radians": -4.71238898038469,
+    "degrees": -270
+  }]
+}

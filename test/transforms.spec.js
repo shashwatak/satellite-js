@@ -12,16 +12,41 @@ import {
 } from '../src/transforms';
 /* eslint-enable */
 
+import extData from './ext.json';
+
 chai.should();
 
-describe('Transforms', () => {
-  it('latitude in radians to degrees', () => {
-    // TODO:
+const epsilon = 1e-6;
+
+describe('Latitude & longitude conversions', () => {
+  const {
+    validLatitudes,
+    validLongitudes,
+    invalidLatitudes,
+    invalidLongitudes,
+  } = extData;
+
+  validLatitudes.forEach((item) => {
+    it(`convert valid latitude value (${item.radians} radians) to degrees`, () => {
+      (degreesLat(item.radians)).should.be.closeTo(item.degrees, epsilon);
+    });
   });
 
-  it('longitude in radians to degrees', () => {
-    // TODO:
+  validLongitudes.forEach((item) => {
+    it(`convert valid longitude value (${item.radians} radians) to degrees`, () => {
+      (degreesLong(item.radians)).should.be.closeTo(item.degrees, epsilon);
+    });
   });
 
-  // TODO: ...
+  invalidLatitudes.forEach((item) => {
+    it(`convert invalid latitude value (${item.radians} radians) to degrees`, () => {
+      (() => degreesLat(item.radians)).should.throw(RangeError);
+    });
+  });
+
+  invalidLongitudes.forEach((item) => {
+    it(`convert invalid longitude value (${item.radians} radians) to degrees`, () => {
+      (() => degreesLong(item.radians)).should.throw(RangeError);
+    });
+  });
 });
