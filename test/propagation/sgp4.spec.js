@@ -21,8 +21,14 @@ describe('SGP4', () => {
     sgp4DataItem.results.forEach((expected, j) => {
       it(`TLE: ${i + 1}, measurement: ${j + 1}`, () => {
         const sgp4Result = sgp4(satrec, expected.time);
-        compareVectors(sgp4Result.position, expected.position, epsilon);
-        compareVectors(sgp4Result.velocity, expected.velocity, epsilon);
+
+        if (expected.position) {
+          compareVectors(sgp4Result.position, expected.position, epsilon);
+        }
+
+        if (expected.velocity) {
+          compareVectors(sgp4Result.velocity, expected.velocity, epsilon);
+        }
       });
     });
   });
