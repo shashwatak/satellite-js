@@ -12,20 +12,73 @@ import { propagate, gstime } from '../src/propagation';
 chai.should();
 
 describe('Julian date / time', () => {
-  it('jday gives the same result with different arguments describing the same time', () => {
-    const now = new Date();
-    jday(now).should.equal(jday(
-      now.getUTCFullYear(),
-      now.getUTCMonth() + 1,
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-    ));
+  let now;
+  before(() => {
+    now = new Date();
+  });
+
+  describe('jday', () => {
+    it('gives the same result with different arguments describing the same time', () => {
+      jday(now).should.equal(jday(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        now.getUTCMilliseconds(),
+      ));
+    });
+
+    it('outputs different results when milliseconds are passed', () => {
+      const noMS = jday(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+      );
+
+      const withMS = jday(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        now.getUTCMilliseconds(),
+      );
+
+      noMS.should.not.equal(withMS);
+    });
+
+    it('outputs different results with millisecond precision', () => {
+      const time1 = jday(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        (now.getUTCMilliseconds() + 1) % 1000
+      );
+
+      const time2 = jday(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        now.getUTCMilliseconds(),
+      );
+
+      time1.should.not.equal(time2);
+    });
   });
 
   it('invjday gives the same result as date and array', () => {
-    const now = new Date();
     const jd = jday(now);
     const date = invjday(jd);
     const dateArray = invjday(jd, true);
@@ -38,14 +91,12 @@ describe('Julian date / time', () => {
   });
 
   it('date to jday and inverse conversion', () => {
-    const now = new Date();
     const jd = jday(now);
     (invjday(jd).getTime() / 1000).should.be.closeTo(
       ((now.getTime() - now.getMilliseconds()) / 1000), 1);
   });
 
   it('gstime gives the same result with different arguments describing the same time', () => {
-    const now = new Date();
     gstime(now).should.equal(gstime(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1,
@@ -53,6 +104,7 @@ describe('Julian date / time', () => {
       now.getUTCHours(),
       now.getUTCMinutes(),
       now.getUTCSeconds(),
+      now.getUTCMilliseconds(),
     ));
   });
 

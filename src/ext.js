@@ -97,17 +97,17 @@ export function days2mdhms(year, days) {
  *    vallado       2007, 189, alg 14, ex 3-14
  *
  * --------------------------------------------------------------------------- */
-function jdayInternal(year, mon, day, hr, minute, sec) {
+function jdayInternal(year, mon, day, hr, minute, sec, msec = 0) {
   return (
     ((367.0 * year) - Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25)) +
     Math.floor((275 * mon) / 9.0) +
     day + 1721013.5 +
-    (((((sec / 60.0) + minute) / 60.0) + hr) / 24.0) // ut in days
+    (((((msec / 60000) + (sec / 60.0) + minute) / 60.0) + hr) / 24.0) // ut in days
     // # - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
   );
 }
 
-export function jday(year, mon, day, hr, minute, sec) {
+export function jday(year, mon, day, hr, minute, sec, msec) {
   if (year instanceof Date) {
     const date = year;
     return jdayInternal(
@@ -117,10 +117,11 @@ export function jday(year, mon, day, hr, minute, sec) {
       date.getUTCHours(),
       date.getUTCMinutes(),
       date.getUTCSeconds(),
+      date.getUTCMilliseconds(),
     );
   }
 
-  return jdayInternal(year, mon, day, hr, minute, sec);
+  return jdayInternal(year, mon, day, hr, minute, sec, msec);
 }
 
 /* -----------------------------------------------------------------------------
