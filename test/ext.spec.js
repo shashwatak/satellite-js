@@ -61,7 +61,7 @@ describe('Julian date / time', () => {
         now.getUTCHours(),
         now.getUTCMinutes(),
         now.getUTCSeconds(),
-        (now.getUTCMilliseconds() + 1) % 1000
+        (now.getUTCMilliseconds() + 1) % 1000,
       );
 
       const time2 = jday(
