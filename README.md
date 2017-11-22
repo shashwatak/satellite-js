@@ -26,9 +26,12 @@ Special thanks to all contributors for improving usability and bug fixes :)
 - [tikhonovits (Nikos Sagias)](https://github.com/tikhonovits)
 - [dangodev (Drew Powers)](https://github.com/dangodev)
 - [bakercp (Christopher Baker)](https://github.com/bakercp)
+- [drom (Aliaksei Chapyzhenka)](https://github.com/drom)
 - [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
 - [owntheweb](https://github.com/owntheweb)
 - [Zigone](https://github.com/Zigone)
+
+If you want to contribute to the project please read the [Contributing](#contributing) section first.
 
 **Start Here:**
 
@@ -149,7 +152,7 @@ var observerGd = {
 
 // You will need GMST for some of the coordinate transforms.
 // http://en.wikipedia.org/wiki/Sidereal_time#Definition
-var gmst = satellite.gstimeFromDate(new Date());
+var gmst = satellite.gstime(new Date());
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
 var positionEcf   = satellite.eciToEcf(positionEci, gmst),
@@ -179,6 +182,19 @@ var longitudeStr = satellite.degreesLong(longitude),
     latitudeStr  = satellite.degreesLat(latitude);
 ```
     
+## Contributing
+
+This repo follows [Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
+Before starting a work on new [pull request](https://github.com/shashwatak/satellite-js/compare), please, checkout your
+feature or bugfix branch from `develop` branch:
+
+```
+git checkout develop
+git fetch origin
+git merge origin/develop
+git checkout -b my-feature
+```
+
 ## Building
 
 The source code is organized as Common.js modules and uses [ES6 syntax](http://es6-features.org/).
@@ -318,13 +334,13 @@ You'll need to provide some of the coordinate transform functions with your curr
 Julian Day:
 
 ```js
-var gmst = satellite.gstimeFromJday(julianDay);
+var gmst = satellite.gstime(julianDay);
 ```
 
 or a JavaScript Date:
 
 ```js
-var gmst = satellite.gstimeFromDate(new Date());
+var gmst = satellite.gstime(new Date());
 ```
 
 #### Transforms
