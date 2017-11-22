@@ -83,8 +83,8 @@ describe('Library export', () => {
 
   it('gstime produces the same output as gstimeFromJday', () => {
     const now = new Date();
-    const jday = lib.jday(now);
-    lib.gstime(jday).should.equal(lib.gstimeFromJday(jday));
+    const jd = lib.jday(now);
+    lib.gstime(jd).should.equal(lib.gstimeFromJday(jd));
   });
 
   it('gstime produces the same output as gstimeFromDate', () => {
