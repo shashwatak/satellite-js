@@ -8,7 +8,7 @@
 .babelrc
 .eslintignore
 .eslintrc.json
-test/.eslintrc.json
 .npmignore
 bower.json
 webpack.config.babel.js
+yarn.lock
