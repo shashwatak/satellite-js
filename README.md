@@ -188,11 +188,25 @@ This repo follows [Gitflow Workflow](https://www.atlassian.com/git/tutorials/com
 Before starting a work on new [pull request](https://github.com/shashwatak/satellite-js/compare), please, checkout your
 feature or bugfix branch from `develop` branch:
 
-```
+```bash
 git checkout develop
 git fetch origin
 git merge origin/develop
 git checkout -b my-feature
+```
+
+Make sure that your changes don't brake the existing code by running:
+
+```bash
+npm test
+```
+
+Implementing new functions or features, please, if possible, provide tests to cover them.
+
+In order to get test code coverage run the following:
+
+```bash
+npm run test:coverage
 ```
 
 ## Building
