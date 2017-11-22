@@ -195,10 +195,17 @@ git merge origin/develop
 git checkout -b my-feature
 ```
 
-Make sure that your changes don't brake the existing code by running:
+Make sure that your changes don't brake the existing code by running
 
 ```bash
 npm test
+```
+
+and that your code follows [Airbnb](https://www.npmjs.com/package/eslint-config-airbnb-base) style
+
+```bash
+npm run lint
+npm run lint:test
 ```
 
 Implementing new functions or features, please, if possible, provide tests to cover them.
