@@ -1,6 +1,7 @@
 .idea
 /commands
 /coverage
+/dist/satellite.js.map
 /sgp4_verification
 /src
 /test
