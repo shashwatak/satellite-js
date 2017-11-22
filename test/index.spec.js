@@ -80,4 +80,15 @@ describe('Library export', () => {
     lib.ecfToEci.should.equal(ecfToEci);
     lib.ecfToLookAngles.should.equal(ecfToLookAngles);
   });
+
+  it('gstime produces the same output as gstimeFromJday', () => {
+    const now = new Date();
+    const jday = lib.jday(now);
+    lib.gstime(jday).should.equal(lib.gstimeFromJday(jday));
+  });
+
+  it('gstime produces the same output as gstimeFromDate', () => {
+    const now = new Date();
+    lib.gstime(now).should.equal(lib.gstimeFromDate(now));
+  });
 });

@@ -33,8 +33,14 @@ export default {
   twoline2satrec,
 
   gstime,
-  gstimeFromJday: gstime, // TODO: deprecate
-  gstimeFromDate: gstime, // TODO: deprecate
+  gstimeFromJday: (...args) => {
+    console.warn('gstimeFromJday is deprecated, use gstime instead.');
+    return gstime(...args);
+  },
+  gstimeFromDate: (...args) => {
+    console.warn('gstimeFromDate is deprecated, use gstime instead.');
+    return gstime(...args);
+  },
   jday,
   invjday,
 
