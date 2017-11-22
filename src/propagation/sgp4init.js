@@ -1,5 +1,3 @@
-import assign from 'object-assign';
-
 import {
   pi,
   earthRadius,
@@ -97,7 +95,7 @@ import sgp4 from './sgp4';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4init(satrec, options) {
-  const rec = assign({}, satrec);
+  const rec = Object.assign({}, satrec);
 
   const {
     opsmode,

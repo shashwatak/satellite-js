@@ -1,5 +1,3 @@
-import assign from 'object-assign';
-
 import {
   pi,
   twoPi,
@@ -100,7 +98,7 @@ import dspace from './dspace';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4(satrec, tsince) {
-  const rec = assign({}, satrec);
+  const rec = Object.assign({}, satrec);
 
   let coseo1;
   let sineo1;

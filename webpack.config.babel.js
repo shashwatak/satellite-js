@@ -8,7 +8,7 @@ const NODE_ENV = process.env.NODE_ENV === 'production' ? 'production' : 'develop
 const config = {
   context: path.resolve(__dirname, 'lib'),
   entry: {
-    satellite: './index.js',
+    satellite: ['babel-polyfill', './index.js'],
   },
   output: {
     library: 'satellite',
