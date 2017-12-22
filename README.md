@@ -99,9 +99,9 @@ var positionAndVelocity = satellite.sgp4(satrec, time);
 ### ES ([Babel.js](https://babeljs.io/))
 
 ```js
-import satellite from 'satellite.js';
+import { sgp4 } from 'satellite.js';
 ...
-const positionAndVelocity = satellite.sgp4(satrec, time);
+const positionAndVelocity = sgp4(satrec, time);
 ```
 
 ### AMD ([Require.js](http://requirejs.org/))
