@@ -9,6 +9,5 @@
 .eslintignore
 .eslintrc.json
 .npmignore
-bower.json
 webpack.config.babel.js
 yarn.lock
