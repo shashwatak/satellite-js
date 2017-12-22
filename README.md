@@ -1,7 +1,11 @@
 # satellite.js
 
-[![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
-[![Bower version](https://badge.fury.io/bo/satellite.js.svg)](https://badge.fury.io/bo/satellite.js)
+[![NPM version](https://img.shields.io/npm/v/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
+[![Downloads/month](https://img.shields.io/npm/dm/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
+[![Build Status](https://img.shields.io/travis/shashwatak/satellite-js/develop.svg)](https://travis-ci.org/shashwatak/satellite-js)
+[![Coverage Status](https://img.shields.io/coveralls/github/shashwatak/satellite-js/develop.svg)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
+[![Gitter chat](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/satellite-js/Lobby)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE.md)
 
 ## Introduction
 
@@ -16,7 +20,19 @@ propagate paths. The only changes I made to Brandon Rhode's code was to change t
 functions to key:value objects. This reduces the complexity of functions that require 50+ parameters,
 and doesn't require the parameters to be placed in the exact order.
 
-Special thanks to [ezze](https://github.com/ezze), for modernizing the code and greatly improving usability =)
+Special thanks to all contributors for improving usability and bug fixes :)
+
+- [ezze (Dmitriy Pushkov)](https://github.com/ezze)
+- [davidcalhoun (David Calhoun)](https://github.com/davidcalhoun)
+- [tikhonovits (Nikos Sagias)](https://github.com/tikhonovits)
+- [dangodev (Drew Powers)](https://github.com/dangodev)
+- [bakercp (Christopher Baker)](https://github.com/bakercp)
+- [drom (Aliaksei Chapyzhenka)](https://github.com/drom)
+- [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
+- [owntheweb](https://github.com/owntheweb)
+- [Zigone](https://github.com/Zigone)
+
+If you want to contribute to the project please read the [Contributing](#contributing) section first.
 
 **Start Here:**
 
@@ -46,12 +62,18 @@ I would recommend anybody interested in satellite tracking or orbital propagatio
 Get a free [Space Track account](https://www.space-track.org/auth/login) and download your own up to date TLEs
 for use with this library.
 
-## Installation (NPM or Bower)
+## Installation
 
 Install the library with [NPM](https://www.npmjs.com/):
 
 ```bash
 npm install satellite.js
+```
+
+Install the library with [Yarn](https://yarnpkg.com/):
+
+```bash
+yarn add satellite.js
 ```
 
 Install the library with [Bower](http://bower.io/):
@@ -60,9 +82,13 @@ Install the library with [Bower](http://bower.io/):
 bower install satellite.js
 ```
 
+**Warning!**
+
+`satellite.js` version 1.3.0 is the latest one for Bower since it has been deprecated.
+
 ## Usage
 
-### [Node.js](https://nodejs.org)
+### Common.js ([Node.js](https://nodejs.org))
 
 ```js
 var satellite = require('satellite.js');
@@ -70,15 +96,15 @@ var satellite = require('satellite.js');
 var positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
-or with ES6 syntax:
+### ES ([Babel.js](https://babeljs.io/))
 
 ```js
-import satellite from 'satellite.js';
+import { sgp4 } from 'satellite.js';
 ...
-const positionAndVelocity = satellite.sgp4(satrec, time);
+const positionAndVelocity = sgp4(satrec, time);
 ```
 
-### [Require.js](http://requirejs.org/)
+### AMD ([Require.js](http://requirejs.org/))
 
 ```js
 define(['path/to/dist/satellite'], function(satellite) {
@@ -131,7 +157,7 @@ var observerGd = {
 
 // You will need GMST for some of the coordinate transforms.
 // http://en.wikipedia.org/wiki/Sidereal_time#Definition
-var gmst = satellite.gstimeFromDate(new Date());
+var gmst = satellite.gstime(new Date());
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
 var positionEcf   = satellite.eciToEcf(positionEci, gmst),
@@ -161,6 +187,41 @@ var longitudeStr = satellite.degreesLong(longitude),
     latitudeStr  = satellite.degreesLat(latitude);
 ```
     
+## Contributing
+
+This repo follows [Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow).
+Before starting a work on new [pull request](https://github.com/shashwatak/satellite-js/compare), please, checkout your
+feature or bugfix branch from `develop` branch:
+
+```bash
+git checkout develop
+git fetch origin
+git merge origin/develop
+git checkout -b my-feature
+```
+
+Make sure that your changes don't brake the existing code by running
+
+```bash
+npm test
+```
+
+and that your code follows [Airbnb](https://www.npmjs.com/package/eslint-config-airbnb-base) style
+
+```bash
+npm run lint
+npm run lint:test
+```
+
+Implementing new functions or features, please, if possible, provide tests to cover them and mention your works
+in [Changelog](#CHANGELOG).
+
+In order to get test code coverage run the following:
+
+```bash
+npm run test:coverage
+```
+
 ## Building
 
 The source code is organized as Common.js modules and uses [ES6 syntax](http://es6-features.org/).
@@ -189,19 +250,29 @@ In order to build the library follow these steps:
 
 These is a full list of all available NPM scripts:
 
-- `clean`       removes all built files in `lib` and `dist` directories;
-- `transpile`   transpiles ES6 source files located in `src` directory to ES5 and saves the resulting files
-                in `lib` directory;
-- `dist`        builds a single [UMD](https://github.com/umdjs/umd) module located in `dist` directory from
-                transpiled library `lib`;
-- `copy`        copies built library from `dist` to `sgp4_verification/lib/sgp4`;
-- `build`       builds everything (`transpile` > `dist` > `copy`);
-- `rebuild`     rebuilds everything (`clean` > `build`);
-- `lint`        lints sources code located in `src` directory with [ESLint](http://eslint.org/) with
-                [Airbnb shared configuration]((https://www.npmjs.com/package/eslint-config-airbnb));
-- `lint:test`   lints tests located in `test` directory with ESLint;
-- `test`        runs tests;
-- `verify`      starts a local web server to host `sgp4_verification` application;
+- `build`           builds everything;
+- `transpile`       transpiles ES source files located in `src` directory to Common.js compatible modules and saves
+                    the resulting files in `lib` directory;
+- `dist`            builds ES and UMD modules in `dist` directory;
+- `dist:es`         builds ES module in `dist` directory;
+- `dist:umd`        builds [UMD](https://github.com/umdjs/umd) module in `dist` directory (both non-compressed and
+                    compressed versions);
+- `dist:umd:dev`    builds non-compressed version of UMD module in `dist` directory;
+- `dist:umd:prod`   builds compressed version of UMD module in `dist` directory; 
+- `watch:es`        watches for changes in `src` directory and automatically rebuilds ES module;
+- `copy`            copies built library from `dist` to [SGP4 verification](#benchmarking) application's directory;
+- `lint`            lints sources code located in `src` directory with [ESLint](http://eslint.org/) with
+                    [Airbnb shared configuration]((https://www.npmjs.com/package/eslint-config-airbnb));
+- `lint:test`       lints tests located in `test` directory with ESLint;
+- `test`            runs tests;
+- `test:coverage`   runs tests with [Istanbul](https://github.com/gotwarlost/istanbul) coverage summary;
+- `test:coveralls`  runs tests with Istanbul coverage summary and aggregates the results by
+                    [Coveralls](https://coveralls.io/github/shashwatak/satellite-js); in order to run it locally
+                    `COVERALLS_REPO_TOKEN` is required:
+                    
+    ```
+    COVERALLS_REPO_TOKEN=<token> npm run test:coveralls
+    ```
 
 ## TODO
 
@@ -248,10 +319,10 @@ Space Track, there should be no problem.
 
 Both `propagate()` and `sgp4()` functions return position and velocity as a dictionary of the form:
 
-```js
+```json
 {
-  "position" : { "x" : 1, "y" : 1, "z" : 1 },
-  "velocity" : { "x" : 1, "y" : 1, "z" : 1 }
+  "position": { "x" : 1, "y" : 1, "z" : 1 },
+  "velocity": { "x" : 1, "y" : 1, "z" : 1 }
 }
 ```
 
@@ -291,13 +362,13 @@ You'll need to provide some of the coordinate transform functions with your curr
 Julian Day:
 
 ```js
-var gmst = satellite.gstimeFromJday(julianDay);
+var gmst = satellite.gstime(julianDay);
 ```
 
 or a JavaScript Date:
 
 ```js
-var gmst = satellite.gstimeFromDate(new Date());
+var gmst = satellite.gstime(new Date());
 ```
 
 #### Transforms
@@ -370,6 +441,13 @@ Test Criteria provided by SpaceTrack Report #3, and is based off
 
 The testing app is a Chrome Packaged App that uses the `angular.js` framework.
 
+Before running the app build the library and copy resulting files from `dist` directory to app's directory with
+the following command:
+
+```bash
+npm run copy
+```
+
 To run the test, open up Chrome, go to the extensions page, and check "Developer Mode". Then, click "Load Unpacked App",
 and select the `sgp4_verification` folder. Then run the app from within Chrome. The test file is located within
 the `sgp4_verification` directory, as a JSON file called `spacetrack-report-3.json`.
@@ -384,7 +462,7 @@ Petersen (AC6P) of UCSC for pointing me in the correct directions.
 All files marked with the License header at the top are Licensed. Any files unmarked by me or others are
 unlicensed, and are kept only as a resource for [Shashwat Kandadai and other developers] for testing.
 
-I chose the MIT License because this library is a derivative work off
+I chose the [MIT License](LICENSE.md) because this library is a derivative work off
 [Brandon Rhodes sgp4](https://pypi.python.org/pypi/sgp4/), and that is licensed with MIT. It just seemed simpler
 this way, sub-licensing freedoms notwithstanding.
 

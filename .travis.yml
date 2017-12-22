@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+  - "9"
+  - "8"
+  - "7"
+  - "6"
+  - "5"
+  - "4"
+branches:
+  only:
+    - master
+    - develop
+    - release
+install:
+  - npm install
+before_script:
+  - npm run lint
+  - npm run lint:test
+  - npm test
+script:
+  - npm run build
+after_success:
+  - npm run test:coveralls
