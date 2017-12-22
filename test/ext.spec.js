@@ -31,26 +31,28 @@ describe('Julian date / time', () => {
     });
 
     it('outputs different results when milliseconds are passed', () => {
-      const noMS = jday(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1,
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds(),
+      const date = new Date('2018-01-01T05:30:30.123Z');
+
+      const jdayNoMs = jday(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds()
       );
 
-      const withMS = jday(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1,
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds(),
-        now.getUTCMilliseconds(),
+      const jdayMs = jday(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds(),
+        date.getUTCMilliseconds(),
       );
 
-      noMS.should.not.equal(withMS);
+      jdayNoMs.should.not.equal(jdayMs);
     });
 
     it('outputs different results with millisecond precision', () => {
