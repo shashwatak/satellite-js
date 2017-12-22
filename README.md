@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/travis/shashwatak/satellite-js/develop.svg)](https://travis-ci.org/shashwatak/satellite-js)
 [![Coverage Status](https://img.shields.io/coveralls/github/shashwatak/satellite-js/develop.svg)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
 [![Gitter chat](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/satellite-js/Lobby)
-[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE.md)
 
 ## Introduction
 
@@ -462,7 +462,7 @@ Petersen (AC6P) of UCSC for pointing me in the correct directions.
 All files marked with the License header at the top are Licensed. Any files unmarked by me or others are
 unlicensed, and are kept only as a resource for [Shashwat Kandadai and other developers] for testing.
 
-I chose the MIT License because this library is a derivative work off
+I chose the [MIT License](LICENSE.md) because this library is a derivative work off
 [Brandon Rhodes sgp4](https://pypi.python.org/pypi/sgp4/), and that is licensed with MIT. It just seemed simpler
 this way, sub-licensing freedoms notwithstanding.
 
