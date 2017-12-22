@@ -4,6 +4,6 @@
     "stage-3"
   ],
   "ignore": [
-    "src/index-umd.js"
+    "src/indexUmd.js"
   ]
 }
