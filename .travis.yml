@@ -10,6 +10,7 @@ branches:
   only:
     - master
     - develop
+    - release
 install:
   - npm install
 before_script:
