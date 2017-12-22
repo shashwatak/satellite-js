@@ -98,7 +98,7 @@ import dspace from './dspace';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4(satrec, tsince) {
-  const rec = Object.assign({}, satrec);
+  const rec = { ...satrec };
 
   let coseo1;
   let sineo1;

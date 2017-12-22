@@ -3,22 +3,25 @@
   "version": "1.4.0",
   "description": "SGP4/SDP4 calculation library",
   "main": "lib/index.js",
+  "jsnext:main": "dist/satellite.es.js",
+  "module": "dist/satellite.es.js",
   "scripts": {
-    "clean": "rimraf lib dist",
+    "build": "rimraf lib dist && npm run transpile && npm run dist",
     "transpile": "babel src -d lib && node --require babel-register commands/add-copyright.js 'lib/**/*.js'",
-    "dist": "webpack",
-    "dist:development": "cross-env NODE_ENV=development npm run dist && node --require babel-register commands/add-copyright.js 'dist/**/satellite.js'",
-    "dist:production": "cross-env NODE_ENV=production npm run dist && node --require babel-register commands/add-copyright.js 'dist/**/satellite.min.js'",
+    "dist": "npm run dist:es && npm run dist:umd:dev && npm run dist:umd:prod",
+    "dist:es": "rollup --config rollup.config.es.js && node --require babel-register commands/add-copyright.js 'dist/satellite.es.js'",
+    "dist:umd": "rollup --config rollup.config.js",
+    "dist:umd:dev": "cross-env NODE_ENV=development npm run dist:umd && node --require babel-register commands/add-copyright.js 'dist/**/satellite.js'",
+    "dist:umd:prod": "cross-env NODE_ENV=production npm run dist:umd && node --require babel-register commands/add-copyright.js 'dist/**/satellite.min.js'",
+    "watch:es": "node --require babel-register rollup.watch.es.js",
     "copy": "copyfiles -u 1 'dist/**/*' sgp4_verification/lib/sgp4",
-    "build": "npm run transpile && npm run dist:development && npm run dist:production && npm run copy",
-    "rebuild": "npm run clean && npm run build",
     "lint": "eslint ./src",
     "lint:test": "eslint -c test/.eslintrc.json ./test",
     "test": "mocha --recursive --require babel-register test",
     "test:coverage": "rimraf coverage && istanbul cover _mocha -- --recursive --require babel-register test",
     "test:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
     "verify": "static sgp4_verification",
-    "prepare": "npm run lint && npm run lint:test && npm test && npm run rebuild"
+    "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build"
   },
   "repository": {
     "type": "git",
@@ -36,17 +39,16 @@
   "bugs": {
     "url": "https://github.com/shashwatak/satellite-js/issues"
   },
-  "dependencies": {
-    "babel-polyfill": "^6.26.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-exponentiation-operator": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
+    "chokidar": "^1.7.0",
     "copyfiles": "^1.2.0",
     "coveralls": "^3.0.0",
     "cross-env": "^5.1.1",
@@ -59,7 +61,10 @@
     "node-static": "^0.7.10",
     "prepend-file": "^1.3.1",
     "rimraf": "^2.6.2",
-    "webpack": "^3.8.1"
+    "rollup": "^0.53.0",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-uglify": "^2.0.1",
+    "uglify-es": "^3.2.2"
   },
   "homepage": "https://github.com/shashwatak/satellite-js",
   "directories": {

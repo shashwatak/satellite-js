@@ -95,7 +95,7 @@ import sgp4 from './sgp4';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4init(satrec, options) {
-  const rec = Object.assign({}, satrec);
+  const rec = { ...satrec };
 
   const {
     opsmode,

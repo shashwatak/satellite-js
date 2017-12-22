@@ -1,9 +1,9 @@
 {
   "presets": [
-    "es2015"
+    "env",
+    "stage-3"
   ],
-  "plugins": [
-    "add-module-exports",
-    "transform-exponentiation-operator"
+  "ignore": [
+    "src/index-umd.js"
   ]
 }

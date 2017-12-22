@@ -1,7 +1,6 @@
 .idea
 /commands
 /coverage
-/dist/satellite.js.map
 /sgp4_verification
 /src
 /test
@@ -9,5 +8,7 @@
 .eslintignore
 .eslintrc.json
 .npmignore
-webpack.config.babel.js
+.travis.yml
+rollup.*
 yarn.lock
+*.log

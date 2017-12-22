@@ -16,17 +16,7 @@ import {
   ecfToLookAngles,
 } from './transforms';
 
-const gstimeFromJday = (...args) => {
-  console.warn('gstimeFromJday is deprecated, use gstime instead.'); // eslint-disable-line no-console
-  return gstime(...args);
-};
-
-const gstimeFromDate = (...args) => {
-  console.warn('gstimeFromDate is deprecated, use gstime instead.'); // eslint-disable-line no-console
-  return gstime(...args);
-};
-
-export {
+const umd = {
   constants,
 
   // Propagation
@@ -35,8 +25,14 @@ export {
   twoline2satrec,
 
   gstime,
-  gstimeFromJday,
-  gstimeFromDate,
+  gstimeFromJday: (...args) => {
+    console.warn('gstimeFromJday is deprecated, use gstime instead.'); // eslint-disable-line no-console
+    return gstime(...args);
+  },
+  gstimeFromDate: (...args) => {
+    console.warn('gstimeFromDate is deprecated, use gstime instead.'); // eslint-disable-line no-console
+    return gstime(...args);
+  },
   jday,
   invjday,
 
@@ -51,3 +47,5 @@ export {
   ecfToEci,
   ecfToLookAngles,
 };
+
+export default umd;
