@@ -1,9 +1,11 @@
 # satellite.js
 
-[![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
-[![Build Status](https://travis-ci.org/shashwatak/satellite-js.svg?branch=develop)](https://travis-ci.org/shashwatak/satellite-js)
-[![Coverage Status](https://coveralls.io/repos/github/shashwatak/satellite-js/badge.svg?branch=develop)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
-[![Gitter chat](https://badges.gitter.im/shashwatak/satellite-js.png)](https://gitter.im/satellite-js/Lobby)
+[![NPM version](https://img.shields.io/npm/v/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
+[![Downloads/month](https://img.shields.io/npm/dm/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
+[![Build Status](https://img.shields.io/travis/shashwatak/satellite-js/develop.svg)](https://travis-ci.org/shashwatak/satellite-js)
+[![Coverage Status](https://img.shields.io/coveralls/github/shashwatak/satellite-js/develop.svg)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
+[![Gitter chat](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/satellite-js/Lobby)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 ## Introduction
 
