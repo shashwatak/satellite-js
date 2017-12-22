@@ -16,7 +16,7 @@ import {
   ecfToLookAngles,
 } from './transforms';
 
-const umd = {
+export default {
   constants,
 
   // Propagation
@@ -47,5 +47,3 @@ const umd = {
   ecfToEci,
   ecfToLookAngles,
 };
-
-export default umd;

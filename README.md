@@ -1,9 +1,11 @@
 # satellite.js
 
-[![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
-[![Build Status](https://travis-ci.org/shashwatak/satellite-js.svg?branch=develop)](https://travis-ci.org/shashwatak/satellite-js)
-[![Coverage Status](https://coveralls.io/repos/github/shashwatak/satellite-js/badge.svg?branch=develop)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
-[![Gitter chat](https://badges.gitter.im/shashwatak/satellite-js.png)](https://gitter.im/satellite-js/Lobby)
+[![NPM version](https://img.shields.io/npm/v/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
+[![Downloads/month](https://img.shields.io/npm/dm/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
+[![Build Status](https://img.shields.io/travis/shashwatak/satellite-js/develop.svg)](https://travis-ci.org/shashwatak/satellite-js)
+[![Coverage Status](https://img.shields.io/coveralls/github/shashwatak/satellite-js/develop.svg)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
+[![Gitter chat](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/satellite-js/Lobby)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE.md)
 
 ## Introduction
 
@@ -86,7 +88,7 @@ bower install satellite.js
 
 ## Usage
 
-### [Node.js](https://nodejs.org)
+### Common.js ([Node.js](https://nodejs.org))
 
 ```js
 var satellite = require('satellite.js');
@@ -94,15 +96,15 @@ var satellite = require('satellite.js');
 var positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
-or with ES6 syntax:
+### ES ([Babel.js](https://babeljs.io/))
 
 ```js
-import satellite from 'satellite.js';
+import { sgp4 } from 'satellite.js';
 ...
-const positionAndVelocity = satellite.sgp4(satrec, time);
+const positionAndVelocity = sgp4(satrec, time);
 ```
 
-### [Require.js](http://requirejs.org/)
+### AMD ([Require.js](http://requirejs.org/))
 
 ```js
 define(['path/to/dist/satellite'], function(satellite) {
@@ -211,7 +213,8 @@ npm run lint
 npm run lint:test
 ```
 
-Implementing new functions or features, please, if possible, provide tests to cover them.
+Implementing new functions or features, please, if possible, provide tests to cover them and mention your works
+in [Changelog](#CHANGELOG).
 
 In order to get test code coverage run the following:
 
@@ -247,14 +250,17 @@ In order to build the library follow these steps:
 
 These is a full list of all available NPM scripts:
 
-- `clean`           removes all built files in `lib` and `dist` directories;
-- `transpile`       transpiles ES6 source files located in `src` directory to ES5 and saves the resulting files
-                    in `lib` directory;
-- `dist`            builds a single [UMD](https://github.com/umdjs/umd) module located in `dist` directory from
-                    transpiled library `lib`;
-- `copy`            copies built library from `dist` to `sgp4_verification/lib/sgp4`;
-- `build`           builds everything (`transpile` > `dist` > `copy`);
-- `rebuild`         rebuilds everything (`clean` > `build`);
+- `build`           builds everything;
+- `transpile`       transpiles ES source files located in `src` directory to Common.js compatible modules and saves
+                    the resulting files in `lib` directory;
+- `dist`            builds ES and UMD modules in `dist` directory;
+- `dist:es`         builds ES module in `dist` directory;
+- `dist:umd`        builds [UMD](https://github.com/umdjs/umd) module in `dist` directory (both non-compressed and
+                    compressed versions);
+- `dist:umd:dev`    builds non-compressed version of UMD module in `dist` directory;
+- `dist:umd:prod`   builds compressed version of UMD module in `dist` directory; 
+- `watch:es`        watches for changes in `src` directory and automatically rebuilds ES module;
+- `copy`            copies built library from `dist` to [SGP4 verification](#benchmarking) application's directory;
 - `lint`            lints sources code located in `src` directory with [ESLint](http://eslint.org/) with
                     [Airbnb shared configuration]((https://www.npmjs.com/package/eslint-config-airbnb));
 - `lint:test`       lints tests located in `test` directory with ESLint;
@@ -267,8 +273,6 @@ These is a full list of all available NPM scripts:
     ```
     COVERALLS_REPO_TOKEN=<token> npm run test:coveralls
     ```
-                    
-- `verify`          starts a local web server to host `sgp4_verification` application;
 
 ## TODO
 
@@ -437,6 +441,13 @@ Test Criteria provided by SpaceTrack Report #3, and is based off
 
 The testing app is a Chrome Packaged App that uses the `angular.js` framework.
 
+Before running the app build the library and copy resulting files from `dist` directory to app's directory with
+the following command:
+
+```bash
+npm run copy
+```
+
 To run the test, open up Chrome, go to the extensions page, and check "Developer Mode". Then, click "Load Unpacked App",
 and select the `sgp4_verification` folder. Then run the app from within Chrome. The test file is located within
 the `sgp4_verification` directory, as a JSON file called `spacetrack-report-3.json`.
@@ -451,7 +462,7 @@ Petersen (AC6P) of UCSC for pointing me in the correct directions.
 All files marked with the License header at the top are Licensed. Any files unmarked by me or others are
 unlicensed, and are kept only as a resource for [Shashwat Kandadai and other developers] for testing.
 
-I chose the MIT License because this library is a derivative work off
+I chose the [MIT License](LICENSE.md) because this library is a derivative work off
 [Brandon Rhodes sgp4](https://pypi.python.org/pypi/sgp4/), and that is licensed with MIT. It just seemed simpler
 this way, sub-licensing freedoms notwithstanding.
 
