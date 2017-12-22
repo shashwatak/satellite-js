@@ -12,3 +12,4 @@
 - [Incorrect position and velocity bug](https://github.com/shashwatak/satellite-js/issues/26) for times not close to
 TLE epoch is fixed ([#37](https://github.com/shashwatak/satellite-js/pull/37)).
 - Continuous integration and test coverage are provided.
+- [Bower support is dropped](https://github.com/shashwatak/satellite-js/issues/40).
