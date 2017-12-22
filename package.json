@@ -20,7 +20,6 @@
     "test": "mocha --recursive --require babel-register test",
     "test:coverage": "rimraf coverage && istanbul cover _mocha -- --recursive --require babel-register test",
     "test:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
-    "verify": "static sgp4_verification",
     "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build"
   },
   "repository": {
@@ -58,7 +57,6 @@
     "glob": "^7.1.2",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
-    "node-static": "^0.7.10",
     "prepend-file": "^1.3.1",
     "rimraf": "^2.6.2",
     "rollup": "^0.53.0",
