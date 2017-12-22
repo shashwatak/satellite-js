@@ -1,7 +1,6 @@
 # satellite.js
 
 [![NPM version](https://badge.fury.io/js/satellite.js.svg)](https://badge.fury.io/js/satellite.js)
-[![Bower version](https://badge.fury.io/bo/satellite.js.svg)](https://badge.fury.io/bo/satellite.js)
 [![Build Status](https://travis-ci.org/shashwatak/satellite-js.svg?branch=develop)](https://travis-ci.org/shashwatak/satellite-js)
 [![Coverage Status](https://coveralls.io/repos/github/shashwatak/satellite-js/badge.svg?branch=develop)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
 [![Gitter chat](https://badges.gitter.im/shashwatak/satellite-js.png)](https://gitter.im/satellite-js/Lobby)
@@ -80,6 +79,10 @@ Install the library with [Bower](http://bower.io/):
 ```bash
 bower install satellite.js
 ```
+
+**Warning!**
+
+`satellite.js` version 1.3.0 is the latest one for Bower since it has been deprecated.
 
 ## Usage
 
