@@ -1,6 +1,6 @@
 ## Changelog
 
-### 1.4.0
+### 2.0.0
 
 - Library became ES and Common.js compatible.
 - Source code is reorganized to match [original Python library](https://pypi.python.org/pypi/sgp4/).
