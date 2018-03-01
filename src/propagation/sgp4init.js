@@ -643,10 +643,11 @@ export default function sgp4init(satrec, options) {
     // sgp4fix take out check to let satellites process until they are actually below earth surface
     // if(rec.error == 0)
   }
-  sgp4(rec, 0.0);
 
-  rec.init = 'n';
+  const { satrec: resultRec } = sgp4(rec, 0.0);
 
-  // rec.error contains any error codes
-  return rec;
+  resultRec.init = 'n';
+
+  // resultRec.error contains any error codes
+  return resultRec;
 }

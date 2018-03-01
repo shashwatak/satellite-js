@@ -214,7 +214,7 @@ npm run lint:test
 ```
 
 Implementing new functions or features, please, if possible, provide tests to cover them and mention your works
-in [Changelog](#CHANGELOG).
+in [Changelog](CHANGELOG.md).
 
 In order to get test code coverage run the following:
 
