@@ -1,6 +1,6 @@
 {
   "name": "satellite.js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "SGP4/SDP4 calculation library",
   "main": "lib/index.js",
   "jsnext:main": "dist/satellite.es.js",
