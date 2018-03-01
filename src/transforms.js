@@ -1,5 +1,6 @@
 import {
   pi,
+  twoPi,
   rad2deg,
 } from './constants';
 
@@ -52,7 +53,15 @@ export function eciToGeodetic(eciCoords, gmst) {
   const R = Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y));
   const f = (a - b) / a;
   const e2 = ((2 * f) - (f * f));
-  const longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
+
+  let longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
+  while (longitude < -pi) {
+    longitude += twoPi;
+  }
+  while (longitude > pi) {
+    longitude -= twoPi;
+  }
+
   const kmax = 20;
   let k = 0;
   let latitude = Math.atan2(
