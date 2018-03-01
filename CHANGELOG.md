@@ -1,6 +1,11 @@
 ## Changelog
 
-### 2.0.0
+### 2.0.1 (2018-03-01)
+
+- `sgp4` function's call result is used in `sgp4init`.
+- Longitude of `eciToGeodetic` result is in [-PI; PI] range now.
+
+### 2.0.0 (2017-12-23)
 
 - Library became ES and Common.js compatible.
 - Source code is reorganized to match [original Python library](https://pypi.python.org/pypi/sgp4/).
