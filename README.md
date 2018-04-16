@@ -29,6 +29,7 @@ Special thanks to all contributors for improving usability and bug fixes :)
 - [bakercp (Christopher Baker)](https://github.com/bakercp)
 - [drom (Aliaksei Chapyzhenka)](https://github.com/drom)
 - [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
+- [nhamer](https://github.com/nhamer)
 - [owntheweb](https://github.com/owntheweb)
 - [Zigone](https://github.com/Zigone)
 

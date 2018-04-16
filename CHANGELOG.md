@@ -1,5 +1,10 @@
 ## Changelog
 
+### 2.0.2 (2018-04-16)
+
+- [Wrong predictions for Molniya 3-47 orbits](https://github.com/shashwatak/satellite-js/issues/43) are fixed. Special
+thanks to [@nhamer](https://github.com/nhamer).
+
 ### 2.0.1 (2018-03-01)
 
 - `sgp4` function's call result is used in `sgp4init`.

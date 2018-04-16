@@ -3,9 +3,11 @@ import fs from 'fs';
 import glob from 'glob'; // eslint-disable-line
 import prependFile from 'prepend-file'; // eslint-disable-line
 
-const lines = fs.readFileSync('copyright.txt', {
+import packageJson from '../package.json';
+
+const lines = fs.readFileSync('copyright-template.txt', {
   encoding: 'utf8',
-}).split('\n');
+}).replace('{version}', packageJson.version).split('\n');
 
 const args = process.argv.slice(2);
 const pattern = args[0];

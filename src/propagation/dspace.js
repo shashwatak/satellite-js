@@ -245,7 +245,7 @@ export default function dspace(options) {
     nm = xni + (xndt * ft) + (xnddt * ft * ft * 0.5);
     xl = xli + (xldot * ft) + (xndt * ft * ft * 0.5);
     if (irez !== 1) {
-      mm = xl - ((2.0 * nodem) + (2.0 * theta));
+      mm = (xl - (2.0 * nodem)) + (2.0 * theta);
       dndt = nm - no;
     } else {
       mm = (xl - nodem - argpm) + theta;
