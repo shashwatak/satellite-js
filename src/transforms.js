@@ -22,12 +22,12 @@ export function degreesLong(radians) {
   return radiansToDegrees(radians);
 }
 
-export function geodeticToEcf(geodeticCoords) {
+export function geodeticToEcf(geodetic) {
   const {
     longitude,
     latitude,
     height,
-  } = geodeticCoords;
+  } = geodetic;
 
   const a = 6378.137;
   const b = 6356.7523142;
@@ -46,15 +46,15 @@ export function geodeticToEcf(geodeticCoords) {
   };
 }
 
-export function eciToGeodetic(eciCoords, gmst) {
+export function eciToGeodetic(eci, gmst) {
   // http://www.celestrak.com/columns/v02n03/
   const a = 6378.137;
   const b = 6356.7523142;
-  const R = Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y));
+  const R = Math.sqrt((eci.x * eci.x) + (eci.y * eci.y));
   const f = (a - b) / a;
   const e2 = ((2 * f) - (f * f));
 
-  let longitude = Math.atan2(eciCoords.y, eciCoords.x) - gmst;
+  let longitude = Math.atan2(eci.y, eci.x) - gmst;
   while (longitude < -pi) {
     longitude += twoPi;
   }
@@ -65,33 +65,33 @@ export function eciToGeodetic(eciCoords, gmst) {
   const kmax = 20;
   let k = 0;
   let latitude = Math.atan2(
-    eciCoords.z,
-    Math.sqrt((eciCoords.x * eciCoords.x) + (eciCoords.y * eciCoords.y)),
+    eci.z,
+    Math.sqrt((eci.x * eci.x) + (eci.y * eci.y)),
   );
   let C;
   while (k < kmax) {
     C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
-    latitude = Math.atan2(eciCoords.z + (a * C * e2 * Math.sin(latitude)), R);
+    latitude = Math.atan2(eci.z + (a * C * e2 * Math.sin(latitude)), R);
     k += 1;
   }
   const height = (R / Math.cos(latitude)) - (a * C);
   return { longitude, latitude, height };
 }
 
-export function ecfToEci(ecfCoords, gmst) {
+export function ecfToEci(ecf, gmst) {
   // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
   //
   // [X]     [C -S  0][X]
   // [Y]  =  [S  C  0][Y]
   // [Z]eci  [0  0  1][Z]ecf
   //
-  const X = (ecfCoords.x * Math.cos(gmst)) - (ecfCoords.y * Math.sin(gmst));
-  const Y = (ecfCoords.x * (Math.sin(gmst))) + (ecfCoords.y * Math.cos(gmst));
-  const Z = ecfCoords.z;
+  const X = (ecf.x * Math.cos(gmst)) - (ecf.y * Math.sin(gmst));
+  const Y = (ecf.x * (Math.sin(gmst))) + (ecf.y * Math.cos(gmst));
+  const Z = ecf.z;
   return { x: X, y: Y, z: Z };
 }
 
-export function eciToEcf(eciCoords, gmst) {
+export function eciToEcf(eci, gmst) {
   // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
   //
   // [X]     [C -S  0][X]
@@ -104,9 +104,9 @@ export function eciToEcf(eciCoords, gmst) {
   // [Y]  =  [-S C  0][Y]
   // [Z]ecf  [0  0  1][Z]eci
 
-  const x = (eciCoords.x * Math.cos(gmst)) + (eciCoords.y * Math.sin(gmst));
-  const y = (eciCoords.x * (-Math.sin(gmst))) + (eciCoords.y * Math.cos(gmst));
-  const { z } = eciCoords;
+  const x = (eci.x * Math.cos(gmst)) + (eci.y * Math.sin(gmst));
+  const y = (eci.x * (-Math.sin(gmst))) + (eci.y * Math.cos(gmst));
+  const { z } = eci;
 
   return {
     x,
@@ -115,7 +115,7 @@ export function eciToEcf(eciCoords, gmst) {
   };
 }
 
-function topocentric(observerCoords, satelliteCoords) {
+function topocentric(observerGeodetic, satelliteEcf) {
   // http://www.celestrak.com/columns/v02n02/
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
@@ -123,13 +123,13 @@ function topocentric(observerCoords, satelliteCoords) {
   const {
     longitude,
     latitude,
-  } = observerCoords;
+  } = observerGeodetic;
 
-  const observerEcf = geodeticToEcf(observerCoords);
+  const observerEcf = geodeticToEcf(observerGeodetic);
 
-  const rx = satelliteCoords.x - observerEcf.x;
-  const ry = satelliteCoords.y - observerEcf.y;
-  const rz = satelliteCoords.z - observerEcf.z;
+  const rx = satelliteEcf.x - observerEcf.x;
+  const ry = satelliteEcf.y - observerEcf.y;
+  const rz = satelliteEcf.z - observerEcf.z;
 
   const topS =
     ((Math.sin(latitude) * Math.cos(longitude) * rx) +
@@ -168,7 +168,7 @@ function topocentricToLookAngles(tc) {
   };
 }
 
-export function ecfToLookAngles(observerCoordsEcf, satelliteCoordsEcf) {
-  const topocentricCoords = topocentric(observerCoordsEcf, satelliteCoordsEcf);
+export function ecfToLookAngles(observerGeodetic, satelliteEcf) {
+  const topocentricCoords = topocentric(observerGeodetic, satelliteEcf);
   return topocentricToLookAngles(topocentricCoords);
 }
