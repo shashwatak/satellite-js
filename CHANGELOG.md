@@ -2,7 +2,7 @@
 
 ### 2.0.3 (2018-09-15)
 
-- `satrec` object is not cloned in `sgp4` and `sg4init` functions due to performance reasons.
+- `satrec` object is not cloned in `sgp4` and `sgp4init` functions due to [performance reasons](https://github.com/shashwatak/satellite-js/issues/45).
 
 ### 2.0.2 (2018-04-16)
 
