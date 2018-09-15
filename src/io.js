@@ -144,7 +144,7 @@ export default function twoline2satrec(longstr1, longstr2) {
   satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
-  return sgp4init(satrec, {
+  sgp4init(satrec, {
     opsmode,
     satn: satrec.satnum,
     epoch: satrec.jdsatepoch - 2433281.5,
@@ -156,4 +156,6 @@ export default function twoline2satrec(longstr1, longstr2) {
     xno: satrec.no,
     xnodeo: satrec.nodeo,
   });
+
+  return satrec;
 }
