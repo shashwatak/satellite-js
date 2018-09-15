@@ -98,7 +98,7 @@ import dspace from './dspace';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4(satrec, tsince) {
-  const rec = { ...satrec };
+  /* eslint-disable no-param-reassign */
 
   let coseo1;
   let sineo1;
@@ -138,76 +138,76 @@ export default function sgp4(satrec, tsince) {
   const vkmpersec = (earthRadius * xke) / 60.0;
 
   // --------------------- clear sgp4 error flag -----------------
-  rec.t = tsince;
-  rec.error = 0;
+  satrec.t = tsince;
+  satrec.error = 0;
 
   //  ------- update for secular gravity and atmospheric drag -----
-  const xmdf = rec.mo + (rec.mdot * rec.t);
-  const argpdf = rec.argpo + (rec.argpdot * rec.t);
-  const nodedf = rec.nodeo + (rec.nodedot * rec.t);
+  const xmdf = satrec.mo + (satrec.mdot * satrec.t);
+  const argpdf = satrec.argpo + (satrec.argpdot * satrec.t);
+  const nodedf = satrec.nodeo + (satrec.nodedot * satrec.t);
   argpm = argpdf;
   mm = xmdf;
-  const t2 = rec.t * rec.t;
-  nodem = nodedf + (rec.nodecf * t2);
-  tempa = 1.0 - (rec.cc1 * rec.t);
-  tempe = rec.bstar * rec.cc4 * rec.t;
-  templ = rec.t2cof * t2;
+  const t2 = satrec.t * satrec.t;
+  nodem = nodedf + (satrec.nodecf * t2);
+  tempa = 1.0 - (satrec.cc1 * satrec.t);
+  tempe = satrec.bstar * satrec.cc4 * satrec.t;
+  templ = satrec.t2cof * t2;
 
-  if (rec.isimp !== 1) {
-    delomg = rec.omgcof * rec.t;
+  if (satrec.isimp !== 1) {
+    delomg = satrec.omgcof * satrec.t;
     //  sgp4fix use mutliply for speed instead of pow
-    const delmtemp = 1.0 + (rec.eta * Math.cos(xmdf));
-    delm = rec.xmcof * ((delmtemp * delmtemp * delmtemp) - rec.delmo);
+    const delmtemp = 1.0 + (satrec.eta * Math.cos(xmdf));
+    delm = satrec.xmcof * ((delmtemp * delmtemp * delmtemp) - satrec.delmo);
     temp = delomg + delm;
     mm = xmdf + temp;
     argpm = argpdf - temp;
-    t3 = t2 * rec.t;
-    t4 = t3 * rec.t;
-    tempa = tempa - (rec.d2 * t2) - (rec.d3 * t3) - (rec.d4 * t4);
-    tempe += rec.bstar * rec.cc5 * (Math.sin(mm) - rec.sinmao);
-    templ = templ + (rec.t3cof * t3) + (t4 * (rec.t4cof + (rec.t * rec.t5cof)));
+    t3 = t2 * satrec.t;
+    t4 = t3 * satrec.t;
+    tempa = tempa - (satrec.d2 * t2) - (satrec.d3 * t3) - (satrec.d4 * t4);
+    tempe += satrec.bstar * satrec.cc5 * (Math.sin(mm) - satrec.sinmao);
+    templ = templ + (satrec.t3cof * t3) + (t4 * (satrec.t4cof + (satrec.t * satrec.t5cof)));
   }
-  nm = rec.no;
-  let em = rec.ecco;
-  inclm = rec.inclo;
-  if (rec.method === 'd') {
-    tc = rec.t;
+  nm = satrec.no;
+  let em = satrec.ecco;
+  inclm = satrec.inclo;
+  if (satrec.method === 'd') {
+    tc = satrec.t;
 
     const dspaceOptions = {
-      irez: rec.irez,
-      d2201: rec.d2201,
-      d2211: rec.d2211,
-      d3210: rec.d3210,
-      d3222: rec.d3222,
-      d4410: rec.d4410,
-      d4422: rec.d4422,
-      d5220: rec.d5220,
-      d5232: rec.d5232,
-      d5421: rec.d5421,
-      d5433: rec.d5433,
-      dedt: rec.dedt,
-      del1: rec.del1,
-      del2: rec.del2,
-      del3: rec.del3,
-      didt: rec.didt,
-      dmdt: rec.dmdt,
-      dnodt: rec.dnodt,
-      domdt: rec.domdt,
-      argpo: rec.argpo,
-      argpdot: rec.argpdot,
-      t: rec.t,
+      irez: satrec.irez,
+      d2201: satrec.d2201,
+      d2211: satrec.d2211,
+      d3210: satrec.d3210,
+      d3222: satrec.d3222,
+      d4410: satrec.d4410,
+      d4422: satrec.d4422,
+      d5220: satrec.d5220,
+      d5232: satrec.d5232,
+      d5421: satrec.d5421,
+      d5433: satrec.d5433,
+      dedt: satrec.dedt,
+      del1: satrec.del1,
+      del2: satrec.del2,
+      del3: satrec.del3,
+      didt: satrec.didt,
+      dmdt: satrec.dmdt,
+      dnodt: satrec.dnodt,
+      domdt: satrec.domdt,
+      argpo: satrec.argpo,
+      argpdot: satrec.argpdot,
+      t: satrec.t,
       tc,
-      gsto: rec.gsto,
-      xfact: rec.xfact,
-      xlamo: rec.xlamo,
-      no: rec.no,
-      atime: rec.atime,
+      gsto: satrec.gsto,
+      xfact: satrec.xfact,
+      xlamo: satrec.xlamo,
+      no: satrec.no,
+      atime: satrec.atime,
       em,
       argpm,
       inclm,
-      xli: rec.xli,
+      xli: satrec.xli,
       mm,
-      xni: rec.xni,
+      xni: satrec.xni,
       nodem,
       nm,
     };
@@ -226,7 +226,7 @@ export default function sgp4(satrec, tsince) {
 
   if (nm <= 0.0) {
     // printf("// error nm %f\n", nm);
-    rec.error = 2;
+    satrec.error = 2;
     // sgp4fix add return
     return [false, false];
   }
@@ -239,7 +239,7 @@ export default function sgp4(satrec, tsince) {
   // sgp4fix am is fixed from the previous nm check
   if (em >= 1.0 || em < -0.001) { // || (am < 0.95)
     // printf("// error em %f\n", em);
-    rec.error = 1;
+    satrec.error = 1;
     // sgp4fix to return if there is an error in eccentricity
     return [false, false];
   }
@@ -248,7 +248,7 @@ export default function sgp4(satrec, tsince) {
   if (em < 1.0e-6) {
     em = 1.0e-6;
   }
-  mm += rec.no * templ;
+  mm += satrec.no * templ;
   xlm = mm + argpm + nodem;
 
   nodem %= twoPi;
@@ -268,19 +268,19 @@ export default function sgp4(satrec, tsince) {
   mp = mm;
   sinip = sinim;
   cosip = cosim;
-  if (rec.method === 'd') {
+  if (satrec.method === 'd') {
     const dpperParameters = {
-      inclo: rec.inclo,
+      inclo: satrec.inclo,
       init: 'n',
       ep,
       inclp: xincp,
       nodep,
       argpp,
       mp,
-      opsmode: rec.operationmod,
+      opsmode: satrec.operationmod,
     };
 
-    const dpperResult = dpper(rec, dpperParameters);
+    const dpperResult = dpper(satrec, dpperParameters);
 
     ({
       ep,
@@ -298,30 +298,30 @@ export default function sgp4(satrec, tsince) {
     }
     if (ep < 0.0 || ep > 1.0) {
       //  printf("// error ep %f\n", ep);
-      rec.error = 3;
+      satrec.error = 3;
       //  sgp4fix add return
       return [false, false];
     }
   }
 
   //  -------------------- long period periodics ------------------
-  if (rec.method === 'd') {
+  if (satrec.method === 'd') {
     sinip = Math.sin(xincp);
     cosip = Math.cos(xincp);
-    rec.aycof = -0.5 * j3oj2 * sinip;
+    satrec.aycof = -0.5 * j3oj2 * sinip;
 
     //  sgp4fix for divide by zero for xincp = 180 deg
     if (Math.abs(cosip + 1.0) > 1.5e-12) {
-      rec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / (1.0 + cosip);
+      satrec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / (1.0 + cosip);
     } else {
-      rec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / temp4;
+      satrec.xlcof = (-0.25 * j3oj2 * sinip * (3.0 + (5.0 * cosip))) / temp4;
     }
   }
 
   const axnl = ep * Math.cos(argpp);
   temp = 1.0 / (am * (1.0 - (ep * ep)));
-  const aynl = (ep * Math.sin(argpp)) + (temp * rec.aycof);
-  const xl = mp + argpp + nodep + (temp * rec.xlcof * axnl);
+  const aynl = (ep * Math.sin(argpp)) + (temp * satrec.aycof);
+  const xl = mp + argpp + nodep + (temp * satrec.xlcof * axnl);
 
   // --------------------- solve kepler's equation ---------------
   const u = (xl - nodep) % twoPi;
@@ -354,7 +354,7 @@ export default function sgp4(satrec, tsince) {
   const pl = am * (1.0 - el2);
   if (pl < 0.0) {
     //  printf("// error pl %f\n", pl);
-    rec.error = 4;
+    satrec.error = 4;
     //  sgp4fix add return
     return [false, false];
   }
@@ -374,20 +374,20 @@ export default function sgp4(satrec, tsince) {
   const temp2 = temp1 * temp;
 
   // -------------- update for short period periodics ------------
-  if (rec.method === 'd') {
+  if (satrec.method === 'd') {
     cosisq = cosip * cosip;
-    rec.con41 = (3.0 * cosisq) - 1.0;
-    rec.x1mth2 = 1.0 - cosisq;
-    rec.x7thm1 = (7.0 * cosisq) - 1.0;
+    satrec.con41 = (3.0 * cosisq) - 1.0;
+    satrec.x1mth2 = 1.0 - cosisq;
+    satrec.x7thm1 = (7.0 * cosisq) - 1.0;
   }
 
-  const mrt = (rl * (1.0 - (1.5 * temp2 * betal * rec.con41))) +
-    (0.5 * temp1 * rec.x1mth2 * cos2u);
-  su -= 0.25 * temp2 * rec.x7thm1 * sin2u;
+  const mrt = (rl * (1.0 - (1.5 * temp2 * betal * satrec.con41))) +
+    (0.5 * temp1 * satrec.x1mth2 * cos2u);
+  su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;
   const xnode = nodep + (1.5 * temp2 * cosip * sin2u);
   const xinc = xincp + (1.5 * temp2 * cosip * sinip * cos2u);
-  const mvt = rdotl - ((nm * temp1 * rec.x1mth2 * sin2u) / xke);
-  const rvdot = rvdotl + ((nm * temp1 * ((rec.x1mth2 * cos2u) + (1.5 * rec.con41))) / xke);
+  const mvt = rdotl - ((nm * temp1 * satrec.x1mth2 * sin2u) / xke);
+  const rvdot = rvdotl + ((nm * temp1 * ((satrec.x1mth2 * cos2u) + (1.5 * satrec.con41))) / xke);
 
   // --------------------- orientation vectors -------------------
   const sinsu = Math.sin(su);
@@ -420,17 +420,17 @@ export default function sgp4(satrec, tsince) {
   // sgp4fix for decaying satellites
   if (mrt < 1.0) {
     // printf("// decay condition %11.6f \n",mrt);
-    rec.error = 6;
+    satrec.error = 6;
     return {
       position: false,
       velocity: false,
-      satrec: rec,
     };
   }
 
   return {
     position: r,
     velocity: v,
-    satrec: rec,
   };
+
+  /* eslint-enable no-param-reassign */
 }

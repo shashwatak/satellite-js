@@ -1,5 +1,7 @@
 ## Changelog
 
+- `satrec` object is not cloned in `sgp4` and `sg4init` functions due to performance reasons.
+
 ### 2.0.2 (2018-04-16)
 
 - [Wrong predictions for Molniya 3-47 orbits](https://github.com/shashwatak/satellite-js/issues/43) are fixed. Special
