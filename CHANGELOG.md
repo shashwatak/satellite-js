@@ -1,5 +1,7 @@
 ## Changelog
 
+### 2.0.3 (2018-09-15)
+
 - `satrec` object is not cloned in `sgp4` and `sg4init` functions due to performance reasons.
 
 ### 2.0.2 (2018-04-16)
