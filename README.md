@@ -35,6 +35,8 @@ Special thanks to all contributors for improving usability and bug fixes :)
 
 If you want to contribute to the project please read the [Contributing](#contributing) section first.
 
+Sites using the library can be found [here](https://github.com/shashwatak/satellite-js/wiki/Sites-using-satellite.js).
+
 **Start Here:**
 
 - [TS Kelso's Columns for Satellite Times](http://celestrak.com/columns/), Orbital Propagation Parts I and II a must!
@@ -113,6 +115,8 @@ define(['path/to/dist/satellite'], function(satellite) {
     var positionAndVelocity = satellite.sgp4(satrec, time);
 });
 ```
+
+[Here is a repo](https://github.com/solarpatrol/satellite-requirejs) showing basic library usage with Require.js.
 
 ### Script tag
 
