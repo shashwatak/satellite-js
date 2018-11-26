@@ -1,5 +1,7 @@
 ## Changelog
 
+### 3.0.0 (2018-11-26)
+
 - Node.js 4 support is dropped (breaking change).
 - Deprecated functions `gstimeFromJday` and `gstimeFromDate` are removed (breaking change).
 - New transformation functions are added: `radiansToDegrees`, `degreesToRadians`, `radiansLat`, `radiansLong`.
