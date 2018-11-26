@@ -43,8 +43,6 @@ import {
   propagate as propagateEs,
   sgp4 as sgp4Es,
   gstime as gstimeEs,
-  gstimeFromJday as gstimeFromJdayEs,
-  gstimeFromDate as gstimeFromDateEs,
   jday as jdayEs,
   invjday as invjdayEs,
   dopplerFactor as dopplerFactorEs,
@@ -105,17 +103,6 @@ describe('Library export', () => {
       ecfToEciEs.should.equal(ecfToEci);
       ecfToLookAnglesEs.should.equal(ecfToLookAngles);
     });
-
-    it('gstime produces the same output as gstimeFromJday', () => {
-      const now = new Date();
-      const jd = umd.jday(now);
-      gstimeEs(jd).should.equal(gstimeFromJdayEs(jd));
-    });
-
-    it('gstime produces the same output as gstimeFromDate', () => {
-      const now = new Date();
-      gstimeEs(now).should.equal(gstimeFromDateEs(now));
-    });
   });
 
   describe('umd', () => {
@@ -157,17 +144,6 @@ describe('Library export', () => {
       umd.eciToEcf.should.equal(eciToEcf);
       umd.ecfToEci.should.equal(ecfToEci);
       umd.ecfToLookAngles.should.equal(ecfToLookAngles);
-    });
-
-    it('gstime produces the same output as gstimeFromJday', () => {
-      const now = new Date();
-      const jd = umd.jday(now);
-      umd.gstime(jd).should.equal(umd.gstimeFromJday(jd));
-    });
-
-    it('gstime produces the same output as gstimeFromDate', () => {
-      const now = new Date();
-      umd.gstime(now).should.equal(umd.gstimeFromDate(now));
     });
   });
 });

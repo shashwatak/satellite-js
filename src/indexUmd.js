@@ -29,14 +29,6 @@ export default {
   twoline2satrec,
 
   gstime,
-  gstimeFromJday: (...args) => {
-    console.warn('gstimeFromJday is deprecated, use gstime instead.'); // eslint-disable-line no-console
-    return gstime(...args);
-  },
-  gstimeFromDate: (...args) => {
-    console.warn('gstimeFromDate is deprecated, use gstime instead.'); // eslint-disable-line no-console
-    return gstime(...args);
-  },
   jday,
   invjday,
 

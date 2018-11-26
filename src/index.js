@@ -20,16 +20,6 @@ import {
   ecfToLookAngles,
 } from './transforms';
 
-const gstimeFromJday = (...args) => {
-  console.warn('gstimeFromJday is deprecated, use gstime instead.'); // eslint-disable-line no-console
-  return gstime(...args);
-};
-
-const gstimeFromDate = (...args) => {
-  console.warn('gstimeFromDate is deprecated, use gstime instead.'); // eslint-disable-line no-console
-  return gstime(...args);
-};
-
 export {
   constants,
 
@@ -39,8 +29,6 @@ export {
   twoline2satrec,
 
   gstime,
-  gstimeFromJday,
-  gstimeFromDate,
   jday,
   invjday,
 
