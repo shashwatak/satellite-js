@@ -303,9 +303,9 @@ export default function sgp4init(satrec, options) {
     psisq = Math.abs(1.0 - etasq);
     coef = qzms24 * (tsi ** 4.0);
     coef1 = coef / (psisq ** 3.5);
-    cc2 = coef1 * satrec.no * ((ao * (1.0 + (1.5 * etasq) + (eeta * (4.0 + etasq)))) +
-      (((0.375 * j2 * tsi) / psisq) * satrec.con41 *
-        (8.0 + (3.0 * etasq * (8.0 + etasq)))));
+    cc2 = coef1 * satrec.no * ((ao * (1.0 + (1.5 * etasq) + (eeta * (4.0 + etasq))))
+      + (((0.375 * j2 * tsi) / psisq) * satrec.con41
+        * (8.0 + (3.0 * etasq * (8.0 + etasq)))));
     satrec.cc1 = satrec.bstar * cc2;
     cc3 = 0.0;
     if (satrec.ecco > 1.0e-4) {
@@ -313,27 +313,27 @@ export default function sgp4init(satrec, options) {
     }
     satrec.x1mth2 = 1.0 - cosio2;
     satrec.cc4 = 2.0 * satrec.no * coef1 * ao * omeosq * (
-      ((satrec.eta * (2.0 + (0.5 * etasq))) +
-        (satrec.ecco * (0.5 + (2.0 * etasq)))) -
-      (((j2 * tsi) / (ao * psisq)) *
-        ((-3.0 * satrec.con41 * ((1.0 - (2.0 * eeta)) + (etasq * (1.5 - (0.5 * eeta))))) +
-          (0.75 * satrec.x1mth2 *
-            ((2.0 * etasq) - (eeta * (1.0 + etasq))) *
-            Math.cos(2.0 * satrec.argpo))))
+      ((satrec.eta * (2.0 + (0.5 * etasq)))
+        + (satrec.ecco * (0.5 + (2.0 * etasq))))
+      - (((j2 * tsi) / (ao * psisq))
+        * ((-3.0 * satrec.con41 * ((1.0 - (2.0 * eeta)) + (etasq * (1.5 - (0.5 * eeta)))))
+          + (0.75 * satrec.x1mth2
+            * ((2.0 * etasq) - (eeta * (1.0 + etasq)))
+            * Math.cos(2.0 * satrec.argpo))))
     );
     satrec.cc5 = 2.0 * coef1 * ao * omeosq * (1.0 + (2.75 * (etasq + eeta)) + (eeta * etasq));
     cosio4 = cosio2 * cosio2;
     temp1 = 1.5 * j2 * pinvsq * satrec.no;
     temp2 = 0.5 * temp1 * j2 * pinvsq;
     temp3 = -0.46875 * j4 * pinvsq * pinvsq * satrec.no;
-    satrec.mdot = satrec.no + (0.5 * temp1 * rteosq * satrec.con41) +
-      (0.0625 * temp2 * rteosq * ((13.0 - (78.0 * cosio2)) + (137.0 * cosio4)));
-    satrec.argpdot = (-0.5 * temp1 * con42) +
-      (0.0625 * temp2 * ((7.0 - (114.0 * cosio2)) + (395.0 * cosio4))) +
-      (temp3 * ((3.0 - (36.0 * cosio2)) + (49.0 * cosio4)));
+    satrec.mdot = satrec.no + (0.5 * temp1 * rteosq * satrec.con41)
+      + (0.0625 * temp2 * rteosq * ((13.0 - (78.0 * cosio2)) + (137.0 * cosio4)));
+    satrec.argpdot = (-0.5 * temp1 * con42)
+      + (0.0625 * temp2 * ((7.0 - (114.0 * cosio2)) + (395.0 * cosio4)))
+      + (temp3 * ((3.0 - (36.0 * cosio2)) + (49.0 * cosio4)));
     xhdot1 = -temp1 * cosio;
-    satrec.nodedot = xhdot1 + (((0.5 * temp2 * (4.0 - (19.0 * cosio2))) +
-      (2.0 * temp3 * (3.0 - (7.0 * cosio2)))) * cosio);
+    satrec.nodedot = xhdot1 + (((0.5 * temp2 * (4.0 - (19.0 * cosio2)))
+      + (2.0 * temp3 * (3.0 - (7.0 * cosio2)))) * cosio);
     xpidot = satrec.argpdot + satrec.nodedot;
     satrec.omgcof = satrec.bstar * cc3 * Math.cos(satrec.argpo);
     satrec.xmcof = 0.0;
@@ -630,13 +630,13 @@ export default function sgp4init(satrec, options) {
       satrec.d3 = ((17.0 * ao) + sfour) * temp;
       satrec.d4 = 0.5 * temp * ao * tsi * ((221.0 * ao) + (31.0 * sfour)) * satrec.cc1;
       satrec.t3cof = satrec.d2 + (2.0 * cc1sq);
-      satrec.t4cof = 0.25 * ((3.0 * satrec.d3) +
-        (satrec.cc1 * ((12.0 * satrec.d2) + (10.0 * cc1sq))));
+      satrec.t4cof = 0.25 * ((3.0 * satrec.d3)
+        + (satrec.cc1 * ((12.0 * satrec.d2) + (10.0 * cc1sq))));
       satrec.t5cof = 0.2 * (
-        (3.0 * satrec.d4) +
-        (12.0 * satrec.cc1 * satrec.d3) +
-        (6.0 * satrec.d2 * satrec.d2) +
-        (15.0 * cc1sq * ((2.0 * satrec.d2) + cc1sq))
+        (3.0 * satrec.d4)
+        + (12.0 * satrec.cc1 * satrec.d3)
+        + (6.0 * satrec.d2 * satrec.d2)
+        + (15.0 * cc1sq * ((2.0 * satrec.d2) + cc1sq))
       );
     }
 

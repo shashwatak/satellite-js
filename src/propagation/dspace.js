@@ -185,44 +185,40 @@ export default function dspace(options) {
       //  ------------------- dot terms calculated -------------
       //  ----------- near - synchronous resonance terms -------
       if (irez !== 2) {
-        xndt =
-          (del1 * Math.sin(xli - fasx2)) +
-          (del2 * Math.sin(2.0 * (xli - fasx4))) +
-          (del3 * Math.sin(3.0 * (xli - fasx6)));
+        xndt = (del1 * Math.sin(xli - fasx2))
+          + (del2 * Math.sin(2.0 * (xli - fasx4)))
+          + (del3 * Math.sin(3.0 * (xli - fasx6)));
         xldot = xni + xfact;
-        xnddt =
-          (del1 * Math.cos(xli - fasx2)) +
-          (2.0 * del2 * Math.cos(2.0 * (xli - fasx4))) +
-          (3.0 * del3 * Math.cos(3.0 * (xli - fasx6)));
+        xnddt = (del1 * Math.cos(xli - fasx2))
+          + (2.0 * del2 * Math.cos(2.0 * (xli - fasx4)))
+          + (3.0 * del3 * Math.cos(3.0 * (xli - fasx6)));
         xnddt *= xldot;
       } else {
         // --------- near - half-day resonance terms --------
         xomi = argpo + (argpdot * atime);
         x2omi = xomi + xomi;
         x2li = xli + xli;
-        xndt =
-          (d2201 * Math.sin((x2omi + xli) - g22)) +
-          (d2211 * Math.sin(xli - g22)) +
-          (d3210 * Math.sin((xomi + xli) - g32)) +
-          (d3222 * Math.sin((-xomi + xli) - g32)) +
-          (d4410 * Math.sin((x2omi + x2li) - g44)) +
-          (d4422 * Math.sin(x2li - g44)) +
-          (d5220 * Math.sin((xomi + xli) - g52)) +
-          (d5232 * Math.sin((-xomi + xli) - g52)) +
-          (d5421 * Math.sin((xomi + x2li) - g54)) +
-          (d5433 * Math.sin((-xomi + x2li) - g54));
+        xndt = (d2201 * Math.sin((x2omi + xli) - g22))
+          + (d2211 * Math.sin(xli - g22))
+          + (d3210 * Math.sin((xomi + xli) - g32))
+          + (d3222 * Math.sin((-xomi + xli) - g32))
+          + (d4410 * Math.sin((x2omi + x2li) - g44))
+          + (d4422 * Math.sin(x2li - g44))
+          + (d5220 * Math.sin((xomi + xli) - g52))
+          + (d5232 * Math.sin((-xomi + xli) - g52))
+          + (d5421 * Math.sin((xomi + x2li) - g54))
+          + (d5433 * Math.sin((-xomi + x2li) - g54));
         xldot = xni + xfact;
-        xnddt =
-          (d2201 * Math.cos((x2omi + xli) - g22)) +
-          (d2211 * Math.cos(xli - g22)) +
-          (d3210 * Math.cos((xomi + xli) - g32)) +
-          (d3222 * Math.cos((-xomi + xli) - g32)) +
-          (d5220 * Math.cos((xomi + xli) - g52)) +
-          (d5232 * Math.cos((-xomi + xli) - g52)) +
-          (2.0 * d4410 * Math.cos((x2omi + x2li) - g44)) +
-          (d4422 * Math.cos(x2li - g44)) +
-          (d5421 * Math.cos((xomi + x2li) - g54)) +
-          (d5433 * Math.cos((-xomi + x2li) - g54));
+        xnddt = (d2201 * Math.cos((x2omi + xli) - g22))
+          + (d2211 * Math.cos(xli - g22))
+          + (d3210 * Math.cos((xomi + xli) - g32))
+          + (d3222 * Math.cos((-xomi + xli) - g32))
+          + (d5220 * Math.cos((xomi + xli) - g52))
+          + (d5232 * Math.cos((-xomi + xli) - g52))
+          + (2.0 * d4410 * Math.cos((x2omi + x2li) - g44))
+          + (d4422 * Math.cos(x2li - g44))
+          + (d5421 * Math.cos((xomi + x2li) - g54))
+          + (d5433 * Math.cos((-xomi + x2li) - g54));
         xnddt *= xldot;
       }
 

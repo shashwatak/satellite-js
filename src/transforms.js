@@ -150,19 +150,16 @@ function topocentric(observerGeodetic, satelliteEcf) {
   const ry = satelliteEcf.y - observerEcf.y;
   const rz = satelliteEcf.z - observerEcf.z;
 
-  const topS =
-    ((Math.sin(latitude) * Math.cos(longitude) * rx) +
-      (Math.sin(latitude) * Math.sin(longitude) * ry)) -
-    (Math.cos(latitude) * rz);
+  const topS = ((Math.sin(latitude) * Math.cos(longitude) * rx)
+      + (Math.sin(latitude) * Math.sin(longitude) * ry))
+    - (Math.cos(latitude) * rz);
 
-  const topE =
-    (-Math.sin(longitude) * rx) +
-    (Math.cos(longitude) * ry);
+  const topE = (-Math.sin(longitude) * rx)
+    + (Math.cos(longitude) * ry);
 
-  const topZ =
-    (Math.cos(latitude) * Math.cos(longitude) * rx) +
-    (Math.cos(latitude) * Math.sin(longitude) * ry) +
-    (Math.sin(latitude) * rz);
+  const topZ = (Math.cos(latitude) * Math.cos(longitude) * rx)
+    + (Math.cos(latitude) * Math.sin(longitude) * ry)
+    + (Math.sin(latitude) * rz);
 
   return { topS, topE, topZ };
 }

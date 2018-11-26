@@ -12,11 +12,13 @@ export default {
     babel({
       babelrc: false,
       presets: [
-        ['env', { modules: false }],
-        'stage-3',
+        ['@babel/preset-env', { modules: false }],
       ],
       plugins: [
-        'external-helpers',
+        '@babel/plugin-syntax-dynamic-import',
+        '@babel/plugin-syntax-import-meta',
+        ['@babel/plugin-proposal-class-properties', { loose: false }],
+        '@babel/plugin-proposal-json-strings',
       ],
       exclude: 'node_modules/**',
     }),

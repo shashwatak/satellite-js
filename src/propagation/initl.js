@@ -84,8 +84,8 @@ export default function initl(options) {
   const ak = ((xke / no) ** x2o3);
   const d1 = (0.75 * j2 * ((3.0 * cosio2) - 1.0)) / (rteosq * omeosq);
   let delPrime = d1 / (ak * ak);
-  const adel = ak * (1.0 - (delPrime * delPrime) -
-    (delPrime * ((1.0 / 3.0) + ((134.0 * delPrime * delPrime) / 81.0))));
+  const adel = ak * (1.0 - (delPrime * delPrime)
+    - (delPrime * ((1.0 / 3.0) + ((134.0 * delPrime * delPrime) / 81.0))));
   delPrime = d1 / (adel * adel);
   no /= (1.0 + delPrime);
 
