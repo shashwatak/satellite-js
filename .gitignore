@@ -5,3 +5,5 @@
 /lib
 /sgp4_verification/lib/sgp4
 *.log
+package-lock.json
+
