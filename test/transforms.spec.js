@@ -4,6 +4,8 @@ import chai from 'chai';
 import {
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
@@ -30,11 +32,17 @@ describe('Latitude & longitude conversions', () => {
     it(`convert valid latitude value (${item.radians} radians) to degrees`, () => {
       (degreesLat(item.radians)).should.be.closeTo(item.degrees, epsilon);
     });
+    it(`convert valid latitude value (${item.degrees} degrees) to radians`, () => {
+      (radiansLat(item.degrees)).should.be.closeTo(item.radians, epsilon);
+    });
   });
 
   validLongitudes.forEach((item) => {
     it(`convert valid longitude value (${item.radians} radians) to degrees`, () => {
       (degreesLong(item.radians)).should.be.closeTo(item.degrees, epsilon);
+    });
+    it(`convert valid longitude value (${item.degrees} degrees) to radians`, () => {
+      (radiansLong(item.degrees)).should.be.closeTo(item.radians, epsilon);
     });
   });
 
@@ -42,11 +50,17 @@ describe('Latitude & longitude conversions', () => {
     it(`convert invalid latitude value (${item.radians} radians) to degrees`, () => {
       (() => degreesLat(item.radians)).should.throw(RangeError);
     });
+    it(`convert invalid latitude value (${item.degrees} degrees) to radians`, () => {
+      (() => radiansLat(item.degrees)).should.throw(RangeError);
+    });
   });
 
   invalidLongitudes.forEach((item) => {
     it(`convert invalid longitude value (${item.radians} radians) to degrees`, () => {
       (() => degreesLong(item.radians)).should.throw(RangeError);
+    });
+    it(`convert invalid longitude value (${item.degrees} degrees) to radians`, () => {
+      (() => radiansLong(item.degrees)).should.throw(RangeError);
     });
   });
 });

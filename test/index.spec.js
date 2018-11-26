@@ -24,8 +24,12 @@ import { propagate, sgp4, gstime } from '../src/propagation';
 import dopplerFactor from '../src/dopplerFactor';
 
 import {
+  radiansToDegrees,
+  degreesToRadians,
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
@@ -44,8 +48,12 @@ import {
   jday as jdayEs,
   invjday as invjdayEs,
   dopplerFactor as dopplerFactorEs,
+  radiansToDegrees as radiansToDegreesEs,
+  degreesToRadians as degreesToRadiansEs,
   degreesLat as degreesLatEs,
   degreesLong as degreesLongEs,
+  radiansLat as radiansLatEs,
+  radiansLong as radiansLongEs,
   geodeticToEcf as geodeticToEcfEs,
   eciToGeodetic as eciToGeodeticEs,
   eciToEcf as eciToEcfEs,
@@ -85,8 +93,12 @@ describe('Library export', () => {
     it('dopplerFactor', () => dopplerFactorEs.should.equal(dopplerFactor));
 
     it('transforms', () => {
+      radiansToDegreesEs.should.equal(radiansToDegrees);
+      degreesToRadiansEs.should.equal(degreesToRadians);
       degreesLatEs.should.equal(degreesLat);
       degreesLongEs.should.equal(degreesLong);
+      radiansLatEs.should.equal(radiansLat);
+      radiansLongEs.should.equal(radiansLong);
       geodeticToEcfEs.should.equal(geodeticToEcf);
       eciToGeodeticEs.should.equal(eciToGeodetic);
       eciToEcfEs.should.equal(eciToEcf);
@@ -134,8 +146,12 @@ describe('Library export', () => {
     it('dopplerFactor', () => umd.dopplerFactor.should.equal(dopplerFactor));
 
     it('transforms', () => {
+      umd.radiansToDegrees.should.equal(radiansToDegrees);
+      umd.degreesToRadians.should.equal(degreesToRadians);
       umd.degreesLat.should.equal(degreesLat);
       umd.degreesLong.should.equal(degreesLong);
+      umd.radiansLat.should.equal(radiansLat);
+      umd.radiansLong.should.equal(radiansLong);
       umd.geodeticToEcf.should.equal(geodeticToEcf);
       umd.eciToGeodetic.should.equal(eciToGeodetic);
       umd.eciToEcf.should.equal(eciToEcf);

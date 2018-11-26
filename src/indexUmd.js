@@ -7,8 +7,12 @@ import { propagate, sgp4, gstime } from './propagation';
 import dopplerFactor from './dopplerFactor';
 
 import {
+  radiansToDegrees,
+  degreesToRadians,
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
@@ -39,8 +43,12 @@ export default {
   dopplerFactor,
 
   // Coordinate transforms
+  radiansToDegrees,
+  degreesToRadians,
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
