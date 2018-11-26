@@ -24,8 +24,12 @@ import { propagate, sgp4, gstime } from '../src/propagation';
 import dopplerFactor from '../src/dopplerFactor';
 
 import {
+  radiansToDegrees,
+  degreesToRadians,
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
@@ -39,13 +43,15 @@ import {
   propagate as propagateEs,
   sgp4 as sgp4Es,
   gstime as gstimeEs,
-  gstimeFromJday as gstimeFromJdayEs,
-  gstimeFromDate as gstimeFromDateEs,
   jday as jdayEs,
   invjday as invjdayEs,
   dopplerFactor as dopplerFactorEs,
+  radiansToDegrees as radiansToDegreesEs,
+  degreesToRadians as degreesToRadiansEs,
   degreesLat as degreesLatEs,
   degreesLong as degreesLongEs,
+  radiansLat as radiansLatEs,
+  radiansLong as radiansLongEs,
   geodeticToEcf as geodeticToEcfEs,
   eciToGeodetic as eciToGeodeticEs,
   eciToEcf as eciToEcfEs,
@@ -85,24 +91,17 @@ describe('Library export', () => {
     it('dopplerFactor', () => dopplerFactorEs.should.equal(dopplerFactor));
 
     it('transforms', () => {
+      radiansToDegreesEs.should.equal(radiansToDegrees);
+      degreesToRadiansEs.should.equal(degreesToRadians);
       degreesLatEs.should.equal(degreesLat);
       degreesLongEs.should.equal(degreesLong);
+      radiansLatEs.should.equal(radiansLat);
+      radiansLongEs.should.equal(radiansLong);
       geodeticToEcfEs.should.equal(geodeticToEcf);
       eciToGeodeticEs.should.equal(eciToGeodetic);
       eciToEcfEs.should.equal(eciToEcf);
       ecfToEciEs.should.equal(ecfToEci);
       ecfToLookAnglesEs.should.equal(ecfToLookAngles);
-    });
-
-    it('gstime produces the same output as gstimeFromJday', () => {
-      const now = new Date();
-      const jd = umd.jday(now);
-      gstimeEs(jd).should.equal(gstimeFromJdayEs(jd));
-    });
-
-    it('gstime produces the same output as gstimeFromDate', () => {
-      const now = new Date();
-      gstimeEs(now).should.equal(gstimeFromDateEs(now));
     });
   });
 
@@ -134,24 +133,17 @@ describe('Library export', () => {
     it('dopplerFactor', () => umd.dopplerFactor.should.equal(dopplerFactor));
 
     it('transforms', () => {
+      umd.radiansToDegrees.should.equal(radiansToDegrees);
+      umd.degreesToRadians.should.equal(degreesToRadians);
       umd.degreesLat.should.equal(degreesLat);
       umd.degreesLong.should.equal(degreesLong);
+      umd.radiansLat.should.equal(radiansLat);
+      umd.radiansLong.should.equal(radiansLong);
       umd.geodeticToEcf.should.equal(geodeticToEcf);
       umd.eciToGeodetic.should.equal(eciToGeodetic);
       umd.eciToEcf.should.equal(eciToEcf);
       umd.ecfToEci.should.equal(ecfToEci);
       umd.ecfToLookAngles.should.equal(ecfToLookAngles);
-    });
-
-    it('gstime produces the same output as gstimeFromJday', () => {
-      const now = new Date();
-      const jd = umd.jday(now);
-      umd.gstime(jd).should.equal(umd.gstimeFromJday(jd));
-    });
-
-    it('gstime produces the same output as gstimeFromDate', () => {
-      const now = new Date();
-      umd.gstime(now).should.equal(umd.gstimeFromDate(now));
     });
   });
 });

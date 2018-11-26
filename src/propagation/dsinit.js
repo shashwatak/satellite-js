@@ -318,14 +318,14 @@ export default function dsinit(options) {
       f441 = 35.0 * sini2 * f220;
       f442 = 39.3750 * sini2 * sini2;
 
-      f522 = 9.84375 * sinim * ((sini2 * (1.0 - (2.0 * cosim) - (5.0 * cosisq))) +
-        (0.33333333 * (-2.0 + (4.0 * cosim) + (6.0 * cosisq))));
-      f523 = sinim * ((4.92187512 * sini2 * ((-2.0 - (4.0 * cosim)) + (10.0 * cosisq))) +
-        (6.56250012 * ((1.0 + (2.0 * cosim)) - (3.0 * cosisq))));
-      f542 = 29.53125 * sinim * ((2.0 - (8.0 * cosim)) +
-        (cosisq * (-12.0 + (8.0 * cosim) + (10.0 * cosisq))));
-      f543 = 29.53125 * sinim * ((-2.0 - (8.0 * cosim)) +
-        (cosisq * ((12.0 + (8.0 * cosim)) - (10.0 * cosisq))));
+      f522 = 9.84375 * sinim * ((sini2 * (1.0 - (2.0 * cosim) - (5.0 * cosisq)))
+        + (0.33333333 * (-2.0 + (4.0 * cosim) + (6.0 * cosisq))));
+      f523 = sinim * ((4.92187512 * sini2 * ((-2.0 - (4.0 * cosim)) + (10.0 * cosisq)))
+        + (6.56250012 * ((1.0 + (2.0 * cosim)) - (3.0 * cosisq))));
+      f542 = 29.53125 * sinim * ((2.0 - (8.0 * cosim))
+        + (cosisq * (-12.0 + (8.0 * cosim) + (10.0 * cosisq))));
+      f543 = 29.53125 * sinim * ((-2.0 - (8.0 * cosim))
+        + (cosisq * ((12.0 + (8.0 * cosim)) - (10.0 * cosisq))));
 
       xno2 = nm * nm;
       ainv2 = aonv * aonv;

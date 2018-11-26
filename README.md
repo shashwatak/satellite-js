@@ -26,6 +26,7 @@ Special thanks to all contributors for improving usability and bug fixes :)
 - [davidcalhoun (David Calhoun)](https://github.com/davidcalhoun)
 - [tikhonovits (Nikos Sagias)](https://github.com/tikhonovits)
 - [dangodev (Drew Powers)](https://github.com/dangodev)
+- [thkruz (Theodore Kruczek)](https://github.com/thkruz)
 - [bakercp (Christopher Baker)](https://github.com/bakercp)
 - [drom (Aliaksei Chapyzhenka)](https://github.com/drom)
 - [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
@@ -34,6 +35,8 @@ Special thanks to all contributors for improving usability and bug fixes :)
 - [Zigone](https://github.com/Zigone)
 
 If you want to contribute to the project please read the [Contributing](#contributing) section first.
+
+Sites using the library can be found [here](https://github.com/shashwatak/satellite-js/wiki/Sites-using-satellite.js).
 
 **Start Here:**
 
@@ -113,6 +116,8 @@ define(['path/to/dist/satellite'], function(satellite) {
     var positionAndVelocity = satellite.sgp4(satrec, time);
 });
 ```
+
+[Here is a repo](https://github.com/solarpatrol/satellite-requirejs) showing basic library usage with Require.js.
 
 ### Script tag
 

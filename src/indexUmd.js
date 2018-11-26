@@ -7,8 +7,12 @@ import { propagate, sgp4, gstime } from './propagation';
 import dopplerFactor from './dopplerFactor';
 
 import {
+  radiansToDegrees,
+  degreesToRadians,
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
@@ -25,22 +29,18 @@ export default {
   twoline2satrec,
 
   gstime,
-  gstimeFromJday: (...args) => {
-    console.warn('gstimeFromJday is deprecated, use gstime instead.'); // eslint-disable-line no-console
-    return gstime(...args);
-  },
-  gstimeFromDate: (...args) => {
-    console.warn('gstimeFromDate is deprecated, use gstime instead.'); // eslint-disable-line no-console
-    return gstime(...args);
-  },
   jday,
   invjday,
 
   dopplerFactor,
 
   // Coordinate transforms
+  radiansToDegrees,
+  degreesToRadians,
   degreesLat,
   degreesLong,
+  radiansLat,
+  radiansLong,
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,

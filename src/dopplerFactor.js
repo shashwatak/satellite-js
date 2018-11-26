@@ -1,8 +1,8 @@
 export default function dopplerFactor(location, position, velocity) {
   const currentRange = Math.sqrt(
-    ((position.x - location.x) ** 2) +
-    ((position.y - location.y) ** 2) +
-    ((position.z - location.z) ** 2));
+    ((position.x - location.x) ** 2)
+    + ((position.y - location.y) ** 2)
+    + ((position.z - location.z) ** 2));
 
   const nextPos = {
     x: position.x + velocity.x,
@@ -11,9 +11,9 @@ export default function dopplerFactor(location, position, velocity) {
   };
 
   const nextRange = Math.sqrt(
-    ((nextPos.x - location.x) ** 2) +
-    ((nextPos.y - location.y) ** 2) +
-    ((nextPos.z - location.z) ** 2));
+    ((nextPos.x - location.x) ** 2)
+    + ((nextPos.y - location.y) ** 2)
+    + ((nextPos.z - location.z) ** 2));
 
   let rangeRate = nextRange - currentRange;
 

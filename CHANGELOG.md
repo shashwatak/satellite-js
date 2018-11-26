@@ -1,8 +1,14 @@
 ## Changelog
 
+### 3.0.0 (2018-11-26)
+
+- Node.js 4 support is dropped (breaking change).
+- Deprecated functions `gstimeFromJday` and `gstimeFromDate` are removed (breaking change).
+- New transformation functions are added: `radiansToDegrees`, `degreesToRadians`, `radiansLat`, `radiansLong`.
+
 ### 2.0.3 (2018-09-15)
 
-- `satrec` object is not cloned in `sgp4` and `sg4init` functions due to performance reasons.
+- `satrec` object is not cloned in `sgp4` and `sgp4init` functions due to [performance reasons](https://github.com/shashwatak/satellite-js/issues/45).
 
 ### 2.0.2 (2018-04-16)
 

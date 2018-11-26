@@ -381,8 +381,8 @@ export default function sgp4(satrec, tsince) {
     satrec.x7thm1 = (7.0 * cosisq) - 1.0;
   }
 
-  const mrt = (rl * (1.0 - (1.5 * temp2 * betal * satrec.con41))) +
-    (0.5 * temp1 * satrec.x1mth2 * cos2u);
+  const mrt = (rl * (1.0 - (1.5 * temp2 * betal * satrec.con41)))
+    + (0.5 * temp1 * satrec.x1mth2 * cos2u);
   su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;
   const xnode = nodep + (1.5 * temp2 * cosip * sin2u);
   const xinc = xincp + (1.5 * temp2 * cosip * sinip * cos2u);

@@ -2,10 +2,15 @@ import {
   pi,
   twoPi,
   rad2deg,
+  deg2rad,
 } from './constants';
 
-function radiansToDegrees(radians) {
+export function radiansToDegrees(radians) {
   return radians * rad2deg;
+}
+
+export function degreesToRadians(degrees) {
+  return degrees * deg2rad;
 }
 
 export function degreesLat(radians) {
@@ -20,6 +25,20 @@ export function degreesLong(radians) {
     throw new RangeError('Longitude radians must be in range [-pi; pi].');
   }
   return radiansToDegrees(radians);
+}
+
+export function radiansLat(degrees) {
+  if (degrees < -90 || degrees > 90) {
+    throw new RangeError('Latitude degrees must be in range [-90; 90].');
+  }
+  return degreesToRadians(degrees);
+}
+
+export function radiansLong(degrees) {
+  if (degrees < -180 || degrees > 180) {
+    throw new RangeError('Longitude degrees must be in range [-180; 180].');
+  }
+  return degreesToRadians(degrees);
 }
 
 export function geodeticToEcf(geodetic) {
@@ -131,19 +150,16 @@ function topocentric(observerGeodetic, satelliteEcf) {
   const ry = satelliteEcf.y - observerEcf.y;
   const rz = satelliteEcf.z - observerEcf.z;
 
-  const topS =
-    ((Math.sin(latitude) * Math.cos(longitude) * rx) +
-      (Math.sin(latitude) * Math.sin(longitude) * ry)) -
-    (Math.cos(latitude) * rz);
+  const topS = ((Math.sin(latitude) * Math.cos(longitude) * rx)
+      + (Math.sin(latitude) * Math.sin(longitude) * ry))
+    - (Math.cos(latitude) * rz);
 
-  const topE =
-    (-Math.sin(longitude) * rx) +
-    (Math.cos(longitude) * ry);
+  const topE = (-Math.sin(longitude) * rx)
+    + (Math.cos(longitude) * ry);
 
-  const topZ =
-    (Math.cos(latitude) * Math.cos(longitude) * rx) +
-    (Math.cos(latitude) * Math.sin(longitude) * ry) +
-    (Math.sin(latitude) * rz);
+  const topZ = (Math.cos(latitude) * Math.cos(longitude) * rx)
+    + (Math.cos(latitude) * Math.sin(longitude) * ry)
+    + (Math.sin(latitude) * rz);
 
   return { topS, topE, topZ };
 }
