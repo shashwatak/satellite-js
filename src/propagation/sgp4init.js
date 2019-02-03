@@ -275,7 +275,7 @@ export default function sgp4init(satrec, options) {
 
   if (omeosq >= 0.0 || satrec.no >= 0.0) {
     satrec.isimp = 0;
-    if ((rp < 220.0 / earthRadius) + 1.0) {
+    if (rp < (220.0 / earthRadius + 1.0)) {
       satrec.isimp = 1;
     }
     sfour = ss;
