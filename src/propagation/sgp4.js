@@ -277,7 +277,7 @@ export default function sgp4(satrec, tsince) {
       nodep,
       argpp,
       mp,
-      opsmode: satrec.operationmod,
+      opsmode: satrec.operationmode,
     };
 
     const dpperResult = dpper(satrec, dpperParameters);
