@@ -156,8 +156,8 @@ var positionEci = positionAndVelocity.position,
 
 // Set the Observer at 122.03 West by 36.96 North, in RADIANS
 var observerGd = {
-    longitude: -122.0308 * deg2rad,
-    latitude: 36.9613422 * deg2rad,
+    longitude: satellite.degreesToRadians(-122.0308),
+    latitude: satellite.degreesToRadians(36.9613422),
     height: 0.370
 };
 

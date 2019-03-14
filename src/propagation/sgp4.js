@@ -3,6 +3,7 @@ import {
   twoPi,
   earthRadius,
   xke,
+  vkmpersec,
   j2,
   j3oj2,
   x2o3,
@@ -134,8 +135,6 @@ export default function sgp4(satrec, tsince) {
   // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
 
   const temp4 = 1.5e-12;
-
-  const vkmpersec = (earthRadius * xke) / 60.0;
 
   // --------------------- clear sgp4 error flag -----------------
   satrec.t = tsince;
@@ -277,7 +276,7 @@ export default function sgp4(satrec, tsince) {
       nodep,
       argpp,
       mp,
-      opsmode: satrec.operationmod,
+      opsmode: satrec.operationmode,
     };
 
     const dpperResult = dpper(satrec, dpperParameters);
@@ -383,6 +382,17 @@ export default function sgp4(satrec, tsince) {
 
   const mrt = (rl * (1.0 - (1.5 * temp2 * betal * satrec.con41)))
     + (0.5 * temp1 * satrec.x1mth2 * cos2u);
+
+  // sgp4fix for decaying satellites
+  if (mrt < 1.0) {
+    // printf("// decay condition %11.6f \n",mrt);
+    satrec.error = 6;
+    return {
+      position: false,
+      velocity: false,
+    };
+  }
+
   su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;
   const xnode = nodep + (1.5 * temp2 * cosip * sin2u);
   const xinc = xincp + (1.5 * temp2 * cosip * sinip * cos2u);
@@ -416,16 +426,6 @@ export default function sgp4(satrec, tsince) {
     y: ((mvt * uy) + (rvdot * vy)) * vkmpersec,
     z: ((mvt * uz) + (rvdot * vz)) * vkmpersec,
   };
-
-  // sgp4fix for decaying satellites
-  if (mrt < 1.0) {
-    // printf("// decay condition %11.6f \n",mrt);
-    satrec.error = 6;
-    return {
-      position: false,
-      velocity: false,
-    };
-  }
 
   return {
     position: r,
