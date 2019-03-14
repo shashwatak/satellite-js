@@ -3,6 +3,7 @@ import {
   twoPi,
   earthRadius,
   xke,
+  vkmpersec,
   j2,
   j3oj2,
   x2o3,
@@ -134,8 +135,6 @@ export default function sgp4(satrec, tsince) {
   // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
 
   const temp4 = 1.5e-12;
-
-  const vkmpersec = (earthRadius * xke) / 60.0;
 
   // --------------------- clear sgp4 error flag -----------------
   satrec.t = tsince;

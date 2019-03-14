@@ -9,6 +9,7 @@ import {
   mu,
   earthRadius,
   xke,
+  vkmpersec,
   tumin,
   j2,
   j3,
@@ -74,6 +75,7 @@ describe('Library export', () => {
       constantsEs.mu.should.equal(mu);
       constantsEs.earthRadius.should.equal(earthRadius);
       constantsEs.xke.should.equal(xke);
+      constantsEs.vkmpersec.should.equal(vkmpersec);
       constantsEs.tumin.should.equal(tumin);
       constantsEs.j2.should.equal(j2);
       constantsEs.j3.should.equal(j3);
@@ -116,6 +118,7 @@ describe('Library export', () => {
       constants.mu.should.equal(mu);
       constants.earthRadius.should.equal(earthRadius);
       constants.xke.should.equal(xke);
+      constants.vkmpersec.should.equal(vkmpersec);
       constants.tumin.should.equal(tumin);
       constants.j2.should.equal(j2);
       constants.j3.should.equal(j3);
