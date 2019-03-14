@@ -9,6 +9,7 @@
 .eslintrc.json
 .npmignore
 .travis.yml
+copyright-template.txt
 rollup.*
 yarn.lock
 *.log
