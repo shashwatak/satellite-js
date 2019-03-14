@@ -1,5 +1,7 @@
 ## Changelog
 
+### 3.0.1 (2019-03-14)
+
 - Unnecessary calculations in `sgp4` function are reduced (#47).
 - `vkmpersec` calculation is moved to constants (#50). 
 - `degreesToRadians` function is used in docs instead of `deg2rad` constant (#53).
