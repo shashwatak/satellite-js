@@ -1,5 +1,10 @@
 ## Changelog
 
+- Unnecessary calculations in `sgp4` function are reduced (#47).
+- `vkmpersec` calculation is moved to constants (#50). 
+- `degreesToRadians` function is used in docs instead of `deg2rad` constant (#53).
+- Typos' fixes (#54).
+
 ### 3.0.0 (2018-11-26)
 
 - Node.js 4 support is dropped (breaking change).
