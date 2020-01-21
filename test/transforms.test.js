@@ -1,5 +1,3 @@
-import chai from 'chai';
-
 /* eslint-disable */
 import {
   degreesLat,
@@ -16,9 +14,7 @@ import {
 
 import transformData from './transforms.json';
 
-chai.should();
-
-const epsilon = 1e-6;
+const numDigits = 6;
 
 describe('Latitude & longitude conversions', () => {
   const {
@@ -30,37 +26,37 @@ describe('Latitude & longitude conversions', () => {
 
   validLatitudes.forEach((item) => {
     it(`convert valid latitude value (${item.radians} radians) to degrees`, () => {
-      (degreesLat(item.radians)).should.be.closeTo(item.degrees, epsilon);
+      expect(degreesLat(item.radians)).toBeCloseTo(item.degrees, numDigits);
     });
     it(`convert valid latitude value (${item.degrees} degrees) to radians`, () => {
-      (radiansLat(item.degrees)).should.be.closeTo(item.radians, epsilon);
+      expect(radiansLat(item.degrees)).toBeCloseTo(item.radians, numDigits);
     });
   });
 
   validLongitudes.forEach((item) => {
     it(`convert valid longitude value (${item.radians} radians) to degrees`, () => {
-      (degreesLong(item.radians)).should.be.closeTo(item.degrees, epsilon);
+      expect(degreesLong(item.radians)).toBeCloseTo(item.degrees, numDigits);
     });
     it(`convert valid longitude value (${item.degrees} degrees) to radians`, () => {
-      (radiansLong(item.degrees)).should.be.closeTo(item.radians, epsilon);
+      expect(radiansLong(item.degrees)).toBeCloseTo(item.radians, numDigits);
     });
   });
 
   invalidLatitudes.forEach((item) => {
     it(`convert invalid latitude value (${item.radians} radians) to degrees`, () => {
-      (() => degreesLat(item.radians)).should.throw(RangeError);
+      expect(() => degreesLat(item.radians)).toThrowError(RangeError);
     });
     it(`convert invalid latitude value (${item.degrees} degrees) to radians`, () => {
-      (() => radiansLat(item.degrees)).should.throw(RangeError);
+      expect(() => radiansLat(item.degrees)).toThrowError(RangeError);
     });
   });
 
   invalidLongitudes.forEach((item) => {
     it(`convert invalid longitude value (${item.radians} radians) to degrees`, () => {
-      (() => degreesLong(item.radians)).should.throw(RangeError);
+      expect(() => degreesLong(item.radians)).toThrowError(RangeError);
     });
     it(`convert invalid longitude value (${item.degrees} degrees) to radians`, () => {
-      (() => radiansLong(item.degrees)).should.throw(RangeError);
+      expect(() => radiansLong(item.degrees)).toThrowError(RangeError);
     });
   });
 });

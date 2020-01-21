@@ -1,17 +1,13 @@
-import chai from 'chai';
+import '../ext.test';
 
-import '../ext.spec';
-
-import compareVectors from '../compareVectors';
+import { compareVectors } from '../helpers';
 
 import twoline2satrec from '../../src/io';
 import sgp4 from '../../src/propagation/sgp4';
 
 import sgp4Data from './sgp4.json';
 
-chai.should();
-
-const epsilon = 1e-6;
+const numDigits = 6;
 
 describe('SGP4', () => {
   sgp4Data.forEach((sgp4DataItem, i) => {
@@ -23,11 +19,11 @@ describe('SGP4', () => {
         const sgp4Result = sgp4(satrec, expected.time);
 
         if (expected.position) {
-          compareVectors(sgp4Result.position, expected.position, epsilon);
+          compareVectors(sgp4Result.position, expected.position, numDigits);
         }
 
         if (expected.velocity) {
-          compareVectors(sgp4Result.velocity, expected.velocity, epsilon);
+          compareVectors(sgp4Result.velocity, expected.velocity, numDigits);
         }
       });
     });
