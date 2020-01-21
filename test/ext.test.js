@@ -1,4 +1,4 @@
-import { compareVectors } from './helpers';
+import compareVectors from './compareVectors';
 
 import {
   jday,

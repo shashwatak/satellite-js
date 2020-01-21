@@ -1,4 +1,4 @@
-export function compareVectors(vector1, vector2, numDigits) {
+export default function compareVectors(vector1, vector2, numDigits) {
   if (!numDigits) {
     expect(vector1.x).toEqual(vector2.x);
     expect(vector1.y).toEqual(vector2.y);

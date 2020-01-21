@@ -1,6 +1,6 @@
 import '../ext.test';
 
-import { compareVectors } from '../helpers';
+import compareVectors from '../compareVectors';
 
 import twoline2satrec from '../../src/io';
 import sgp4 from '../../src/propagation/sgp4';
