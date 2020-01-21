@@ -137,8 +137,8 @@ var positionAndVelocity = satellite.sgp4(satrec, time);
     
 ```js
 // Sample TLE
-var tleLine1 = '1 25544U 98067A   13149.87225694  .00009369  00000-0  16828-3 0  9031',
-    tleLine2 = '2 25544 051.6485 199.1576 0010128 012.7275 352.5669 15.50581403831869';
+var tleLine1 = '1 25544U 98067A   19156.50900463  .00003075  00000-0  59442-4 0  9992',
+    tleLine2 = '2 25544  51.6433  59.2583 0008217  16.4489 347.6017 15.51174618173442';    
 
 // Initialize a satellite record
 var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
