@@ -1,5 +1,7 @@
 ## Changelog
 
+- Dependencies are upgraded.
+
 ### 3.0.1 (2019-03-14)
 
 - Unnecessary calculations in `sgp4` function are reduced (#47).
