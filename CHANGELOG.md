@@ -1,5 +1,6 @@
 ## Changelog
 
+- Support for Node.12 is added. Support for Node.js 6 and 8 is dropped.
 - Dependencies are upgraded.
 
 ### 3.0.1 (2019-03-14)
