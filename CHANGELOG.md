@@ -1,5 +1,7 @@
 ## Changelog
 
+### 4.0.0 (2020-01-21)
+
 - Node.js 12 support is added. Node.js 6 and Node.js 8 support is dropped (breaking change).
 - Mocha, Chai and Istanbul are replaced by [Jest](https://jestjs.io/).
 - Dependencies are upgraded.
