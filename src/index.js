@@ -18,6 +18,7 @@ import {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
+  eciVelocityToKms,
 } from './transforms';
 
 export {
@@ -46,4 +47,5 @@ export {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
+  eciVelocityToKms,
 };

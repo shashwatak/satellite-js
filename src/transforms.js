@@ -188,3 +188,10 @@ export function ecfToLookAngles(observerGeodetic, satelliteEcf) {
   const topocentricCoords = topocentric(observerGeodetic, satelliteEcf);
   return topocentricToLookAngles(topocentricCoords);
 }
+
+// converts ECI velocity to a single value in km/s
+export function eciVelocityToKms(velocity) {
+  return Math.sqrt(
+    Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2) + Math.pow(velocity.z, 2)
+  );
+}
