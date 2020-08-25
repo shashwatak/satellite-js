@@ -1,5 +1,9 @@
 ## Changelog
 
+### 4.0.1 (2020-08-25)
+
+- TypeScript support is added via new TypeScript definitions file.
+
 ### 4.0.0 (2020-01-21)
 
 - Node.js 12 support is added. Node.js 6 and Node.js 8 support is dropped (breaking change).
@@ -9,7 +13,7 @@
 ### 3.0.1 (2019-03-14)
 
 - Unnecessary calculations in `sgp4` function are reduced (#47).
-- `vkmpersec` calculation is moved to constants (#50). 
+- `vkmpersec` calculation is moved to constants (#50).
 - `degreesToRadians` function is used in docs instead of `deg2rad` constant (#53).
 - Typos' fixes (#54).
 

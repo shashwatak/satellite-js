@@ -4,6 +4,7 @@
   "description": "SGP4/SDP4 calculation library",
   "main": "lib/index.js",
   "jsnext:main": "dist/satellite.es.js",
+  "types": "types/index.d.ts",
   "module": "dist/satellite.es.js",
   "scripts": {
     "build": "rimraf lib dist && npm run transpile && npm run dist",
