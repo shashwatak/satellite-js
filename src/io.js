@@ -116,7 +116,6 @@ export default function twoline2satrec(longstr1, longstr2) {
   satrec.alta = (satrec.a * (1.0 + satrec.ecco)) - 1.0;
   satrec.altp = (satrec.a * (1.0 - satrec.ecco)) - 1.0;
 
-
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set
   // remember that sgp4 uses units of days from 0 jan 1950 (sgp4epoch)
