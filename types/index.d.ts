@@ -144,10 +144,24 @@ declare module 'satellite.js' {
   export type GMSTime = number;
 
   /**
-   * Convert a date time to GMST
-   * @param date Time to convert
+   * Convert values to GMST. Accepts either a Date object, a Julian date number, or individual date and time
+   * component values. If individual values are specified, all but `msec` are required.
+   * @param dateYearArg Can be a Date, Julian date, or the year number for
+   * @param month Zero-based month number
+   * @param day Day of month
+   * @param hour Hour of day, based on 24 hour clock
+   * @param minute Minute(s)
+   * @param second Second(s)
+   * @param msec Optional milliseconds
    */
-  export function gstime(date: Date): GMSTime;
+  export function gstime(
+      dateYearArg: number | Date,
+      month?: number,
+      day?: number,
+      hour?: number,
+      minute?: number,
+      second?: number,
+      msec?: number): GMSTime;
 
   /**
    * Convert ECI to ECF. Units are not modified.
@@ -188,12 +202,12 @@ declare module 'satellite.js' {
   ): number;
 
   /**
-   * Convert the longitude in RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W", etc).
+   * Convert the longitude in RADIANS to DEGREES.
    */
-  export function degreesLong(longitude: Radians): string;
+  export function degreesLong(longitude: Radians): number;
 
   /**
-   * Convert the latitude in RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W", etc).
+   * Convert the latitude in RADIANS to DEGREES.
    */
-  export function degreesLat(latitude: Radians): string;
+  export function degreesLat(latitude: Radians): number;
 }

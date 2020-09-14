@@ -188,9 +188,9 @@ var longitude = positionGd.longitude,
     latitude  = positionGd.latitude,
     height    = positionGd.height;
 
-//  Convert the RADIANS to DEGREES for pretty printing (appends "N", "S", "E", "W", etc).
-var longitudeStr = satellite.degreesLong(longitude),
-    latitudeStr  = satellite.degreesLat(latitude);
+//  Convert the RADIANS to DEGREES.
+var longitudeDeg = satellite.degreesLong(longitude),
+    latitudeDeg  = satellite.degreesLat(latitude);
 ```
     
 ## Contributing
