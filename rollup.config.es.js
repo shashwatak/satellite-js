@@ -1,4 +1,4 @@
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 
 export default {
   input: 'src/index.js',
@@ -11,6 +11,7 @@ export default {
   plugins: [
     babel({
       babelrc: false,
+      babelHelpers: 'bundled',
       presets: [
         ['@babel/preset-env', { modules: false }],
       ],
