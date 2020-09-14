@@ -8,6 +8,7 @@ const external = Object.keys(globals);
 
 const babelOptions = {
   babelrc: false,
+  babelHelpers: 'bundled',
   presets: [
     ['@babel/preset-env', { modules: false }],
   ],
