@@ -1,8 +1,7 @@
 ## Changelog
 
-### 4.0.1 (2020-08-25)
-
-- TypeScript support is added via new TypeScript definitions file.
+- TypeScript support is added via new TypeScript definitions file (#71).
+- Rollup and some other dependencies are upgraded.
 
 ### 4.0.0 (2020-01-21)
 

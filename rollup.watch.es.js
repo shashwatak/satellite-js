@@ -8,14 +8,12 @@ config.watch = {
 };
 
 const watcher = watch(config);
-watcher.on('event', event => {
+watcher.on('event', (event) => {
   if (event.code === 'START') {
     console.log('Rebuilding package...');
-  }
-  else if (event.code === 'END') {
+  } else if (event.code === 'END') {
     console.log('Package is rebuilt.');
-  }
-  else if (event.code === 'FATAL') {
+  } else if (event.code === 'FATAL') {
     console.log('Fatal error is occurred.');
   }
 });

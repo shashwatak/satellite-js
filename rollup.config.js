@@ -1,6 +1,5 @@
-import babel from 'rollup-plugin-babel';
-import { uglify } from 'rollup-plugin-uglify';
-import { minify } from 'uglify-es';
+import babel from '@rollup/plugin-babel';
+import { terser } from 'rollup-plugin-terser';
 
 const { NODE_ENV } = process.env;
 
@@ -16,7 +15,7 @@ const babelOptions = {
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-syntax-import-meta',
     ['@babel/plugin-proposal-class-properties', { loose: false }],
-    '@babel/plugin-proposal-json-strings'
+    '@babel/plugin-proposal-json-strings',
   ],
   exclude: 'node_modules/**',
 };
@@ -26,7 +25,7 @@ const plugins = [
 ];
 
 if (NODE_ENV === 'production') {
-  plugins.push(uglify({}, minify));
+  plugins.push(terser());
 }
 
 export default {
