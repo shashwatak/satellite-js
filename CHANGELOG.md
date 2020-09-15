@@ -1,6 +1,6 @@
 ## Changelog
 
-### 4.1.1 (2020-09-14)
+### 4.1.1 (2020-09-15)
 
 - Fix TypeScript definition for `gstime` (#73).
 - Fix documentation and TypeScript definition for `degreesLong` and `degreesLat` (#74).
