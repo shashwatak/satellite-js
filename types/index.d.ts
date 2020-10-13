@@ -55,6 +55,10 @@ declare module 'satellite.js' {
      * Mean motion in radians per minute.
      */
     no: number;
+    /**
+     * Error code indicating propagation failure type.
+     */
+    error: number;
   }
 
   /**
@@ -95,10 +99,11 @@ declare module 'satellite.js' {
   /**
    * The position_velocity result is a key-value pair of ECI coordinates.
    * These are the base results from which all other coordinates are derived.
+   * If there is an error the position and velocity will be false.
    */
   export interface PositionAndVelocity {
-    position: EciVec3<Kilometer>;
-    velocity: EciVec3<KilometerPerSecond>;
+    position: EciVec3<Kilometer>|boolean;
+    velocity: EciVec3<KilometerPerSecond>|boolean;
   }
 
   /**
