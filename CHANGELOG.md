@@ -1,5 +1,10 @@
 ## Changelog
 
+### 4.1.2 (2020-10-13)
+
+- Expose `error` in TypeScript definition of `SatRec`.
+- Fix TypeScript definition for `PositionAndVelocity` to allow error handling.
+
 ### 4.1.1 (2020-09-15)
 
 - Fix TypeScript definition for `gstime` (#73).
