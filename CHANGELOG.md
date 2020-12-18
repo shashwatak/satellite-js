@@ -1,5 +1,9 @@
 ## Changelog
 
+### 4.1.3 (2020-10-22)
+
+- Fixed calculation of Doppler effect (`dopplerFactor`).
+
 ### 4.1.2 (2020-10-13)
 
 - Expose `error` in TypeScript definition of `SatRec`.
