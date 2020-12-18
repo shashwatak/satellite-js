@@ -225,7 +225,23 @@ npm run lint:test
 Implementing new functions or features, please, if possible, provide tests to cover them and mention your works in
 [Changelog](CHANGELOG.md). Please don't change version number in `package.json` and don't add it to `CHANGELOG.md`.
 All these things should be done later with [raise-version](https://github.com/ezze/node-raise-version) when
-merging to `master`.
+merging to `master`:
+
+```bash
+npm run raise major
+```
+
+or
+
+```bash
+npm run raise minor
+```
+
+or
+
+```bash
+npm run raise patch
+```
 
 In order to get test code coverage run the following:
 
