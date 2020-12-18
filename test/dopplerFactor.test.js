@@ -4,7 +4,7 @@ const earthRadius = 6378.137;
 const sincos45deg = Math.sqrt(2) / 2;
 
 describe('Doppler factor', () => {
-  it('without doppler factor', () => {
+  it('without observer movement', () => {
     // North Pole
     const observerEcf = {
       x: 0,
@@ -20,6 +20,26 @@ describe('Doppler factor', () => {
     const velocityEcf = {
       x: 7.91,
       y: 0,
+      z: 0,
+    };
+    const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
+    expect(dopFactor).toEqual(1);
+  });
+
+  it('movement of observer is not affected', () => {
+    const observerEcf = {
+      x: earthRadius,
+      y: 0,
+      z: 0,
+    };
+    const positionEcf = {
+      x: earthRadius + 500,
+      y: 0,
+      z: 0,
+    };
+    const velocityEcf = {
+      x: 0,
+      y: 7.91,
       z: 0,
     };
     const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
