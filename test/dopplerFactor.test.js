@@ -1,5 +1,7 @@
 import dopplerFactor from '../src/dopplerFactor'; // eslint-disable-line
 
+const numDigits = 8;
+
 const earthRadius = 6378.137;
 const sincos45deg = Math.sqrt(2) / 2;
 
@@ -23,7 +25,7 @@ describe('Doppler factor', () => {
       z: 0,
     };
     const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
-    expect(dopFactor).toEqual(1);
+    expect(dopFactor).toBeCloseTo(1, numDigits);
   });
 
   it('movement of observer is not affected', () => {
@@ -43,7 +45,7 @@ describe('Doppler factor', () => {
       z: 0,
     };
     const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
-    expect(dopFactor).toEqual(1);
+    expect(dopFactor).toBeCloseTo(1, numDigits);
   });
 
   it('special case', () => {
@@ -63,6 +65,6 @@ describe('Doppler factor', () => {
       z: 0,
     };
     const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
-    expect(dopFactor).toEqual(1.0000107847789212);
+    expect(dopFactor).toBeCloseTo(1.0000107847789212, numDigits);
   });
 });
