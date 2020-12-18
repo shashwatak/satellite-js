@@ -32,6 +32,7 @@ Special thanks to all contributors for improving usability and bug fixes :)
 - [iamthechad (Chad Johnston)](https://github.com/iamthechad)
 - [drom (Aliaksei Chapyzhenka)](https://github.com/drom)
 - [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
+- [Alesha72003](https://github.com/Alesha72003)
 - [nhamer](https://github.com/nhamer)
 - [owntheweb](https://github.com/owntheweb)
 - [Zigone](https://github.com/Zigone)
@@ -221,8 +222,10 @@ npm run lint
 npm run lint:test
 ```
 
-Implementing new functions or features, please, if possible, provide tests to cover them and mention your works
-in [Changelog](CHANGELOG.md).
+Implementing new functions or features, please, if possible, provide tests to cover them and mention your works in
+[Changelog](CHANGELOG.md). Please don't change version number in `package.json` and don't add it to `CHANGELOG.md`.
+All these things should be done later with [raise-version](https://github.com/ezze/node-raise-version) when
+merging to `master`.
 
 In order to get test code coverage run the following:
 

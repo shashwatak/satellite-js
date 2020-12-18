@@ -1,0 +1,20 @@
+{
+  "changelog": {
+    "enabled": true,
+    "path": "CHANGELOG.md",
+    "encoding": "utf-8",
+    "prefix": "##",
+    "bullet": "-"
+  },
+  "git": {
+    "enabled": true,
+    "release": "master",
+    "development": "develop",
+    "remote": "origin",
+    "commit": true,
+    "merge": true,
+    "all": false,
+    "tag": true,
+    "push": false
+  }
+}
