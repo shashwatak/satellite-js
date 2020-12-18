@@ -1,27 +1,25 @@
 export default function dopplerFactor(location, position, velocity) {
-  const currentRange = Math.sqrt(
-    ((position.x - location.x) ** 2)
-    + ((position.y - location.y) ** 2)
-    + ((position.z - location.z) ** 2));
+  const mfactor = 7.292115E-5;
+  const c = 299792.458; // Speed of light in km/s
 
-  const nextPos = {
-    x: position.x + velocity.x,
-    y: position.y + velocity.y,
-    z: position.z + velocity.z,
+  const range = {
+    x: position.x - location.x,
+    y: position.y - location.y,
+    z: position.z - location.z,
   };
+  range.w = Math.sqrt(range.x ** 2 + range.y ** 2 + range.z ** 2);
 
-  const nextRange = Math.sqrt(
-    ((nextPos.x - location.x) ** 2)
-    + ((nextPos.y - location.y) ** 2)
-    + ((nextPos.z - location.z) ** 2));
-
-  let rangeRate = nextRange - currentRange;
+  const rangeVel = {
+    x: velocity.x + mfactor * location.y,
+    y: velocity.y - mfactor * location.x,
+    z: velocity.z,
+  };
 
   function sign(value) {
     return value >= 0 ? 1 : -1;
   }
 
-  rangeRate *= sign(rangeRate);
-  const c = 299792.458; // Speed of light in km/s
-  return (1 + (rangeRate / c));
+  const rangeRate = (range.x * rangeVel.x + range.y * rangeVel.y + range.z * rangeVel.z) / range.w;
+
+  return (1 + (rangeRate / c) * sign(rangeRate));
 }
