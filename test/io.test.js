@@ -1,7 +1,14 @@
 import twoline2satrec from '../src/io'; // eslint-disable-line
+import badTleData from './io.json';
 
 describe('Twoline', () => {
   it('twoline to satellite record', () => {
-    // TODO:
+    badTleData.forEach((tleDataItem, i) => {   
+      const satrec = twoline2satrec(tleDataItem.tleLine1, tleDataItem.tleLine2);
+      tleDataItem.results.forEach((expected) => {
+        // Fetching satellite record from incorrectly formatted TLE lines
+        expect(satrec.error).toEqual(expected.error);
+      });
+    });
   });
 });
