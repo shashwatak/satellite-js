@@ -66,8 +66,7 @@ import sgp4init from './propagation/sgp4init';
  * to the algorithm.  If you want to turn some of these off and go
  * back into "afspc" mode, then set `afspc_mode` to `True`.
  */
-export default function twoline2satrec(longstr1, longstr2) {
-  const opsmode = 'i';
+export default function twoline2satrec(longstr1, longstr2, opsmode = 'i') {  
   const xpdotp = 1440.0 / (2.0 * pi); // 229.1831180523293;
   let year = 0;
 
