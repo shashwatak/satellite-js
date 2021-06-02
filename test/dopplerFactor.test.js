@@ -1,4 +1,4 @@
-import dopplerFactor from '../src/dopplerFactor'; // eslint-disable-line
+import dopplerFactor from "../src/dopplerFactor"; // eslint-disable-line
 
 const numDigits = 8;
 
@@ -66,5 +66,27 @@ describe('Doppler factor', () => {
     };
     const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
     expect(dopFactor).toBeCloseTo(1.0000107847789212, numDigits);
+  });
+
+  it('calculated from a negative range rate', () => {
+    // North Pole
+    const observerEcf = {
+      x: -500,
+      y: 0,
+      z: earthRadius + 500,
+    };
+    const positionEcf = {
+      x: 500,
+      y: 0,
+      z: earthRadius,
+    };
+    // Escape velocity
+    const velocityEcf = {
+      x: -7.91,
+      y: -3.12,
+      z: 0,
+    };
+    const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
+    expect(dopFactor).toBeCloseTo(1.0000235993898179, numDigits);
   });
 });
