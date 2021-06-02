@@ -1,4 +1,4 @@
-import initl from "../../src/propagation/initl"; // eslint-disable-line
+import initl from '../../src/propagation/initl';
 
 describe('Propagator Initialization', () => {
   it('Legacy Sidereal Time Calculations', () => {

@@ -1,4 +1,4 @@
-import twoline2satrec from '../src/io'; // eslint-disable-line
+import twoline2satrec from '../src/io';
 import badTleData from './io.json';
 
 describe('Twoline', () => {

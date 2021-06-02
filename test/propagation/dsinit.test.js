@@ -1,4 +1,4 @@
-import dsinit from "../../src/propagation/dsinit"; // eslint-disable-line
+import dsinit from '../../src/propagation/dsinit';
 import dsOptionSets from './dsinit.json';
 
 describe('Initialize Resonance Terms', () => {

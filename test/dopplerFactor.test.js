@@ -1,4 +1,4 @@
-import dopplerFactor from "../src/dopplerFactor"; // eslint-disable-line
+import dopplerFactor from '../src/dopplerFactor';
 
 const numDigits = 8;
 
