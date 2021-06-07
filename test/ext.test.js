@@ -1,9 +1,6 @@
 import compareVectors from './compareVectors';
 
-import {
-  jday,
-  invjday,
-} from '../src/ext';
+import { jday, invjday } from '../src/ext';
 import twoline2satrec from '../src/io';
 import { propagate, gstime } from '../src/propagation';
 
@@ -15,15 +12,17 @@ describe('Julian date / time', () => {
 
   describe('jday & invjday', () => {
     it('gives the same result with different arguments describing the same time', () => {
-      expect(jday(now)).toEqual(jday(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1,
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds(),
-        now.getUTCMilliseconds(),
-      ));
+      expect(jday(now)).toEqual(
+        jday(
+          now.getUTCFullYear(),
+          now.getUTCMonth() + 1,
+          now.getUTCDate(),
+          now.getUTCHours(),
+          now.getUTCMinutes(),
+          now.getUTCSeconds(),
+          now.getUTCMilliseconds(),
+        ),
+      );
     });
 
     it('outputs different results when milliseconds are passed', () => {
@@ -89,21 +88,23 @@ describe('Julian date / time', () => {
 
     it('date to jday and inverse conversion', () => {
       const jd = jday(now);
-      const expected = ((now.getTime() - now.getMilliseconds()) / 1000);
+      const expected = (now.getTime() - now.getMilliseconds()) / 1000;
       expect(invjday(jd).getTime() / 1000).toEqual(expected);
     });
   });
 
   it('gstime gives the same result with different arguments describing the same time', () => {
-    expect(gstime(now)).toEqual(gstime(
-      now.getUTCFullYear(),
-      now.getUTCMonth() + 1,
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-      now.getUTCMilliseconds(),
-    ));
+    expect(gstime(now)).toEqual(
+      gstime(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        now.getUTCMilliseconds(),
+      ),
+    );
   });
 
   it('propagation gives the same result with different arguments describing the same time', () => {
