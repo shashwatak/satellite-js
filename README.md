@@ -209,7 +209,7 @@ git merge origin/develop
 git checkout -b my-feature
 ```
 
-Make sure that your changes don't brake the existing code by running
+Make sure that your changes don't break the existing code by running
 
 ```bash
 npm test
