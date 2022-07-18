@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.4 (2022-07-18)
+
+- TypeScript definition for `ecfToEci` function is added. 
+
 ## 4.1.3 (2020-12-18)
 
 - Fixed calculation of Doppler effect (`dopplerFactor`).

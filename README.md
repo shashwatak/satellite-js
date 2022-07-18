@@ -209,7 +209,7 @@ git merge origin/develop
 git checkout -b my-feature
 ```
 
-Make sure that your changes don't brake the existing code by running
+Make sure that your changes don't break the existing code by running
 
 ```bash
 npm test
@@ -300,6 +300,14 @@ These is a full list of all available NPM scripts:
     ```
     COVERALLS_REPO_TOKEN=<token> npm run test:coveralls
     ```
+
+## ES5 and satellite.min.js
+
+Some people are confused that they can't just download a single satellite.js or satellite.min.js file. That is because satellite.js is not written in plain old JavaScript (ES5) anymore but ported to latter JavaScript versions ES6+.
+
+Only the "src" directory is included in the Git repository, "dist" and "lib" directories are ignored. It's done intentionally to retain the size of the repository as small as possible. A full detailed explanation of why is located [here](https://github.com/shashwatak/satellite-js/issues/80#issuecomment-749225324).
+
+You should install satellite.js with your package manager (npm or yarn) and then find satellite.js and satellite.min.js in node_modules/satellite.js/dist directory.
 
 ## TODO
 

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   degreesLat,
   degreesLong,
@@ -8,10 +7,9 @@ import {
   eciToGeodetic,
   eciToEcf,
   ecfToEci,
-  ecfToLookAngles
+  ecfToLookAngles,
 } from '../src/transforms';
-/* eslint-enable */
-
+import compareVectors from './compareVectors';
 import transformData from './transforms.json';
 
 const numDigits = 6;
@@ -20,6 +18,11 @@ describe('Latitude & longitude conversions', () => {
   const {
     validLatitudes,
     validLongitudes,
+    validGeodeticToEcf,
+    validEciToGeodetic,
+    validEciToEcf,
+    validEcfToEci,
+    validEcfToLookangles,
     invalidLatitudes,
     invalidLongitudes,
   } = transformData;
@@ -39,6 +42,45 @@ describe('Latitude & longitude conversions', () => {
     });
     it(`convert valid longitude value (${item.degrees} degrees) to radians`, () => {
       expect(radiansLong(item.degrees)).toBeCloseTo(item.radians, numDigits);
+    });
+  });
+
+  validGeodeticToEcf.forEach((item) => {
+    it('convert valid LLA coordinates to ECF', () => {
+      const ecfCoordinates = geodeticToEcf(item.lla);
+      compareVectors(ecfCoordinates, item.ecf, 8);
+    });
+  });
+
+  validEciToGeodetic.forEach((item) => {
+    it('convert valid ECI coordinates to LLA', () => {
+      const llaCoordinates = eciToGeodetic(item.eci, item.gmst);
+      expect(llaCoordinates.longitude).toBeCloseTo(item.lla.longitude);
+      expect(llaCoordinates.latitude).toBeCloseTo(item.lla.latitude);
+      expect(llaCoordinates.height).toBeCloseTo(item.lla.height);
+    });
+  });
+
+  validEciToEcf.forEach((item) => {
+    it('convert valid ECI coordinates to ECF', () => {
+      const ecfCoordinates = eciToEcf(item.eci, item.gmst);
+      compareVectors(ecfCoordinates, item.ecf, 8);
+    });
+  });
+
+  validEcfToEci.forEach((item) => {
+    it('convert valid ECF coordinates to ECI', () => {
+      const eciCoordinates = ecfToEci(item.ecf, item.gmst);
+      compareVectors(eciCoordinates, item.eci, 8);
+    });
+  });
+
+  validEcfToLookangles.forEach((item) => {
+    it('convert valid ECF coordinates to RAE', () => {
+      const raeCoordinates = ecfToLookAngles(item.lla, item.satelliteEcf);
+      expect(raeCoordinates.rangeSat).toBeCloseTo(item.rae.rangeSat);
+      expect(raeCoordinates.azimuth).toBeCloseTo(item.rae.azimuth);
+      expect(raeCoordinates.elevation).toBeCloseTo(item.rae.elevation);
     });
   });
 
