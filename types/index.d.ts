@@ -174,6 +174,11 @@ declare module 'satellite.js' {
   export function eciToEcf<T>(positionEci: EciVec3<T>, gmst: GMSTime): EcfVec3<T>;
 
   /**
+   * Convert ECF to ECI. Units are not modified.
+   */
+  export function ecfToEci<T>(positionEcf: EcfVec3<T>, gmst: GMSTime): EciVec3<T>;
+
+  /**
    * Convert geodetic location to ECF
    */
   export function geodeticToEcf(observerGd: GeodeticLocation): EcfVec3<Kilometer>;
