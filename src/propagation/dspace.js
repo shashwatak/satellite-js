@@ -215,10 +215,10 @@ export default function dspace(options) {
           + (d3222 * Math.cos((-xomi + xli) - g32))
           + (d5220 * Math.cos((xomi + xli) - g52))
           + (d5232 * Math.cos((-xomi + xli) - g52))
-          + (2.0 * d4410 * Math.cos((x2omi + x2li) - g44))
+          + (2.0 * (d4410 * Math.cos((x2omi + x2li) - g44))
           + (d4422 * Math.cos(x2li - g44))
           + (d5421 * Math.cos((xomi + x2li) - g54))
-          + (d5433 * Math.cos((-xomi + x2li) - g54));
+          + (d5433 * Math.cos((-xomi + x2li) - g54)));
         xnddt *= xldot;
       }
 
