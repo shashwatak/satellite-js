@@ -1,5 +1,7 @@
 # Changelog
 
+## 5.0.0 (2023-01-06)
+
 - Errors in calculations are fixed, WGS72 is used instead of WGS84 (#107).
 - Dependencies are upgraded.
 
