@@ -109,9 +109,9 @@ export default function initl(options) {
     const tfrac = ts70 - ds70;
 
     //  find greenwich location at epoch
-    const c1 = 1.72027916940703639e-2;
-    const thgr70 = 1.7321343856509374;
-    const fk5r = 5.07551419432269442e-15;
+    const c1 = 1.72027916940703639e-2; // eslint-disable-line no-loss-of-precision
+    const thgr70 = 1.7321343856509374; // eslint-disable-line no-loss-of-precision
+    const fk5r = 5.07551419432269442e-15; // eslint-disable-line no-loss-of-precision
     const c1p2p = c1 + twoPi;
     gsto = (thgr70 + (c1 * ds70) + (c1p2p * tfrac) + (ts70 * ts70 * fk5r)) % twoPi;
     if (gsto < 0.0) {

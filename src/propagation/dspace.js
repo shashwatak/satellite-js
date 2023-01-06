@@ -123,6 +123,7 @@ export default function dspace(options) {
   const g44 = 1.8014998;
   const g52 = 1.0508330;
   const g54 = 4.4108898;
+  // eslint-disable-next-line no-loss-of-precision
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const stepp = 720.0;
   const stepn = -720.0;
@@ -215,10 +216,10 @@ export default function dspace(options) {
           + (d3222 * Math.cos((-xomi + xli) - g32))
           + (d5220 * Math.cos((xomi + xli) - g52))
           + (d5232 * Math.cos((-xomi + xli) - g52))
-          + (2.0 * d4410 * Math.cos((x2omi + x2li) - g44))
+          + 2.0 * ((d4410 * Math.cos((x2omi + x2li) - g44))
           + (d4422 * Math.cos(x2li - g44))
           + (d5421 * Math.cos((xomi + x2li) - g54))
-          + (d5433 * Math.cos((-xomi + x2li) - g54));
+          + (d5433 * Math.cos((-xomi + x2li) - g54)));
         xnddt *= xldot;
       }
 

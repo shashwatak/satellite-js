@@ -201,6 +201,7 @@ export default function dsinit(options) {
   const root22 = 1.7891679e-6;
   const root44 = 7.3636953e-9;
   const root54 = 2.1765803e-9;
+  // eslint-disable-next-line no-loss-of-precision
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const root32 = 3.7393792e-7;
   const root52 = 1.1428639e-7;
