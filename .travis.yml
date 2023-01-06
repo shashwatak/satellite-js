@@ -1,11 +1,9 @@
 language: node_js
 node_js:
-  - "15"
+  - "19"
+  - "18"
+  - "16"
   - "14"
-  - "13"
-  - "12"
-  - "11"
-  - "10"
 branches:
   only:
     - master
