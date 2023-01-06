@@ -1,6 +1,7 @@
 # Changelog
 
 - Errors in calculations are fixed, WGS72 is used instead of WGS84 (#107).
+- Dependencies are upgraded.
 
 ## 4.1.4 (2022-07-18)
 
