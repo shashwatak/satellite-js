@@ -1,13 +1,6 @@
-import {
-  pi,
-  tumin,
-  deg2rad,
-} from './constants';
+import { pi, deg2rad } from './constants';
 
-import {
-  jday,
-  days2mdhms,
-} from './ext';
+import { jday, days2mdhms } from './ext';
 
 import sgp4init from './propagation/sgp4init';
 
@@ -80,13 +73,16 @@ export default function twoline2satrec(longstr1, longstr2) {
   satrec.epochdays = parseFloat(longstr1.substring(20, 32));
   satrec.ndot = parseFloat(longstr1.substring(33, 43));
   satrec.nddot = parseFloat(
-    `.${parseInt(longstr1.substring(44, 50), 10)
-    }E${longstr1.substring(50, 52)}`,
+    `.${parseInt(longstr1.substring(44, 50), 10)}E${longstr1.substring(
+      50,
+      52,
+    )}`,
   );
   satrec.bstar = parseFloat(
-    `${longstr1.substring(53, 54)
-    }.${parseInt(longstr1.substring(54, 59), 10)
-    }E${longstr1.substring(59, 61)}`,
+    `${longstr1.substring(53, 54)}.${parseInt(
+      longstr1.substring(54, 59),
+      10,
+    )}E${longstr1.substring(59, 61)}`,
   );
 
   // satrec.satnum = longstr2.substring(2, 7);
@@ -103,18 +99,14 @@ export default function twoline2satrec(longstr1, longstr2) {
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
   // ---- convert to sgp4 units ----
-  satrec.a = ((satrec.no * tumin) ** (-2.0 / 3.0));
-  satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
-  satrec.nddot /= (xpdotp * 1440.0 * 1440);
+  // satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
+  // satrec.nddot /= (xpdotp * 1440.0 * 1440);
 
   // ---- find standard orbital elements ----
   satrec.inclo *= deg2rad;
   satrec.nodeo *= deg2rad;
   satrec.argpo *= deg2rad;
   satrec.mo *= deg2rad;
-
-  satrec.alta = (satrec.a * (1.0 + satrec.ecco)) - 1.0;
-  satrec.altp = (satrec.a * (1.0 - satrec.ecco)) - 1.0;
 
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set
@@ -134,11 +126,7 @@ export default function twoline2satrec(longstr1, longstr2) {
   const mdhmsResult = days2mdhms(year, satrec.epochdays);
 
   const {
-    mon,
-    day,
-    hr,
-    minute,
-    sec,
+    mon, day, hr, minute, sec,
   } = mdhmsResult;
   satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 

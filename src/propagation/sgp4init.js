@@ -5,6 +5,7 @@ import {
   j4,
   j3oj2,
   x2o3,
+  tumin,
 } from '../constants';
 
 import dpper from './dpper';
@@ -262,6 +263,9 @@ export default function sgp4init(satrec, options) {
   satrec.no = initlResult.no;
   satrec.con41 = initlResult.con41;
   satrec.gsto = initlResult.gsto;
+  satrec.a = (satrec.no * tumin) ** (-2.0 / 3.0);
+  satrec.alta = satrec.a * (1.0 + satrec.ecco) - 1.0;
+  satrec.altp = satrec.a * (1.0 - satrec.ecco) - 1.0;
   satrec.error = 0;
 
   // sgp4fix remove this check as it is unnecessary
