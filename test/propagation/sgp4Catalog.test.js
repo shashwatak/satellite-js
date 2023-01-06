@@ -26,7 +26,7 @@ const tleSuites = getTleSuites();
 
 tleSuites.forEach((tleSuite, i) => {
   const testSuiteName = `sgp4catalog ${(i + 1).toString().padStart(2, '0')}`;
-  const satellitesRange = `satellites ${i * satellitesPerTestSuite + 1} — ${(i + 1) * satellitesPerTestSuite}`;
+  const satellitesRange = `${i * satellitesPerTestSuite + 1} — ${(i + 1) * satellitesPerTestSuite}`;
   describe(`${testSuiteName} (${satellitesRange})`, () => {
     tleSuite.forEach((tle) => {
       const satrec = twoline2satrec(tle.line1, tle.line2);
