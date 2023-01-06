@@ -1,5 +1,7 @@
 # Changelog
 
+- Errors in calculations are fixed, WGS72 is used instead of WGS84 (#107).
+
 ## 4.1.4 (2022-07-18)
 
 - TypeScript definition for `ecfToEci` function is added. 
