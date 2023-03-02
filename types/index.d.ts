@@ -227,5 +227,5 @@ declare module 'satellite.js' {
    */
   export function degreesLat(latitude: Radians): number;
 
-  export function invjday(jd: Number, asArray: boolean): Date | Array<Number>;
+  export function invjday(jd: number, asArray?: boolean): Date | Array<number>;
 }
