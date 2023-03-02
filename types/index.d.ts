@@ -102,8 +102,8 @@ declare module 'satellite.js' {
    * If there is an error the position and velocity will be false.
    */
   export interface PositionAndVelocity {
-    position: EciVec3<Kilometer>|boolean;
-    velocity: EciVec3<KilometerPerSecond>|boolean;
+    position: EciVec3<Kilometer> | boolean;
+    velocity: EciVec3<KilometerPerSecond> | boolean;
   }
 
   /**
@@ -133,6 +133,12 @@ declare module 'satellite.js' {
   export function degreesToRadians(value: Degrees): Radians;
 
   /**
+   * Convert number in degrees to number in radians
+   * @param value Number to convert
+   */
+  export function radiansToDegrees(value: Radians): Degrees;
+
+  /**
    * https://en.wikipedia.org/wiki/Geographic_coordinate_system#Latitude_and_longitude
    */
   export interface GeodeticLocation {
@@ -160,13 +166,13 @@ declare module 'satellite.js' {
    * @param msec Optional milliseconds
    */
   export function gstime(
-      dateYearArg: number | Date,
-      month?: number,
-      day?: number,
-      hour?: number,
-      minute?: number,
-      second?: number,
-      msec?: number): GMSTime;
+    dateYearArg: number | Date,
+    month?: number,
+    day?: number,
+    hour?: number,
+    minute?: number,
+    second?: number,
+    msec?: number): GMSTime;
 
   /**
    * Convert ECI to ECF. Units are not modified.
@@ -220,4 +226,6 @@ declare module 'satellite.js' {
    * Convert the latitude in RADIANS to DEGREES.
    */
   export function degreesLat(latitude: Radians): number;
+
+  export function invjday(jd: Number, asArray: boolean): Date | Array<Number>;
 }
