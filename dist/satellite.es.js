@@ -2296,6 +2296,7 @@ function sgp4init(satrec, options) {
   satrec.mo = xmo;
   satrec.no = xno;
   satrec.nodeo = xnodeo;
+  satrec.no_kozai = xno;
 
   //  sgp4fix add opsmode
   satrec.operationmode = opsmode;
@@ -2329,12 +2330,12 @@ function sgp4init(satrec, options) {
     rp = initlResult.rp,
     rteosq = initlResult.rteosq,
     sinio = initlResult.sinio;
-  satrec.no = initlResult.no;
   satrec.con41 = initlResult.con41;
   satrec.gsto = initlResult.gsto;
   satrec.a = Math.pow(satrec.no * tumin, -2.0 / 3.0);
   satrec.alta = satrec.a * (1.0 + satrec.ecco) - 1.0;
   satrec.altp = satrec.a * (1.0 - satrec.ecco) - 1.0;
+  satrec.no = initlResult.no;
   satrec.error = 0;
 
   // sgp4fix remove this check as it is unnecessary

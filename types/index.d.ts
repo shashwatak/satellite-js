@@ -59,6 +59,12 @@ declare module 'satellite.js' {
      * Error code indicating propagation failure type.
      */
     error: number;
+
+    no_kozai: number;
+    a: number;
+    alta: number;
+    altp: number;
+
   }
 
   /**
