@@ -1,8 +1,6 @@
 .idea
 coverage
-dist
 node_modules
-lib
 sgp4_verification/lib/sgp4
 *.log
 package-lock.json
