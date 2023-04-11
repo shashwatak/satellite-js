@@ -190,11 +190,11 @@ export function invjday(jd, asArray) {
     minute,
   } = mdhms;
 
-  const sec = mdhms.sec - 0.00000086400;
-
+  const sec = Math.floor(mdhms.sec - 0.00000086400);
+  const msec = Math.floor(1000 * (mdhms.sec - sec));
   if (asArray) {
-    return [year, mon, day, hr, minute, Math.floor(sec)];
+    return [year, mon, day, hr, minute, sec, msec];
   }
 
-  return new Date(Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec)));
+  return new Date(Date.UTC(year, mon - 1, day, hr, minute, sec, msec));
 }
