@@ -6,7 +6,7 @@ import sgp4init from './propagation/sgp4init';
 
 /* -----------------------------------------------------------------------------
  *
- *                           function twoline2rv
+ *                           function twoline2satrec
  *
  *  this function converts the two line element set character string data to
  *    variables and initializes the sgp4 variables. several intermediate varaibles
@@ -128,6 +128,131 @@ export default function twoline2satrec(longstr1, longstr2) {
   const {
     mon, day, hr, minute, sec,
   } = mdhmsResult;
+  satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
+
+  //  ---------------- initialize the orbit at sgp4epoch -------------------
+  sgp4init(satrec, {
+    opsmode,
+    satn: satrec.satnum,
+    epoch: satrec.jdsatepoch - 2433281.5,
+    xbstar: satrec.bstar,
+    xecco: satrec.ecco,
+    xargpo: satrec.argpo,
+    xinclo: satrec.inclo,
+    xmo: satrec.mo,
+    xno: satrec.no,
+    xnodeo: satrec.nodeo,
+  });
+
+  return satrec;
+}
+
+/* -----------------------------------------------------------------------------
+ *
+ *                           function json2satrec
+ *
+ *  this function converts the OMM json data to variables and initializes the sgp4 
+ *    variables. several intermediate varaibles and quantities are determined. note 
+ *    that the result is a structure so multiple satellites can be processed 
+ *    simultaneously without having to reinitialize. the verification mode is an 
+ *    important option that permits quick checks of any changes to the underlying 
+ *    technical theory. this option works using a modified tle file in which the 
+ *    start, stop, and delta time values are included at the end of the second line
+ *    of data. this only works with the verification mode. the catalog mode simply 
+ *    propagates from -1440 to 1440 min from epoch and is useful when performing 
+ *    entire catalog runs.
+ *
+ *  author        : david vallado                  719-573-2600    1 mar 2001
+ *
+ *  inputs        :
+ *    jsonobj     - OMM json data
+ *    typerun     - type of run                    verification 'v', catalog 'c',
+ *                                                 manual 'm'
+ *    typeinput   - type of manual input           mfe 'm', epoch 'e', dayofyr 'd'
+ *    opsmode     - mode of operation afspc or improved 'a', 'i'
+ *    whichconst  - which set of constants to use  72, 84
+ *
+ *  outputs       :
+ *    satrec      - structure containing all the sgp4 satellite information
+ *
+ *  coupling      :
+ *    getgravconst-
+ *    days2mdhms  - conversion of days to month, day, hour, minute, second
+ *    jday        - convert day month year hour minute second into julian date
+ *    sgp4init    - initialize the sgp4 variables
+ *
+ *  references    :
+ *    norad spacetrack report #3
+ *    vallado, crawford, hujsak, kelso  2006
+ --------------------------------------------------------------------------- */
+
+/**
+ * Return a Satellite imported from OMM JSON format data.
+ *
+ * Provide the OMM JSON format data as `jsonobj`,
+ * and select which standard set of gravitational constants you want
+ * by providing `gravity_constants`:
+ *
+ * `sgp4.propagation.wgs72` - Standard WGS 72 model
+ * `sgp4.propagation.wgs84` - More recent WGS 84 model
+ * `sgp4.propagation.wgs72old` - Legacy support for old SGP4 behavior
+ *
+ * Normally, computations are made using letious recent improvements
+ * to the algorithm.  If you want to turn some of these off and go
+ * back into "afspc" mode, then set `afspc_mode` to `True`.
+ */
+function json2satrec(jsonobj) {
+  const opsmode = 'i';
+  const xpdotp = 1440.0 / (2.0 * pi); // 229.1831180523293;
+  let year = 0;
+
+  const satrec = {};
+  satrec.error = 0;
+
+  satrec.satnum = jsonobj.NORAD_CAT_ID.toString();
+
+  var epoch = new Date(jsonobj.EPOCH + 'Z');
+  year = epoch.getUTCFullYear();
+
+  satrec.epochyr = Number(year.toString().slice(-2));
+  satrec.epochdays =
+    (epoch - new Date(Date.UTC(year, 0, 1, 0, 0, 0))) / (86400 * 1000) + 1;
+
+  satrec.ndot = jsonobj.MEAN_MOTION_DOT;
+  satrec.nddot = jsonobj.MEAN_MOTION_DDOT;
+  satrec.bstar = jsonobj.BSTAR;
+
+  satrec.inclo = jsonobj.INCLINATION;
+  satrec.nodeo = jsonobj.RA_OF_ASC_NODE;
+  satrec.ecco = jsonobj.ECCENTRICITY;
+  satrec.argpo = jsonobj.ARG_OF_PERICENTER;
+  satrec.mo = jsonobj.MEAN_ANOMALY;
+  satrec.no = jsonobj.MEAN_MOTION;
+
+  // ---- find no, ndot, nddot ----
+  satrec.no /= xpdotp; //   rad/min
+  // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
+  // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
+
+  // ---- convert to sgp4 units ----
+  // satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
+  // satrec.nddot /= (xpdotp * 1440.0 * 1440);
+
+  // ---- find standard orbital elements ----
+  satrec.inclo *= deg2rad;
+  satrec.nodeo *= deg2rad;
+  satrec.argpo *= deg2rad;
+  satrec.mo *= deg2rad;
+
+  // ----------------------------------------------------------------
+  // find sgp4epoch time of element set
+  // remember that sgp4 uses units of days from 0 jan 1950 (sgp4epoch)
+  // and minutes from the epoch (time)
+  // ----------------------------------------------------------------
+
+  const mdhmsResult = days2mdhms(year, satrec.epochdays);
+
+  const { mon, day, hr, minute, sec } = mdhmsResult;
   satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
