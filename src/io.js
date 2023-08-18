@@ -162,46 +162,26 @@ export default function twoline2satrec(longstr1, longstr2) {
  *    propagates from -1440 to 1440 min from epoch and is useful when performing 
  *    entire catalog runs.
  *
- *  author        : david vallado                  719-573-2600    1 mar 2001
+ *  author        : Hariharan Vitaladevuni                   18 Aug 2023
  *
  *  inputs        :
  *    jsonobj     - OMM json data
- *    typerun     - type of run                    verification 'v', catalog 'c',
- *                                                 manual 'm'
- *    typeinput   - type of manual input           mfe 'm', epoch 'e', dayofyr 'd'
- *    opsmode     - mode of operation afspc or improved 'a', 'i'
- *    whichconst  - which set of constants to use  72, 84
+ *    opsmode     - mode of operation afspc or improved 'a', 'i'. Default: 'i'.
  *
  *  outputs       :
  *    satrec      - structure containing all the sgp4 satellite information
  *
  *  coupling      :
- *    getgravconst-
  *    days2mdhms  - conversion of days to month, day, hour, minute, second
  *    jday        - convert day month year hour minute second into julian date
  *    sgp4init    - initialize the sgp4 variables
  *
  *  references    :
+ *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
  *    norad spacetrack report #3
  *    vallado, crawford, hujsak, kelso  2006
  --------------------------------------------------------------------------- */
-
-/**
- * Return a Satellite imported from OMM JSON format data.
- *
- * Provide the OMM JSON format data as `jsonobj`,
- * and select which standard set of gravitational constants you want
- * by providing `gravity_constants`:
- *
- * `sgp4.propagation.wgs72` - Standard WGS 72 model
- * `sgp4.propagation.wgs84` - More recent WGS 84 model
- * `sgp4.propagation.wgs72old` - Legacy support for old SGP4 behavior
- *
- * Normally, computations are made using letious recent improvements
- * to the algorithm.  If you want to turn some of these off and go
- * back into "afspc" mode, then set `afspc_mode` to `True`.
- */
-function json2satrec(jsonobj) {
+function json2satrec(jsonobj, opsmode='i') {
   const opsmode = 'i';
   const xpdotp = 1440.0 / (2.0 * pi); // 229.1831180523293;
   let year = 0;
@@ -231,12 +211,6 @@ function json2satrec(jsonobj) {
 
   // ---- find no, ndot, nddot ----
   satrec.no /= xpdotp; //   rad/min
-  // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
-  // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
-
-  // ---- convert to sgp4 units ----
-  // satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
-  // satrec.nddot /= (xpdotp * 1440.0 * 1440);
 
   // ---- find standard orbital elements ----
   satrec.inclo *= deg2rad;
