@@ -17,7 +17,7 @@ import {
 } from '../src/constants';
 
 import { jday, invjday } from '../src/ext';
-import { twoline2satrec, json2satrec } from '../../src/io';
+import { twoline2satrec, json2satrec } from '../src/io';
 import { propagate, sgp4, gstime } from '../src/propagation';
 
 import dopplerFactor from '../src/dopplerFactor';
