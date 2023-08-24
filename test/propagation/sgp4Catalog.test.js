@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 
 import sgp4 from '../../src/propagation/sgp4';
-import twoline2satrec from '../../src/io';
+import { twoline2satrec } from '../../src/io';
 
 const satellitesPerTestSuite = 500;
 

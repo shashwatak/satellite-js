@@ -1,4 +1,4 @@
-import { pi, deg2rad } from './constants';
+import { deg2rad, xpdotp } from './constants';
 
 import { jday, days2mdhms } from './ext';
 
@@ -59,9 +59,8 @@ import sgp4init from './propagation/sgp4init';
  * to the algorithm.  If you want to turn some of these off and go
  * back into "afspc" mode, then set `afspc_mode` to `True`.
  */
-export default function twoline2satrec(longstr1, longstr2) {
+export function twoline2satrec(longstr1, longstr2) {
   const opsmode = 'i';
-  const xpdotp = 1440.0 / (2.0 * pi); // 229.1831180523293;
   let year = 0;
 
   const satrec = {};
@@ -163,6 +162,7 @@ export default function twoline2satrec(longstr1, longstr2) {
  *    entire catalog runs.
  *
  *  author        : Hariharan Vitaladevuni                   18 Aug 2023
+ *                  Theodore Kruczek                         19 Aug 2023
  *
  *  inputs        :
  *    jsonobj     - OMM json data
@@ -175,24 +175,24 @@ export default function twoline2satrec(longstr1, longstr2) {
  *    days2mdhms  - conversion of days to month, day, hour, minute, second
  *    jday        - convert day month year hour minute second into julian date
  *    sgp4init    - initialize the sgp4 variables
+ * 
+ *  warning       : the epoch date in OMM format is more accurate than TLE format!
+ *                  this will result in extremely close, but different 
+ *                  position/velocity values. Depending on your use case, it may
+ *                  be better to use twoline2satrec, but for the average user this
+ *                  will provide comparable results.
  *
  *  references    :
  *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
- *    norad spacetrack report #3
- *    vallado, crawford, hujsak, kelso  2006
  --------------------------------------------------------------------------- */
-function json2satrec(jsonobj, opsmode='i') {
-  const opsmode = 'i';
-  const xpdotp = 1440.0 / (2.0 * pi); // 229.1831180523293;
-  let year = 0;
-
+export function json2satrec(jsonobj, opsmode = 'i') {
   const satrec = {};
   satrec.error = 0;
 
-  satrec.satnum = jsonobj.NORAD_CAT_ID.toString();
+  satrec.satnum = jsonobj.NORAD_CAT_ID.toString().padStart(5, '0');
 
-  var epoch = new Date(jsonobj.EPOCH + 'Z');
-  year = epoch.getUTCFullYear();
+  const epoch = new Date(jsonobj.EPOCH + 'Z');
+  const year = epoch.getUTCFullYear();
 
   satrec.epochyr = Number(year.toString().slice(-2));
   satrec.epochdays =
@@ -202,28 +202,18 @@ function json2satrec(jsonobj, opsmode='i') {
   satrec.nddot = jsonobj.MEAN_MOTION_DDOT;
   satrec.bstar = jsonobj.BSTAR;
 
-  satrec.inclo = jsonobj.INCLINATION;
-  satrec.nodeo = jsonobj.RA_OF_ASC_NODE;
+  satrec.inclo = jsonobj.INCLINATION * deg2rad;
+  satrec.nodeo = jsonobj.RA_OF_ASC_NODE * deg2rad;
   satrec.ecco = jsonobj.ECCENTRICITY;
-  satrec.argpo = jsonobj.ARG_OF_PERICENTER;
-  satrec.mo = jsonobj.MEAN_ANOMALY;
-  satrec.no = jsonobj.MEAN_MOTION;
-
-  // ---- find no, ndot, nddot ----
-  satrec.no /= xpdotp; //   rad/min
-
-  // ---- find standard orbital elements ----
-  satrec.inclo *= deg2rad;
-  satrec.nodeo *= deg2rad;
-  satrec.argpo *= deg2rad;
-  satrec.mo *= deg2rad;
+  satrec.argpo = jsonobj.ARG_OF_PERICENTER * deg2rad;
+  satrec.mo = jsonobj.MEAN_ANOMALY * deg2rad;
+  satrec.no = jsonobj.MEAN_MOTION / xpdotp;
 
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set
   // remember that sgp4 uses units of days from 0 jan 1950 (sgp4epoch)
   // and minutes from the epoch (time)
   // ----------------------------------------------------------------
-
   const mdhmsResult = days2mdhms(year, satrec.epochdays);
 
   const { mon, day, hr, minute, sec } = mdhmsResult;
