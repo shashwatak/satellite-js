@@ -20,6 +20,8 @@ import {
   ecfToLookAngles,
 } from './transforms';
 
+import { sunPos } from './sun';
+
 export {
   constants,
 
@@ -47,4 +49,7 @@ export {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
+
+  // Sun Position
+  sunPos,
 };
