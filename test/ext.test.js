@@ -1,7 +1,7 @@
 import compareVectors from './compareVectors';
 
 import { jday, invjday } from '../src/ext';
-import twoline2satrec from '../src/io';
+import { twoline2satrec } from '../src/io';
 import { propagate, gstime } from '../src/propagation';
 
 describe('Julian date / time', () => {
