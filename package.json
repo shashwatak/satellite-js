@@ -40,7 +40,6 @@
   "bugs": {
     "url": "https://github.com/shashwatak/satellite-js/issues"
   },
-  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
@@ -60,7 +59,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
     "glob": "^8.0.3",
-    "jest": "^29.3.1",
+    "jest": "^29.7.0",
     "prepend-file": "^2.0.1",
     "raise-version": "^0.5.0",
     "rimraf": "^3.0.2",
