@@ -48,6 +48,7 @@ describe('Doppler factor', () => {
     expect(dopFactor).toBeCloseTo(1, numDigits);
   });
 
+  // Object moving away from observer
   it('special case', () => {
     const observerEcf = {
       x: earthRadius,
@@ -65,7 +66,7 @@ describe('Doppler factor', () => {
       z: 0,
     };
     const dopFactor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
-    expect(dopFactor).toBeCloseTo(1.0000107847789212, numDigits);
+    expect(dopFactor).toBeCloseTo(0.9999892152210788, numDigits);
   });
 
   it('calculated from a negative range rate', () => {

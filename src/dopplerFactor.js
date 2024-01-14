@@ -1,5 +1,5 @@
 export default function dopplerFactor(location, position, velocity) {
-  const mfactor = 7.292115E-5;
+  const earthRotation = 7.292115E-5;
   const c = 299792.458; // Speed of light in km/s
 
   const range = {
@@ -10,16 +10,16 @@ export default function dopplerFactor(location, position, velocity) {
   range.w = Math.sqrt(range.x ** 2 + range.y ** 2 + range.z ** 2);
 
   const rangeVel = {
-    x: velocity.x + mfactor * location.y,
-    y: velocity.y - mfactor * location.x,
+    x: velocity.x + earthRotation * location.y,
+    y: velocity.y - earthRotation * location.x,
     z: velocity.z,
   };
 
-  function sign(value) {
-    return value >= 0 ? 1 : -1;
-  }
-
   const rangeRate = (range.x * rangeVel.x + range.y * rangeVel.y + range.z * rangeVel.z) / range.w;
 
-  return (1 + (rangeRate / c) * sign(rangeRate));
+  // Negative range rate means the satellite is moving towards the observer and
+  // its frequency is shifted higher because 1 minus a negative range rate is
+  // positive. If the range rate is positive, the satellite is moving away from
+  // the observer and its frequency is shifted lower.
+  return 1 - rangeRate / c;
 }
