@@ -255,6 +255,16 @@ export default function sgp4(satrec, tsince) {
   xlm %= twoPi;
   mm = (xlm - argpm - nodem) % twoPi;
 
+  const meanElements = {
+    am: am,
+    em: em,
+    im: inclm,
+    Om: nodem,
+    om: argpm,
+    mm: mm,
+    nm: nm,
+  };
+
   // ----------------- compute extra mean quantities -------------
   const sinim = Math.sin(inclm);
   const cosim = Math.cos(inclm);
@@ -390,6 +400,7 @@ export default function sgp4(satrec, tsince) {
     return {
       position: false,
       velocity: false,
+      meanElements,
     };
   }
 
@@ -430,6 +441,7 @@ export default function sgp4(satrec, tsince) {
   return {
     position: r,
     velocity: v,
+    meanElements,
   };
 
   /* eslint-enable no-param-reassign */
