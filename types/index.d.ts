@@ -102,8 +102,8 @@ declare module 'satellite.js' {
    * If there is an error the position and velocity will be false.
    */
   export interface PositionAndVelocity {
-    position: EciVec3<Kilometer>|boolean;
-    velocity: EciVec3<KilometerPerSecond>|boolean;
+    position: EciVec3<Kilometer>|false;
+    velocity: EciVec3<KilometerPerSecond>|false;
   }
 
   /**
