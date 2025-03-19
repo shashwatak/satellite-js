@@ -17,7 +17,7 @@ import {
 } from '../src/constants';
 
 import { jday, invjday } from '../src/ext';
-import twoline2satrec from '../src/io';
+import { twoline2satrec, json2satrec } from '../src/io';
 import { propagate, sgp4, gstime } from '../src/propagation';
 
 import dopplerFactor from '../src/dopplerFactor';
@@ -74,6 +74,7 @@ function checkTransforms(transforms) {
 function checkExports(namespace) {
   it('constants', () => checkConstants(namespace.constants));
   it('twoline2satrec', () => expect(namespace.twoline2satrec).toEqual(twoline2satrec));
+  it('json2satrec', () => expect(namespace.json2satrec).toEqual(json2satrec));
   it('propagate', () => expect(namespace.propagate).toEqual(propagate));
   it('sgp4', () => expect(namespace.sgp4).toEqual(sgp4));
   it('gstime', () => expect(namespace.gstime).toEqual(gstime));

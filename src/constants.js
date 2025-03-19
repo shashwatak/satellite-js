@@ -13,3 +13,4 @@ export const j3 = -0.00000253881;
 export const j4 = -0.00000165597;
 export const j3oj2 = j3 / j2;
 export const x2o3 = 2.0 / 3.0;
+export const xpdotp = 1440.0 / (2.0 * pi); // 229.1831180523293;

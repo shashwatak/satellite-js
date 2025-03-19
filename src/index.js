@@ -1,7 +1,7 @@
 import * as constants from './constants';
 
 import { jday, invjday } from './ext';
-import twoline2satrec from './io';
+import { twoline2satrec, json2satrec} from './io';
 import { propagate, sgp4, gstime } from './propagation';
 
 import dopplerFactor from './dopplerFactor';
@@ -20,6 +20,8 @@ import {
   ecfToLookAngles,
 } from './transforms';
 
+import { sunPos } from './sun';
+
 export {
   constants,
 
@@ -27,6 +29,7 @@ export {
   propagate,
   sgp4,
   twoline2satrec,
+  json2satrec,
 
   gstime,
   jday,
@@ -46,4 +49,7 @@ export {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
+
+  // Sun Position
+  sunPos,
 };
