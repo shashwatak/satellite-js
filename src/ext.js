@@ -1,3 +1,15 @@
+function isLeapYear(year) {
+  if (year % 4 === 0) {
+    if (year % 100 === 0) {
+      if (year % 400 === 0) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
 /* -----------------------------------------------------------------------------
  *
  *                           procedure days2mdhms
@@ -35,7 +47,7 @@
  *    none.
  * --------------------------------------------------------------------------- */
 export function days2mdhms(year, days) {
-  const lmonth = [31, (year % 4) === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const lmonth = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   const dayofyr = Math.floor(days);
 
   //  ----------------- find month and day of month ----------------
