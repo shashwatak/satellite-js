@@ -1,3 +1,5 @@
+export type JDay = number;
+
 /* -----------------------------------------------------------------------------
  *
  *                           procedure days2mdhms
@@ -34,17 +36,21 @@
  *  coupling      :
  *    none.
  * --------------------------------------------------------------------------- */
-export function days2mdhms(year, days) {
+export function days2mdhms(year: number, days: number) {
   const lmonth = [31, (year % 4) === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   const dayofyr = Math.floor(days);
 
   //  ----------------- find month and day of month ----------------
   let i = 1;
   let inttemp = 0;
-  while ((dayofyr > (inttemp + lmonth[i - 1])) && i < 12) {
-    inttemp += lmonth[i - 1];
+  
+  // i starts from 1 so no null check is needed
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  while ((dayofyr > (inttemp + lmonth[i - 1]!)) && i < 12) {
+    inttemp += lmonth[i - 1]!;
     i += 1;
   }
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
   const mon = i;
   const day = dayofyr - inttemp;
@@ -97,7 +103,7 @@ export function days2mdhms(year, days) {
  *    vallado       2007, 189, alg 14, ex 3-14
  *
  * --------------------------------------------------------------------------- */
-function jdayInternal(year, mon, day, hr, minute, sec, msec = 0) {
+function jdayInternal(year: number, mon: number, day: number, hr: number, minute: number, sec: number, msec = 0): JDay {
   return (
     ((367.0 * year) - Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25))
     + Math.floor((275 * mon) / 9.0)
@@ -107,9 +113,11 @@ function jdayInternal(year, mon, day, hr, minute, sec, msec = 0) {
   );
 }
 
-export function jday(year, mon, day, hr, minute, sec, msec) {
-  if (year instanceof Date) {
-    const date = year;
+export function jday(year: Date): JDay;
+export function jday(year: number, mon: number, day: number, hr: number, minute: number, sec: number, msec?: number): JDay;
+export function jday(yearOrDate: number | Date, mon?: number, day?: number, hr?: number, minute?: number, sec?: number, msec = 0): JDay {
+  if (yearOrDate instanceof Date) {
+    const date = yearOrDate;
     return jdayInternal(
       date.getUTCFullYear(),
       date.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
@@ -121,7 +129,9 @@ export function jday(year, mon, day, hr, minute, sec, msec) {
     );
   }
 
-  return jdayInternal(year, mon, day, hr, minute, sec, msec);
+  // from the overload signatures above we know that rest of the parameters are defined
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return jdayInternal(yearOrDate, mon!, day!, hr!, minute!, sec!, msec);
 }
 
 /* -----------------------------------------------------------------------------
@@ -163,7 +173,9 @@ export function jday(year, mon, day, hr, minute, sec, msec) {
  *  references    :
  *    vallado       2007, 208, alg 22, ex 3-13
  * --------------------------------------------------------------------------- */
-export function invjday(jd, asArray) {
+export function invjday(jd: JDay, asArray: true): [year: number, mon: number, day: number, hr: number, minute: number, sec: number];
+export function invjday(jd: JDay, asArray?: false): Date;
+export function invjday(jd: JDay, asArray?: boolean) {
   // --------------- find year and days of the year -
   const temp = jd - 2415019.5;
   const tu = temp / 365.25;

@@ -1,3 +1,4 @@
+import { Degrees, EcfVec3, EciVec3, GeodeticLocation, GMSTime, Kilometer, LookAngles, Radians } from './common-types.js';
 import {
   pi,
   twoPi,
@@ -5,49 +6,47 @@ import {
   deg2rad,
 } from './constants';
 
-export function radiansToDegrees(radians) {
+export function radiansToDegrees(radians: Radians): Degrees {
   return radians * rad2deg;
 }
 
-export function degreesToRadians(degrees) {
+export function degreesToRadians(degrees: Degrees): Radians {
   return degrees * deg2rad;
 }
 
-export function degreesLat(radians) {
+export function degreesLat(radians: Radians): Degrees {
   if (radians < (-pi / 2) || radians > (pi / 2)) {
     throw new RangeError('Latitude radians must be in range [-pi/2; pi/2].');
   }
   return radiansToDegrees(radians);
 }
 
-export function degreesLong(radians) {
+export function degreesLong(radians: Radians): Degrees {
   if (radians < -pi || radians > pi) {
     throw new RangeError('Longitude radians must be in range [-pi; pi].');
   }
   return radiansToDegrees(radians);
 }
 
-export function radiansLat(degrees) {
+export function radiansLat(degrees: Degrees): Radians {
   if (degrees < -90 || degrees > 90) {
     throw new RangeError('Latitude degrees must be in range [-90; 90].');
   }
   return degreesToRadians(degrees);
 }
 
-export function radiansLong(degrees) {
+export function radiansLong(degrees: Degrees): Radians {
   if (degrees < -180 || degrees > 180) {
     throw new RangeError('Longitude degrees must be in range [-180; 180].');
   }
   return degreesToRadians(degrees);
 }
 
-export function geodeticToEcf(geodetic) {
-  const {
-    longitude,
-    latitude,
-    height,
-  } = geodetic;
-
+export function geodeticToEcf({
+  longitude,
+  latitude,
+  height,
+}: GeodeticLocation): EcfVec3<Kilometer> {
   const a = 6378.137;
   const b = 6356.7523142;
   const f = (a - b) / a;
@@ -65,7 +64,7 @@ export function geodeticToEcf(geodetic) {
   };
 }
 
-export function eciToGeodetic(eci, gmst) {
+export function eciToGeodetic(eci: EciVec3<Kilometer>, gmst: GMSTime): GeodeticLocation {
   // http://www.celestrak.com/columns/v02n03/
   const a = 6378.137;
   const b = 6356.7523142;
@@ -87,17 +86,18 @@ export function eciToGeodetic(eci, gmst) {
     eci.z,
     Math.sqrt((eci.x * eci.x) + (eci.y * eci.y)),
   );
-  let C;
-  while (k < kmax) {
+  let C: number;
+  while (k++ < kmax) {
     C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
     latitude = Math.atan2(eci.z + (a * C * e2 * Math.sin(latitude)), R);
-    k += 1;
   }
-  const height = (R / Math.cos(latitude)) - (a * C);
+  // 20 iterations are passed at this point
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const height = (R / Math.cos(latitude)) - (a * C!);
   return { longitude, latitude, height };
 }
 
-export function ecfToEci(ecf, gmst) {
+export function ecfToEci(ecf: EcfVec3<number>, gmst: GMSTime): EciVec3<number> {
   // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
   //
   // [X]     [C -S  0][X]
@@ -110,7 +110,7 @@ export function ecfToEci(ecf, gmst) {
   return { x: X, y: Y, z: Z };
 }
 
-export function eciToEcf(eci, gmst) {
+export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime) : EcfVec3<number> {
   // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
   //
   // [X]     [C -S  0][X]
@@ -134,7 +134,22 @@ export function eciToEcf(eci, gmst) {
   };
 }
 
-function topocentric(observerGeodetic, satelliteEcf) {
+interface Topocentric {
+  /**
+   * Positive horizontal vector S due south.
+   */
+  topS: number;
+  /**
+   * Positive horizontal vector E due east.
+   */
+  topE: number;
+  /**
+   * Vector Z normal to the surface of the earth (up).
+   */
+  topZ: number;
+}
+
+function topocentric(observerGeodetic: GeodeticLocation, satelliteEcf: EcfVec3<Kilometer>): Topocentric {
   // http://www.celestrak.com/columns/v02n02/
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
@@ -164,14 +179,7 @@ function topocentric(observerGeodetic, satelliteEcf) {
   return { topS, topE, topZ };
 }
 
-/**
- * @param {Object} tc
- * @param {Number} tc.topS Positive horizontal vector S due south.
- * @param {Number} tc.topE Positive horizontal vector E due east.
- * @param {Number} tc.topZ Vector Z normal to the surface of the earth (up).
- * @returns {Object}
- */
-function topocentricToLookAngles(tc) {
+function topocentricToLookAngles(tc: Topocentric): LookAngles {
   const { topS, topE, topZ } = tc;
   const rangeSat = Math.sqrt((topS * topS) + (topE * topE) + (topZ * topZ));
   const El = Math.asin(topZ / rangeSat);
@@ -184,7 +192,7 @@ function topocentricToLookAngles(tc) {
   };
 }
 
-export function ecfToLookAngles(observerGeodetic, satelliteEcf) {
+export function ecfToLookAngles(observerGeodetic: GeodeticLocation, satelliteEcf: EcfVec3<Kilometer>): LookAngles {
   const topocentricCoords = topocentric(observerGeodetic, satelliteEcf);
   return topocentricToLookAngles(topocentricCoords);
 }

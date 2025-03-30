@@ -1,3 +1,4 @@
+import { OMMJsonObject, SatRec } from './common-types.js';
 import { deg2rad, xpdotp } from './constants';
 
 import { jday, days2mdhms } from './ext';
@@ -47,7 +48,7 @@ import sgp4init from './propagation/sgp4init';
 /**
  * Return a Satellite imported from two lines of TLE data.
  *
- * Provide the two TLE lines as strings `longstr1` and `longstr2`,
+ * Provide the two TLE lines as strings `tleLine1` and `tleLine2`,
  * and select which standard set of gravitational constants you want
  * by providing `gravity_constants`:
  *
@@ -59,53 +60,38 @@ import sgp4init from './propagation/sgp4init';
  * to the algorithm.  If you want to turn some of these off and go
  * back into "afspc" mode, then set `afspc_mode` to `True`.
  */
-export function twoline2satrec(longstr1, longstr2) {
+export function twoline2satrec(longstr1: string, longstr2: string) {
   const opsmode = 'i';
-  let year = 0;
+  const error = 0;
 
-  const satrec = {};
-  satrec.error = 0;
+  const satnum = longstr1.substring(2, 7);
 
-  satrec.satnum = longstr1.substring(2, 7);
-
-  satrec.epochyr = parseInt(longstr1.substring(18, 20), 10);
-  satrec.epochdays = parseFloat(longstr1.substring(20, 32));
-  satrec.ndot = parseFloat(longstr1.substring(33, 43));
-  satrec.nddot = parseFloat(
-    `.${parseInt(longstr1.substring(44, 50), 10)}E${longstr1.substring(
-      50,
-      52,
-    )}`,
+  const epochyr = parseInt(longstr1.substring(18, 20), 10);
+  const epochdays = parseFloat(longstr1.substring(20, 32));
+  const ndot = parseFloat(longstr1.substring(33, 43));
+  const nddot = parseFloat(
+    `${longstr1.substring(44, 45)}.${longstr1.substring(45, 50)}E${longstr1.substring(50, 52)}`,
   );
-  satrec.bstar = parseFloat(
-    `${longstr1.substring(53, 54)}.${parseInt(
-      longstr1.substring(54, 59),
-      10,
-    )}E${longstr1.substring(59, 61)}`,
+  const bstar = parseFloat(
+    `${longstr1.substring(53, 54)}.${longstr1.substring(54, 59)}E${longstr1.substring(59, 61)}`,
   );
 
   // satrec.satnum = longstr2.substring(2, 7);
-  satrec.inclo = parseFloat(longstr2.substring(8, 16));
-  satrec.nodeo = parseFloat(longstr2.substring(17, 25));
-  satrec.ecco = parseFloat(`.${longstr2.substring(26, 33)}`);
-  satrec.argpo = parseFloat(longstr2.substring(34, 42));
-  satrec.mo = parseFloat(longstr2.substring(43, 51));
-  satrec.no = parseFloat(longstr2.substring(52, 63));
+  // ---- find standard orbital elements ----
+  const inclo = parseFloat(longstr2.substring(8, 16)) * deg2rad;
+  const nodeo = parseFloat(longstr2.substring(17, 25)) * deg2rad;
+  const ecco = parseFloat(`.${longstr2.substring(26, 33)}`);
+  const argpo = parseFloat(longstr2.substring(34, 42)) * deg2rad;
+  const mo = parseFloat(longstr2.substring(43, 51)) * deg2rad;
 
   // ---- find no, ndot, nddot ----
-  satrec.no /= xpdotp; //   rad/min
+  const no = parseFloat(longstr2.substring(52, 63)) / xpdotp;
   // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
   // ---- convert to sgp4 units ----
   // satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
   // satrec.nddot /= (xpdotp * 1440.0 * 1440);
-
-  // ---- find standard orbital elements ----
-  satrec.inclo *= deg2rad;
-  satrec.nodeo *= deg2rad;
-  satrec.argpo *= deg2rad;
-  satrec.mo *= deg2rad;
 
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set
@@ -115,19 +101,31 @@ export function twoline2satrec(longstr1, longstr2) {
 
   // ---------------- temp fix for years from 1957-2056 -------------------
   // --------- correct fix will occur when year is 4-digit in tle ---------
+  const year = epochyr < 57 ? epochyr + 2000 : epochyr + 1900;
 
-  if (satrec.epochyr < 57) {
-    year = satrec.epochyr + 2000;
-  } else {
-    year = satrec.epochyr + 1900;
-  }
-
-  const mdhmsResult = days2mdhms(year, satrec.epochdays);
+  const mdhmsResult = days2mdhms(year, epochdays);
 
   const {
     mon, day, hr, minute, sec,
   } = mdhmsResult;
-  satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
+  const jdsatepoch = jday(year, mon, day, hr, minute, sec);
+
+  const satrec: SatRec = {
+    error,
+    satnum,
+    epochyr,
+    epochdays,
+    ndot,
+    nddot,
+    bstar,
+    inclo,
+    nodeo,
+    ecco,
+    argpo,
+    mo,
+    no,
+    jdsatepoch,
+  }
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
   sgp4init(satrec, {
@@ -185,39 +183,55 @@ export function twoline2satrec(longstr1, longstr2) {
  *  references    :
  *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
  --------------------------------------------------------------------------- */
-export function json2satrec(jsonobj, opsmode = 'i') {
-  const satrec = {};
-  satrec.error = 0;
+export function json2satrec(jsonobj: OMMJsonObject, opsmode = 'i') {
+  const error = 0;
 
-  satrec.satnum = jsonobj.NORAD_CAT_ID.toString();
+  const satnum = jsonobj.NORAD_CAT_ID.toString();
 
   const epoch = new Date(jsonobj.EPOCH + 'Z');
   const year = epoch.getUTCFullYear();
 
-  satrec.epochyr = Number(year.toString().slice(-2));
-  satrec.epochdays =
-    (epoch - new Date(Date.UTC(year, 0, 1, 0, 0, 0))) / (86400 * 1000) + 1;
+  const epochyr = Number(year.toString().slice(-2));
+  const epochdays =
+    (epoch.valueOf() - new Date(Date.UTC(year, 0, 1, 0, 0, 0)).valueOf()) / (86400 * 1000) + 1;
 
-  satrec.ndot = jsonobj.MEAN_MOTION_DOT;
-  satrec.nddot = jsonobj.MEAN_MOTION_DDOT;
-  satrec.bstar = jsonobj.BSTAR;
+  const ndot = Number(jsonobj.MEAN_MOTION_DOT);
+  const nddot = Number(jsonobj.MEAN_MOTION_DDOT);
+  const bstar = Number(jsonobj.BSTAR);
 
-  satrec.inclo = jsonobj.INCLINATION * deg2rad;
-  satrec.nodeo = jsonobj.RA_OF_ASC_NODE * deg2rad;
-  satrec.ecco = jsonobj.ECCENTRICITY;
-  satrec.argpo = jsonobj.ARG_OF_PERICENTER * deg2rad;
-  satrec.mo = jsonobj.MEAN_ANOMALY * deg2rad;
-  satrec.no = jsonobj.MEAN_MOTION / xpdotp;
+  const inclo = Number(jsonobj.INCLINATION) * deg2rad;
+  const nodeo = Number(jsonobj.RA_OF_ASC_NODE) * deg2rad;
+  const ecco = Number(jsonobj.ECCENTRICITY);
+  const argpo = Number(jsonobj.ARG_OF_PERICENTER) * deg2rad;
+  const mo = Number(jsonobj.MEAN_ANOMALY) * deg2rad;
+  const no = Number(jsonobj.MEAN_MOTION) / xpdotp;
 
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set
   // remember that sgp4 uses units of days from 0 jan 1950 (sgp4epoch)
   // and minutes from the epoch (time)
   // ----------------------------------------------------------------
-  const mdhmsResult = days2mdhms(year, satrec.epochdays);
+  const mdhmsResult = days2mdhms(year, epochdays);
 
   const { mon, day, hr, minute, sec } = mdhmsResult;
-  satrec.jdsatepoch = jday(year, mon, day, hr, minute, sec);
+  const jdsatepoch = jday(year, mon, day, hr, minute, sec);
+
+  const satrec: SatRec = {
+    error,
+    satnum,
+    epochyr,
+    epochdays,
+    ndot,
+    nddot,
+    bstar,
+    inclo,
+    nodeo,
+    ecco,
+    argpo,
+    mo,
+    no,
+    jdsatepoch,
+  }
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
   sgp4init(satrec, {

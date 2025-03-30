@@ -1,4 +1,5 @@
-import { deg2rad, twoPi } from './constants';
+import { deg2rad, pi, twoPi } from './constants';
+import { JDay } from './ext.js';
 
 ////////////////////////////////////////////////////////////////////////////////////
 /* Line by Line MATLAB-to-Javascript conversion of "sun.mat" from Vallado package */
@@ -32,20 +33,19 @@ import { deg2rad, twoPi } from './constants';
  *      Computer software in MATLAB: http://celestrak.org/software/vallado-sw.php 
  *  --------------------------------------------------------------------------- */
 
-export function sunPos(jd) {
+export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: number } {
   
     // -------------------------  implementation   -----------------
     // -------------------  initialize values   --------------------
-    const tut1 = ( jd - 2451545.0  ) / 36525.0;
+    const tut1 = (jday - 2451545) / 36525;
   
-    const meanlong = (280.460  + 36000.77 * tut1) % 360.0; //deg
+    const meanlong = (280.460 + 36000.77 * tut1) % 360; //deg
   
     const ttdb = tut1; // is this declaration required instead of replacing `ttdb` with `tut1`
- 
-    if (meananomaly < 0.0 ) {
-        const meananomaly = twoPi + ((357.5277233  + 35999.05034 * ttdb) * deg2rad) % twoPi; //rad;
-    } else {
-        const meananomaly = ((357.5277233  + 35999.05034 * ttdb) * deg2rad) % twoPi; //rad;
+
+    let meananomaly = (357.5277233 + 35999.05034 * ttdb * deg2rad) % twoPi; //rad
+    if (meananomaly < 0) {
+      meananomaly += twoPi;
     }
   
     const eclplong_raw = ((meanlong + 1.914666471 * Math.sin(meananomaly) + 0.019994643 * Math.sin(2.0 * meananomaly)) % 360.0) * deg2rad; //rad
@@ -53,32 +53,30 @@ export function sunPos(jd) {
     const obliquity = (23.439291 - 0.0130042 * ttdb) * deg2rad; //rad
   
     // --------- find magnitude of sun vector, and it's components ------
-    const magr = 1.000140612  - 0.016708617 * Math.cos( meananomaly ) - 0.000139589 * Math.cos( 2.0 * meananomaly ); // in au's
+    const magr = 1.000140612 - 0.016708617 * Math.cos(meananomaly) - 0.000139589 * Math.cos(2.0 * meananomaly); // in au's
   
     const rsun = [
-        magr*Math.cos(eclplong_raw), 
-        magr*Math.cos(obliquity)*Math.sin(eclplong_raw), 
-        magr*Math.sin(obliquity)*Math.sin(eclplong_raw)
+      magr * Math.cos(eclplong_raw), 
+      magr * Math.cos(obliquity) * Math.sin(eclplong_raw), 
+      magr * Math.sin(obliquity) * Math.sin(eclplong_raw)
     ];
   
-    const rtasc_raw = Math.atan( Math.cos(obliquity) * Math.tan(eclplong_raw) );
+    const rtasc_raw = Math.atan(Math.cos(obliquity) * Math.tan(eclplong_raw));
   
     // --- check that rtasc is in the same quadrant as eclplong_raw ----
-    if ( eclplong_raw < 0.0  ) {
-        const eclplong = eclplong_raw + twoPi;    // make sure it's in 0 to 2pi range
-    } else {
-        const eclplong = eclplong_raw;
+    let eclplong = eclplong_raw;
+    if (eclplong < 0.0) {
+      eclplong += twoPi;    // make sure it's in 0 to 2pi range
     }
 
-    if ( Math.abs( eclplong_raw - rtasc_raw ) > pi*0.5  ) {
-        const rtasc = rtasc_raw + 0.5 *pi*Math.round( (eclplong_raw - rtasc_raw)/(0.5 *pi));
-    } else {
-        const rtasc = rtasc_raw;
+    let rtasc = rtasc_raw;
+    if (Math.abs(eclplong_raw - rtasc) > pi * 0.5) {
+        rtasc += 0.5 * pi * Math.round((eclplong_raw - rtasc_raw) / (0.5 * pi));
     }
     
-    const decl = Math.asin( Math.sin(obliquity) * Math.sin(eclplong_raw) );
+    const decl = Math.asin(Math.sin(obliquity) * Math.sin(eclplong_raw));
   
-    return {rsun, rtasc, decl}
+    return { rsun, rtasc, decl }
   }
   
   
