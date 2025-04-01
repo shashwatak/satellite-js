@@ -1,7 +1,18 @@
+import { SatRec } from './SatRec.js';
 import {
   pi,
   twoPi,
 } from '../constants';
+
+interface DpperOptions {
+  init: 'y' | 'n';
+  opsmode: 'a' | 'i';
+  ep: number;
+  inclp: number;
+  nodep: number;
+  argpp: number;
+  mp: number;
+}
 
 /* -----------------------------------------------------------------------------
  *
@@ -69,7 +80,7 @@ import {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dpper(satrec, options) {
+export default function dpper(satrec: SatRec, options: DpperOptions) {
   const {
     e3,
     ee2,

@@ -1,3 +1,4 @@
+import { PositionAndVelocity } from '../common-types.js';
 import {
   pi,
   twoPi,
@@ -11,6 +12,7 @@ import {
 
 import dpper from './dpper';
 import dspace from './dspace';
+import { SatRec } from './SatRec.js';
 
 /*----------------------------------------------------------------------------
  *
@@ -98,7 +100,7 @@ import dspace from './dspace';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function sgp4(satrec, tsince) {
+export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocity {
   /* eslint-disable no-param-reassign */
 
   let coseo1;
@@ -227,7 +229,7 @@ export default function sgp4(satrec, tsince) {
     // printf("// error nm %f\n", nm);
     satrec.error = 2;
     // sgp4fix add return
-    return [false, false];
+    return { position: false, velocity: false, meanElements: false };
   }
 
   const am = ((xke / nm) ** x2o3) * tempa * tempa;
@@ -240,7 +242,7 @@ export default function sgp4(satrec, tsince) {
     // printf("// error em %f\n", em);
     satrec.error = 1;
     // sgp4fix to return if there is an error in eccentricity
-    return [false, false];
+    return { position: false, velocity: false, meanElements: false };
   }
 
   //  sgp4fix fix tolerance to avoid a divide by zero
@@ -254,6 +256,16 @@ export default function sgp4(satrec, tsince) {
   argpm %= twoPi;
   xlm %= twoPi;
   mm = (xlm - argpm - nodem) % twoPi;
+
+  const meanElements = {
+    am: am,
+    em: em,
+    im: inclm,
+    Om: nodem,
+    om: argpm,
+    mm: mm,
+    nm: nm,
+  };
 
   // ----------------- compute extra mean quantities -------------
   const sinim = Math.sin(inclm);
@@ -270,7 +282,7 @@ export default function sgp4(satrec, tsince) {
   if (satrec.method === 'd') {
     const dpperParameters = {
       inclo: satrec.inclo,
-      init: 'n',
+      init: 'n' as const,
       ep,
       inclp: xincp,
       nodep,
@@ -299,7 +311,7 @@ export default function sgp4(satrec, tsince) {
       //  printf("// error ep %f\n", ep);
       satrec.error = 3;
       //  sgp4fix add return
-      return [false, false];
+      return { position: false, velocity: false, meanElements: false };
     }
   }
 
@@ -347,15 +359,15 @@ export default function sgp4(satrec, tsince) {
   }
 
   //  ------------- short period preliminary quantities -----------
-  const ecose = (axnl * coseo1) + (aynl * sineo1);
-  const esine = (axnl * sineo1) - (aynl * coseo1);
+  const ecose = (axnl * coseo1!) + (aynl * sineo1!);
+  const esine = (axnl * sineo1!) - (aynl * coseo1!);
   const el2 = (axnl * axnl) + (aynl * aynl);
   const pl = am * (1.0 - el2);
   if (pl < 0.0) {
     //  printf("// error pl %f\n", pl);
     satrec.error = 4;
     //  sgp4fix add return
-    return [false, false];
+    return { position: false, velocity: false, meanElements: false };
   }
 
   const rl = am * (1.0 - ecose);
@@ -363,8 +375,8 @@ export default function sgp4(satrec, tsince) {
   const rvdotl = Math.sqrt(pl) / rl;
   const betal = Math.sqrt(1.0 - el2);
   temp = esine / (1.0 + betal);
-  const sinu = (am / rl) * (sineo1 - aynl - (axnl * temp));
-  const cosu = (am / rl) * ((coseo1 - axnl) + (aynl * temp));
+  const sinu = (am / rl) * (sineo1! - aynl - (axnl * temp));
+  const cosu = (am / rl) * ((coseo1! - axnl) + (aynl * temp));
   su = Math.atan2(sinu, cosu);
   const sin2u = (cosu + cosu) * sinu;
   const cos2u = 1.0 - (2.0 * sinu * sinu);
@@ -387,10 +399,7 @@ export default function sgp4(satrec, tsince) {
   if (mrt < 1.0) {
     // printf("// decay condition %11.6f \n",mrt);
     satrec.error = 6;
-    return {
-      position: false,
-      velocity: false,
-    };
+    false;
   }
 
   su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;
@@ -430,6 +439,7 @@ export default function sgp4(satrec, tsince) {
   return {
     position: r,
     velocity: v,
+    meanElements,
   };
 
   /* eslint-enable no-param-reassign */

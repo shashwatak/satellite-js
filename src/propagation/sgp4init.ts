@@ -13,6 +13,20 @@ import dscom from './dscom';
 import dsinit from './dsinit';
 import initl from './initl';
 import sgp4 from './sgp4';
+import { SatRec, SatRecInit } from './SatRec.js';
+
+export interface Sgp4InitOptions {
+  opsmode: 'a' | 'i';
+  satn: string;
+  epoch: number;
+  xbstar: number;
+  xecco: number;
+  xargpo: number;
+  xinclo: number;
+  xmo: number;
+  xno: number;
+  xnodeo: number;
+}
 
 /*-----------------------------------------------------------------------------
  *
@@ -95,9 +109,7 @@ import sgp4 from './sgp4';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function sgp4init(satrec, options) {
-  /* eslint-disable no-param-reassign */
-
+export default function sgp4init(satrecInit: SatRecInit, options: Sgp4InitOptions): asserts satrecInit is SatRec {
   const {
     opsmode,
     satn,
@@ -173,6 +185,8 @@ export default function sgp4init(satrec, options) {
   // the old check used 1.0 + Math.cos(pi-1.0e-9), but then compared it to
   // 1.5 e-12, so the threshold was changed to 1.5e-12 for consistency
   const temp4 = 1.5e-12;
+
+  const satrec = satrecInit as SatRec;
 
   // ----------- set all near earth variables to zero ------------
   satrec.isimp = 0; satrec.method = 'n'; satrec.aycof = 0.0;
@@ -523,25 +537,25 @@ export default function sgp4init(satrec, options) {
         cosim,
         emsq,
         argpo: satrec.argpo,
-        s1,
-        s2,
-        s3,
-        s4,
-        s5,
-        sinim,
-        ss1,
-        ss2,
-        ss3,
-        ss4,
-        ss5,
-        sz1,
-        sz3,
-        sz11,
-        sz13,
-        sz21,
-        sz23,
-        sz31,
-        sz33,
+        s1: s1!,
+        s2: s2!,
+        s3: s3!,
+        s4: s4!,
+        s5: s5!,
+        sinim: sinim!,
+        ss1: ss1!,
+        ss2: ss2!,
+        ss3: ss3!,
+        ss4: ss4!,
+        ss5: ss5!,
+        sz1: sz1!,
+        sz3: sz3!,
+        sz11: sz11!,
+        sz13: sz13!,
+        sz21: sz21!,
+        sz23: sz23!,
+        sz31: sz31!,
+        sz33: sz33!,
         t: satrec.t,
         tc,
         gsto: satrec.gsto,
@@ -550,15 +564,15 @@ export default function sgp4init(satrec, options) {
         no: satrec.no,
         nodeo: satrec.nodeo,
         nodedot: satrec.nodedot,
-        xpidot,
-        z1,
-        z3,
-        z11,
-        z13,
-        z21,
-        z23,
-        z31,
-        z33,
+        xpidot: xpidot!,
+        z1: z1!,
+        z3: z3!,
+        z11: z11!,
+        z13: z13!,
+        z21: z21!,
+        z23: z23!,
+        z31: z31!,
+        z33: z33!,
         ecco: satrec.ecco,
         eccsq,
         em,
@@ -649,9 +663,7 @@ export default function sgp4init(satrec, options) {
     // if(satrec.error == 0)
   }
 
-  sgp4(satrec, 0, 0);
+  sgp4(satrec, 0);
 
   satrec.init = 'n';
-
-  /* eslint-enable no-param-reassign */
 }

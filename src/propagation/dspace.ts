@@ -1,5 +1,44 @@
 import { twoPi } from '../constants';
 
+interface DspaceOptions {
+  irez: number;
+  d2201: number;
+  d2211: number;
+  d3210: number;
+  d3222: number;
+  d4410: number;
+  d4422: number;
+  d5220: number;
+  d5232: number;
+  d5421: number;
+  d5433: number;
+  dedt: number;
+  del1: number;
+  del2: number;
+  del3: number;
+  didt: number;
+  dmdt: number;
+  dnodt: number;
+  domdt: number;
+  argpo: number;
+  argpdot: number;
+  t: number;
+  tc: number;
+  gsto: number;
+  xfact: number;
+  xlamo: number;
+  no: number;
+  atime: number;
+  em: number;
+  argpm: number;
+  inclm: number;
+  xli: number;
+  mm: number;
+  xni: number;
+  nodem: number;
+  nm: number;
+}
+
 /*-----------------------------------------------------------------------------
  *
  *                           procedure dspace
@@ -72,7 +111,7 @@ import { twoPi } from '../constants';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dspace(options) {
+export default function dspace(options: DspaceOptions) {
   const {
     irez,
     d2201,
@@ -239,8 +278,8 @@ export default function dspace(options) {
       }
     }
 
-    nm = xni + (xndt * ft) + (xnddt * ft * ft * 0.5);
-    xl = xli + (xldot * ft) + (xndt * ft * ft * 0.5);
+    nm = xni + (xndt! * ft) + (xnddt! * ft * ft * 0.5);
+    xl = xli + (xldot! * ft) + (xndt! * ft * ft * 0.5);
     if (irez !== 1) {
       mm = (xl - (2.0 * nodem)) + (2.0 * theta);
       dndt = nm - no;

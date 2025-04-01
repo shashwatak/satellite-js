@@ -15,5 +15,12 @@ export default tseslint.config(
   },
   {
     ignores: ['/dist', '/lib', '*.mjs']
+  },
+  {
+    rules: {
+      '@typescript-eslint/unified-signatures': {
+        ignoreDifferentlyNamedParameters: true,
+      }
+    }
   }
 );

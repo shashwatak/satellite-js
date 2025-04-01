@@ -5,6 +5,80 @@ import {
   x2o3,
 } from '../constants';
 
+interface DsinitOptions {
+  cosim: number;
+  emsq: number;
+  argpo: number;
+  s1: number;
+  s2: number;
+  s3: number;
+  s4: number;
+  s5: number;
+  sinim: number;
+  ss1: number;
+  ss2: number;
+  ss3: number;
+  ss4: number;
+  ss5: number;
+  sz1: number;
+  sz3: number;
+  sz11: number;
+  sz13: number;
+  sz21: number;
+  sz23: number;
+  sz31: number;
+  sz33: number;
+  t: number;
+  tc: number;
+  gsto: number;
+  mo: number;
+  mdot: number;
+  no: number;
+  nodeo: number;
+  nodedot: number;
+  xpidot: number;
+  z1: number;
+  z3: number;
+  z11: number;
+  z13: number;
+  z21: number;
+  z23: number;
+  z31: number;
+  z33: number;
+  ecco: number;
+  eccsq: number;
+  em: number;
+  argpm: number;
+  inclm: number;
+  mm: number;
+  nm: number;
+  nodem: number;
+  irez: number;
+  atime: number;
+  d2201: number;
+  d2211: number;
+  d3210: number;
+  d3222: number;
+  d4410: number;
+  d4422: number;
+  d5220: number;
+  d5232: number;
+  d5421: number;
+  d5433: number;
+  dedt: number;
+  didt: number;
+  dmdt: number;
+  dnodt: number;
+  domdt: number;
+  del1: number;
+  del2: number;
+  del3: number;
+  xfact: number;
+  xlamo: number;
+  xli: number;
+  xni: number;
+}
+
 /*-----------------------------------------------------------------------------
  *
  *                           procedure dsinit
@@ -84,7 +158,7 @@ import {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dsinit(options) {
+export default function dsinit(options: DsinitOptions) {
   const {
     cosim,
     argpo,

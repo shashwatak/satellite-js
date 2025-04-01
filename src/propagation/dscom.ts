@@ -1,5 +1,15 @@
 import { twoPi } from '../constants';
 
+interface DscomOptions {
+  epoch: number;
+  ep: number;
+  argpp: number;
+  tc: number;
+  inclp: number;
+  nodep: number;
+  np: number;
+}
+
 /*-----------------------------------------------------------------------------
  *
  *                           procedure dscom
@@ -67,7 +77,7 @@ import { twoPi } from '../constants';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dscom(options) {
+export default function dscom(options: DscomOptions) {
   const {
     epoch,
     ep,
@@ -289,33 +299,36 @@ export default function dscom(options) {
   const zmol = (4.7199672 + ((0.22997150 * day) - gam)) % twoPi;
   const zmos = (6.2565837 + (0.017201977 * day)) % twoPi;
 
+  // should be refactored at some point
+  /* eslint-disable */
   //  ------------------------ do solar terms ----------------------
-  const se2 = 2.0 * ss1 * ss6;
-  const se3 = 2.0 * ss1 * ss7;
-  const si2 = 2.0 * ss2 * sz12;
-  const si3 = 2.0 * ss2 * (sz13 - sz11);
-  const sl2 = -2.0 * ss3 * sz2;
-  const sl3 = -2.0 * ss3 * (sz3 - sz1);
-  const sl4 = -2.0 * ss3 * (-21.0 - (9.0 * emsq)) * zes;
-  const sgh2 = 2.0 * ss4 * sz32;
-  const sgh3 = 2.0 * ss4 * (sz33 - sz31);
-  const sgh4 = -18.0 * ss4 * zes;
-  const sh2 = -2.0 * ss2 * sz22;
-  const sh3 = -2.0 * ss2 * (sz23 - sz21);
+  const se2 = 2.0 * ss1! * ss6!;
+  const se3 = 2.0 * ss1! * ss7!;
+  const si2 = 2.0 * ss2! * sz12!;
+  const si3 = 2.0 * ss2! * (sz13! - sz11!);
+  const sl2 = -2.0 * ss3! * sz2!;
+  const sl3 = -2.0 * ss3! * (sz3! - sz1!);
+  const sl4 = -2.0 * ss3! * (-21.0 - (9.0 * emsq)) * zes;
+  const sgh2 = 2.0 * ss4! * sz32!;
+  const sgh3 = 2.0 * ss4! * (sz33! - sz31!);
+  const sgh4 = -18.0 * ss4! * zes;
+  const sh2 = -2.0 * ss2! * sz22!;
+  const sh3 = -2.0 * ss2! * (sz23! - sz21!);
 
   //  ------------------------ do lunar terms ----------------------
-  const ee2 = 2.0 * s1 * s6;
-  const e3 = 2.0 * s1 * s7;
-  const xi2 = 2.0 * s2 * z12;
-  const xi3 = 2.0 * s2 * (z13 - z11);
-  const xl2 = -2.0 * s3 * z2;
-  const xl3 = -2.0 * s3 * (z3 - z1);
-  const xl4 = -2.0 * s3 * (-21.0 - (9.0 * emsq)) * zel;
-  const xgh2 = 2.0 * s4 * z32;
-  const xgh3 = 2.0 * s4 * (z33 - z31);
-  const xgh4 = -18.0 * s4 * zel;
-  const xh2 = -2.0 * s2 * z22;
-  const xh3 = -2.0 * s2 * (z23 - z21);
+  const ee2 = 2.0 * s1! * s6!;
+  const e3 = 2.0 * s1! * s7!;
+  const xi2 = 2.0 * s2! * z12!;
+  const xi3 = 2.0 * s2! * (z13! - z11!);
+  const xl2 = -2.0 * s3! * z2!;
+  const xl3 = -2.0 * s3! * (z3! - z1!);
+  const xl4 = -2.0 * s3! * (-21.0 - (9.0 * emsq)) * zel;
+  const xgh2 = 2.0 * s4! * z32!;
+  const xgh3 = 2.0 * s4! * (z33! - z31!);
+  const xgh4 = -18.0 * s4! * zel;
+  const xh2 = -2.0 * s2! * z22!;
+  const xh3 = -2.0 * s2! * (z23! - z21!);
+  /* eslint-enable */
 
   return {
     snodm,

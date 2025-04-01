@@ -7,6 +7,14 @@ import {
 
 import gstime from './gstime';
 
+interface InitlOptions {
+  opsmode: 'a' | 'i';
+  ecco: number,
+  epoch: number,
+  inclo: number,
+  no: number,
+}
+
 /*-----------------------------------------------------------------------------
  *
  *                           procedure initl
@@ -57,7 +65,7 @@ import gstime from './gstime';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function initl(options) {
+export default function initl(options: InitlOptions) {
   const {
     ecco,
     epoch,

@@ -19,6 +19,16 @@ export type Radians = number;
 export type Degrees = number;
 
 /**
+ * Type alias documents units for mean motion are radians per minute
+ */
+export type RadiansPerMinute = number;
+
+/**
+ * Type alias documents units for semi-major axis (earth radii)
+ */
+export type EarthRadii = number;
+
+/**
    * Coordinate frame Earth Centered Inertial (ECI)
    * https://en.wikipedia.org/wiki/Earth-centered_inertial
    */
@@ -39,13 +49,57 @@ export interface EcfVec3<T> {
 }
 
 /**
+   * A set of "singly averaged mean elements" that describe shape of the
+   * satellite’s orbit at the propagation date. They are averaged
+   * with respect to the mean anomaly and include the effects of secular
+   * gravity, atmospheric drag, and - in Deep Space mode - of those
+   * pertubations from the Sun and Moon that SGP4 averages over an entire
+   * revolution of each of those bodies. They omit both the shorter-term
+   * and longer-term periodic pertubations from the Sun and Moon that
+   * SGP4 applies right before computing each position.
+   */
+export type MeanElements = {
+  /**
+   * Average semi-major axis (earth radii).
+   */
+  am: EarthRadii;
+  /**
+   * Average eccentricity.
+   */
+  em: number;
+  /**
+   * Average inclination (radians).
+   */
+  im: Radians;
+  /**
+   * Average right ascension of ascending node (radians).
+   */
+  Om: Radians;
+  /**
+   * Average argument of perigee (radians).
+   */
+  om: Radians;
+  /**
+   * Average mean anomaly (radians).
+   */
+  mm: Radians;
+  /**
+   * Average mean motion (radians/minute).
+   */
+  nm: RadiansPerMinute;
+}
+
+/**
  * The position_velocity result is a key-value pair of ECI coordinates.
  * These are the base results from which all other coordinates are derived.
  * If there is an error the position and velocity will be false.
+ * The meanElements are the averaged elements of the orbit at the
+ * moment of propagation.
  */
 export interface PositionAndVelocity {
-  position: EciVec3<Kilometer>|false;
-  velocity: EciVec3<KilometerPerSecond>|false;
+  position: EciVec3<Kilometer>  |false;
+  velocity: EciVec3<KilometerPerSecond> | false;
+  meanElements: MeanElements | false;
 }
 
 /**
@@ -71,65 +125,6 @@ export interface LookAngles {
   azimuth: Radians;
   elevation: Radians;
   rangeSat: Kilometer;
-}
-
-export interface SatRec {
-  /**
-   * Unique satellite number given in the TLE file.
-   */
-  satnum: string;
-  /**
-   * Full four-digit year of this element set's epoch moment.
-   */
-  epochyr: number;
-  /**
-   * Fractional days into the year of the epoch moment.
-   */
-  epochdays: number;
-  /**
-   * Julian date of the epoch (computed from epochyr and epochdays).
-   */
-  jdsatepoch: number;
-  /**
-   * First time derivative of the mean motion (ignored by SGP4).
-   */
-  ndot: number;
-  /**
-   * Second time derivative of the mean motion (ignored by SGP4).
-   */
-  nddot: number;
-  /**
-   * Ballistic drag coefficient B* in inverse earth radii.
-   */
-  bstar: number;
-  /**
-   * Inclination in radians.
-   */
-  inclo: number;
-  /**
-   * Right ascension of ascending node in radians.
-   */
-  nodeo: number;
-  /**
-   * Eccentricity.
-   */
-  ecco: number;
-  /**
-   * Argument of perigee in radians.
-   */
-  argpo: number;
-  /**
-   * Mean anomaly in radians.
-   */
-  mo: number;
-  /**
-   * Mean motion in radians per minute.
-   */
-  no: number;
-  /**
-   * Error code indicating propagation failure type.
-   */
-  error: number;
 }
 
 type StartsWith<T extends string> = `${T}${string}`

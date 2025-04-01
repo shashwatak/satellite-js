@@ -1,3 +1,4 @@
+import { GMSTime } from '../common-types.js';
 import {
   deg2rad,
   twoPi,
@@ -30,7 +31,7 @@ import { jday } from '../ext';
  *  references    :
  *    vallado       2004, 191, eq 3-45
  * --------------------------------------------------------------------------- */
-function gstimeInternal(jdut1) {
+function gstimeInternal(jdut1: number) {
   const tut1 = (jdut1 - 2451545.0) / 36525.0;
 
   let temp = (-6.2e-6 * tut1 * tut1 * tut1)
@@ -46,9 +47,33 @@ function gstimeInternal(jdut1) {
   return temp;
 }
 
-export default function gstime(...args) {
-  if (args[0] instanceof Date || args.length > 1) {
-    return gstimeInternal(jday(...args));
+function gstime(jd: number): GMSTime;
+function gstime(date: Date): GMSTime;
+function gstime(
+  year: number, 
+  month: number, 
+  day: number, 
+  hour: number, 
+  minute: number, 
+  second: number, 
+  millisecond?: number
+): GMSTime;
+function gstime(
+  first: Date | number,
+  month?: number,
+  day?: number,
+  hour?: number,
+  minute?: number,
+  second?: number,
+  millisecond?: number
+): GMSTime {
+  if (first instanceof Date) {
+    return gstimeInternal(jday(first));
+  } else if (month !== undefined) {
+    return gstimeInternal(jday(first, month, day!, hour!, minute!, second!, millisecond));
+  } else {
+    return gstimeInternal(first);
   }
-  return gstimeInternal(...args);
 }
+
+export default gstime;

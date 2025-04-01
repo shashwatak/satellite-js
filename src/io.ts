@@ -1,7 +1,8 @@
-import { OMMJsonObject, SatRec } from './common-types.js';
+import { OMMJsonObject } from './common-types.js';
 import { deg2rad, xpdotp } from './constants';
 
 import { jday, days2mdhms } from './ext';
+import { SatRecInit } from './propagation/SatRec.js';
 
 import sgp4init from './propagation/sgp4init';
 
@@ -110,7 +111,7 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
   } = mdhmsResult;
   const jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
-  const satrec: SatRec = {
+  const satrec: SatRecInit = {
     error,
     satnum,
     epochyr,
@@ -183,7 +184,7 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
  *  references    :
  *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
  --------------------------------------------------------------------------- */
-export function json2satrec(jsonobj: OMMJsonObject, opsmode = 'i') {
+export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
   const error = 0;
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
@@ -216,7 +217,7 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode = 'i') {
   const { mon, day, hr, minute, sec } = mdhmsResult;
   const jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
-  const satrec: SatRec = {
+  const satrec: SatRecInit = {
     error,
     satnum,
     epochyr,
