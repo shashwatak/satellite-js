@@ -30,7 +30,7 @@ if (NODE_ENV === 'production') {
 }
 
 export default {
-  input: 'src/indexUmd.js',
+  input: 'compiled/indexUmd.js',
   output: {
     name: 'satellite',
     file: `dist/satellite${NODE_ENV === 'production' ? '.min' : ''}.js`,

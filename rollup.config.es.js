@@ -1,7 +1,7 @@
 import babel from '@rollup/plugin-babel';
 
 export default {
-  input: 'src/index.js',
+  input: 'compiled/index.js',
   output: {
     name: 'satellite',
     file: 'dist/satellite.es.js',
