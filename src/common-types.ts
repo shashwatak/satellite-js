@@ -97,9 +97,9 @@ export interface MeanElements {
  * moment of propagation.
  */
 export interface PositionAndVelocity {
-  position: EciVec3<Kilometer>  |false;
-  velocity: EciVec3<KilometerPerSecond> | false;
-  meanElements: MeanElements | false;
+  position: EciVec3<Kilometer>;
+  velocity: EciVec3<KilometerPerSecond>;
+  meanElements: MeanElements;
 }
 
 /**

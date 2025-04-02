@@ -21,6 +21,7 @@ describe('OMM Format Conversion', () => {
         for (const prop in origSatrec) {
             it(`should have a valid ${prop} property`, () => {
                 switch (prop) {
+                    case 'satnum': break; // no normalization of satnum
                     case 'epochdays':
                     case 'jdsatepoch':
                         expect(satrec[prop]).toBeCloseTo(origSatrec[prop], 7);

@@ -100,7 +100,7 @@ import { SatRec } from './SatRec.js';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocity {
+export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocity | null {
   let coseo1;
   let sineo1;
   let cosip;
@@ -227,7 +227,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     // printf("// error nm %f\n", nm);
     satrec.error = 2;
     // sgp4fix add return
-    return [false, false] as unknown as PositionAndVelocity;
+    return null;
   }
 
   const am = ((xke / nm) ** x2o3) * tempa * tempa;
@@ -240,7 +240,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     // printf("// error em %f\n", em);
     satrec.error = 1;
     // sgp4fix to return if there is an error in eccentricity
-    return [false, false] as unknown as PositionAndVelocity;
+    return null;
   }
 
   //  sgp4fix fix tolerance to avoid a divide by zero
@@ -309,7 +309,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
       //  printf("// error ep %f\n", ep);
       satrec.error = 3;
       //  sgp4fix add return
-      return [false, false] as unknown as PositionAndVelocity;
+      return null;
     }
   }
 
@@ -365,7 +365,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     //  printf("// error pl %f\n", pl);
     satrec.error = 4;
     //  sgp4fix add return
-    return [false, false] as unknown as PositionAndVelocity;
+    return null;
   }
 
   const rl = am * (1.0 - ecose);
@@ -397,10 +397,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
   if (mrt < 1.0) {
     // printf("// decay condition %11.6f \n",mrt);
     satrec.error = 6;
-    return {
-      position: false,
-      velocity: false,
-    } as unknown as PositionAndVelocity;
+    return null;
   }
 
   su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;

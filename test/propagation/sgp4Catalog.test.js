@@ -36,7 +36,7 @@ tleSuites.forEach((tleSuite, i) => {
       it(`satellite ${satrec.satnum.padStart(5, '0')} measurements`, () => {
         for (const time of [0, 360, 720, 1080, 1440]) {
           const result = sgp4(satrec, time)
-          expect(Array.isArray(result) ? result : { position: result.position, velocity: result.velocity }).toMatchSnapshot();
+          expect(result).toMatchSnapshot();
         }
       });
     });
