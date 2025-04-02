@@ -7,7 +7,7 @@
   "types": "types/index.d.ts",
   "module": "dist/satellite.es.js",
   "scripts": {
-    "build": "tsc && rimraf lib dist && npm run transpile && npm run dist",
+    "build": "rimraf lib dist compiled types && tsc && npm run transpile && npm run dist",
     "transpile": "babel compiled --out-dir lib --ignore indexUmd.js && node --require @babel/register commands/add-copyright.js 'lib/**/*.js'",
     "dist": "npm run dist:es && npm run dist:umd:dev && npm run dist:umd:prod",
     "dist:es": "rollup --bundleConfigAsCjs --config rollup.config.es.js && node --require @babel/register commands/add-copyright.js 'dist/satellite.es.js'",
