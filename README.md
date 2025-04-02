@@ -3,7 +3,6 @@
 [![NPM version](https://img.shields.io/npm/v/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
 [![Downloads/month](https://img.shields.io/npm/dm/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
 [![Build Status](https://img.shields.io/travis/shashwatak/satellite-js/develop.svg)](https://travis-ci.org/shashwatak/satellite-js)
-[![Coverage Status](https://img.shields.io/coveralls/github/shashwatak/satellite-js/develop.svg)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
 [![Gitter chat](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/satellite-js/Lobby)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE.md)
 

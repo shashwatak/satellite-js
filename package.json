@@ -20,7 +20,6 @@
     "lint:test": "eslint test",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:coveralls": "npm run test:coverage && cat coverage/lcov.info | coveralls",
     "raise": "raise-version",
     "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build"
   },
@@ -54,7 +53,6 @@
     "@rollup/plugin-terser": "^0.2.1",
     "chokidar": "^3.5.3",
     "copyfiles": "^2.4.1",
-    "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.22.0",
     "eslint-plugin-import": "^2.26.0",
