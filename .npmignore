@@ -1,6 +1,7 @@
 .idea
 commands
 coverage
+compiled
 sgp4_verification
 src
 test
