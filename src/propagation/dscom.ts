@@ -299,8 +299,6 @@ export default function dscom(options: DscomOptions) {
   const zmol = (4.7199672 + ((0.22997150 * day) - gam)) % twoPi;
   const zmos = (6.2565837 + (0.017201977 * day)) % twoPi;
 
-  // should be refactored at some point
-  /* eslint-disable */
   //  ------------------------ do solar terms ----------------------
   const se2 = 2.0 * ss1! * ss6!;
   const se3 = 2.0 * ss1! * ss7!;
@@ -328,7 +326,6 @@ export default function dscom(options: DscomOptions) {
   const xgh4 = -18.0 * s4! * zel;
   const xh2 = -2.0 * s2! * z22!;
   const xh3 = -2.0 * s2! * (z23! - z21!);
-  /* eslint-enable */
 
   return {
     snodm,

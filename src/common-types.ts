@@ -58,7 +58,7 @@ export interface EcfVec3<T> {
    * and longer-term periodic pertubations from the Sun and Moon that
    * SGP4 applies right before computing each position.
    */
-export type MeanElements = {
+export interface MeanElements {
   /**
    * Average semi-major axis (earth radii).
    */

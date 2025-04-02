@@ -91,8 +91,6 @@ export function eciToGeodetic(eci: EciVec3<Kilometer>, gmst: GMSTime): GeodeticL
     C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
     latitude = Math.atan2(eci.z + (a * C * e2 * Math.sin(latitude)), R);
   }
-  // 20 iterations are passed at this point
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const height = (R / Math.cos(latitude)) - (a * C!);
   return { longitude, latitude, height };
 }

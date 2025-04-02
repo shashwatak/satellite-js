@@ -45,12 +45,10 @@ export function days2mdhms(year: number, days: number) {
   let inttemp = 0;
   
   // i starts from 1 so no null check is needed
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   while ((dayofyr > (inttemp + lmonth[i - 1]!)) && i < 12) {
     inttemp += lmonth[i - 1]!;
     i += 1;
   }
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
   const mon = i;
   const day = dayofyr - inttemp;
@@ -129,8 +127,6 @@ export function jday(yearOrDate: number | Date, mon?: number, day?: number, hr?:
     );
   }
 
-  // from the overload signatures above we know that rest of the parameters are defined
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return jdayInternal(yearOrDate, mon!, day!, hr!, minute!, sec!, msec);
 }
 

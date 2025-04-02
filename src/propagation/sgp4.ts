@@ -101,8 +101,6 @@ import { SatRec } from './SatRec.js';
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocity {
-  /* eslint-disable no-param-reassign */
-
   let coseo1;
   let sineo1;
   let cosip;
@@ -444,6 +442,4 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     velocity: v,
     meanElements,
   };
-
-  /* eslint-enable no-param-reassign */
 }
