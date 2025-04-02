@@ -8,7 +8,10 @@ const satellitesPerTestSuite = 500;
 
 function getTleSuites() {
   const tleSuites = [];
-  const lines = fs.readFileSync(path.resolve(__dirname, 'tle.txt'), 'utf-8').split('\n');
+  const lines = fs.readFileSync(path.resolve(__dirname, 'tle.txt'), 'utf-8')
+    // remove BOM marker
+    .replace(/^\uFEFF/, '')
+    .split('\n');
   while (lines.length > 0) {
     const suiteLines = lines.splice(0, 2 * satellitesPerTestSuite);
     const tleSuite = [];
