@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "allowJs": true,
     "strict": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
@@ -14,7 +13,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "isolatedModules": true,
-    "checkJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
@@ -22,7 +20,7 @@
     "outDir": "./compiled",
   },
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Strictest (plus allowJS minus esModuleInterop)",
+  "display": "Strictest (minus esModuleInterop)",
   "include": [
     "src/**.ts",
   ],
