@@ -229,7 +229,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     // printf("// error nm %f\n", nm);
     satrec.error = 2;
     // sgp4fix add return
-    return { position: false, velocity: false, meanElements: false };
+    return [false, false] as unknown as PositionAndVelocity;
   }
 
   const am = ((xke / nm) ** x2o3) * tempa * tempa;
@@ -242,7 +242,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     // printf("// error em %f\n", em);
     satrec.error = 1;
     // sgp4fix to return if there is an error in eccentricity
-    return { position: false, velocity: false, meanElements: false };
+    return [false, false] as unknown as PositionAndVelocity;
   }
 
   //  sgp4fix fix tolerance to avoid a divide by zero
@@ -311,7 +311,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
       //  printf("// error ep %f\n", ep);
       satrec.error = 3;
       //  sgp4fix add return
-      return { position: false, velocity: false, meanElements: false };
+      return [false, false] as unknown as PositionAndVelocity;
     }
   }
 
@@ -367,7 +367,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     //  printf("// error pl %f\n", pl);
     satrec.error = 4;
     //  sgp4fix add return
-    return { position: false, velocity: false, meanElements: false };
+    return [false, false] as unknown as PositionAndVelocity;
   }
 
   const rl = am * (1.0 - ecose);
@@ -399,7 +399,10 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
   if (mrt < 1.0) {
     // printf("// decay condition %11.6f \n",mrt);
     satrec.error = 6;
-    false;
+    return {
+      position: false,
+      velocity: false,
+    } as unknown as PositionAndVelocity;
   }
 
   su -= 0.25 * temp2 * satrec.x7thm1 * sin2u;

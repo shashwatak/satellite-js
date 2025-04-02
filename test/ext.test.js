@@ -1,8 +1,6 @@
 import compareVectors from './compareVectors';
 
-import { jday, invjday } from '../src/ext';
-import { twoline2satrec } from '../src/io';
-import { propagate, gstime } from '../src/propagation';
+import { jday, invjday, twoline2satrec, propagate, gstime } from '../dist/satellite';
 
 describe('Julian date / time', () => {
   let now;

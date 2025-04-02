@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 
-import sgp4 from '../../src/propagation/sgp4';
-import { twoline2satrec } from '../../src/io';
+import * as satellite from '../../dist/satellite.es';
+const { sgp4, twoline2satrec } = satellite;
 
 const satellitesPerTestSuite = 500;
 
@@ -31,11 +31,10 @@ tleSuites.forEach((tleSuite, i) => {
     tleSuite.forEach((tle) => {
       const satrec = twoline2satrec(tle.line1, tle.line2);
       it(`satellite ${satrec.satnum.padStart(5, '0')} measurements`, () => {
-        expect(sgp4(satrec, 0)).toMatchSnapshot();
-        expect(sgp4(satrec, 360)).toMatchSnapshot();
-        expect(sgp4(satrec, 720)).toMatchSnapshot();
-        expect(sgp4(satrec, 1080)).toMatchSnapshot();
-        expect(sgp4(satrec, 1440)).toMatchSnapshot();
+        for (const time of [0, 360, 720, 1080, 1440]) {
+          const result = sgp4(satrec, time)
+          expect(Array.isArray(result) ? result : { position: result.position, velocity: result.velocity }).toMatchSnapshot();
+        }
       });
     });
   });

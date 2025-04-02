@@ -8,7 +8,7 @@ import {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
-} from '../src/transforms';
+} from '../dist/satellite';
 import compareVectors from './compareVectors';
 import transformData from './transforms.json';
 

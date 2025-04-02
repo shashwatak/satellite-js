@@ -1,4 +1,4 @@
-import { twoline2satrec, json2satrec } from '../src/io';
+import { twoline2satrec, json2satrec } from '../dist/satellite';
 import badTleData from './io-edge.json';
 import goodData from './io.json';
 
