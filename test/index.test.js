@@ -14,13 +14,13 @@ import {
   j4,
   j3oj2,
   x2o3,
-} from '../src/constants';
+} from '../compiled/constants';
 
-import { jday, invjday } from '../src/ext';
-import { twoline2satrec, json2satrec } from '../src/io';
-import { propagate, sgp4, gstime } from '../src/propagation';
+import { jday, invjday } from '../compiled/ext';
+import { twoline2satrec, json2satrec } from '../compiled/io';
+import { propagate, sgp4, gstime } from '../compiled/propagation';
 
-import dopplerFactor from '../src/dopplerFactor';
+import dopplerFactor from '../compiled/dopplerFactor';
 
 import {
   radiansToDegrees,
@@ -34,10 +34,10 @@ import {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
-} from '../src/transforms';
+} from '../compiled/transforms';
 
-import * as es from '../src/index';
-import umd from '../src/indexUmd';
+import * as es from '../compiled/index';
+import umd from '../compiled/indexUmd';
 
 function checkConstants(constants) {
   expect(constants.pi).toEqual(pi);

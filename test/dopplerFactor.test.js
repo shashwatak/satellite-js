@@ -1,4 +1,4 @@
-import dopplerFactor from '../src/dopplerFactor';
+import { dopplerFactor } from '../dist/satellite';
 
 const numDigits = 8;
 

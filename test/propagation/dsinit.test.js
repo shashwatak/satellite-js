@@ -1,4 +1,4 @@
-import dsinit from '../../src/propagation/dsinit';
+import dsinit from '../../compiled/propagation/dsinit';
 import dsOptionSets from './dsinit.json';
 
 describe('Initialize Resonance Terms', () => {

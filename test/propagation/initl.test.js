@@ -1,4 +1,4 @@
-import initl from '../../src/propagation/initl';
+import initl from '../../compiled/propagation/initl';
 
 describe('Propagator Initialization', () => {
   it('Legacy Sidereal Time Calculations', () => {
