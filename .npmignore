@@ -9,11 +9,8 @@ test
 .eslintignore
 .eslintrc.json
 .npmignore
-.npmrc
 .raiseverrc
 .travis.yml
 copyright-template.txt
 rollup.*
-package-lock.json
-yarn.lock
 *.log
