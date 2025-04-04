@@ -1,11 +1,66 @@
+export enum SatRecError {
+  /**
+   * No error, propagation for the last supplied date is successful
+   */
+  None = 0,
+  /**
+   * Mean eccentricity is out of range 0 ≤ e < 1
+   */
+  MeanEccentricityOutOfRange = 1,
+  /**
+   * Mean motion has fallen below zero.
+   */
+  MeanMotionBelowZero = 2,
+  /**
+   * Perturbed eccentricity is out of range 0 ≤ e < 1
+   */
+  PerturbedEccentricityOutOfRange = 3,
+  /**
+   * Length of the orbit’s semi-latus rectum has fallen below zero.
+   */
+  SemiLatusRectumBelowZero = 4,
+  // 5 is not used
+  /**
+   * Orbit has decayed: the computed position is underground.
+   */
+  Decayed = 6,
+}
+
+/**
+ * A structure that contains all the information needed to propagate a satellite's orbit using the SGP4 model.
+ * 
+ * Mostly you can consider it opaque as you only need to pass it to `propagate` function.
+ * All properties should be considered read-only as they're used and set by SGP4 model internally.
+ * 
+ * This interface is a direct translation of C++ struct `elsetrec` from the source code by David Vallado;
+ * all changes to the original struct are documented.
+ */
 export interface SatRec {
+  /**
+   * Stringified satellite number, usually from NORAD catalog
+   */
   satnum: string;
+  /**
+   * Full four-digit year of this element set's epoch moment
+   */
   epochyr: number;
   epochtynumrev: number;
-  error: number;
+  /**
+   * Error code produced by the most recent SGP4 propagation you performed with this element set.
+   */
+  error: SatRecError;
+  /**
+   * A single character that directs SGP4 to either operate in its modern 'i' improved mode or
+   * in its legacy 'a' AFSPC mode.
+   */
   operationmode: 'a' | 'i';
   init: 'y' | 'n';
-  method: string;
+  /**
+   * A single character, chosen automatically when the orbital elements were loaded, that
+   * indicates whether SGP4 has chosen to use its built-in 'n' Near Earth or 'd' Deep Space
+   * mode for this satellite.
+   */
+  method: 'n' | 'd';
 
   /* Near Earth */
   isimp: number;
@@ -22,6 +77,10 @@ export interface SatRec {
   argpdot: number;
   omgcof: number;
   sinmao: number;
+  /**
+   * The time you gave when you most recently asked SGP4 to compute this satellite’s position,
+   * measured in minutes before (negative) or after (positive) the satellite’s epoch.
+   */
   t: number;
   t2cof: number;
   t3cof: number;
@@ -97,14 +156,15 @@ export interface SatRec {
   altp: number;
   alta: number;
   /**
-   * Fractional days into the year of the epoch moment.
+   * Fractional days into the year of the epoch moment in UTC.
    */
   epochdays: number;
   /**
    * Julian date of the epoch (computed from epochyr and epochdays).
    */
   jdsatepoch: number;
-  jdsatepochF: number;
+  // fractional part is not needed for JS as it's retained in the `jdsatepoch` field
+  // jdsatepochF: number;
   /**
    * Second time derivative of the mean motion (ignored by SGP4).
    */
@@ -117,7 +177,8 @@ export interface SatRec {
    * Ballistic drag coefficient B* in inverse earth radii.
    */
   bstar: number;
-  rcse: number;
+  // not used by the library
+  // rcse: number;
   /**
    * Inclination in radians.
    */
@@ -144,7 +205,8 @@ export interface SatRec {
   no: number;
   
   // sgp4fix add unkozai'd variable
-  no_unkozai: number;
+  // not used by the library
+  // no_unkozai: number;
   
   // sgp4fix add singly averaged variables
   // this is instead returned in propagation results
