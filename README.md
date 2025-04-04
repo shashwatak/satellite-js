@@ -164,7 +164,18 @@ const positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
 //  Or you can use a JavaScript Date
 const positionAndVelocity = satellite.propagate(satrec, new Date());
 
-// The position_velocity result is a key-value pair of ECI coordinates.
+// if the result is `null`, it means that the propagation failed;
+// consult `satrec.error` property for a specific reason.
+if (positionAndVelocity === null) {
+  switch (satrec.error) {
+    // all possible values are listed in SatRecError enum:
+    case satellite.SatRecError.Decayed:
+      console.log('The satellite has decayed')
+    // ...
+  }
+}
+
+// The positionAndVelocity result is a pair of ECI coordinates.
 // These are the base results from which all other coordinates are derived.
 const positionEci = positionAndVelocity.position,
       velocityEci = positionAndVelocity.velocity;
@@ -193,7 +204,7 @@ const satelliteX = positionEci.x,
       satelliteY = positionEci.y,
       satelliteZ = positionEci.z;
 
-// Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
+// Look Angles may be accessed by `azimuth`, `elevation`, `rangeSat` properties.
 const azimuth   = lookAngles.azimuth,
       elevation = lookAngles.elevation,
       rangeSat  = lookAngles.rangeSat;
