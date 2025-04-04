@@ -12,7 +12,7 @@ import {
 
 import dpper from './dpper';
 import dspace from './dspace';
-import { SatRec } from './SatRec.js';
+import { SatRec, SatRecError } from './SatRec.js';
 
 /*----------------------------------------------------------------------------
  *
@@ -138,7 +138,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
 
   // --------------------- clear sgp4 error flag -----------------
   satrec.t = tsince;
-  satrec.error = 0;
+  satrec.error = SatRecError.None;
 
   //  ------- update for secular gravity and atmospheric drag -----
   const xmdf = satrec.mo + (satrec.mdot * satrec.t);
@@ -225,7 +225,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
 
   if (nm <= 0.0) {
     // printf("// error nm %f\n", nm);
-    satrec.error = 2;
+    satrec.error = SatRecError.MeanMotionBelowZero;
     // sgp4fix add return
     return null;
   }
@@ -238,7 +238,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
   // sgp4fix am is fixed from the previous nm check
   if (em >= 1.0 || em < -0.001) { // || (am < 0.95)
     // printf("// error em %f\n", em);
-    satrec.error = 1;
+    satrec.error = SatRecError.MeanEccentricityOutOfRange;
     // sgp4fix to return if there is an error in eccentricity
     return null;
   }
@@ -307,7 +307,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
     }
     if (ep < 0.0 || ep > 1.0) {
       //  printf("// error ep %f\n", ep);
-      satrec.error = 3;
+      satrec.error = SatRecError.PerturbedEccentricityOutOfRange;
       //  sgp4fix add return
       return null;
     }
@@ -363,7 +363,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
   const pl = am * (1.0 - el2);
   if (pl < 0.0) {
     //  printf("// error pl %f\n", pl);
-    satrec.error = 4;
+    satrec.error = SatRecError.SemiLatusRectumBelowZero;
     //  sgp4fix add return
     return null;
   }
@@ -396,7 +396,7 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
   // sgp4fix for decaying satellites
   if (mrt < 1.0) {
     // printf("// decay condition %11.6f \n",mrt);
-    satrec.error = 6;
+    satrec.error = SatRecError.Decayed;
     return null;
   }
 

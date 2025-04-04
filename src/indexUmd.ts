@@ -3,6 +3,7 @@ import * as constants from './constants';
 import { jday, invjday } from './ext';
 import { twoline2satrec, json2satrec} from './io';
 import { propagate, sgp4, gstime } from './propagation';
+import { SatRecError } from './propagation/SatRec.js';
 import * as types from './common-types.js';
 
 import dopplerFactor from './dopplerFactor';
@@ -56,4 +57,6 @@ export default {
 
   // Types
   ...types,
+
+  SatRecError,
 };

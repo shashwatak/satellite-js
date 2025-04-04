@@ -21,5 +21,5 @@ export {
 } from './transforms';
 
 export { sunPos } from './sun';
-export type { SatRec } from './propagation/SatRec.js';
+export { type SatRec, SatRecError } from './propagation/SatRec.js';
 export * from './common-types.js';
