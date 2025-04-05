@@ -1,5 +1,50 @@
 # Changelog
 
+- chore: The library is rewritten to TypeScript and type definitions are now not hand-written
+but compiled from source code.
+- feature: New `json2satrec` function that allows parsing orbital elements in
+[OMM](https://www.nasa.gov/wp-content/uploads/2017/12/orbit_data_messages.pdf) format,
+**encoded as JSON**. Orbital elements in OMM format are already available for download
+from Celestrak and Space-Track. `json2satrec` supports both of these sources and aims 
+to support all sources of properly formatted OMM data.
+
+To obtain OMM as JSON from Celestrak, select "JSON" option at the top of "Current GP
+Element Sets" page or follow
+[this link](https://celestrak.org/NORAD/elements/index.php?FORMAT=json) where it will
+be already selected.
+
+Space-Track doesn't expose the JSON format in their UI, so to get JSON encoded OMM,
+on "Recent ELSETs" page, from "Current Catalog Files", copy a URL for the needed category
+and change the ending part of the URL from `/format/xml` to be `/format/json`.
+- **BREAKING**: The return type of the `sgp4` and `propagate` functions is changed from:
+```ts
+{
+  position: EciVec3<Kilometer> | false
+  velocity: EciVec3<KilometerPerSecond> | false
+}
+```
+to:
+```ts
+null | {
+  position: EciVec3<Kilometer>
+  velocity: EciVec3<KilometerPerSecond>
+  meanElements: MeanElements
+}
+```
+Where, if propagation failed, `null` is returned instead of individual keys set to `false`.
+- **BREAKING**: removed overloads of `gstime` and return types of `sgp4` and `propagate` that
+were not documented by TypeScript definitions as of v5.0.0, but could happen in runtime with v5.0.0.
+- feature: New `SatRecError` enum that lists all error codes that can be set on `SatRec.error`.
+- feature: `sgp4` and `propagate` function result object returns `meanElements` key,
+which is orbit parameters as they have evolved at the propagation moment. Since they are always
+internally calculated by SGP4 model, this doesn't impact performance.
+- feature: New `sunPos` function that calculates Sun position at date, useful to calculate if
+a satellite is in Earth umbra. Its accuracy is within 0.01 angular degree between years
+1950 and 2050.
+- feature: Many additional properties of `SatRec` are documented
+- fix: `dopplerFactor` produces correct results depending on if the satellite is moving
+towards or away from the observer.
+
 ## 5.0.0 (2023-01-06)
 
 - Errors in calculations are fixed, WGS72 is used instead of WGS84 (#107).
