@@ -3,6 +3,12 @@ import { EcfVec3, Kilometer, KilometerPerSecond } from './common-types.js';
 const earthRotation = 7.292115E-5;
 const c = 299792.458; // Speed of light in km/s
 
+/**
+ * Negative range rate means the satellite is moving towards the observer and
+ * its frequency is shifted higher because 1 minus a negative range rate is
+ * positive. If the range rate is positive, the satellite is moving away from
+ * the observer and its frequency is shifted lower.
+ */
 export default function dopplerFactor(
   observerCoordsEcf: EcfVec3<Kilometer>,
   positionEcf: EcfVec3<Kilometer>,
@@ -21,9 +27,5 @@ export default function dopplerFactor(
 
   const rangeRate = (rangeX * rangeVel.x + rangeY * rangeVel.y + rangeZ * rangeVel.z) / length;
 
-  // Negative range rate means the satellite is moving towards the observer and
-  // its frequency is shifted higher because 1 minus a negative range rate is
-  // positive. If the range rate is positive, the satellite is moving away from
-  // the observer and its frequency is shifted lower.
   return 1 - rangeRate / c;
 }
