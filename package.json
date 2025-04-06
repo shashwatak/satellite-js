@@ -1,14 +1,14 @@
 {
   "name": "satellite.js",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "SGP4/SDP4 calculation library",
   "main": "lib/index.js",
   "jsnext:main": "dist/satellite.es.js",
   "types": "types/index.d.ts",
   "module": "dist/satellite.es.js",
   "scripts": {
-    "build": "rimraf lib dist && npm run transpile && npm run dist",
-    "transpile": "babel src --out-dir lib --ignore indexUmd.js && node --require @babel/register commands/add-copyright.js 'lib/**/*.js'",
+    "build": "rimraf lib dist compiled types && tsc && npm run transpile && npm run dist",
+    "transpile": "babel compiled --out-dir lib --ignore indexUmd.js && node --require @babel/register commands/add-copyright.js 'lib/**/*.js'",
     "dist": "npm run dist:es && npm run dist:umd:dev && npm run dist:umd:prod",
     "dist:es": "rollup --bundleConfigAsCjs --config rollup.config.es.js && node --require @babel/register commands/add-copyright.js 'dist/satellite.es.js'",
     "dist:umd": "rollup --bundleConfigAsCjs --config rollup.config.js",
@@ -20,7 +20,6 @@
     "lint:test": "eslint test",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:coveralls": "npm run test:coverage && cat coverage/lcov.info | coveralls",
     "raise": "raise-version",
     "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build"
   },
@@ -40,7 +39,6 @@
   "bugs": {
     "url": "https://github.com/shashwatak/satellite-js/issues"
   },
-  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.20.7",
     "@babel/core": "^7.20.12",
@@ -50,21 +48,22 @@
     "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.18.9",
+    "@eslint/js": "^9.22.0",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-terser": "^0.2.1",
     "chokidar": "^3.5.3",
     "copyfiles": "^2.4.1",
-    "coveralls": "^3.1.1",
     "cross-env": "^7.0.3",
-    "eslint": "^8.31.0",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint": "^9.22.0",
     "eslint-plugin-import": "^2.26.0",
     "glob": "^8.0.3",
-    "jest": "^29.3.1",
+    "jest": "^29.7.0",
     "prepend-file": "^2.0.1",
     "raise-version": "^0.5.0",
     "rimraf": "^3.0.2",
-    "rollup": "^3.9.1"
+    "rollup": "^3.9.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.1"
   },
   "jest": {
     "testPathIgnorePatterns": [

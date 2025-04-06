@@ -1,14 +1,17 @@
 import path from 'path';
 import fs from 'fs';
 
-import sgp4 from '../../src/propagation/sgp4';
-import twoline2satrec from '../../src/io';
+import * as satellite from '../../dist/satellite.es';
+const { sgp4, twoline2satrec } = satellite;
 
 const satellitesPerTestSuite = 500;
 
 function getTleSuites() {
   const tleSuites = [];
-  const lines = fs.readFileSync(path.resolve(__dirname, 'tle.txt'), 'utf-8').split('\n');
+  const lines = fs.readFileSync(path.resolve(__dirname, 'tle.txt'), 'utf-8')
+    // remove BOM marker
+    .replace(/^\uFEFF/, '')
+    .split('\n');
   while (lines.length > 0) {
     const suiteLines = lines.splice(0, 2 * satellitesPerTestSuite);
     const tleSuite = [];
@@ -31,11 +34,10 @@ tleSuites.forEach((tleSuite, i) => {
     tleSuite.forEach((tle) => {
       const satrec = twoline2satrec(tle.line1, tle.line2);
       it(`satellite ${satrec.satnum.padStart(5, '0')} measurements`, () => {
-        expect(sgp4(satrec, 0)).toMatchSnapshot();
-        expect(sgp4(satrec, 360)).toMatchSnapshot();
-        expect(sgp4(satrec, 720)).toMatchSnapshot();
-        expect(sgp4(satrec, 1080)).toMatchSnapshot();
-        expect(sgp4(satrec, 1440)).toMatchSnapshot();
+        for (const time of [0, 360, 720, 1080, 1440]) {
+          const result = sgp4(satrec, time)
+          expect(result).toMatchSnapshot();
+        }
       });
     });
   });

@@ -3,14 +3,13 @@
 [![NPM version](https://img.shields.io/npm/v/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
 [![Downloads/month](https://img.shields.io/npm/dm/satellite.js.svg)](https://www.npmjs.com/package/satellite.js)
 [![Build Status](https://img.shields.io/travis/shashwatak/satellite-js/develop.svg)](https://travis-ci.org/shashwatak/satellite-js)
-[![Coverage Status](https://img.shields.io/coveralls/github/shashwatak/satellite-js/develop.svg)](https://coveralls.io/github/shashwatak/satellite-js?branch=develop)
 [![Gitter chat](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/satellite-js/Lobby)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE.md)
 
 ## Introduction
 
-A library to make satellite propagation via TLEs possible in the web.
-Provides the functions necessary for SGP4/SDP4 calculations, as callable javascript. Also provides
+A library to make satellite propagation via TLEs or [OMM](https://www.nasa.gov/wp-content/uploads/2017/12/orbit_data_messages.pdf)
+possible in the web. Provides the functions necessary for SGP4/SDP4 calculations, as callable javascript. Also provides
 functions for coordinate transforms.
 
 The internals of this library are nearly identical to
@@ -83,24 +82,14 @@ Install the library with [Yarn](https://yarnpkg.com/):
 yarn add satellite.js
 ```
 
-Install the library with [Bower](http://bower.io/):
-
-```bash
-bower install satellite.js
-```
-
-**Warning!**
-
-`satellite.js` version 1.3.0 is the latest one for Bower since it has been deprecated.
-
 ## Usage
 
 ### Common.js ([Node.js](https://nodejs.org))
 
 ```js
-var satellite = require('satellite.js');
+const satellite = require('satellite.js');
 ...
-var positionAndVelocity = satellite.sgp4(satrec, time);
+const positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
 ### ES ([Babel.js](https://babeljs.io/))
@@ -133,67 +122,101 @@ Include `dist/satellite.min.js` as a script in your html:
 `satellite` object will be available in global scope:
 
 ```js
-var positionAndVelocity = satellite.sgp4(satrec, time);
+const positionAndVelocity = satellite.sgp4(satrec, time);
 ```
 
 ## Sample Usage
     
 ```js
 // Sample TLE
-var tleLine1 = '1 25544U 98067A   19156.50900463  .00003075  00000-0  59442-4 0  9992',
-    tleLine2 = '2 25544  51.6433  59.2583 0008217  16.4489 347.6017 15.51174618173442';    
+const tleLine1 = '1 25544U 98067A   19156.50900463  .00003075  00000-0  59442-4 0  9992',
+      tleLine2 = '2 25544  51.6433  59.2583 0008217  16.4489 347.6017 15.51174618173442';    
 
 // Initialize a satellite record
-var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+
+// Or sample OMM
+const omm = {
+  "OBJECT_NAME": "HELIOS 2A",
+  "OBJECT_ID": "2004-049A",
+  "EPOCH": "2025-03-26T05:19:34.116960",
+  "MEAN_MOTION": 15.00555103,
+  "ECCENTRICITY": 0.000583,
+  "INCLINATION": 98.3164,
+  "RA_OF_ASC_NODE": 103.8411,
+  "ARG_OF_PERICENTER": 20.5667,
+  "MEAN_ANOMALY": 339.5789,
+  "EPHEMERIS_TYPE": 0,
+  "CLASSIFICATION_TYPE": "U",
+  "NORAD_CAT_ID": 28492,
+  "ELEMENT_SET_NO": 999,
+  "REV_AT_EPOCH": 8655,
+  "BSTAR": 0.00048021,
+  "MEAN_MOTION_DOT": 0.00005995,
+  "MEAN_MOTION_DDOT": 0
+}
+
+const satrecFromOmm = satellite.json2satrec(omm)
 
 //  Propagate satellite using time since epoch (in minutes).
-var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
+const positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
 
 //  Or you can use a JavaScript Date
-var positionAndVelocity = satellite.propagate(satrec, new Date());
+const positionAndVelocity = satellite.propagate(satrec, new Date());
 
-// The position_velocity result is a key-value pair of ECI coordinates.
+// if the result is `null`, it means that the propagation failed;
+// consult `satrec.error` property for a specific reason.
+if (positionAndVelocity === null) {
+  switch (satrec.error) {
+    // all possible values are listed in SatRecError enum:
+    case satellite.SatRecError.Decayed:
+      console.log('The satellite has decayed')
+    // ...
+  }
+}
+
+// The positionAndVelocity result is a pair of ECI coordinates.
 // These are the base results from which all other coordinates are derived.
-var positionEci = positionAndVelocity.position,
-    velocityEci = positionAndVelocity.velocity;
+const positionEci = positionAndVelocity.position,
+      velocityEci = positionAndVelocity.velocity;
 
 // Set the Observer at 122.03 West by 36.96 North, in RADIANS
-var observerGd = {
-    longitude: satellite.degreesToRadians(-122.0308),
-    latitude: satellite.degreesToRadians(36.9613422),
-    height: 0.370
+const observerGd = {
+  longitude: satellite.degreesToRadians(-122.0308),
+  latitude: satellite.degreesToRadians(36.9613422),
+  height: 0.370
 };
 
 // You will need GMST for some of the coordinate transforms.
 // http://en.wikipedia.org/wiki/Sidereal_time#Definition
-var gmst = satellite.gstime(new Date());
+const gmst = satellite.gstime(new Date());
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
-var positionEcf   = satellite.eciToEcf(positionEci, gmst),
-    observerEcf   = satellite.geodeticToEcf(observerGd),
-    positionGd    = satellite.eciToGeodetic(positionEci, gmst),
-    lookAngles    = satellite.ecfToLookAngles(observerGd, positionEcf),
-    dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
+const positionEcf   = satellite.eciToEcf(positionEci, gmst),
+      observerEcf   = satellite.geodeticToEcf(observerGd),
+      positionGd    = satellite.eciToGeodetic(positionEci, gmst),
+      lookAngles    = satellite.ecfToLookAngles(observerGd, positionEcf),
+      dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
 
 // The coordinates are all stored in key-value pairs.
 // ECI and ECF are accessed by `x`, `y`, `z` properties.
-var satelliteX = positionEci.x,
-    satelliteY = positionEci.y,
-    satelliteZ = positionEci.z;
+const satelliteX = positionEci.x,
+      satelliteY = positionEci.y,
+      satelliteZ = positionEci.z;
 
-// Look Angles may be accessed by `azimuth`, `elevation`, `range_sat` properties.
-var azimuth   = lookAngles.azimuth,
-    elevation = lookAngles.elevation,
-    rangeSat  = lookAngles.rangeSat;
+// Look Angles may be accessed by `azimuth`, `elevation`, `rangeSat` properties.
+const azimuth   = lookAngles.azimuth,
+      elevation = lookAngles.elevation,
+      rangeSat  = lookAngles.rangeSat;
 
 // Geodetic coords are accessed via `longitude`, `latitude`, `height`.
-var longitude = positionGd.longitude,
-    latitude  = positionGd.latitude,
-    height    = positionGd.height;
+const longitude = positionGd.longitude,
+      latitude  = positionGd.latitude,
+      height    = positionGd.height;
 
 //  Convert the RADIANS to DEGREES.
-var longitudeDeg = satellite.degreesLong(longitude),
-    latitudeDeg  = satellite.degreesLat(latitude);
+const longitudeDeg = satellite.degreesLong(longitude),
+      latitudeDeg  = satellite.degreesLat(latitude);
 ```
     
 ## Contributing
@@ -251,7 +274,7 @@ npm run test:coverage
 
 ## Building
 
-The source code is organized as Common.js modules and uses [ES6 syntax](http://es6-features.org/).
+The source code is written in [TypeScript](https://www.typescriptlang.org/) and uses a strict tsconfig.
 
 In order to build the library follow these steps:
 
@@ -293,13 +316,6 @@ These is a full list of all available NPM scripts:
 - `lint:test`       lints tests located in `test` directory with ESLint;
 - `test`            runs tests;
 - `test:coverage`   runs tests with [Istanbul](https://github.com/gotwarlost/istanbul) coverage summary;
-- `test:coveralls`  runs tests with Istanbul coverage summary and aggregates the results by
-                    [Coveralls](https://coveralls.io/github/shashwatak/satellite-js); in order to run it locally
-                    `COVERALLS_REPO_TOKEN` is required:
-                    
-    ```
-    COVERALLS_REPO_TOKEN=<token> npm run test:coveralls
-    ```
 
 ## ES5 and satellite.min.js
 
@@ -340,7 +356,7 @@ suggest that anybody try to simplify it unless they have absolute understanding 
 ### Initialization
 
 ```js
-var satrec = satellite.twoline2satrec(longstr1, longstr2);
+const satrec = satellite.twoline2satrec(longstr1, longstr2);
 ```
 
 returns satrec object, created from the TLEs passed in. The satrec object is vastly complicated, but you don't have
@@ -352,19 +368,31 @@ Space Track, there should be no problem.
 
 ### Propagation
 
-Both `propagate()` and `sgp4()` functions return position and velocity as a dictionary of the form:
+Both `propagate()` and `sgp4()` functions return position and velocity; as well as mean elements:
 
 ```json
 {
   "position": { "x" : 1, "y" : 1, "z" : 1 },
-  "velocity": { "x" : 1, "y" : 1, "z" : 1 }
+  "velocity": { "x" : 1, "y" : 1, "z" : 1 },
+  "meanElements": {
+    "Om": 2.2835713400168607,
+    "am": 1.3043985097733939,
+    "em": 0.166565,
+    "im": 0.5743651675510579,
+    "mm": -4.361270622785478,
+    "nm": 0.049918822378349076,
+    "om": 4.074394344293675,
+  }
 }
 ```
 
-position is in km, velocity is in km/s, both the ECI coordinate frame.
+position is in km, velocity is in km/s, both the ECI coordinate frame. Mean elements are satellite orbit elements as they
+evolved at the propagation date: `am` (semi-major axis, Earth radii), `em` (eccentricity), `im` (inclination, radians),
+`Om` (right ascension of ascending node, radians), `om` (argument of perigee, radians),
+`nm` (mean motion, radians per minute).
 
 ```js
-var positionAndVelocity = satellite.propagate(satrec, new Date());
+const positionAndVelocity = satellite.propagate(satrec, new Date());
 ```
 
 Returns position and velocity, given a satrec and the calendar date. Is merely a wrapper for `sgp4()`, converts the
@@ -372,7 +400,7 @@ calendar day to Julian time since satellite epoch. Sometimes it's better to ask 
 a specific date.
 
 ```js
-var positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
+const positionAndVelocity = satellite.sgp4(satrec, timeSinceTleEpochMinutes);
 ```
 
 Returns position and velocity, given a satrec and the time in minutes since epoch. Sometimes it's better to ask for
@@ -384,7 +412,7 @@ You can get the satellites current Doppler factor, relative to your position, us
 Use either ECI or ECF coordinates, but don't mix them.
 
 ```js
-var dopplerFactor = satellite.dopplerFactor(observer, position, velocity);
+const dopplerFactor = satellite.dopplerFactor(observer, position, velocity);
 ```
 
 See the section on Coordinate Transforms to see how to get ECF/ECI/Geodetic coordinates.
@@ -397,13 +425,13 @@ You'll need to provide some of the coordinate transform functions with your curr
 Julian Day:
 
 ```js
-var gmst = satellite.gstime(julianDay);
+const gmst = satellite.gstime(julianDay);
 ```
 
 or a JavaScript Date:
 
 ```js
-var gmst = satellite.gstime(new Date());
+const gmst = satellite.gstime(new Date());
 ```
 
 #### Transforms
@@ -423,26 +451,26 @@ These four are used to convert between ECI, ECF, and Geodetic, as you need them.
 km or km/s. Geodetic coords are in radians.
 
 ```js
-var ecfCoords = satellite.eciToEcf(eciCoords, gmst);
+const ecfCoords = satellite.eciToEcf(eciCoords, gmst);
 ```
 
 ```js
-var eciCoords = satellite.ecfToEci(ecfCoords, gmst);
+const eciCoords = satellite.ecfToEci(ecfCoords, gmst);
 ```
 
 ```js
-var geodeticCoords = satellite.eciToGeodetic(eciCoords, gmst);
+const geodeticCoords = satellite.eciToGeodetic(eciCoords, gmst);
 ```
 
 ```js
-var ecfCoords = satellite.geodeticToEcf(geodeticCoords);
+const ecfCoords = satellite.geodeticToEcf(geodeticCoords);
 ```
 
 These function is used to compute the look angle, from your geodetic position to a satellite in ECF coordinates.
 Make sure you convert the ECI output from sgp4() and propagate() to ECF first.
 
 ```js
-var lookAngles = satellite.ecfToLookAngles(observerGeodetic, satelliteEcf);
+const lookAngles = satellite.ecfToLookAngles(observerGeodetic, satelliteEcf);
 ```
 
 #### Latitude and Longitude
@@ -451,8 +479,25 @@ These two functions will return human readable Latitude or Longitude strings (Ex
 from `geodeticCoords`:
 
 ```js
-var latitudeStr = satellite.degreesLat(geodeticRadians),
-    longitudeStr = satellite.degreesLong(geodeticRadians);
+const latitudeStr = satellite.degreesLat(geodeticRadians),
+      longitudeStr = satellite.degreesLong(geodeticRadians);
+```
+
+#### Sun position
+
+This function returns Sun position at the given date. This is useful to further calculate if a given satellite
+is in Earth umbra. Position is returned as geocentric equatorial vector pointing at the sun,
+along with Right Ascension and Declination. This is the low precision formula and is valid for years from 1950
+to 2050. Accuracy of apparent coordinates is 0.01 degrees.
+```js
+const jday = satellite.jday(new Date())
+const sunPosition = satellite.sunPos(jday)
+
+{
+  rsun: [1, 1, 1], // x, y, z; astronomical units
+  rtasc: 0.5, // radians
+  decl: 0.5 // radians
+}
 ```
 
 ## Note about Code Conventions
