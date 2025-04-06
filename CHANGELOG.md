@@ -1,5 +1,7 @@
 # Changelog
 
+## 6.0.0 (2025-04-06)
+
 - chore: The library is rewritten to TypeScript and type definitions are now not hand-written
 but compiled from source code.
 - feature: New `json2satrec` function that allows parsing orbital elements in
