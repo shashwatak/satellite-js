@@ -209,10 +209,10 @@ for use with this library.
 
 ## Exposed Objects
 
-### satrec
+### SatRec
 
-The `satrec` object comes from the original code by Rhodes as well as Vallado. It is immense and complex, but the
-most important values it contains are the Keplerian Elements and the other values pulled from the TLEs. I do not
+The `SatRec` object comes from the original code by Rhodes as well as Vallado. It is immense and complex, but the
+most important values it contains are the Keplerian Elements and the other values pulled from the TLE/OMM. I do not
 suggest that anybody try to simplify it unless they have absolute understanding of Orbital Mechanics.
 
 - `satnum`      Unique satellite number given in the TLE file.
@@ -228,6 +228,17 @@ suggest that anybody try to simplify it unless they have absolute understanding 
 - `argpo`       Argument of perigee in radians.
 - `mo`          Mean anomaly in radians.
 - `no`          Mean motion in radians per minute.
+- `error`       The error code that is set by SGP4 model in case when propagation fails.
+
+### SatRecError
+
+The enum that lists all possible error codes in `SatRec.error property:
+- `None` - No error, propagation for the last supplied date is successful
+- `MeanEccentricityOutOfRange` - Mean eccentricity is out of range 0 ≤ e < 1
+- `MeanMotionBelowZero` - Mean motion has fallen below zero
+- `PerturbedEccentricityOutOfRange` - Perturbed eccentricity is out of range 0 ≤ e < 1
+- `SemiLatusRectumBelowZero` - Length of the orbit’s semi-latus rectum has fallen below zero
+- `Decayed` - Orbit has decayed: the computed position is underground
 
 ## Exposed Functions
 
