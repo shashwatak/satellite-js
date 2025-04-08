@@ -29,7 +29,12 @@
   },
   "keywords": [
     "sgp4",
-    "satellite"
+    "sdp4",
+    "satellite",
+    "TLE",
+    "two-line elements",
+    "OMM",
+    "sgp4prop"
   ],
   "author": "Shashwat Kandadai <shashwatak@gmail.com> (https://github.com/shashwatak)",
   "contributors": [
