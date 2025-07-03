@@ -169,7 +169,7 @@ export interface OMMJsonObjectV3 {
    * SGP ephemeris type.
    */
   REF_FRAME?: 'TEME';
-  
+
   /**
    * NOTE: This is required field in OMM spec, but Celestrak omits it, so we make it optional
    */
@@ -228,7 +228,7 @@ export interface OMMJsonObjectV3 {
 
   NORAD_CAT_ID: string | number;
   ELEMENT_SET_NO: string | number;
-  REV_AT_EPOCH: string | number;
+  REV_AT_EPOCH?: string | number;
   BSTAR: string | number;
   MEAN_MOTION_DOT: string | number;
   MEAN_MOTION_DDOT: string | number;
