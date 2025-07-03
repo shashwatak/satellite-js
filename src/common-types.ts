@@ -153,11 +153,11 @@ export interface OMMJsonObjectV3 {
   CCSDS_OMM_VERS?: StartsWith<'3.'>;
   COMMENT?: string;
   CLASSIFICATION?: string;
-  OBJECT_NAME?: string;
+  OBJECT_NAME: string;
   /**
    * Recommended, but not required, to be an International spacecraft designator.
    */
-  OBJECT_ID?: string;
+  OBJECT_ID: string;
   /**
    * NOTE: This is required field in OMM spec, but Celestrak omits it, so we make it optional.
    * If present, it is restricted to only the value this library supports.

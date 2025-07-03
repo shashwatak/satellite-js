@@ -184,12 +184,12 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
  *  references    :
  *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
  --------------------------------------------------------------------------- */
-export function json2satrec(jsonobj: OMMJsonObject & { EPOCH: number | string }, opsmode: 'a' | 'i' = 'i') {
+export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
   const error = 0;
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
 
-  const epoch = new Date(typeof jsonobj.EPOCH === 'number' ? jsonobj.EPOCH : jsonobj.EPOCH + (jsonobj.EPOCH.endsWith('Z') ? '' : 'Z'));
+  const epoch = new Date(jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : jsonobj.EPOCH + 'Z');
   const year = epoch.getUTCFullYear();
 
   const epochyr = Number(year.toString().slice(-2));
