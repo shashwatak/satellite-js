@@ -1,5 +1,7 @@
 # Changelog
 
+## 6.0.1 (2025-07-04)
+
 - fix: `json2satrec` couldn't parse OMM `EPOCH` that was ending with Z
 - fix: `OMMJsonObject.REV_AT_EPOCH` is made optional according to OMM spec
 
