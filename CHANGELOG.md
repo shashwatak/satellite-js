@@ -1,5 +1,8 @@
 # Changelog
 
+- fix: `json2satrec` couldn't parse OMM `EPOCH` that was ending with Z
+- fix: `OMMJsonObject.REV_AT_EPOCH` is made optional according to OMM spec
+
 ## 6.0.0 (2025-04-06)
 
 - chore: The library is rewritten to TypeScript and type definitions are now not hand-written
