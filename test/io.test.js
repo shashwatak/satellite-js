@@ -37,3 +37,15 @@ describe('OMM Format Conversion', () => {
         }
     });
 })
+
+// PR #146 
+describe('OMM Epoch must be parsed with or without ending Z', () => {
+  const goodDataExample = goodData[0];
+  expect(goodDataExample.EPOCH.endsWith('Z')).toBe(false);
+  const goodDataExampleWithEpochEndingInZ = {
+    ...goodDataExample,
+    EPOCH: new Date(goodDataExample.EPOCH + 'Z').toISOString(),
+  };
+  expect(goodDataExampleWithEpochEndingInZ.EPOCH.endsWith('Z')).toBe(true);
+  expect(json2satrec(goodDataExampleWithEpochEndingInZ)).toEqual(json2satrec(goodDataExample));
+});
