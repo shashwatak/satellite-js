@@ -189,7 +189,7 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
 
-  const epoch = new Date(jsonobj.EPOCH + 'Z');
+  const epoch = new Date(jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : jsonobj.EPOCH + 'Z');
   const year = epoch.getUTCFullYear();
 
   const epochyr = Number(year.toString().slice(-2));
