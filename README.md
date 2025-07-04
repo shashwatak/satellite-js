@@ -230,7 +230,7 @@ suggest that anybody try to simplify it unless they have absolute understanding 
 
 ### SatRecError
 
-The enum that lists all possible error codes in `SatRec.error property:
+The enum that lists all possible error codes in `SatRec.error` property:
 - `None` - No error, propagation for the last supplied date is successful
 - `MeanEccentricityOutOfRange` - Mean eccentricity is out of range 0 ≤ e < 1
 - `MeanMotionBelowZero` - Mean motion has fallen below zero
