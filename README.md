@@ -15,20 +15,9 @@ The internals of this library are nearly identical to
 
 Special thanks to all contributors for improving usability and bug fixes :)
 
-- [ezze (Dmitriy Pushkov)](https://github.com/ezze)
-- [davidcalhoun (David Calhoun)](https://github.com/davidcalhoun)
-- [tikhonovits (Nikos Sagias)](https://github.com/tikhonovits)
-- [dangodev (Drew Powers)](https://github.com/dangodev)
-- [thkruz (Theodore Kruczek)](https://github.com/thkruz)
-- [bakercp (Christopher Baker)](https://github.com/bakercp)
-- [kylegmaxwell (Kyle G. Maxwell)](https://github.com/kylegmaxwell)
-- [iamthechad (Chad Johnston)](https://github.com/iamthechad)
-- [drom (Aliaksei Chapyzhenka)](https://github.com/drom)
-- [PeterDaveHello (Peter Dave Hello)](https://github.com/PeterDaveHello)
-- [Alesha72003](https://github.com/Alesha72003)
-- [nhamer](https://github.com/nhamer)
-- [owntheweb](https://github.com/owntheweb)
-- [Zigone](https://github.com/Zigone)
+<a href="https://github.com/shashwatak/satellite-js/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=shashwatak/satellite-js" style="width:50%"/>
+</a>
 
 Sites using the library can be found [here](https://github.com/shashwatak/satellite-js/wiki/Sites-using-satellite.js).
 
