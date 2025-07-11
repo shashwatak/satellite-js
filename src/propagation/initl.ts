@@ -3,9 +3,9 @@ import {
   xke,
   j2,
   x2o3,
-} from '../constants';
+} from '../constants.js';
 
-import gstime from './gstime';
+import gstime from './gstime.js';
 
 interface InitlOptions {
   opsmode: 'a' | 'i';

@@ -1,7 +1,7 @@
 import { PositionAndVelocity } from '../common-types.js';
-import { minutesPerDay } from '../constants';
-import { jday } from '../ext';
-import sgp4 from './sgp4';
+import { minutesPerDay } from '../constants.js';
+import { jday } from '../ext.js';
+import sgp4 from './sgp4.js';
 import { SatRec } from './SatRec.js';
 
 export function propagate (satrec: SatRec, date: Date): PositionAndVelocity;

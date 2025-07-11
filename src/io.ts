@@ -1,10 +1,10 @@
 import { OMMJsonObject } from './common-types.js';
-import { deg2rad, xpdotp } from './constants';
+import { deg2rad, xpdotp } from './constants.js';
 
-import { jday, days2mdhms } from './ext';
+import { jday, days2mdhms } from './ext.js';
 import { SatRecInit } from './propagation/SatRec.js';
 
-import sgp4init from './propagation/sgp4init';
+import sgp4init from './propagation/sgp4init.js';
 
 /* -----------------------------------------------------------------------------
  *

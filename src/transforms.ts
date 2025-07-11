@@ -4,7 +4,7 @@ import {
   twoPi,
   rad2deg,
   deg2rad,
-} from './constants';
+} from './constants.js';
 
 export function radiansToDegrees(radians: Radians): Degrees {
   return radians * rad2deg;

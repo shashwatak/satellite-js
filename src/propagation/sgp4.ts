@@ -8,10 +8,10 @@ import {
   j2,
   j3oj2,
   x2o3,
-} from '../constants';
+} from '../constants.js';
 
-import dpper from './dpper';
-import dspace from './dspace';
+import dpper from './dpper.js';
+import dspace from './dspace.js';
 import { SatRec, SatRecError } from './SatRec.js';
 
 /*----------------------------------------------------------------------------

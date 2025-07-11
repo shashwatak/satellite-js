@@ -2,9 +2,9 @@ import { GMSTime } from '../common-types.js';
 import {
   deg2rad,
   twoPi,
-} from '../constants';
+} from '../constants.js';
 
-import { jday } from '../ext';
+import { jday } from '../ext.js';
 
 /* -----------------------------------------------------------------------------
  *
