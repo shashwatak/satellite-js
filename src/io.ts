@@ -69,8 +69,8 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
 
   const epochyr = parseInt(longstr1.substring(18, 20), 10);
   const epochdays = parseFloat(longstr1.substring(20, 32));
-  const ndot = parseFloat(longstr1.substring(33, 43));
-  const nddot = parseFloat(
+  let ndot = parseFloat(longstr1.substring(33, 43));
+  let nddot = parseFloat(
     `${longstr1.substring(44, 45)}.${longstr1.substring(45, 50)}E${longstr1.substring(50, 52)}`,
   );
   const bstar = parseFloat(
@@ -91,8 +91,9 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
   // ---- convert to sgp4 units ----
-  // satrec.ndot /= (xpdotp * 1440.0); // ? * minperday
-  // satrec.nddot /= (xpdotp * 1440.0 * 1440);
+  // this commented out resulted in discrepancies between js and native struct
+  ndot /= (xpdotp * 1440.0); // ? * minperday
+  nddot /= (xpdotp * 1440.0 * 1440);
 
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set

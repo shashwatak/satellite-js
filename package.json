@@ -21,7 +21,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "raise": "raise-version",
-    "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build"
+    "wasm:serve": "vite serve simd-test",
+    "wasm:build": "em++ src-cpp/js-addons.cpp src-cpp/SGP4.cpp --emit-tsd simd_test.d.ts -O3 -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free,___lsan_do_leak_check -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o simd-test/simd_test.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=ccall,UTF8ToString,stringToUTF8,lengthBytesUTF8 -fsanitize=leak"
   },
   "repository": {
     "type": "git",
@@ -67,8 +68,10 @@
     "raise-version": "^0.5.0",
     "rimraf": "^3.0.2",
     "rollup": "^3.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.26.1"
+    "typescript-eslint": "^8.26.1",
+    "vite": "^6.3.5"
   },
   "jest": {
     "testPathIgnorePatterns": [
