@@ -1,10 +1,10 @@
-export * as constants from './constants';
+export * as constants from './constants.js';
 
-export { jday, invjday } from './ext';
-export { twoline2satrec, json2satrec} from './io';
-export { propagate, sgp4, gstime } from './propagation';
+export { jday, invjday } from './ext.js';
+export { twoline2satrec, json2satrec} from './io.js';
+export { propagate, sgp4, gstime } from './propagation.js';
 
-export { default as dopplerFactor } from './dopplerFactor';
+export { default as dopplerFactor } from './dopplerFactor.js';
 
 export {
   radiansToDegrees,
@@ -18,8 +18,8 @@ export {
   eciToEcf,
   ecfToEci,
   ecfToLookAngles,
-} from './transforms';
+} from './transforms.js';
 
-export { sunPos } from './sun';
+export { sunPos } from './sun.js';
 export { type SatRec, SatRecError } from './propagation/SatRec.js';
 export * from './common-types.js';

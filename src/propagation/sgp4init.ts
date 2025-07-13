@@ -6,13 +6,13 @@ import {
   j3oj2,
   x2o3,
   tumin,
-} from '../constants';
+} from '../constants.js';
 
-import dpper from './dpper';
-import dscom from './dscom';
-import dsinit from './dsinit';
-import initl from './initl';
-import sgp4 from './sgp4';
+import dpper from './dpper.js';
+import dscom from './dscom.js';
+import dsinit from './dsinit.js';
+import initl from './initl.js';
+import sgp4 from './sgp4.js';
 import { SatRec, SatRecInit } from './SatRec.js';
 
 export interface Sgp4InitOptions {

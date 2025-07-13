@@ -1,4 +1,4 @@
-import { deg2rad, pi, twoPi } from './constants';
+import { deg2rad, pi, twoPi } from './constants.js';
 import { JDay } from './ext.js';
 
 ////////////////////////////////////////////////////////////////////////////////////

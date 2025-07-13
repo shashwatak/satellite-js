@@ -3,7 +3,7 @@ import {
   twoPi,
   xke,
   x2o3,
-} from '../constants';
+} from '../constants.js';
 
 interface DsinitOptions {
   cosim: number;

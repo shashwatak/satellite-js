@@ -2,7 +2,7 @@ import { SatRec } from './SatRec.js';
 import {
   pi,
   twoPi,
-} from '../constants';
+} from '../constants.js';
 
 interface DpperOptions {
   init: 'y' | 'n';
