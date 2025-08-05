@@ -6,7 +6,7 @@
 #define pi 3.14159265358979323846
 
 extern "C" {
-  size_t EMSCRIPTEN_KEEPALIVE get_satrec_size() {
+  size_t EMSCRIPTEN_KEEPALIVE get_elsetrec_size() {
     return sizeof(elsetrec);
   }
 
@@ -14,10 +14,10 @@ extern "C" {
     printf("char is: %s\n", (char)-1 < 0 ? "signed" : "unsigned");
   }
 
-  char* EMSCRIPTEN_KEEPALIVE get_offsets() {
+  char* EMSCRIPTEN_KEEPALIVE create_struct_layout_string_pointer() {
     elsetrec* zero_rec = ((elsetrec*)0);
     std::string result = "[";
-    result += "[\"satnum\",\"string\"," + std::to_string(offsetof(elsetrec, satnum)) + "," + std::to_string(sizeof(zero_rec->satnum)) + "],";
+    result += "[\"satnum\",\"char[]\"," + std::to_string(offsetof(elsetrec, satnum)) + "," + std::to_string(sizeof(zero_rec->satnum)) + "],";
     result += "[\"epochyr\",\"int\"," + std::to_string(offsetof(elsetrec, epochyr)) + "," + std::to_string(sizeof(zero_rec->epochyr)) + "],";
     result += "[\"epochtynumrev\",\"int\"," + std::to_string(offsetof(elsetrec, epochtynumrev)) + "," + std::to_string(sizeof(zero_rec->epochtynumrev)) + "],";
     result += "[\"error\",\"int\"," + std::to_string(offsetof(elsetrec, error)) + "," + std::to_string(sizeof(zero_rec->error)) + "],";
@@ -123,7 +123,7 @@ extern "C" {
     result += "[\"mo\",\"double\"," + std::to_string(offsetof(elsetrec, mo)) + "," + std::to_string(sizeof(zero_rec->mo)) + "],";
     result += "[\"no_kozai\",\"double\"," + std::to_string(offsetof(elsetrec, no_kozai)) + "," + std::to_string(sizeof(zero_rec->no_kozai)) + "],";
     result += "[\"classification\",\"char\"," + std::to_string(offsetof(elsetrec, classification)) + "," + std::to_string(sizeof(zero_rec->classification)) + "],";
-    result += "[\"intldesg\",\"string\"," + std::to_string(offsetof(elsetrec, intldesg)) + "," + std::to_string(sizeof(zero_rec->intldesg)) + "],";
+    result += "[\"intldesg\",\"char[]\"," + std::to_string(offsetof(elsetrec, intldesg)) + "," + std::to_string(sizeof(zero_rec->intldesg)) + "],";
     result += "[\"ephtype\",\"int\"," + std::to_string(offsetof(elsetrec, ephtype)) + "," + std::to_string(sizeof(zero_rec->ephtype)) + "],";
     result += "[\"elnum\",\"long\"," + std::to_string(offsetof(elsetrec, elnum)) + "," + std::to_string(sizeof(zero_rec->elnum)) + "],";
     result += "[\"revnum\",\"long\"," + std::to_string(offsetof(elsetrec, revnum)) + "," + std::to_string(sizeof(zero_rec->revnum)) + "],";
@@ -663,6 +663,14 @@ extern "C" {
   void EMSCRIPTEN_KEEPALIVE propagate_many(elsetrec* __restrict satrecs, int count, double unix_ms, double* __restrict positions, double* __restrict velocities) {
     for (int i = 0; i < count; i++) {
       sgp4forJs(satrecs[i], unix_ms, &positions[i * 3], &velocities[i * 3]);
+    }
+  }
+
+  void EMSCRIPTEN_KEEPALIVE calculate_eci_base(elsetrec* __restrict satrecs, int satrecs_count, double* __restrict unix_ms, int unix_ms_count, double* __restrict positions, double* __restrict velocities) {
+    for (int i = 0; i < satrecs_count; i++) {
+      for (int j = 0; j < unix_ms_count; j++) {
+        sgp4forJs(satrecs[i], unix_ms[j], &positions[(i * unix_ms_count + j) * 3], &velocities[(i * unix_ms_count + j) * 3]);
+      }
     }
   }
 }

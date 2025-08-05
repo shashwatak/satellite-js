@@ -8,3 +8,5 @@ sgp4_verification/lib/sgp4
 *.log
 test/propagation/sgp4prop
 types
+wasm-build/*/*.js
+wasm-build/*/*.wasm
