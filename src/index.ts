@@ -4,7 +4,7 @@ export { jday, invjday } from './ext.js';
 export { twoline2satrec, json2satrec} from './io.js';
 export { propagate, sgp4, gstime } from './propagation.js';
 
-export { default as dopplerFactor } from './dopplerFactor.js';
+export { dopplerFactor } from './dopplerFactor.js';
 
 export {
   radiansToDegrees,

@@ -9,7 +9,7 @@ const c = 299792.458; // Speed of light in km/s
  * positive. If the range rate is positive, the satellite is moving away from
  * the observer and its frequency is shifted lower.
  */
-export default function dopplerFactor(
+export function dopplerFactor(
   observerCoordsEcf: EcfVec3<Kilometer>,
   positionEcf: EcfVec3<Kilometer>,
   velocityEcf: EcfVec3<KilometerPerSecond>
