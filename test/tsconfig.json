@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "./**/*.ts"
+  ],
+  "compilerOptions": {
+    "paths": {
+      "wasm-module/*": ["../wasm-build/debug/*"]
+    }
+  }
+}

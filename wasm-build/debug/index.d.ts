@@ -44,7 +44,7 @@ interface WasmModule {
   _calculate_eci_base(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
-  ___lsan_do_leak_check(): void;
+  ___lsan_do_recoverable_leak_check(): number;
 }
 
 export type MainModule = WasmModule & typeof RuntimeExports;

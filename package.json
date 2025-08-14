@@ -25,7 +25,7 @@
     "raise": "raise-version",
     "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build",
     "wasm:serve": "vite serve simd-test",
-    "wasm:build:debug": "em++ src-cpp/js-addons.cpp src-cpp/SGP4.cpp --emit-tsd index.d.ts -g -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free,___lsan_do_leak_check -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/debug/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8 -fsanitize=leak",
+    "wasm:build:debug": "em++ src-cpp/js-addons.cpp src-cpp/SGP4.cpp --emit-tsd index.d.ts -g -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free,___lsan_do_recoverable_leak_check -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/debug/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8 -fsanitize=leak",
     "wasm:build:release": "em++ src-cpp/js-addons.cpp src-cpp/SGP4.cpp --emit-tsd index.d.ts -O3 -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/release/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8",
     "wasm:build": "npm run wasm:build:debug && npm run wasm:build:release"
   },
@@ -79,12 +79,6 @@
     "typescript-eslint": "^8.39.0",
     "vite": "^7.1.0",
     "vitest": "^3.2.4"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "node_modules",
-      "test/propagation/sgp4prop"
-    ]
   },
   "homepage": "https://github.com/shashwatak/satellite-js",
   "directories": {

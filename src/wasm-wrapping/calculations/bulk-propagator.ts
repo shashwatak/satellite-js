@@ -93,6 +93,7 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
   dispose(): void {
     this.module._free(this.satrecsPointer);
     this.module._free(this.outputPointer);
+    this.module._free(this.datesPointer);
   }
 
   [Symbol.dispose]!: () => void
