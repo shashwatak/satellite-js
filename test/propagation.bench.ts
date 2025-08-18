@@ -6,7 +6,7 @@ import { json2satrec, propagate, SatRecError } from '../src/index.js';
 import type { OMMJsonObject } from '../src/common-types.js';
 import ommData from './omm.json' with { type: 'json' };
 
-const MAX_SATELLITES = 2000;
+const MAX_SATELLITES = 20000;
 const DATES_COUNT = 50;
 const DATE_START = new Date('2025-07-12T00:00:00.123Z');
 const DATE_STEP_MS = 60 * 60 * 1000;
@@ -15,16 +15,16 @@ const satrecs = (ommData as OMMJsonObject[]).slice(0, MAX_SATELLITES).map(obj =>
 const dates = Array.from({ length: DATES_COUNT }, (_, i) => new Date(DATE_START.getTime() + i * DATE_STEP_MS));
 
 const wasmModule = await WasmModuleFactory();
+using bp = new BulkPropagator({
+  wasmModule,
+  calculators: [new EciBaseCalculator()],
+  satRecs: satrecs,
+  datesCount: dates.length,
+});
 
 let sideEffectSink = 0; // avoid elimination of loops
 
 bench('WASM BulkPropagator', () => {
-  using bp = new BulkPropagator({
-    wasmModule,
-    calculators: [new EciBaseCalculator()],
-    satRecs: satrecs,
-    datesCount: dates.length,
-  });
   bp.run(dates);
   let local = 0;
   for (let si = 0; si < satrecs.length; si++) {

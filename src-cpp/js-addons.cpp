@@ -366,7 +366,7 @@ extern "C" {
   void EMSCRIPTEN_KEEPALIVE sgp4forJs
 		(
 		elsetrec& satrec, double unix_ms,
-		double r[3], double v[3]
+		double r[3], double v[3], int& error
 		)
 	{
 		double am, axnl, aynl, betal, cosim, cnod,
@@ -459,7 +459,7 @@ extern "C" {
 		if (nm <= 0.0)
 		{
 			//         printf("# error nm %f\n", nm);
-			satrec.error = 2;
+			error = 2;
 			// sgp4fix add return
 			return;
 		}
@@ -472,7 +472,7 @@ extern "C" {
 		if ((em >= 1.0) || (em < -0.001)/* || (am < 0.95)*/)
 		{
 			//         printf("# error em %f\n", em);
-			satrec.error = 1;
+			error = 1;
 			// sgp4fix to return if there is an error in eccentricity
 			return;
 		}
@@ -536,7 +536,7 @@ extern "C" {
 			if ((ep < 0.0) || (ep > 1.0))
 			{
 				//            printf("# error ep %f\n", ep);
-				satrec.error = 3;
+				error = 3;
 				// sgp4fix add return
 				return;
 			}
@@ -586,7 +586,7 @@ extern "C" {
 		if (pl < 0.0)
 		{
 			//         printf("# error pl %f\n", pl);
-			satrec.error = 4;
+			error = 4;
 			// sgp4fix add return
 			return;
 		}
@@ -616,6 +616,14 @@ extern "C" {
 			}
 			mrt = rl * (1.0 - 1.5 * temp2 * betal * satrec.con41) +
 				0.5 * temp1 * satrec.x1mth2 * cos2u;
+      // sgp4fix for decaying satellites
+      if (mrt < 1.0)
+      {
+        //         printf("# decay condition %11.6f \n",mrt);
+        error = 6;
+        return;
+      }
+
 			su = su - 0.25 * temp2 * satrec.x7thm1 * sin2u;
 			xnode = nodep + 1.5 * temp2 * cosip * sin2u;
 			xinc = xincp + 1.5 * temp2 * cosip * sinip * cos2u;
@@ -648,28 +656,20 @@ extern "C" {
 			v[2] = (mvt * uz + rvdot * vz) * vkmpersec;
 		}  // if pl > 0
 
-		// sgp4fix for decaying satellites
-		if (mrt < 1.0)
-		{
-			//         printf("# decay condition %11.6f \n",mrt);
-			satrec.error = 6;
-			return;
-		}
-
 		//#include "debug7.cpp"
 		return;
 	}
 
-  void EMSCRIPTEN_KEEPALIVE propagate_many(elsetrec* __restrict satrecs, int count, double unix_ms, double* __restrict positions, double* __restrict velocities) {
-    for (int i = 0; i < count; i++) {
-      sgp4forJs(satrecs[i], unix_ms, &positions[i * 3], &velocities[i * 3]);
-    }
-  }
+  // void EMSCRIPTEN_KEEPALIVE propagate_many(elsetrec* __restrict satrecs, int count, double unix_ms, double* __restrict positions, double* __restrict velocities) {
+  //   for (int i = 0; i < count; i++) {
+  //     sgp4forJs(satrecs[i], unix_ms, &positions[i * 3], &velocities[i * 3]);
+  //   }
+  // }
 
-  void EMSCRIPTEN_KEEPALIVE calculate_eci_base(elsetrec* __restrict satrecs, int satrecs_count, double* __restrict unix_ms, int unix_ms_count, double* __restrict positions, double* __restrict velocities) {
+  void EMSCRIPTEN_KEEPALIVE calculate_eci_base(elsetrec* __restrict satrecs, int satrecs_count, double* __restrict unix_ms, int unix_ms_count, double* __restrict positions, double* __restrict velocities, int* __restrict errors) {
     for (int i = 0; i < satrecs_count; i++) {
       for (int j = 0; j < unix_ms_count; j++) {
-        sgp4forJs(satrecs[i], unix_ms[j], &positions[(i * unix_ms_count + j) * 3], &velocities[(i * unix_ms_count + j) * 3]);
+        sgp4forJs(satrecs[i], unix_ms[j], &positions[(i * unix_ms_count + j) * 3], &velocities[(i * unix_ms_count + j) * 3], errors[(i * unix_ms_count + j)]);
       }
     }
   }

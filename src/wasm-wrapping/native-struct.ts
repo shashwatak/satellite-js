@@ -1,4 +1,5 @@
 import { MainModule } from '../../wasm-build/release/index.js';
+import * as constants from '../constants.js';
 import { SatRec } from '../propagation/SatRec.js';
 import { CppMemoryWriter } from './struct-manipulation.js';
 
@@ -51,6 +52,51 @@ export function getNativeStructSize(module: MainModule): number {
   return module._get_elsetrec_size();
 }
 
+function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: number, type: NativeFieldType, value: unknown, size: number): void {
+  switch (type) {
+    case 'double':
+      {
+        if (typeof value !== 'number') {
+          throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
+        }
+        writer.writeDouble(offset, value);
+        break;
+      }
+    case 'int':
+      {
+        if (typeof value !== 'number') {
+          throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
+        }
+        writer.writeInt(offset, value);
+        break;
+      }
+    case 'long':
+      {
+        if (typeof value !== 'number') {
+          throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
+        }
+        writer.writeLong(offset, value);
+        break;
+      }
+    case 'char':
+      {
+        if (typeof value !== 'string') {
+          throw new Error(`Expected char for ${fieldName}, got "${typeof value}"`);
+        }
+        writer.writeChar(offset, value);
+        break;
+      }
+    case 'char[]':
+      {
+        if (typeof value !== 'string') {
+          throw new Error(`Expected string for ${fieldName}, got "${typeof value}"`);
+        }
+        writer.writeString(offset, value, size);
+        break;
+      }
+  }
+}
+
 export function allocateNativeStructArrayFromSatrecArray(module: MainModule, satrecArray: SatRec[]): number {
   const layout = getNativeStructFieldLayout(module);
   const nativeSize = getNativeStructSize(module);
@@ -60,57 +106,19 @@ export function allocateNativeStructArrayFromSatrecArray(module: MainModule, sat
     const offset = index * nativeSize;
     writer.setBaseOffset(pointer + offset);
     layout.forEach(({ type, offset, size }, field) => {
+      if (Object.hasOwn(constants, field)) {
+        writeValueToMemory(writer, field, offset, type, constants[field as keyof typeof constants], size)
+      }
+      if (field === 'no_unkozai') {
+        writeValueToMemory(writer, field, offset, type, satrec.no, size);
+      }
+      if (field === 'radiusearthkm') {
+        writeValueToMemory(writer, field, offset, type, constants.earthRadius, size)
+      }
       if (!(field in satrec)) {
         return;
       }
-      field = field as (NativeField & keyof SatRec);
-      switch (type) {
-        case 'double':
-          {
-            const value = satrec[field];
-            if (typeof value !== 'number') {
-              throw new Error(`Expected number for ${field}, got ${typeof value}`);
-            }
-            writer.writeDouble(offset, value);
-            break;
-          }
-        case 'int':
-          {
-            const value = satrec[field];
-            if (typeof value !== 'number') {
-              throw new Error(`Expected number for ${field}, got ${typeof value}`);
-            }
-            writer.writeInt(offset, value);
-            break;
-          }
-        case 'long':
-          {
-            const value = satrec[field];
-            if (typeof value !== 'number') {
-              throw new Error(`Expected number for ${field}, got ${typeof value}`);
-            }
-            writer.writeLong(offset, value);
-            break;
-          }
-        case 'char':
-          {
-            const value = satrec[field];
-            if (typeof value !== 'string') {
-              throw new Error(`Expected char for ${field}, got "${typeof value}"`);
-            }
-            writer.writeChar(offset, value);
-            break;
-          }
-        case 'char[]':
-          {
-            const value = satrec[field];
-            if (typeof value !== 'string') {
-              throw new Error(`Expected string for ${field}, got "${typeof value}"`);
-            }
-            writer.writeString(offset, value, size);
-            break;
-          }
-      }
+      writeValueToMemory(writer, field, offset, type, satrec[field as keyof SatRec], size);
     });
   });
   return pointer;

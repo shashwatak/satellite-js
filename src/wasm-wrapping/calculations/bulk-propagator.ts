@@ -48,16 +48,16 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
       return calculator;
     }) as unknown as Calculators;
 
-    const outputSizesByCalculator = new Map();
+    const outputOffsetsByCalculator = new Map();
     let offsetBytes = 0;
     for (const calculator of this.calculators) {
       const sizeBytes = calculator.getOutputBufferSize(satRecs.length, datesCount);
-      outputSizesByCalculator.set(calculator.name, offsetBytes);
+      outputOffsetsByCalculator.set(calculator.name, offsetBytes);
       offsetBytes += sizeBytes;
     } ;
     // offsetBytes is total size at this point
     this.outputPointer = wasmModule._malloc(offsetBytes);
-    this.outputPointersByCalculator = new Map(Array.from(outputSizesByCalculator).map(([name, offset]) => [name, this.outputPointer + offset]));
+    this.outputPointersByCalculator = new Map(Array.from(outputOffsetsByCalculator).map(([name, offset]) => [name, this.outputPointer + offset]));
     this.calculatorDependenciesOutputsPointers = new Map();
     for (const calculator of this.calculators) {
       const dependenciesPointers = calculator.dependencies.map(dependency => this.outputPointersByCalculator.get(dependency)!);
@@ -67,7 +67,7 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
     }
   }
 
-  run(dates: Date[]) {
+  run(dates: readonly Date[]) {
     writeDatesArray(this.module, this.datesPointer, dates);
 
     for (const calculator of this.calculators) {

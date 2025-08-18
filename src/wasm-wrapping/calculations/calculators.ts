@@ -46,10 +46,13 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { eciPosition
 
   getRawOutput(): { eciPosition: Float64Array; eciVelocity: Float64Array, sgp4Error: Int32Array } {
     const vectorsSize = this.satellitesCount * this.timesCount * DIMENSIONS;
+    const eciPosition = new Float64Array(this.module.HEAP8.buffer, this.outputPointer, vectorsSize);
+    const eciVelocity = new Float64Array(this.module.HEAP8.buffer, eciPosition.byteOffset + eciPosition.byteLength, vectorsSize)
+    const sgp4Error = new Int32Array(this.module.HEAP8.buffer, eciVelocity.byteOffset + eciVelocity.byteLength, this.satellitesCount * this.timesCount);
     return {
-      eciPosition: new Float64Array(this.module.HEAPF64.buffer, this.outputPointer, vectorsSize),
-      eciVelocity: new Float64Array(this.module.HEAPF64.buffer, this.outputPointer + vectorsSize * Float64Array.BYTES_PER_ELEMENT, vectorsSize),
-      sgp4Error: new Int32Array(this.module.HEAP32.buffer, this.outputPointer + 2 * vectorsSize * Float64Array.BYTES_PER_ELEMENT, this.satellitesCount * this.timesCount),
+      eciPosition,
+      eciVelocity,
+      sgp4Error,
     }
   }
 
@@ -63,13 +66,16 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { eciPosition
     timesPointer: number,
     timesCount: number,
   ): void {
+    const velocitiesPointer = this.outputPointer + BYTES_PER_VECTOR * this.satellitesCount * this.timesCount;
+    const errorsPointer = velocitiesPointer + BYTES_PER_VECTOR * this.satellitesCount * this.timesCount;
     this.module._calculate_eci_base(
       elsetrecsPointer,
       elsetrecsCount,
       timesPointer,
       timesCount,
       this.outputPointer,
-      this.outputPointer + BYTES_PER_VECTOR * this.satellitesCount * this.timesCount,
+      velocitiesPointer,
+      errorsPointer,
     );
   }
 }
