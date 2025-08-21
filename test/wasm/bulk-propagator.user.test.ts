@@ -5,6 +5,7 @@ import { EciBaseCalculator } from '../../src/wasm-wrapping/calculations/calculat
 import { twoline2satrec } from '../../src/io.js';
 import { propagate } from '../../src/propagation.js';
 import compareVectors from '../compareVectors.js';
+import { topologicalSort } from '../../src/wasm-wrapping/calculations/toposort.js';
 
 const module = await WasmModuleFactory();
 
@@ -52,4 +53,40 @@ describe('BulkPropagator user-facing API', () => {
       compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
     });
   });
+
+  it('returns the same results after the memory is grown', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run(dates);
+    
+    const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
+    const wasmResults = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
+
+    pureJsResults.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
+    });
+
+    const oldMemorySize = module.HEAP8.buffer.byteLength;
+    const dummyMemory = module._malloc(50_000_000);
+    expect(oldMemorySize).toBeLessThan(module.HEAP8.buffer.byteLength);
+    const wasmResultsAfterGrowth = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
+    pureJsResults.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterGrowth[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterGrowth[i]!.velocity, 11);
+    });
+    module._free(dummyMemory);
+  });
 });
+
+describe('Toposort for BulkPropagator', () => {
+  it('Should throw if there is a cyclic dependency', () => {
+    expect(() => {
+      topologicalSort([{ provides: 'thing', hasDependencies: ['otherThing'] }, { provides: 'otherThing', hasDependencies: ['thing'] }])
+    }).toThrow();
+  })
+})
