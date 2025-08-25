@@ -8,9 +8,30 @@ import type { Calculator } from './calculator.js';
 import type { TupleOf } from './tuple-of.js';
 import type { TypedArray } from './typed-array.js';
 
-type CalculatorsToFormattedOutput<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, unknown>[]> = {
+// Map calculator names to their formatted output type
+type CalculatorsToFormattedOutput<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, any, any>[]> = {
   [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getFormattedOutput']>;
 };
+
+type RunParamsOf<C> = C extends Calculator<any, any, any, any, any, infer RP> ? RP : never;
+
+// Helper type to check if RunParams is effectively empty
+type IsEmptyRunParams<T> = {} extends T ? (T extends {} ? true : false) : false;
+
+type CalculatorsRunParamsByName<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, any, any>[]> = {
+  [C in Calculators[number] as C extends { name: infer Name extends string }
+    ? (IsEmptyRunParams<RunParamsOf<C>> extends true ? never : Name)
+    : never]: RunParamsOf<C>
+};
+
+type BulkPropagatorRunArgs = { dates: readonly Date[] }
+
+type BulkPropagatorRunArgsWithCalculatorParams<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, any, any>[]> = BulkPropagatorRunArgs & CalculatorsRunParamsByName<Calculators>;
+
+function ceilToMultipleOf64Bit(bytes: number): number {
+  const bytesPer64Bit = 8;
+  return Math.ceil(bytes / bytesPer64Bit) * bytesPer64Bit;
+}
 
 export class BulkPropagator<const Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, unknown>[]> {
   private readonly calculators: Calculators;
@@ -51,7 +72,7 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
     const outputOffsetsByCalculator = new Map();
     let offsetBytes = 0;
     for (const calculator of this.calculators) {
-      const sizeBytes = calculator.getOutputBufferSize(satRecs.length, datesCount);
+      const sizeBytes = ceilToMultipleOf64Bit(calculator.getOutputBufferSize(satRecs.length, datesCount));
       outputOffsetsByCalculator.set(calculator.name, offsetBytes);
       offsetBytes += sizeBytes;
     } ;
@@ -67,16 +88,18 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
     }
   }
 
-  run(dates: readonly Date[]) {
-    writeDatesArray(this.module, this.datesPointer, dates);
+  run(args: BulkPropagatorRunArgsWithCalculatorParams<Calculators>) {
+    writeDatesArray(this.module, this.datesPointer, args.dates);
 
     for (const calculator of this.calculators) {
+      const runParams = (args as Record<string, RunParamsOf<Calculators>> & BulkPropagatorRunArgs)[calculator.name];
       calculator.run(
         this.satrecsPointer,
         this.satrecsCount,
         this.datesPointer,
-        dates.length,
-        this.calculatorDependenciesOutputsPointers.get(calculator.name)!
+        args.dates.length,
+        this.calculatorDependenciesOutputsPointers.get(calculator.name)!,
+        runParams ?? {}
       );
     }
   }

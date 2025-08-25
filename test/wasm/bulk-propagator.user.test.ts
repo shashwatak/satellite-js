@@ -1,9 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
 import { BulkPropagator } from '../../src/wasm-wrapping/calculations/bulk-propagator.js';
-import { EciBaseCalculator } from '../../src/wasm-wrapping/calculations/calculators.js';
+import { 
+  EciBaseCalculator, 
+  GmstCalculator, 
+  EcfPositionCalculator, 
+  EcfVelocityCalculator, 
+  GeodeticPositionCalculator,
+  DopplerFactorCalculator, 
+  LookAnglesCalculator
+} from '../../src/wasm-wrapping/calculations/calculators.js';
 import { twoline2satrec } from '../../src/io.js';
 import { propagate } from '../../src/propagation.js';
+import { degreesToRadians, ecfToLookAngles, eciToEcf, eciToGeodetic, geodeticToEcf } from '../../src/transforms.js';
+import { dopplerFactor } from '../../src/dopplerFactor.js';
+import gstime from '../../src/propagation/gstime.js';
 import compareVectors from '../compareVectors.js';
 import { topologicalSort } from '../../src/wasm-wrapping/calculations/toposort.js';
 
@@ -19,7 +30,13 @@ const satRecs = [twoline2satrec(TLE1_1, TLE1_2), twoline2satrec(TLE2_1, TLE2_2)]
 
 const dates = [new Date('2025-07-11T00:00:12.345'), new Date('2025-07-12T00:00:12.345')] as const;
 
-describe('BulkPropagator user-facing API', () => {
+const observerGeodetic = {
+  latitude: degreesToRadians(41),
+  longitude: degreesToRadians(-71),
+  height: 1,
+};
+
+describe('BulkPropagator sanity check', () => {
   it('propagates and returns finite values', () => {
     using bp = new BulkPropagator({
       wasmModule: module,
@@ -27,7 +44,7 @@ describe('BulkPropagator user-facing API', () => {
       satRecs: satRecs,
       datesCount: dates.length,
     });
-    bp.run(dates);
+    bp.run({ dates });
 
     const out0 = bp.getFormattedOutput(0, 0).eci;
     const out1 = bp.getFormattedOutput(0, 1).eci;
@@ -43,7 +60,7 @@ describe('BulkPropagator user-facing API', () => {
       satRecs: satRecs,
       datesCount: dates.length,
     });
-    bp.run(dates);
+    bp.run({ dates });
     
     const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
     const wasmResults = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
@@ -61,7 +78,7 @@ describe('BulkPropagator user-facing API', () => {
       satRecs: satRecs,
       datesCount: dates.length,
     });
-    bp.run(dates);
+    bp.run({ dates });
     
     const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
     const wasmResults = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
@@ -80,6 +97,140 @@ describe('BulkPropagator user-facing API', () => {
       compareVectors(jsResult!.velocity, wasmResultsAfterGrowth[i]!.velocity, 11);
     });
     module._free(dummyMemory);
+  });
+});
+
+describe('Calculator comparisons with JS transforms', () => {
+  it('GmstCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new GmstCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates });
+
+    dates.forEach((date, j) => {
+      const jsGmst = gstime(date);
+      const wasmGmst = bp.getFormattedOutput(0, j).gmst;
+      expect(wasmGmst).toBeCloseTo(jsGmst, 11);
+    });
+  });
+
+  it('EcfPositionCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates });
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const gmst = gstime(date);
+        const jsEcfPosition = eciToEcf(eciResult!.position, gmst);
+        const wasmEcfPosition = bp.getFormattedOutput(i, j).ecfPosition.ecfPosition;
+        
+        compareVectors(jsEcfPosition, wasmEcfPosition, 11);
+      });
+    });
+  });
+
+  it('EcfVelocityCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfVelocityCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates });
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const gmst = gstime(date);
+        const jsEcfVelocity = eciToEcf(eciResult!.velocity, gmst);
+        const wasmEcfVelocity = bp.getFormattedOutput(i, j).ecfVelocity.ecfVelocity;
+        
+        compareVectors(jsEcfVelocity, wasmEcfVelocity, 11);
+      });
+    });
+  });
+
+  it('GeodeticPositionCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator(), new GmstCalculator(), new GeodeticPositionCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates });
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const gmst = gstime(date);
+        const jsGeodeticPosition = eciToGeodetic(eciResult!.position, gmst);
+        const wasmGeodeticPosition = bp.getFormattedOutput(i, j).geodeticPosition.geodeticPosition;
+
+        expect(wasmGeodeticPosition.latitude).toBeCloseTo(jsGeodeticPosition.longitude, 11);
+        expect(wasmGeodeticPosition.longitude).toBeCloseTo(jsGeodeticPosition.latitude, 11);
+        expect(wasmGeodeticPosition.height).toBeCloseTo(jsGeodeticPosition.height, 11);
+      });
+    });
+  });
+
+  it('LookAnglesCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator(), new LookAnglesCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates, lookAngles: { observer: observerGeodetic } });
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const gmst = gstime(date);
+        const ecfPosition = eciToEcf(eciResult!.position, gmst);
+        const jsLookAngles = ecfToLookAngles(observerGeodetic, ecfPosition);
+
+        const wasmLookAngles = bp.getFormattedOutput(i, j).lookAngles;
+
+        expect(wasmLookAngles.azimuth).toBeCloseTo(jsLookAngles.azimuth, 11);
+        expect(wasmLookAngles.elevation).toBeCloseTo(jsLookAngles.elevation, 11);
+        expect(wasmLookAngles.rangeSat).toBeCloseTo(jsLookAngles.rangeSat, 11);
+      });
+    });
+  });
+
+  it('DopplerFactorCalculator returns values close to pure JS implementation', () => {
+    const observerEcf = geodeticToEcf(observerGeodetic);
+
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator(), new EcfVelocityCalculator(), new DopplerFactorCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates, dopplerFactor: { observer: observerEcf } });
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const gmst = gstime(date);
+        const ecfPosition = eciToEcf(eciResult!.position, gmst);
+        const ecfVelocity = eciToEcf(eciResult!.velocity, gmst);
+        
+        const jsDopplerFactor = dopplerFactor(observerEcf, ecfPosition, ecfVelocity);
+        const wasmDopplerFactor = bp.getFormattedOutput(i, j).dopplerFactor.dopplerFactor;
+        
+        expect(wasmDopplerFactor).toBeCloseTo(jsDopplerFactor, 11);
+      });
+    });
   });
 });
 

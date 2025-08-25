@@ -6,6 +6,20 @@ import { twoline2satrec } from '../../src/io.js';
 
 const module = await WasmModuleFactory();
 
+/**
+ * This test ensures that C++ struct stays constant and does not change
+ * across compilations and potential changes in SGP4 code.
+ * 
+ * Having different structure size or layout may be the reason for bugs
+ * in code that translates js SatRec objects to C++ elsetrec structs.
+ * 
+ * If there is a new field added to the native elsetrec, you must also make
+ * sure that either it doesn't participate in propagation or it is properly
+ * written into WASM memory. Most of the time you will need to add the new
+ * field to the `create_struct_layout_string_pointer` C++ function.
+ */
+const knownGoodSize = 992;
+
 const knownGoodLayout = {
   "satnum": ["char[]", 0, 6],
   "epochyr": ["int", 8, 4],
@@ -145,8 +159,8 @@ function layoutToObject(layout: NativeStructLayout) {
 }
 
 describe('WASM elsetrec struct (debug only)', () => {
-  it('has size exactly 992 bytes', async () => {
-    expect(getNativeStructSize(module)).toBe(992);
+  it(`has size exactly ${knownGoodSize} bytes`, async () => {
+    expect(getNativeStructSize(module)).toBe(knownGoodSize);
   });
 
   it('layout string has no unknown changes', () => {
@@ -186,7 +200,18 @@ describe('WASM elsetrec struct (debug only)', () => {
         expect(jdsatepochTlePart1 + jdsatepochTlePart2, field).toEqual(jdsatepochJS);
         return;
       }
-      if (['jdsatepochF', 'classification', 'intldesg', 'elnum', 'revnum', 'am', 'em', 'im', 'om', 'Om', 'nm', 'mm', 'mus'].includes(field)) return;
+      /**
+       * Any omissions must be clearly explained.
+       * 
+       * - jdsatepochF is skipped because JS jdsatepoch ≈ C++ (jdsatepoch + jdsatepochF)
+       * - classification, intldesg, elnum, revnum are skipped because they don't participate in propagation
+       * - am, em, im, om, Om, nm, mm are skipped because those are singly averaged elements that aren't
+       * present on JS side, not used as a source of data in SGP4, only as an output
+       * - mus is skipped because it's a constant that isn't used directly in C++ SGP4
+       * - no_kozai is skipped because it is transformed into no_unkozai and then only used as
+       * no_unkozai in further propagations in C++ SGP4
+       */
+      if (['jdsatepochF', 'classification', 'intldesg', 'elnum', 'revnum', 'am', 'em', 'im', 'om', 'Om', 'nm', 'mm', 'mus', 'no_kozai'].includes(field)) return;
       switch (type) {
         case 'int':
           expect(readerOfInitializedFromTLE.readInt(offset), field).toEqual(readerOfInitializedFromJS.readInt(offset));

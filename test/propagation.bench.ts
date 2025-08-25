@@ -25,7 +25,7 @@ using bp = new BulkPropagator({
 let sideEffectSink = 0; // avoid elimination of loops
 
 bench('WASM BulkPropagator', () => {
-  bp.run(dates);
+  bp.run({ dates });
   let local = 0;
   for (let si = 0; si < satrecs.length; si++) {
     for (let di = 0; di < dates.length; di++) {

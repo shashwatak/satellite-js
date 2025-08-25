@@ -41,6 +41,11 @@ interface WasmModule {
   _propagate(_0: number, _1: number, _2: number, _3: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
   _calculate_eci_base(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
+  _calculate_gmst(_0: number, _1: number, _2: number): void;
+  _calculate_ecf_position_or_velocity(_0: number, _1: number, _2: number, _3: number, _4: number): void;
+  _calculate_geodetic_positions(_0: number, _1: number, _2: number, _3: number, _4: number): void;
+  _calculate_look_angles(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
+  _calculate_doppler_factor(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number, _7: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
 }

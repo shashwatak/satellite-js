@@ -22,7 +22,7 @@ describe('BulkPropagator memory disposal', () => {
         satRecs: [sat],
         datesCount: 2,
       });
-      bp.run(dates);
+      bp.run({ dates });
       const out = bp.getFormattedOutput(0, 0).eci;
       expect(out).toHaveProperty('position');
       expect(module.___lsan_do_recoverable_leak_check()).not.toBe(0);
@@ -38,7 +38,7 @@ describe('BulkPropagator memory disposal', () => {
       satRecs: [sat],
       datesCount: 2,
     });
-    bp.run(dates);
+    bp.run({ dates });
     const out = bp.getFormattedOutput(0, 0).eci;
     expect(out).toHaveProperty('position');
     expect(module.___lsan_do_recoverable_leak_check()).not.toBe(0);
