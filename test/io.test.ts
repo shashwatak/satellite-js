@@ -3,7 +3,7 @@ import { twoline2satrec, json2satrec, OMMJsonObject, SatRec } from '../src/index
 import badTleData from './io-edge.json' with { type: 'json' };
 import goodData from './io.json' with { type: 'json' };
 
-describe('Twoline', () => {
+describe('JS propagation errors', () => {
   it('should convert twoline to satellite record', () => {
     badTleData.forEach((tleDataItem) => {
       const satrec = twoline2satrec(tleDataItem.tleLine1, tleDataItem.tleLine2);

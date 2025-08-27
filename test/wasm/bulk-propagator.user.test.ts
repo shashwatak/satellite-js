@@ -17,6 +17,7 @@ import { dopplerFactor } from '../../src/dopplerFactor.js';
 import gstime from '../../src/propagation/gstime.js';
 import compareVectors from '../compareVectors.js';
 import { topologicalSort } from '../../src/wasm-wrapping/calculations/toposort.js';
+import badTleData from '../io-edge.json' with { type: 'json' };
 
 const module = await WasmModuleFactory();
 
@@ -99,6 +100,23 @@ describe('BulkPropagator sanity check', () => {
     module._free(dummyMemory);
   });
 });
+
+describe('BulkPropagator errors', () => {
+  it('Should correctly return SGP4 errors', () => {
+    badTleData.forEach((tleDataItem) => {
+      const satRec = twoline2satrec(tleDataItem.tleLine1, tleDataItem.tleLine2);
+      using bp = new BulkPropagator({
+        calculators: [new EciBaseCalculator()],
+        datesCount: 1,
+        satRecs: [satRec],
+        wasmModule: module,
+      })
+      const date = new Date((satRec.jdsatepoch - 2440587.5) * 86400000);
+      bp.run({ dates: [date] });
+      expect(bp.getFormattedOutput(0, 0).eci.error).toEqual(tleDataItem.results[0]!.error);
+    });
+  })
+})
 
 describe('Calculator comparisons with JS transforms', () => {
   it('GmstCalculator returns values close to pure JS implementation', () => {
