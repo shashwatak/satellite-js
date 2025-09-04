@@ -32,13 +32,9 @@ declare namespace RuntimeExports {
 }
 interface WasmModule {
   _get_elsetrec_size(): number;
-  _print_char_signedness(): void;
   _create_struct_layout_string_pointer(): number;
   _free_offsets_string(_0: number): void;
-  _satrec_from_tle(_0: number, _1: number): number;
   _init_satrec_from_tle(_0: number, _1: number, _2: number): void;
-  _free_satrec(_0: number): void;
-  _propagate(_0: number, _1: number, _2: number, _3: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
   _calculate_eci_base(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
   _calculate_gmst(_0: number, _1: number, _2: number): void;
