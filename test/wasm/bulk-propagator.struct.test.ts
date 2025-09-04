@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
-import { getNativeStructSize, getNativeStructFieldLayout, NativeStructLayout, allocateNativeStructArrayFromSatrecArray } from '../../src/wasm-wrapping/native-struct.js';
-import { CppMemoryReader } from '../../src/wasm-wrapping/struct-manipulation.js';
+import { getNativeStructSize, getNativeStructFieldLayout, NativeStructLayout, allocateAndWriteNativeStructArrayFromSatrecArray } from '../../src/wasm/native-structs-from-js.js';
+import { CppMemoryReader } from '../../src/wasm/struct-read-write.js';
 import { twoline2satrec } from '../../src/io.js';
 
 const module = await WasmModuleFactory();
@@ -185,7 +185,7 @@ describe('WASM elsetrec struct (debug only)', () => {
     module._free(pointer1);
     module._free(pointer2);
 
-    const satrecInitializedFromJSSatrec = allocateNativeStructArrayFromSatrecArray(module, [satrec]);
+    const satrecInitializedFromJSSatrec = allocateAndWriteNativeStructArrayFromSatrecArray(module, [satrec]);
 
     const readerOfInitializedFromTLE = new CppMemoryReader(module.HEAP8.buffer, satrecInitializedFromTlePointer);
     const readerOfInitializedFromJS = new CppMemoryReader(module.HEAP8.buffer, satrecInitializedFromJSSatrec);

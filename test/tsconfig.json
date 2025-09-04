@@ -4,6 +4,8 @@
     "./**/*.ts"
   ],
   "compilerOptions": {
+    "module": "nodenext",
+    "target": "esnext",
     "paths": {
       "wasm-module/*": ["../wasm-build/debug/*"]
     }

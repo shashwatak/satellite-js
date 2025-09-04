@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
-import { BulkPropagator } from '../../src/wasm-wrapping/calculations/bulk-propagator.js';
+import { BulkPropagator } from '../../src/wasm/bulk-propagator.js';
 import { 
   EciBaseCalculator, 
   GmstCalculator, 
@@ -9,14 +9,14 @@ import {
   GeodeticPositionCalculator,
   DopplerFactorCalculator, 
   LookAnglesCalculator
-} from '../../src/wasm-wrapping/calculations/calculators.js';
+} from '../../src/wasm/calculators/calculators.js';
 import { twoline2satrec } from '../../src/io.js';
 import { propagate } from '../../src/propagation.js';
 import { degreesToRadians, ecfToLookAngles, eciToEcf, eciToGeodetic, geodeticToEcf } from '../../src/transforms.js';
 import { dopplerFactor } from '../../src/dopplerFactor.js';
 import gstime from '../../src/propagation/gstime.js';
 import compareVectors from '../compareVectors.js';
-import { topologicalSort } from '../../src/wasm-wrapping/calculations/toposort.js';
+import { topologicalSort } from '../../src/wasm/toposort.js';
 import badTleData from '../io-edge.json' with { type: 'json' };
 
 const module = await WasmModuleFactory();
@@ -47,8 +47,8 @@ describe('BulkPropagator sanity check', () => {
     });
     bp.run({ dates });
 
-    const out0 = bp.getFormattedOutput(0, 0).eci;
-    const out1 = bp.getFormattedOutput(0, 1).eci;
+    const out0 = bp.getFormattedOutput(0, 0)!.eci;
+    const out1 = bp.getFormattedOutput(0, 1)!.eci;
 
     expect(Number.isFinite(out0.position.x)).toBe(true);
     expect(Number.isFinite(out1.velocity.y)).toBe(true);
@@ -64,13 +64,39 @@ describe('BulkPropagator sanity check', () => {
     bp.run({ dates });
     
     const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
-    const wasmResults = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
+    const wasmResults = satRecs.flatMap((_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci));
 
     pureJsResults.forEach((jsResult, i) => {
       compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
       compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
     });
   });
+
+  it('returns undefined if out of bounds', () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+    bp.run({ dates });
+    
+    const out0 = bp.getFormattedOutput(satRecs.length, 0);
+    expect(out0).toBeUndefined();
+  })
+
+  it("throws if dates.length doesn't match datesCount", () => {
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length + 1,
+    });
+
+    expect(() => {
+      bp.run({ dates })
+    }).toThrow();
+  })
 
   it('returns the same results after the memory is grown', () => {
     using bp = new BulkPropagator({
@@ -82,7 +108,7 @@ describe('BulkPropagator sanity check', () => {
     bp.run({ dates });
     
     const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
-    const wasmResults = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
+    const wasmResults = satRecs.flatMap((_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci));
 
     pureJsResults.forEach((jsResult, i) => {
       compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
@@ -92,7 +118,7 @@ describe('BulkPropagator sanity check', () => {
     const oldMemorySize = module.HEAP8.buffer.byteLength;
     const dummyMemory = module._malloc(50_000_000);
     expect(oldMemorySize).toBeLessThan(module.HEAP8.buffer.byteLength);
-    const wasmResultsAfterGrowth = satRecs.flatMap((satRec, i) => dates.map((date, j) => bp.getFormattedOutput(i, j).eci));
+    const wasmResultsAfterGrowth = satRecs.flatMap((_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci));
     pureJsResults.forEach((jsResult, i) => {
       compareVectors(jsResult!.position, wasmResultsAfterGrowth[i]!.position, 11);
       compareVectors(jsResult!.velocity, wasmResultsAfterGrowth[i]!.velocity, 11);
@@ -113,7 +139,7 @@ describe('BulkPropagator errors', () => {
       })
       const date = new Date((satRec.jdsatepoch - 2440587.5) * 86400000);
       bp.run({ dates: [date] });
-      expect(bp.getFormattedOutput(0, 0).eci.error).toEqual(tleDataItem.results[0]!.error);
+      expect(bp.getFormattedOutput(0, 0)!.eci.error).toEqual(tleDataItem.results[0]!.error);
     });
   })
 })
@@ -130,7 +156,7 @@ describe('Calculator comparisons with JS transforms', () => {
 
     dates.forEach((date, j) => {
       const jsGmst = gstime(date);
-      const wasmGmst = bp.getFormattedOutput(0, j).gmst;
+      const wasmGmst = bp.getFormattedOutput(0, j)!.gmst;
       expect(wasmGmst).toBeCloseTo(jsGmst, 11);
     });
   });
@@ -149,7 +175,7 @@ describe('Calculator comparisons with JS transforms', () => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
         const jsEcfPosition = eciToEcf(eciResult!.position, gmst);
-        const wasmEcfPosition = bp.getFormattedOutput(i, j).ecfPosition.ecfPosition;
+        const wasmEcfPosition = bp.getFormattedOutput(i, j)!.ecfPosition;
         
         compareVectors(jsEcfPosition, wasmEcfPosition, 11);
       });
@@ -170,7 +196,7 @@ describe('Calculator comparisons with JS transforms', () => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
         const jsEcfVelocity = eciToEcf(eciResult!.velocity, gmst);
-        const wasmEcfVelocity = bp.getFormattedOutput(i, j).ecfVelocity.ecfVelocity;
+        const wasmEcfVelocity = bp.getFormattedOutput(i, j)!.ecfVelocity;
         
         compareVectors(jsEcfVelocity, wasmEcfVelocity, 11);
       });
@@ -191,7 +217,7 @@ describe('Calculator comparisons with JS transforms', () => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
         const jsGeodeticPosition = eciToGeodetic(eciResult!.position, gmst);
-        const wasmGeodeticPosition = bp.getFormattedOutput(i, j).geodeticPosition.geodeticPosition;
+        const wasmGeodeticPosition = bp.getFormattedOutput(i, j)!.geodeticPosition;
 
         expect(wasmGeodeticPosition.latitude).toBeCloseTo(jsGeodeticPosition.longitude, 11);
         expect(wasmGeodeticPosition.longitude).toBeCloseTo(jsGeodeticPosition.latitude, 11);
@@ -216,7 +242,7 @@ describe('Calculator comparisons with JS transforms', () => {
         const ecfPosition = eciToEcf(eciResult!.position, gmst);
         const jsLookAngles = ecfToLookAngles(observerGeodetic, ecfPosition);
 
-        const wasmLookAngles = bp.getFormattedOutput(i, j).lookAngles;
+        const wasmLookAngles = bp.getFormattedOutput(i, j)!.lookAngles;
 
         expect(wasmLookAngles.azimuth).toBeCloseTo(jsLookAngles.azimuth, 11);
         expect(wasmLookAngles.elevation).toBeCloseTo(jsLookAngles.elevation, 11);
@@ -244,12 +270,58 @@ describe('Calculator comparisons with JS transforms', () => {
         const ecfVelocity = eciToEcf(eciResult!.velocity, gmst);
         
         const jsDopplerFactor = dopplerFactor(observerEcf, ecfPosition, ecfVelocity);
-        const wasmDopplerFactor = bp.getFormattedOutput(i, j).dopplerFactor.dopplerFactor;
+        const wasmDopplerFactor = bp.getFormattedOutput(i, j)!.dopplerFactor;
         
         expect(wasmDopplerFactor).toBeCloseTo(jsDopplerFactor, 11);
       });
     });
   });
+
+  it('BulkPropagator and Calculators raw results are the same as formatted results', () => {
+    const observerEcf = geodeticToEcf(observerGeodetic);
+
+    using bp = new BulkPropagator({
+      wasmModule: module,
+      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator(), new EcfVelocityCalculator(), new DopplerFactorCalculator(), new LookAnglesCalculator()],
+      satRecs: satRecs,
+      datesCount: dates.length,
+    });
+
+    bp.run({ dates, dopplerFactor: { observer: observerEcf }, lookAngles: { observer: observerGeodetic } });
+
+    const formattedResults = bp.getFormattedOutput(1, 0)!
+    const rawResults = bp.getRawOutput()
+    expect(formattedResults.eci).toEqual({
+      error: rawResults.eci.error[2],
+      position: {
+        x: rawResults.eci.position[3 * 2],
+        y: rawResults.eci.position[3 * 2 + 1],
+        z: rawResults.eci.position[3 * 2 + 2]
+      },
+      velocity: {
+        x: rawResults.eci.velocity[3 * 2],
+        y: rawResults.eci.velocity[3 * 2 + 1],
+        z: rawResults.eci.velocity[3 * 2 + 2]
+      },
+    })
+    expect(formattedResults.ecfPosition).toEqual({
+      x: rawResults.ecfPosition[3 * 2],
+      y: rawResults.ecfPosition[3 * 2 + 1],
+      z: rawResults.ecfPosition[3 * 2 + 2]
+    })
+    expect(formattedResults.ecfVelocity).toEqual({
+      x: rawResults.ecfVelocity[3 * 2],
+      y: rawResults.ecfVelocity[3 * 2 + 1],
+      z: rawResults.ecfVelocity[3 * 2 + 2]
+    })
+    expect(formattedResults.gmst).toEqual(rawResults.gmst[0])
+    expect(formattedResults.dopplerFactor).toEqual(rawResults.dopplerFactor[2])
+    expect(formattedResults.lookAngles).toEqual({
+      azimuth: rawResults.lookAngles[3 * 2],
+      elevation: rawResults.lookAngles[3 * 2 + 1],
+      rangeSat: rawResults.lookAngles[3 * 2 + 2]
+    })
+  })
 });
 
 describe('Toposort for BulkPropagator', () => {

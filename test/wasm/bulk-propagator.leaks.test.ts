@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
-import { BulkPropagator } from '../../src/wasm-wrapping/calculations/bulk-propagator.js';
-import { EciBaseCalculator } from '../../src/wasm-wrapping/calculations/calculators.js';
+import { BulkPropagator } from '../../src/wasm/bulk-propagator.js';
+import { EciBaseCalculator } from '../../src/wasm/calculators/calculators.js';
 import { twoline2satrec } from '../../src/io.js';
 
 const module = await WasmModuleFactory();
@@ -23,7 +23,7 @@ describe('BulkPropagator memory disposal', () => {
         datesCount: 2,
       });
       bp.run({ dates });
-      const out = bp.getFormattedOutput(0, 0).eci;
+      const out = bp.getFormattedOutput(0, 0)!.eci;
       expect(out).toHaveProperty('position');
       expect(module.___lsan_do_recoverable_leak_check()).not.toBe(0);
     }
@@ -39,7 +39,7 @@ describe('BulkPropagator memory disposal', () => {
       datesCount: 2,
     });
     bp.run({ dates });
-    const out = bp.getFormattedOutput(0, 0).eci;
+    const out = bp.getFormattedOutput(0, 0)!.eci;
     expect(out).toHaveProperty('position');
     expect(module.___lsan_do_recoverable_leak_check()).not.toBe(0);
 

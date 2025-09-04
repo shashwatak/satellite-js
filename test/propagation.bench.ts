@@ -1,13 +1,13 @@
 import { bench } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
-import { BulkPropagator } from '../src/wasm-wrapping/calculations/bulk-propagator.js';
-import { EciBaseCalculator } from '../src/wasm-wrapping/calculations/calculators.js';
+import { BulkPropagator } from '../src/wasm/bulk-propagator.js';
+import { EciBaseCalculator } from '../src/wasm/calculators/calculators.js';
 import { json2satrec, propagate, SatRecError } from '../src/index.js';
 import type { OMMJsonObject } from '../src/common-types.js';
 import ommData from './omm.json' with { type: 'json' };
 
 const MAX_SATELLITES = 20000;
-const DATES_COUNT = 50;
+const DATES_COUNT = 1;
 const DATE_START = new Date('2025-07-12T00:00:00.123Z');
 const DATE_STEP_MS = 60 * 60 * 1000;
 
@@ -29,7 +29,7 @@ bench('WASM BulkPropagator', () => {
   let local = 0;
   for (let si = 0; si < satrecs.length; si++) {
     for (let di = 0; di < dates.length; di++) {
-      const out = bp.getFormattedOutput(si, di).eci;
+      const out = bp.getFormattedOutput(si, di)!.eci;
       if (out.error === SatRecError.None) {
         local += out.position.x + out.velocity.y;
       }
