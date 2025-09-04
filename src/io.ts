@@ -91,7 +91,6 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
   // ---- convert to sgp4 units ----
-  // this commented out resulted in discrepancies between js and native struct
   ndot /= (xpdotp * 1440.0); // ? * minperday
   nddot /= (xpdotp * 1440.0 * 1440);
 
@@ -197,8 +196,13 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
   const epochdays =
     (epoch.valueOf() - new Date(Date.UTC(year, 0, 1, 0, 0, 0)).valueOf()) / (86400 * 1000) + 1;
 
-  const ndot = Number(jsonobj.MEAN_MOTION_DOT);
-  const nddot = Number(jsonobj.MEAN_MOTION_DDOT);
+  let ndot = Number(jsonobj.MEAN_MOTION_DOT);
+  let nddot = Number(jsonobj.MEAN_MOTION_DDOT);
+
+  // ---- convert to sgp4 units ----
+  ndot /= (xpdotp * 1440.0); // ? * minperday
+  nddot /= (xpdotp * 1440.0 * 1440);
+
   const bstar = Number(jsonobj.BSTAR);
 
   const inclo = Number(jsonobj.INCLINATION) * deg2rad;
