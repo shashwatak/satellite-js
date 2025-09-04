@@ -1,24 +1,24 @@
-import { SatRec } from '../../propagation/SatRec.js';
-import { topologicalSort } from './toposort.js';
-
-import type { MainModule } from '../../../wasm-build/release/index.js';
-import { allocateNativeStructArrayFromSatrecArray } from '../native-struct.js';
-import { allocateDatesArray, writeDatesArray } from '../date-to-wasm.js';
-import type { Calculator } from './calculator.js';
-import type { TupleOf } from './tuple-of.js';
+import type { SatRec } from '../propagation/SatRec.js';
+import type { MainModule } from '../../wasm-build/release/index.js';
+import type { Calculator } from './calculators/calculator-interface.js';
+import type { TupleOf } from './calculators/tuple-of.js';
 import type { TypedArray } from './typed-array.js';
+import { topologicalSort } from './toposort.js';
+import { allocateNativeStructArrayFromSatrecArray } from './native-structs-from-js.js';
+import { allocateDatesArray, writeDatesArray } from './date-to-wasm.js';
 
-// Map calculator names to their formatted output type
-type CalculatorsToFormattedOutput<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, any, any>[]> = {
+export type CalculatorsToFormattedOutput<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any>[]> = {
   [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getFormattedOutput']>;
+};
+export type CalculatorsToRawOutput<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any>[]> = {
+  [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getRawOutput']>;
 };
 
 type RunParamsOf<C> = C extends Calculator<any, any, any, any, any, infer RP> ? RP : never;
 
-// Helper type to check if RunParams is effectively empty
 type IsEmptyRunParams<T> = {} extends T ? (T extends {} ? true : false) : false;
 
-type CalculatorsRunParamsByName<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, any, any>[]> = {
+type CalculatorsRunParamsByName<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any>[]> = {
   [C in Calculators[number] as C extends { name: infer Name extends string }
     ? (IsEmptyRunParams<RunParamsOf<C>> extends true ? never : Name)
     : never]: RunParamsOf<C>
@@ -26,18 +26,19 @@ type CalculatorsRunParamsByName<Calculators extends readonly Calculator<string, 
 
 type BulkPropagatorRunArgs = { dates: readonly Date[] }
 
-type BulkPropagatorRunArgsWithCalculatorParams<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, any, any>[]> = BulkPropagatorRunArgs & CalculatorsRunParamsByName<Calculators>;
+type BulkPropagatorRunArgsWithCalculatorParams<Calculators extends readonly Calculator<string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any>[]> = BulkPropagatorRunArgs & CalculatorsRunParamsByName<Calculators>;
 
 function ceilToMultipleOf64Bit(bytes: number): number {
   const bytesPer64Bit = 8;
   return Math.ceil(bytes / bytesPer64Bit) * bytesPer64Bit;
 }
 
-export class BulkPropagator<const Calculators extends readonly Calculator<string, number, TupleOf<string, number>, Record<string, TypedArray>, unknown>[]> {
+export class BulkPropagator<const Calculators extends readonly Calculator<string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, unknown>[]> implements Disposable {
   private readonly calculators: Calculators;
   private readonly satrecsPointer: number;
   private readonly satrecsCount: number;
   private readonly datesPointer: number;
+  private readonly datesCount: number;
   private readonly module: MainModule;
   private readonly outputPointer: number;
   private readonly outputPointersByCalculator: Map<Calculators[number]['name'], number>;
@@ -62,6 +63,7 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
     this.satrecsPointer = allocateNativeStructArrayFromSatrecArray(wasmModule, satRecs);
     this.satrecsCount = satRecs.length;
     this.datesPointer = allocateDatesArray(wasmModule, datesCount);
+    this.datesCount = datesCount;
 
     const sorted = topologicalSort(calculators.map(calculator => ({ provides: calculator.name, hasDependencies: calculator.dependencies })));
     this.calculators = sorted.map(name => {
@@ -89,6 +91,9 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
   }
 
   run(args: BulkPropagatorRunArgsWithCalculatorParams<Calculators>) {
+    if (args.dates.length !== this.datesCount) {
+      throw new Error('length of `dates` must be the same as the `datesCount` passed to the BulkPropagator constructor');
+    }
     writeDatesArray(this.module, this.datesPointer, args.dates);
 
     for (const calculator of this.calculators) {
@@ -104,13 +109,25 @@ export class BulkPropagator<const Calculators extends readonly Calculator<string
     }
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): CalculatorsToFormattedOutput<Calculators> {
+  getFormattedOutput(satelliteIndex: number, dateIndex: number): CalculatorsToFormattedOutput<Calculators> | undefined {
+    if (satelliteIndex >= this.satrecsCount || dateIndex >= this.datesCount) {
+      return undefined;
+    }
     const result: Record<string, unknown> = {};
     for (const calculator of this.calculators) {
       const output = calculator.getFormattedOutput(satelliteIndex, dateIndex);
       result[calculator.name] = output;
     }
     return result as CalculatorsToFormattedOutput<Calculators>;
+  }
+
+  getRawOutput(): CalculatorsToRawOutput<Calculators> {
+    const result: Record<string, unknown> = {}
+    for (const calculator of this.calculators) {
+      const output = calculator.getRawOutput();
+      result[calculator.name] = output;
+    }
+    return result as CalculatorsToRawOutput<Calculators>;
   }
 
   dispose(): void {

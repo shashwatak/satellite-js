@@ -1,19 +1,18 @@
 import type { MainModule } from '../../../wasm-build/release/index.js';
-import { EcfVec3, GeodeticLocation, Kilometer, LookAngles } from '../../common-types.js';
+import type { EcfVec3, GeodeticLocation, Kilometer, LookAngles } from '../../common-types.js';
 import type { SatRecError } from '../../propagation/SatRec.js';
-import { geodeticToEcf } from '../../transforms.js';
-import type { Calculator } from './calculator.js';
+import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
 const BYTES_PER_VECTOR = DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
 
-interface EciBaseFormattedOutput {
+export interface EciBaseFormattedOutput {
   position: { x: number; y: number; z: number };
   velocity: { x: number; y: number; z: number };
   error: SatRecError;
 };
 
-export class EciBaseCalculator implements Calculator<'eci', 0, [], { eciPosition: Float64Array, eciVelocity: Float64Array, sgp4Error: Int32Array }, EciBaseFormattedOutput> {
+export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: Float64Array, velocity: Float64Array, error: Int8Array }, EciBaseFormattedOutput> {
   readonly name = 'eci';
   readonly dependencies: [] = [];
 
@@ -29,38 +28,38 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { eciPosition
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, timeIndex: number): EciBaseFormattedOutput {
-    const { eciPosition, eciVelocity, sgp4Error } = this.getRawOutput();
-    const index = (satelliteIndex * this.datesCount + timeIndex) * DIMENSIONS;
+  getFormattedOutput(satelliteIndex: number, dateIndex: number): EciBaseFormattedOutput {
+    const { position, velocity, error } = this.getRawOutput();
+    const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
       position: {
-        x: eciPosition[index]!,
-        y: eciPosition[index + 1]!,
-        z: eciPosition[index + 2]!,
+        x: position[index]!,
+        y: position[index + 1]!,
+        z: position[index + 2]!,
       },
       velocity: {
-        x: eciVelocity[index]!,
-        y: eciVelocity[index + 1]!,
-        z: eciVelocity[index + 2]!,
+        x: velocity[index]!,
+        y: velocity[index + 1]!,
+        z: velocity[index + 2]!,
       },
-      error: sgp4Error[(satelliteIndex * this.datesCount + timeIndex)] as SatRecError,
+      error: error[(satelliteIndex * this.datesCount + dateIndex)] as SatRecError,
     };
   }
 
-  getRawOutput(): { eciPosition: Float64Array; eciVelocity: Float64Array, sgp4Error: Int32Array } {
+  getRawOutput(): { position: Float64Array; velocity: Float64Array, error: Int8Array } {
     const vectorsSize = this.satellitesCount * this.datesCount * DIMENSIONS;
-    const eciPosition = new Float64Array(this.module.HEAP8.buffer, this.outputPointer, vectorsSize);
-    const eciVelocity = new Float64Array(this.module.HEAP8.buffer, eciPosition.byteOffset + eciPosition.byteLength, vectorsSize)
-    const sgp4Error = new Int32Array(this.module.HEAP8.buffer, eciVelocity.byteOffset + eciVelocity.byteLength, this.satellitesCount * this.datesCount);
+    const position = new Float64Array(this.module.HEAP8.buffer, this.outputPointer, vectorsSize);
+    const velocity = new Float64Array(this.module.HEAP8.buffer, position.byteOffset + position.byteLength, vectorsSize)
+    const error = new Int8Array(this.module.HEAP8.buffer, velocity.byteOffset + velocity.byteLength, this.satellitesCount * this.datesCount);
     return {
-      eciPosition,
-      eciVelocity,
-      sgp4Error,
+      position,
+      velocity,
+      error,
     }
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
-    return BYTES_PER_VECTOR * satellitesCount * datesCount * 2 + Int32Array.BYTES_PER_ELEMENT * satellitesCount * datesCount;
+    return BYTES_PER_VECTOR * satellitesCount * datesCount * 2 + Int8Array.BYTES_PER_ELEMENT * satellitesCount * datesCount;
   }
 
   run(
@@ -83,7 +82,7 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { eciPosition
   }
 }
 
-export class GmstCalculator implements Calculator<'gmst', 0, [], { gmst: Float64Array }, number> {
+export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, number> {
   readonly name = 'gmst';
   readonly dependencies: [] = [];
 
@@ -91,36 +90,34 @@ export class GmstCalculator implements Calculator<'gmst', 0, [], { gmst: Float64
   private outputPointer!: number;
   private datesCount!: number;
 
-  getOutputBufferSize(satellitesCount: number, datesCount: number): number {
+  getOutputBufferSize(_satellitesCount: number, datesCount: number): number {
     return datesCount * Float64Array.BYTES_PER_ELEMENT;
   }
 
-  init(module: MainModule, outputPointer: number, satellitesCount: number, datesCount: number): void {
+  init(module: MainModule, outputPointer: number, _satellitesCount: number, datesCount: number): void {
     this.module = module;
     this.outputPointer = outputPointer;
     this.datesCount = datesCount;
   }
 
-  run(satellitesPointer: number, satellitesCount: number, datesPointer: number, datesCount: number, dependenciesOutputsPointers: []): void {
+  run(_satellitesPointer: number, _satellitesCount: number, datesPointer: number, datesCount: number): void {
     this.module._calculate_gmst(datesPointer, datesCount, this.outputPointer);
   }
 
-  getRawOutput(): { gmst: Float64Array } {
-    return {
-      gmst: new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.datesCount),
-    };
+  getRawOutput(): Float64Array {
+    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.datesCount);
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): number {
-    return this.getRawOutput().gmst[dateIndex]!;
+  getFormattedOutput(_satelliteIndex: number, dateIndex: number): number {
+    return this.getRawOutput()[dateIndex]!;
   }
 }
 
 export interface EcfPositionFormattedOutput {
-  ecfPosition: { x: number; y: number; z: number };
+  x: number; y: number; z: number
 };
 
-export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci', 'gmst'], { ecfPosition: Float64Array }, EcfPositionFormattedOutput> {
+export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci', 'gmst'], Float64Array, EcfPositionFormattedOutput> {
   readonly name = 'ecfPosition';
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
 
@@ -140,11 +137,9 @@ export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
-      ecfPosition: {
-        x: rawOutput.ecfPosition[index]!,
-        y: rawOutput.ecfPosition[index + 1]!,
-        z: rawOutput.ecfPosition[index + 2]!,
-      }
+      x: rawOutput[index]!,
+      y: rawOutput[index + 1]!,
+      z: rawOutput[index + 2]!,
     }
   }
 
@@ -153,22 +148,20 @@ export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci
   }
 
   getRawOutput() {
-    return {
-      ecfPosition: new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS),
-    }
+    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS);
   }
 
-  run(satellitesPointer: number, satellitesCount: number, datesPointer: number, datesCount: number, dependenciesOutputsPointers: [number, number]): void {
+  run(_satellitesPointer: number, _satellitesCount: number, _datesPointer: number, _datesCount: number, dependenciesOutputsPointers: [number, number]): void {
     const [eciBasePointer, gmstPointer] = dependenciesOutputsPointers;
     this.module._calculate_ecf_position_or_velocity(eciBasePointer, this.satellitesCount, gmstPointer, this.datesCount, this.outputPointer);
   }
 }
 
 export interface EcfVelocityFormattedOutput {
-  ecfVelocity: { x: number; y: number; z: number };
+  x: number; y: number; z: number
 };
 
-export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci', 'gmst'], { ecfVelocity: Float64Array }, EcfVelocityFormattedOutput> {
+export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci', 'gmst'], Float64Array, EcfVelocityFormattedOutput> {
   readonly name = 'ecfVelocity';
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
 
@@ -187,11 +180,9 @@ export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
-      ecfVelocity: {
-        x: rawOutput.ecfVelocity[index]!,
-        y: rawOutput.ecfVelocity[index + 1]!,
-        z: rawOutput.ecfVelocity[index + 2]!,
-      }
+      x: rawOutput[index]!,
+      y: rawOutput[index + 1]!,
+      z: rawOutput[index + 2]!,
     }
   }
 
@@ -200,22 +191,18 @@ export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci
   }
 
   getRawOutput() {
-    return {
-      ecfVelocity: new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS),
-    }
+    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS)
   }
 
-  run(satellitesPointer: number, satellitesCount: number, datesPointer: number, datesCount: number, dependenciesOutputsPointers: [number, number]): void {
+  run(_satellitesPointer: number, _satellitesCount: number, _datesPointer: number, _datesCount: number, dependenciesOutputsPointers: [number, number]): void {
     const [eciBasePointer, gmstPointer] = dependenciesOutputsPointers;
     this.module._calculate_ecf_position_or_velocity(eciBasePointer + this.satellitesCount * this.datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT, this.satellitesCount, gmstPointer, this.datesCount, this.outputPointer);
   }
 }
 
-export interface GeodeticPositionFormattedOutput {
-  geodeticPosition: GeodeticLocation
-};
+export type GeodeticPositionFormattedOutput = GeodeticLocation;
 
-export class GeodeticPositionCalculator implements Calculator<'geodeticPosition', 2, ['eci', 'gmst'], { geodeticPosition: Float64Array }, GeodeticPositionFormattedOutput> {
+export class GeodeticPositionCalculator implements Calculator<'geodeticPosition', 2, ['eci', 'gmst'], Float64Array, GeodeticPositionFormattedOutput> {
   readonly name = 'geodeticPosition';
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
 
@@ -235,11 +222,9 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
-      geodeticPosition: {
-        latitude: rawOutput.geodeticPosition[index]!,
-        longitude: rawOutput.geodeticPosition[index + 1]!,
-        height: rawOutput.geodeticPosition[index + 2]!,
-      }
+      latitude: rawOutput[index]!,
+      longitude: rawOutput[index + 1]!,
+      height: rawOutput[index + 2]!,
     }
   }
 
@@ -248,18 +233,18 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
   }
 
   getRawOutput() {
-    return {
-      geodeticPosition: new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS),
-    }
+    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS)
   }
 
-  run(satellitesPointer: number, satellitesCount: number, datesPointer: number, datesCount: number, dependenciesOutputsPointers: [number, number]): void {
+  run(_satellitesPointer: number, _satellitesCount: number, _datesPointer: number, _datesCount: number, dependenciesOutputsPointers: [number, number]): void {
     const [eciBasePointer, gmstPointer] = dependenciesOutputsPointers;
     this.module._calculate_geodetic_positions(eciBasePointer, this.satellitesCount, gmstPointer, this.datesCount, this.outputPointer);
   }
 }
 
-export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPosition'], { lookAngles: Float64Array }, LookAngles, { observer: GeodeticLocation }> {
+export type LookAnglesFormattedOutput = LookAngles;
+
+export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPosition'], Float64Array, LookAnglesFormattedOutput, { observer: GeodeticLocation }> {
   readonly name = 'lookAngles';
   readonly dependencies: ['ecfPosition'] = ['ecfPosition'];
 
@@ -279,34 +264,28 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
-      azimuth: rawOutput.lookAngles[index]!,
-      elevation: rawOutput.lookAngles[index + 1]!,
-      rangeSat: rawOutput.lookAngles[index + 2]!,
+      azimuth: rawOutput[index]!,
+      elevation: rawOutput[index + 1]!,
+      rangeSat: rawOutput[index + 2]!,
     }
   }
 
-  getRawOutput(): { lookAngles: Float64Array; } {
-    return {
-      lookAngles: new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS),
-    }
+  getRawOutput() {
+    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount * DIMENSIONS)
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
     return satellitesCount * datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
   }
 
-  run(satellitesPointer: number, satellitesCount: number, datesPointer: number, datesCount: number, dependenciesOutputsPointers: [number], runParameters: { observer: GeodeticLocation }): void {
+  run(_satellitesPointer: number, _satellitesCount: number, _datesPointer: number, _datesCount: number, dependenciesOutputsPointers: [number], runParameters: { observer: GeodeticLocation }): void {
     const [ecfPointer] = dependenciesOutputsPointers;
     const { latitude, longitude, height } = runParameters.observer;
     this.module._calculate_look_angles(ecfPointer, this.satellitesCount, this.datesCount, longitude, latitude, height, this.outputPointer);
   }
 }
 
-export interface DopplerFactorFormattedOutput {
-  dopplerFactor: number;
-} 
-
-export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, ['ecfPosition', 'ecfVelocity'], { dopplerFactor: Float64Array }, DopplerFactorFormattedOutput, { observer: EcfVec3<Kilometer> }> {
+export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, ['ecfPosition', 'ecfVelocity'], Float64Array, number, { observer: EcfVec3<Kilometer> }> {
   readonly name = 'dopplerFactor';
   readonly dependencies: ['ecfPosition', 'ecfVelocity'] = ['ecfPosition', 'ecfVelocity'];
 
@@ -322,25 +301,21 @@ export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, [
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): DopplerFactorFormattedOutput {
+  getFormattedOutput(satelliteIndex: number, dateIndex: number): number {
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex);
-    return {
-      dopplerFactor: rawOutput.dopplerFactor[index]!,
-    }
+    return rawOutput[index]!
   }
 
-  getRawOutput(): { dopplerFactor: Float64Array; } {
-    return {
-      dopplerFactor: new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount),
-    }
+  getRawOutput() {
+    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.satellitesCount * this.datesCount)
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
     return satellitesCount * datesCount * Float64Array.BYTES_PER_ELEMENT;
   }
 
-  run(satellitesPointer: number, satellitesCount: number, datesPointer: number, datesCount: number, dependenciesOutputsPointers: [number, number], runParameters: { observer: EcfVec3<Kilometer> }): void {
+  run(_satellitesPointer: number, _satellitesCount: number, _datesPointer: number, _datesCount: number, dependenciesOutputsPointers: [number, number], runParameters: { observer: EcfVec3<Kilometer> }): void {
     const [ecfPositionPointer, ecfVelocityPointer] = dependenciesOutputsPointers;
     const { x, y, z } = runParameters.observer;
     this.module._calculate_doppler_factor(ecfPositionPointer, ecfVelocityPointer, this.satellitesCount, this.datesCount, x, y, z, this.outputPointer);

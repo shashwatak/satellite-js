@@ -1,7 +1,7 @@
 import { MainModule } from '../../wasm-build/release/index.js';
 import * as constants from '../constants.js';
 import { SatRec } from '../propagation/SatRec.js';
-import { CppMemoryWriter } from './struct-manipulation.js';
+import { CppMemoryWriter } from './struct-read-write.js';
 
 type NativeFieldType = 'int' | 'long' | 'double' | 'char[]' | 'char' | 'unsigned char';
 
@@ -56,6 +56,7 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
   switch (type) {
     case 'double':
       {
+        /* v8 ignore next 3 */
         if (typeof value !== 'number') {
           throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
         }
@@ -64,22 +65,16 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
       }
     case 'int':
       {
+        /* v8 ignore next 3 */
         if (typeof value !== 'number') {
           throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
         }
         writer.writeInt(offset, value);
         break;
       }
-    case 'long':
-      {
-        if (typeof value !== 'number') {
-          throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
-        }
-        writer.writeLong(offset, value);
-        break;
-      }
     case 'char':
       {
+        /* v8 ignore next 3 */
         if (typeof value !== 'string') {
           throw new Error(`Expected char for ${fieldName}, got "${typeof value}"`);
         }
@@ -88,6 +83,7 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
       }
     case 'char[]':
       {
+        /* v8 ignore next 3 */
         if (typeof value !== 'string') {
           throw new Error(`Expected string for ${fieldName}, got "${typeof value}"`);
         }
@@ -122,8 +118,4 @@ export function allocateNativeStructArrayFromSatrecArray(module: MainModule, sat
     });
   });
   return pointer;
-}
-
-export function freeNativeStructArray(module: MainModule, arrayPointer: number): void {
-  module._free(arrayPointer);
 }

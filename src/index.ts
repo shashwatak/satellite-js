@@ -23,3 +23,4 @@ export {
 export { sunPos } from './sun.js';
 export { type SatRec, SatRecError } from './propagation/SatRec.js';
 export * from './common-types.js';
+export * from './wasm/index.js'

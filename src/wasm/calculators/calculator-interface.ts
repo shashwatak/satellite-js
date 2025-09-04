@@ -1,12 +1,12 @@
 import type { MainModule } from '../../../wasm-build/release/index.js';
 import type { TupleOf } from './tuple-of.js';
-import type { TypedArray } from './typed-array.js';
+import type { TypedArray } from '../typed-array.js';
 
 export interface Calculator<
   Name extends string,
   DependenciesCount extends number,
   Dependencies extends TupleOf<string, DependenciesCount>,
-  RawOutputs extends Record<string, TypedArray>,
+  RawOutputs extends TypedArray | Record<string, TypedArray>,
   FormattedOutput,
   RunParameters extends Record<string, unknown> = {}
 > {

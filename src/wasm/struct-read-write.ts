@@ -1,13 +1,9 @@
 export class CppMemoryReader {
-  constructor(buffer: ArrayBuffer, private baseOffset = 0) {
+  constructor(buffer: ArrayBuffer, public baseOffset = 0) {
     this.view = new DataView(buffer);
   }
 
   private view: DataView;
-
-  setBaseOffset(offset: number): void {
-    this.baseOffset = offset;
-  }
 
   readInt(offset: number): number {
     const value = this.view.getInt32(this.baseOffset + offset, true);
@@ -56,11 +52,6 @@ export class CppMemoryWriter {
     this.view.setInt32(this.baseOffset + offset, value, true);
   }
 
-  writeLong(offset: number, value: number): void {
-    // Assuming 'long' is 32-bit in this context
-    this.writeInt(offset, value);
-  }
-
   writeString(offset: number, value: string, lengthWithNullTerminator: number): void {
     const encoder = new TextEncoder();
     const encoded = encoder.encode(value);
@@ -74,10 +65,6 @@ export class CppMemoryWriter {
 
   writeDouble(offset: number, value: number): void {
     this.view.setFloat64(this.baseOffset + offset, value, true);
-  }
-
-  writeUnsignedChar(offset: number, value: number): void {
-    this.view.setUint8(this.baseOffset + offset, value);
   }
 
   writeChar(offset: number, value: string): void {
