@@ -12,6 +12,16 @@ export interface EciBaseFormattedOutput {
   error: SatRecError;
 };
 
+/**
+ * Performs SGP4 propagation, producing ECI (Earth-Centered Fixed) position and velocity vectors. Base calculator with no dependencies.
+ *
+ * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
+ *   - `position`: `Float64Array`, packed as [x0, y0, z0, x1, y1, z1, ...] for each satellite/date pair
+ *   - `velocity`: `Float64Array`, packed as [vx0, vy0, vz0, vx1, vy1, vz1, ...] for each satellite/date pair
+ *   - `error`: `Int8Array`, equal to SatRec.error, packed as [err0, err1, ...] for each satellite/date pair
+ * 
+ * Provides formatted output under `eci` property, @see EciBaseFormattedOutput.
+ */
 export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: Float64Array, velocity: Float64Array, error: Int8Array }, EciBaseFormattedOutput> {
   readonly name = 'eci';
   readonly dependencies: [] = [];
@@ -82,6 +92,14 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: F
   }
 }
 
+/**
+ * Calculator for GMST (Greenwich Mean Sidereal Time), required for many coordinate transforms.
+ *
+ * Raw output format:
+ *   - `Float64Array`, packed as [gmst0, gmst1, ...] for each date. Not duplicated per satellite.
+ * 
+ * Provides formatted output as a number under `gmst` property.
+ */
 export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, number> {
   readonly name = 'gmst';
   readonly dependencies: [] = [];
@@ -117,6 +135,18 @@ export interface EcfPositionFormattedOutput {
   x: number; y: number; z: number
 };
 
+/**
+ * Calculator for ECF (Earth-Centered Fixed) position.
+ *
+ * Depends on:
+ * @see EciBaseCalculator
+ * @see GmstCalculator
+ *
+ * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
+ *   - `Float64Array`, packed as [x0, y0, z0, x1, y1, z1, ...] for each satellite/date pair
+ * 
+ * Provides formatted output under `ecfPosition` property, @see EcfPositionFormattedOutput.
+ */
 export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci', 'gmst'], Float64Array, EcfPositionFormattedOutput> {
   readonly name = 'ecfPosition';
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -161,6 +191,18 @@ export interface EcfVelocityFormattedOutput {
   x: number; y: number; z: number
 };
 
+/**
+ * Calculator for ECF (Earth-Centered Fixed) velocity.
+ *
+ * Depends on:
+ * @see EciBaseCalculator
+ * @see GmstCalculator
+ *
+ * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
+ *   - `Float64Array`, packed as [vx0, vy0, vz0, vx1, vy1, vz1, ...] for each satellite/date pair
+ * 
+ * Provides formatted output under `ecfVelocity` property, @see EcfVelocityFormattedOutput.
+ */
 export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci', 'gmst'], Float64Array, EcfVelocityFormattedOutput> {
   readonly name = 'ecfVelocity';
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -202,6 +244,18 @@ export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci
 
 export type GeodeticPositionFormattedOutput = GeodeticLocation;
 
+/**
+ * Calculator for Geodetic position (latitude, longitude, height).
+ *
+ * Depends on:
+ * @see EciBaseCalculator
+ * @see GmstCalculator
+ *
+ * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
+ *   - `Float64Array`, packed as [lat0, lon0, height0, lat1, lon1, height1, ...] for each satellite/date pair
+ *
+ * Provides formatted output under `geodeticPosition` property, @see GeodeticPositionFormattedOutput.
+ */
 export class GeodeticPositionCalculator implements Calculator<'geodeticPosition', 2, ['eci', 'gmst'], Float64Array, GeodeticPositionFormattedOutput> {
   readonly name = 'geodeticPosition';
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -244,6 +298,35 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
 
 export type LookAnglesFormattedOutput = LookAngles;
 
+/**
+ * Calculator for Look Angles (azimuth, elevation, rangeSat).
+ * 
+ * Requires observer location as a parameter for `BulkPropagator.run()` method.
+ *
+ * Depends on:
+ * @see EcfPositionCalculator
+ *
+ * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
+ *   - `Float64Array`, packed as [az0, el0, range0, az1, el1, range1, ...] for each satellite/date pair
+ *
+ * Provides formatted output under `lookAngles` property, @see LookAnglesFormattedOutput.
+ * 
+ * @example
+ * ```ts
+ * bulkPropagator.run({
+ *   dates: [...],
+ *   lookAngles: {
+ *     observer: {
+ *      latitude: degreesToRadians(41),
+ *      longitude: degreesToRadians(-71),
+ *      height: 0.1,
+ *    }
+ *   }
+ * });
+ * 
+ * bulkPropagator.getFormattedOutput(satelliteIndex, dateIndex).lookAngles.azimuth;
+ * ```
+ */
 export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPosition'], Float64Array, LookAnglesFormattedOutput, { observer: GeodeticLocation }> {
   readonly name = 'lookAngles';
   readonly dependencies: ['ecfPosition'] = ['ecfPosition'];
@@ -285,6 +368,18 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
   }
 }
 
+/**
+ * Calculator for Doppler factor.
+ *
+ * Depends on:
+ * @see EcfPositionCalculator
+ * @see EcfVelocityCalculator
+ *
+ * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
+ *   - `Float64Array`, packed as [dopplerFactor0, dopplerFactor1, ...] for each satellite/date pair
+ *
+ * Provides formatted output as a number under `dopplerFactor` property.
+ */
 export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, ['ecfPosition', 'ecfVelocity'], Float64Array, number, { observer: EcfVec3<Kilometer> }> {
   readonly name = 'dopplerFactor';
   readonly dependencies: ['ecfPosition', 'ecfVelocity'] = ['ecfPosition', 'ecfVelocity'];
