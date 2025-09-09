@@ -302,7 +302,7 @@ extern "C"
   // 2. returns void instead of boolean indicating propagation success
   // 3. `if (mrt < 1.0)` check was moved into a place right after `mrt` calculation, instead of the very end of the sgp4 function.
   void EMSCRIPTEN_KEEPALIVE sgp4forJs(
-      elsetrec &satrec, double unix_ms,
+      elsetrec &satrec, double jday,
       double r[3], double v[3], int8_t &error)
   {
     double am, axnl, aynl, betal, cosim, cnod,
@@ -319,7 +319,7 @@ extern "C"
                                              twopi, x2o3, vkmpersec, delmtemp;
     int ktr;
 
-    double tsince = (jday_from_unix(unix_ms) - (satrec.jdsatepoch + satrec.jdsatepochF)) * 1440.0;
+    double tsince = (jday - (satrec.jdsatepoch + satrec.jdsatepochF)) * 1440.0;
 
     /* ------------------ set mathematical constants --------------- */
     // sgp4fix divisor for divide by zero check on inclination
@@ -596,28 +596,23 @@ extern "C"
   //   }
   // }
 
-  void EMSCRIPTEN_KEEPALIVE calculate_eci_base(elsetrec *__restrict satellites, int satellites_count, double *__restrict dates_unix_ms, int dates_count, double *__restrict eci_positions, double *__restrict eci_velocities, int8_t *__restrict sgp4_errors)
+  void EMSCRIPTEN_KEEPALIVE calculate_eci_base(elsetrec *__restrict satellites, int satellites_count, double *__restrict jdays, int dates_count, double *__restrict eci_positions, double *__restrict eci_velocities, int8_t *__restrict sgp4_errors)
   {
     for (int i = 0; i < satellites_count; i++)
     {
       for (int j = 0; j < dates_count; j++)
       {
         int output_index = (i * dates_count + j) * 3;
-        sgp4forJs(satellites[i], dates_unix_ms[j], &eci_positions[output_index], &eci_velocities[output_index], sgp4_errors[output_index / 3]);
+        sgp4forJs(satellites[i], jdays[j], &eci_positions[output_index], &eci_velocities[output_index], sgp4_errors[output_index / 3]);
       }
     }
   }
 
-  double unix_ms_to_jday(double unix_ms)
-  {
-    return (unix_ms / 1000.0 / 86400.0) + 2440587.5;
-  }
-
-  void EMSCRIPTEN_KEEPALIVE calculate_gmst(double *__restrict dates_unix_ms, int dates_count, double *__restrict gmst_values)
+  void EMSCRIPTEN_KEEPALIVE calculate_gmst(double *__restrict jdays, int dates_count, double *__restrict gmst_values)
   {
     for (int i = 0; i < dates_count; i++)
     {
-      gmst_values[i] = SGP4Funcs::gstime_SGP4(unix_ms_to_jday(dates_unix_ms[i]));
+      gmst_values[i] = SGP4Funcs::gstime_SGP4(jdays[i]);
     }
   }
 

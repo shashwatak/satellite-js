@@ -1,10 +1,16 @@
-import { MainModule } from '../../wasm-build/release/index.js';
+import type { MainModule } from '../../wasm-build/release/index.js';
 import * as constants from '../constants.js';
-import { SatRec } from '../propagation/SatRec.js';
+import type { SatRec } from '../propagation/SatRec.js';
 import { CppMemoryWriter } from './struct-read-write.js';
 
+/**
+ * A union of all types of field which can be present in `elsetrec` C++ struct
+ */
 type NativeFieldType = 'int' | 'long' | 'double' | 'char[]' | 'char' | 'unsigned char';
 
+/**
+ * A union of all current fields of `elsetrec` C++ struct
+ */
 type NativeField = 
   | 'satnum'
   | 'epochyr' | 'epochtynumrev'
@@ -38,6 +44,9 @@ type NativeField =
   | 'not_orbital'
   | 'rcs_m2';
 
+/**
+ * Map of names of fields in C++ `elsetrec` struct, together with their types, offsets and sizes
+ */
 export type NativeStructLayout = Map<NativeField, { type: NativeFieldType; offset: number; size: number }>
 
 export function getNativeStructFieldLayout(module: MainModule): NativeStructLayout {
@@ -56,7 +65,6 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
   switch (type) {
     case 'double':
       {
-        /* v8 ignore next 3 */
         if (typeof value !== 'number') {
           throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
         }
@@ -65,7 +73,6 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
       }
     case 'int':
       {
-        /* v8 ignore next 3 */
         if (typeof value !== 'number') {
           throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
         }
@@ -74,7 +81,6 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
       }
     case 'char':
       {
-        /* v8 ignore next 3 */
         if (typeof value !== 'string') {
           throw new Error(`Expected char for ${fieldName}, got "${typeof value}"`);
         }
@@ -83,7 +89,6 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
       }
     case 'char[]':
       {
-        /* v8 ignore next 3 */
         if (typeof value !== 'string') {
           throw new Error(`Expected string for ${fieldName}, got "${typeof value}"`);
         }
@@ -93,7 +98,7 @@ function writeValueToMemory(writer: CppMemoryWriter, fieldName: string, offset: 
   }
 }
 
-export function allocateNativeStructArrayFromSatrecArray(module: MainModule, satrecArray: SatRec[]): number {
+export function allocateAndWriteNativeStructArrayFromSatrecArray(module: MainModule, satrecArray: SatRec[]): number {
   const layout = getNativeStructFieldLayout(module);
   const nativeSize = getNativeStructSize(module);
   const pointer = module._malloc(satrecArray.length * nativeSize);
