@@ -17,25 +17,25 @@ export default defineConfig({
     projects: [
       {
         test: {
-          name: 'JS',
+          name: 'catalog',
+          include: [
+            'test/propagation/sgp4Catalog.test.ts'
+          ],
+          environment: 'node',
+        },
+      },
+      {
+        test: {
+          name: 'js',
           include: [
             'test/*.test.ts',
           ],
           environment: 'node',
         }
       },
-      // {
-      //   test: {
-      //     name: 'JS: Entire catalog run',
-      //     include: [
-      //       'test/propagation/sgp4Catalog.test.ts'
-      //     ],
-      //     environment: 'node',
-      //   },
-      // },
       {
         test: {
-          name: 'WASM release',
+          name: 'wasm_release',
           include: [
             'test/wasm/**/*.user.test.ts',
           ],
@@ -49,7 +49,7 @@ export default defineConfig({
       },
       {
         test: {
-          name: 'WASM debug',
+          name: 'wasm_debug',
           include: [
             'test/wasm/**/*.user.test.ts',
             'test/wasm/**/*.struct.test.ts',
