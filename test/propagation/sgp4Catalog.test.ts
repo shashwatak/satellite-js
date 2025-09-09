@@ -1,12 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
-import { sgp4, twoline2satrec } from '../../src/index.js';
+import { BulkPropagator, createWasmModule, EciBaseCalculator, propagate, sgp4, twoline2satrec } from '../../src/index.js';
 import expected from './sgp4CatalogResults.json' with { type: "json" };
+import { days2mdhms, JDay } from '../../src/ext.js';
 
 const satellitesPerTestSuite = 500;
 
 type NumericValues<T> = { [K in keyof T]: number };
+
+const wasmModule = await createWasmModule();
 
 function haveValuesClose<T extends NumericValues<T>>(actual: T, expected: T, precision = 13): boolean {
   for (const key in expected) {
@@ -46,6 +49,47 @@ function getTleSuites() {
 
 const tleSuites = getTleSuites();
 
+// this is a more precise version of invjday, which also takes milliseconds into account,
+// although it still doesn't result in exact round-trip with jday. The
+// reason for this is not clear (PRs welcome).
+// Since BulkPropagator takes dates, but sgp4 takes time since epoch in minutes,
+// it's impossible to compare them directly.
+// Hence, this function is used to get a Date, albeit with some precision loss,
+// to separately calculate propagate output and compare it to BulkPropagator output.
+export function invjdayFull(jd: JDay) {
+  // --------------- find year and days of the year -
+  const temp = jd - 2415019.5;
+  const tu = temp / 365.25;
+  let year = 1900 + Math.floor(tu);
+  let leapyrs = Math.floor((year - 1901) * 0.25);
+
+  // optional nudge by 8.64x10-7 sec to get even outputs
+  let days = (temp - (((year - 1900) * 365.0) + leapyrs)) + 0.00000000001;
+
+  // ------------ check for case of beginning of a year -----------
+  if (days < 1.0) {
+    year -= 1;
+    leapyrs = Math.floor((year - 1901) * 0.25);
+    days = temp - (((year - 1900) * 365.0) + leapyrs);
+  }
+
+  // ----------------- find remaing data  -------------------------
+  const mdhms = days2mdhms(year, days);
+
+  const {
+    mon,
+    day,
+    hr,
+    minute,
+  } = mdhms;
+
+  const sec = mdhms.sec - 0.00000086400;
+
+  return new Date(Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec), sec % 1 * 1000));
+}
+
+const tsince = [0, 360, 720, 1080, 1440];
+
 tleSuites.forEach((tleSuite, tleSuiteIndex) => {
   const testSuiteName = `sgp4catalog ${(tleSuiteIndex + 1).toString().padStart(2, '0')}`;
   const satellitesRange = `${tleSuiteIndex * satellitesPerTestSuite + 1} — ${(tleSuiteIndex + 1) * satellitesPerTestSuite}`;
@@ -53,16 +97,39 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
     tleSuite.forEach((tle, tleIndex) => {
       const satrec = twoline2satrec(tle.line1, tle.line2);
       it(`satellite ${String(satrec.satnum).padStart(5, '0')} measurements`, () => {
-        [0, 360, 720, 1080, 1440].forEach((time, timeIndex) => {
+        using bp = new BulkPropagator({
+          datesCount: 5,
+          calculators: [new EciBaseCalculator()],
+          satRecs: [satrec],
+          wasmModule
+        });
+        const satelliteEpoch = satrec.jdsatepoch;
+        const dates = tsince.map(ts => invjdayFull(satelliteEpoch + ts / 1440));
+        bp.run({ dates });
+
+        tsince.forEach((time, timeIndex) => {
           const result = sgp4(satrec, time);
+          const expectedResult = (expected as any)[tleSuiteIndex][tleIndex][timeIndex];
           if (!result) {
-            expect(result).toEqual((expected as any)[tleSuiteIndex][tleIndex][timeIndex]);
+            expect(result).toEqual(expectedResult);
             return;
           }
-          expect(expected).toBeDefined();
-          expect(haveValuesClose(result.position, (expected as any)[tleSuiteIndex][tleIndex][timeIndex].meanElements)).toBe(true);
-          expect(haveValuesClose(result.velocity, (expected as any)[tleSuiteIndex][tleIndex][timeIndex].meanElements)).toBe(true);
-          expect(haveValuesClose(result.meanElements, (expected as any)[tleSuiteIndex][tleIndex][timeIndex].meanElements)).toBe(true);
+          expect(expectedResult).toBeDefined();
+          expect(haveValuesClose(result.position, expectedResult.position)).toBe(true);
+          expect(haveValuesClose(result.velocity, expectedResult.velocity)).toBe(true);
+          expect(haveValuesClose(result.meanElements, expectedResult.meanElements)).toBe(true);
+
+          // this compares propagate() output to BulkPropagator output
+          // as mentioned above, due to precision loss in epoch to date conversion,
+          // it's impossible to compare them directly to the expected output of sgp4()
+          const resultPropagate = propagate(satrec, dates[timeIndex]!);
+          const wasmResult = bp.getFormattedOutput(0, timeIndex)!.eci;
+          if (resultPropagate) {
+            expect(haveValuesClose(wasmResult.position, resultPropagate.position, 9)).toBe(true);
+            expect(haveValuesClose(wasmResult.velocity, resultPropagate.velocity, 9)).toBe(true);
+          } else {
+            expect(satrec.error).toEqual(wasmResult.error);
+          }
         });
       });
     });

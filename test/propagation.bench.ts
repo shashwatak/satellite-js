@@ -15,7 +15,8 @@ const satrecs = (ommData as OMMJsonObject[]).slice(0, MAX_SATELLITES).map(obj =>
 const dates = Array.from({ length: DATES_COUNT }, (_, i) => new Date(DATE_START.getTime() + i * DATE_STEP_MS));
 
 const wasmModule = await WasmModuleFactory();
-using bp = new BulkPropagator({
+// `using` here throws because benchmarks are executed separately after bp is disposed
+const bp = new BulkPropagator({
   wasmModule,
   calculators: [new EciBaseCalculator()],
   satRecs: satrecs,
