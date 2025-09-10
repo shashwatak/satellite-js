@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
-import { BulkPropagator, createWasmModule, EciBaseCalculator, propagate, sgp4, twoline2satrec } from '../../src/index.js';
-import expected from './sgp4CatalogResults.json' with { type: "json" };
+import {
+  BulkPropagator, createWasmModule, EciBaseCalculator, propagate, sgp4, twoline2satrec,
+} from '../../src/index.js';
+import expectedData from './sgp4CatalogResults.json' with { type: 'json' };
 import { days2mdhms, JDay } from '../../src/ext.js';
 
 const satellitesPerTestSuite = 500;
@@ -11,15 +13,17 @@ type NumericValues<T> = { [K in keyof T]: number };
 
 const wasmModule = await createWasmModule();
 
-function haveValuesClose<T extends NumericValues<T>>(actual: T, expected: T, precision = 13): boolean {
+function haveValuesClose<
+  T extends NumericValues<T>
+>(actual: T, expected: T, precision = 13): boolean {
   for (const key in expected) {
-    if (expected.hasOwnProperty(key) && actual.hasOwnProperty(key)) {
+    if (Object.hasOwn(expected, key) && Object.hasOwn(actual, key)) {
       const expectedNumber = expected[key];
       const actualNumber = actual[key];
       if (typeof expectedNumber !== 'number' || typeof actualNumber !== 'number') {
         return false;
       }
-      const pass = Math.abs(actualNumber - expectedNumber) < Math.pow(10, -precision) / 2;
+      const pass = Math.abs(actualNumber - expectedNumber) < 10 ** -precision / 2;
       if (!pass) {
         return false;
       }
@@ -85,7 +89,7 @@ export function invjdayFull(jd: JDay) {
 
   const sec = mdhms.sec - 0.00000086400;
 
-  return new Date(Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec), sec % 1 * 1000));
+  return new Date(Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec), (sec % 1) * 1000));
 }
 
 const tsince = [0, 360, 720, 1080, 1440];
@@ -101,15 +105,15 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
           datesCount: 5,
           calculators: [new EciBaseCalculator()],
           satRecs: [satrec],
-          wasmModule
+          wasmModule,
         });
         const satelliteEpoch = satrec.jdsatepoch;
-        const dates = tsince.map(ts => invjdayFull(satelliteEpoch + ts / 1440));
+        const dates = tsince.map((ts) => invjdayFull(satelliteEpoch + ts / 1440));
         bp.run({ dates });
 
         tsince.forEach((time, timeIndex) => {
           const result = sgp4(satrec, time);
-          const expectedResult = (expected as any)[tleSuiteIndex][tleIndex][timeIndex];
+          const expectedResult = (expectedData as any)[tleSuiteIndex][tleIndex][timeIndex];
           if (!result) {
             expect(result).toEqual(expectedResult);
             return;

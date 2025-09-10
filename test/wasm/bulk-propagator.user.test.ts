@@ -1,31 +1,33 @@
 import { describe, it, expect } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
-import { BulkPropagator } from '../../src/wasm/bulk-propagator.js';
-import { 
-  EciBaseCalculator, 
-  GmstCalculator, 
-  EcfPositionCalculator, 
-  EcfVelocityCalculator, 
+import {
+  BulkPropagator,
+  EciBaseCalculator,
+  GmstCalculator,
+  EcfPositionCalculator,
+  EcfVelocityCalculator,
   GeodeticPositionCalculator,
-  DopplerFactorCalculator, 
-  LookAnglesCalculator
-} from '../../src/wasm/calculators/calculators.js';
+  DopplerFactorCalculator,
+  LookAnglesCalculator,
+} from '../../src/wasm/index.js';
 import { twoline2satrec } from '../../src/io.js';
 import { propagate } from '../../src/propagation.js';
-import { degreesToRadians, ecfToLookAngles, eciToEcf, eciToGeodetic, geodeticToEcf } from '../../src/transforms.js';
+import {
+  degreesToRadians, ecfToLookAngles, eciToEcf, eciToGeodetic, geodeticToEcf,
+} from '../../src/transforms.js';
 import { dopplerFactor } from '../../src/dopplerFactor.js';
-import gstime from '../../src/propagation/gstime.js';
-import compareVectors from '../compareVectors.js';
+import { gstime } from '../../src/propagation/gstime.js';
+import { compareVectors } from '../compareVectors.js';
 import { topologicalSort } from '../../src/wasm/toposort.js';
 import badTleData from '../io-edge.json' with { type: 'json' };
 
-const module = await WasmModuleFactory();
+const wasmModule = await WasmModuleFactory();
 
 const TLE1_1 = '1 25544U 98067A   25191.49368601  .00007939  00000-0  14455-3 0  9995';
 const TLE1_2 = '2 25544  51.6350 191.5447 0002161   1.4001 135.0516 15.50469967518770';
 
-const TLE2_1 = "1     5U 58002B   25189.55838196 -.00000055  00000-0 -47510-4 0  9993";
-const TLE2_2 = "2     5  34.2469 294.9296 1841370  29.1499 340.0354 10.85926006406011";
+const TLE2_1 = '1     5U 58002B   25189.55838196 -.00000055  00000-0 -47510-4 0  9993';
+const TLE2_2 = '2     5  34.2469 294.9296 1841370  29.1499 340.0354 10.85926006406011';
 
 const satRecs = [twoline2satrec(TLE1_1, TLE1_2), twoline2satrec(TLE2_1, TLE2_2)];
 
@@ -40,9 +42,9 @@ const observerGeodetic = {
 describe('BulkPropagator sanity check', () => {
   it('propagates and returns finite values', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
@@ -56,15 +58,17 @@ describe('BulkPropagator sanity check', () => {
 
   it('returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
-    
-    const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
-    const wasmResults = satRecs.flatMap((_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci));
+
+    const pureJsResults = satRecs.flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResults = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
 
     pureJsResults.forEach((jsResult, i) => {
       compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
@@ -74,56 +78,60 @@ describe('BulkPropagator sanity check', () => {
 
   it('returns undefined if out of bounds', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
-    
+
     const out0 = bp.getFormattedOutput(satRecs.length, 0);
     expect(out0).toBeUndefined();
-  })
+  });
 
   it("throws if dates.length doesn't match datesCount", () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length + 1,
     });
 
     expect(() => {
-      bp.run({ dates })
+      bp.run({ dates });
     }).toThrow();
-  })
+  });
 
   it('returns the same results after the memory is grown', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
-    
-    const pureJsResults = satRecs.flatMap(satRec => dates.map(date => propagate(satRec, date)));
-    const wasmResults = satRecs.flatMap((_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci));
+
+    const pureJsResults = satRecs.flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResults = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
 
     pureJsResults.forEach((jsResult, i) => {
       compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
       compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
     });
 
-    const oldMemorySize = module.HEAP8.buffer.byteLength;
-    const dummyMemory = module._malloc(50_000_000);
-    expect(oldMemorySize).toBeLessThan(module.HEAP8.buffer.byteLength);
-    const wasmResultsAfterGrowth = satRecs.flatMap((_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci));
+    const oldMemorySize = wasmModule.HEAP8.buffer.byteLength;
+    const dummyMemory = wasmModule._malloc(50_000_000);
+    expect(oldMemorySize).toBeLessThan(wasmModule.HEAP8.buffer.byteLength);
+    const wasmResultsAfterGrowth = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
     pureJsResults.forEach((jsResult, i) => {
       compareVectors(jsResult!.position, wasmResultsAfterGrowth[i]!.position, 11);
       compareVectors(jsResult!.velocity, wasmResultsAfterGrowth[i]!.velocity, 11);
     });
-    module._free(dummyMemory);
+    wasmModule._free(dummyMemory);
   });
 });
 
@@ -135,21 +143,21 @@ describe('BulkPropagator errors', () => {
         calculators: [new EciBaseCalculator()],
         datesCount: 1,
         satRecs: [satRec],
-        wasmModule: module,
-      })
+        wasmModule,
+      });
       const date = new Date((satRec.jdsatepoch - 2440587.5) * 86400000);
       bp.run({ dates: [date] });
       expect(bp.getFormattedOutput(0, 0)!.eci.error).toEqual(tleDataItem.results[0]!.error);
     });
-  })
-})
+  });
+});
 
 describe('Calculator comparisons with JS transforms', () => {
   it('GmstCalculator returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new GmstCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
@@ -163,9 +171,9 @@ describe('Calculator comparisons with JS transforms', () => {
 
   it('EcfPositionCalculator returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
@@ -176,7 +184,7 @@ describe('Calculator comparisons with JS transforms', () => {
         const gmst = gstime(date);
         const jsEcfPosition = eciToEcf(eciResult!.position, gmst);
         const wasmEcfPosition = bp.getFormattedOutput(i, j)!.ecfPosition;
-        
+
         compareVectors(jsEcfPosition, wasmEcfPosition, 11);
       });
     });
@@ -184,9 +192,9 @@ describe('Calculator comparisons with JS transforms', () => {
 
   it('EcfVelocityCalculator returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
+      wasmModule,
       calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfVelocityCalculator()],
-      satRecs: satRecs,
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
@@ -197,7 +205,7 @@ describe('Calculator comparisons with JS transforms', () => {
         const gmst = gstime(date);
         const jsEcfVelocity = eciToEcf(eciResult!.velocity, gmst);
         const wasmEcfVelocity = bp.getFormattedOutput(i, j)!.ecfVelocity;
-        
+
         compareVectors(jsEcfVelocity, wasmEcfVelocity, 11);
       });
     });
@@ -205,9 +213,13 @@ describe('Calculator comparisons with JS transforms', () => {
 
   it('GeodeticPositionCalculator returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
-      calculators: [new EciBaseCalculator(), new GmstCalculator(), new GeodeticPositionCalculator()],
-      satRecs: satRecs,
+      wasmModule,
+      calculators: [
+        new EciBaseCalculator(),
+        new GmstCalculator(),
+        new GeodeticPositionCalculator(),
+      ],
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates });
@@ -228,9 +240,14 @@ describe('Calculator comparisons with JS transforms', () => {
 
   it('LookAnglesCalculator returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
-      wasmModule: module,
-      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator(), new LookAnglesCalculator()],
-      satRecs: satRecs,
+      wasmModule,
+      calculators: [
+        new EciBaseCalculator(),
+        new GmstCalculator(),
+        new EcfPositionCalculator(),
+        new LookAnglesCalculator(),
+      ],
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates, lookAngles: { observer: observerGeodetic } });
@@ -255,9 +272,15 @@ describe('Calculator comparisons with JS transforms', () => {
     const observerEcf = geodeticToEcf(observerGeodetic);
 
     using bp = new BulkPropagator({
-      wasmModule: module,
-      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator(), new EcfVelocityCalculator(), new DopplerFactorCalculator()],
-      satRecs: satRecs,
+      wasmModule,
+      calculators: [
+        new EciBaseCalculator(),
+        new GmstCalculator(),
+        new EcfPositionCalculator(),
+        new EcfVelocityCalculator(),
+        new DopplerFactorCalculator(),
+      ],
+      satRecs,
       datesCount: dates.length,
     });
     bp.run({ dates, dopplerFactor: { observer: observerEcf } });
@@ -268,10 +291,10 @@ describe('Calculator comparisons with JS transforms', () => {
         const gmst = gstime(date);
         const ecfPosition = eciToEcf(eciResult!.position, gmst);
         const ecfVelocity = eciToEcf(eciResult!.velocity, gmst);
-        
+
         const jsDopplerFactor = dopplerFactor(observerEcf, ecfPosition, ecfVelocity);
         const wasmDopplerFactor = bp.getFormattedOutput(i, j)!.dopplerFactor;
-        
+
         expect(wasmDopplerFactor).toBeCloseTo(jsDopplerFactor, 11);
       });
     });
@@ -281,53 +304,64 @@ describe('Calculator comparisons with JS transforms', () => {
     const observerEcf = geodeticToEcf(observerGeodetic);
 
     using bp = new BulkPropagator({
-      wasmModule: module,
-      calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator(), new EcfVelocityCalculator(), new DopplerFactorCalculator(), new LookAnglesCalculator()],
-      satRecs: satRecs,
+      wasmModule,
+      calculators: [
+        new EciBaseCalculator(),
+        new GmstCalculator(),
+        new EcfPositionCalculator(),
+        new EcfVelocityCalculator(),
+        new DopplerFactorCalculator(),
+        new LookAnglesCalculator(),
+      ],
+      satRecs,
       datesCount: dates.length,
     });
 
-    bp.run({ dates, dopplerFactor: { observer: observerEcf }, lookAngles: { observer: observerGeodetic } });
+    bp.run({
+      dates,
+      dopplerFactor: { observer: observerEcf },
+      lookAngles: { observer: observerGeodetic },
+    });
 
-    const formattedResults = bp.getFormattedOutput(1, 0)!
-    const rawResults = bp.getRawOutput()
+    const formattedResults = bp.getFormattedOutput(1, 0)!;
+    const rawResults = bp.getRawOutput();
     expect(formattedResults.eci).toEqual({
       error: rawResults.eci.error[2],
       position: {
         x: rawResults.eci.position[3 * 2],
         y: rawResults.eci.position[3 * 2 + 1],
-        z: rawResults.eci.position[3 * 2 + 2]
+        z: rawResults.eci.position[3 * 2 + 2],
       },
       velocity: {
         x: rawResults.eci.velocity[3 * 2],
         y: rawResults.eci.velocity[3 * 2 + 1],
-        z: rawResults.eci.velocity[3 * 2 + 2]
+        z: rawResults.eci.velocity[3 * 2 + 2],
       },
-    })
+    });
     expect(formattedResults.ecfPosition).toEqual({
       x: rawResults.ecfPosition[3 * 2],
       y: rawResults.ecfPosition[3 * 2 + 1],
-      z: rawResults.ecfPosition[3 * 2 + 2]
-    })
+      z: rawResults.ecfPosition[3 * 2 + 2],
+    });
     expect(formattedResults.ecfVelocity).toEqual({
       x: rawResults.ecfVelocity[3 * 2],
       y: rawResults.ecfVelocity[3 * 2 + 1],
-      z: rawResults.ecfVelocity[3 * 2 + 2]
-    })
-    expect(formattedResults.gmst).toEqual(rawResults.gmst[0])
-    expect(formattedResults.dopplerFactor).toEqual(rawResults.dopplerFactor[2])
+      z: rawResults.ecfVelocity[3 * 2 + 2],
+    });
+    expect(formattedResults.gmst).toEqual(rawResults.gmst[0]);
+    expect(formattedResults.dopplerFactor).toEqual(rawResults.dopplerFactor[2]);
     expect(formattedResults.lookAngles).toEqual({
       azimuth: rawResults.lookAngles[3 * 2],
       elevation: rawResults.lookAngles[3 * 2 + 1],
-      rangeSat: rawResults.lookAngles[3 * 2 + 2]
-    })
-  })
+      rangeSat: rawResults.lookAngles[3 * 2 + 2],
+    });
+  });
 });
 
 describe('Toposort for BulkPropagator', () => {
   it('Should throw if there is a cyclic dependency', () => {
     expect(() => {
-      topologicalSort([{ provides: 'thing', hasDependencies: ['otherThing'] }, { provides: 'otherThing', hasDependencies: ['thing'] }])
+      topologicalSort([{ provides: 'thing', hasDependencies: ['otherThing'] }, { provides: 'otherThing', hasDependencies: ['thing'] }]);
     }).toThrow();
-  })
-})
+  });
+});

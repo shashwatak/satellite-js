@@ -80,7 +80,7 @@ interface DpperOptions {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dpper(satrec: SatRec, options: DpperOptions) {
+export function dpper(satrec: SatRec, options: DpperOptions) {
   const {
     e3,
     ee2,

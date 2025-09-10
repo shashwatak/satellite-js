@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import dsinit from '../../src/propagation/dsinit.js';
+import { dsinit } from '../../src/propagation/dsinit.js';
 import dsOptionSets from './dsinit.json' with { type: 'json' };
 
 describe('Initialize Resonance Terms', () => {

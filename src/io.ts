@@ -4,7 +4,7 @@ import { deg2rad, xpdotp } from './constants.js';
 import { jday, days2mdhms } from './ext.js';
 import { SatRecInit } from './propagation/SatRec.js';
 
-import sgp4init from './propagation/sgp4init.js';
+import { sgp4init } from './propagation/sgp4init.js';
 
 /* -----------------------------------------------------------------------------
  *
@@ -126,7 +126,7 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
     mo,
     no,
     jdsatepoch,
-  }
+  };
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
   sgp4init(satrec, {
@@ -149,15 +149,15 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
  *
  *                           function json2satrec
  *
- *  this function converts the OMM json data to variables and initializes the sgp4 
- *    variables. several intermediate varaibles and quantities are determined. note 
- *    that the result is a structure so multiple satellites can be processed 
- *    simultaneously without having to reinitialize. the verification mode is an 
- *    important option that permits quick checks of any changes to the underlying 
- *    technical theory. this option works using a modified tle file in which the 
+ *  this function converts the OMM json data to variables and initializes the sgp4
+ *    variables. several intermediate varaibles and quantities are determined. note
+ *    that the result is a structure so multiple satellites can be processed
+ *    simultaneously without having to reinitialize. the verification mode is an
+ *    important option that permits quick checks of any changes to the underlying
+ *    technical theory. this option works using a modified tle file in which the
  *    start, stop, and delta time values are included at the end of the second line
- *    of data. this only works with the verification mode. the catalog mode simply 
- *    propagates from -1440 to 1440 min from epoch and is useful when performing 
+ *    of data. this only works with the verification mode. the catalog mode simply
+ *    propagates from -1440 to 1440 min from epoch and is useful when performing
  *    entire catalog runs.
  *
  *  author        : Hariharan Vitaladevuni                   18 Aug 2023
@@ -174,9 +174,9 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
  *    days2mdhms  - conversion of days to month, day, hour, minute, second
  *    jday        - convert day month year hour minute second into julian date
  *    sgp4init    - initialize the sgp4 variables
- * 
+ *
  *  warning       : the epoch date in OMM format is more accurate than TLE format!
- *                  this will result in extremely close, but different 
+ *                  this will result in extremely close, but different
  *                  position/velocity values. Depending on your use case, it may
  *                  be better to use twoline2satrec, but for the average user this
  *                  will provide comparable results.
@@ -189,12 +189,13 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
 
-  const epoch = new Date(jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : jsonobj.EPOCH + 'Z');
+  const epoch = new Date(jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : `${jsonobj.EPOCH}Z`);
   const year = epoch.getUTCFullYear();
 
   const epochyr = Number(year.toString().slice(-2));
-  const epochdays =
-    (epoch.valueOf() - new Date(Date.UTC(year, 0, 1, 0, 0, 0)).valueOf()) / (86400 * 1000) + 1;
+  const epochdays = (epoch.valueOf() - new Date(
+    Date.UTC(year, 0, 1, 0, 0, 0),
+  ).valueOf()) / (86400 * 1000) + 1;
 
   let ndot = Number(jsonobj.MEAN_MOTION_DOT);
   let nddot = Number(jsonobj.MEAN_MOTION_DDOT);
@@ -219,7 +220,9 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
   // ----------------------------------------------------------------
   const mdhmsResult = days2mdhms(year, epochdays);
 
-  const { mon, day, hr, minute, sec } = mdhmsResult;
+  const {
+    mon, day, hr, minute, sec,
+  } = mdhmsResult;
   const jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
   const satrec: SatRecInit = {
@@ -237,7 +240,7 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
     mo,
     no,
     jdsatepoch,
-  }
+  };
 
   //  ---------------- initialize the orbit at sgp4epoch -------------------
   sgp4init(satrec, {

@@ -12,7 +12,7 @@ const c = 299792.458; // Speed of light in km/s
 export function dopplerFactor(
   observerCoordsEcf: EcfVec3<Kilometer>,
   positionEcf: EcfVec3<Kilometer>,
-  velocityEcf: EcfVec3<KilometerPerSecond>
+  velocityEcf: EcfVec3<KilometerPerSecond>,
 ): number {
   const rangeX = positionEcf.x - observerCoordsEcf.x;
   const rangeY = positionEcf.y - observerCoordsEcf.y;

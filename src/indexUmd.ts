@@ -1,7 +1,7 @@
 import * as constants from './constants.js';
 
 import { jday, invjday } from './ext.js';
-import { twoline2satrec, json2satrec} from './io.js';
+import { twoline2satrec, json2satrec } from './io.js';
 import { propagate, sgp4, gstime } from './propagation.js';
 import { SatRecError } from './propagation/SatRec.js';
 import * as types from './common-types.js';
@@ -24,6 +24,7 @@ import {
 
 import { sunPos } from './sun.js';
 
+// eslint-disable-next-line import/no-default-export
 export default {
   constants,
 

@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 
-export default function compareVectors(
+export function compareVectors(
   vector1: { x: number; y: number; z: number },
   vector2: { x: number; y: number; z: number },
   numDigits?: number,

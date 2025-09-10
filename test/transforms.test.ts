@@ -10,7 +10,7 @@ import {
   ecfToEci,
   ecfToLookAngles,
 } from '../src/transforms.js';
-import compareVectors from './compareVectors.js';
+import { compareVectors } from './compareVectors.js';
 import transformData from './transforms.json' with { type: 'json' };
 
 const numDigits = 6;

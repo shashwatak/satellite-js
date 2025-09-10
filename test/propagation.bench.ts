@@ -1,7 +1,6 @@
 import { bench } from 'vitest';
 import WasmModuleFactory from 'wasm-module/index.js';
-import { BulkPropagator } from '../src/wasm/bulk-propagator.js';
-import { EciBaseCalculator } from '../src/wasm/calculators/calculators.js';
+import { BulkPropagator, EciBaseCalculator } from '../src/wasm/index.js';
 import { json2satrec, propagate, SatRecError } from '../src/index.js';
 import type { OMMJsonObject } from '../src/common-types.js';
 import ommData from './omm.json' with { type: 'json' };
@@ -11,8 +10,13 @@ const DATES_COUNT = 1;
 const DATE_START = new Date('2025-07-12T00:00:00.123Z');
 const DATE_STEP_MS = 60 * 60 * 1000;
 
-const satrecs = (ommData as OMMJsonObject[]).slice(0, MAX_SATELLITES).map(obj => json2satrec(obj));
-const dates = Array.from({ length: DATES_COUNT }, (_, i) => new Date(DATE_START.getTime() + i * DATE_STEP_MS));
+const satrecs = (ommData as OMMJsonObject[])
+  .slice(0, MAX_SATELLITES)
+  .map((obj) => json2satrec(obj));
+const dates = Array.from(
+  { length: DATES_COUNT },
+  (_, i) => new Date(DATE_START.getTime() + i * DATE_STEP_MS),
+);
 
 const wasmModule = await WasmModuleFactory();
 // `using` here throws because benchmarks are executed separately after bp is disposed
@@ -52,4 +56,4 @@ bench('Pure JS propagate loop', () => {
   sideEffectSink = local;
 });
 
-export const _benchmarkGuard = () => sideEffectSink;
+export const benchmarkGuard = () => sideEffectSink;

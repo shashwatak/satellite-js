@@ -9,6 +9,7 @@ export function allocateDatesArray(module: MainModule, datesCount: number): numb
 export function writeDatesArray(module: MainModule, pointer: number, dates: readonly Date[]): void {
   const startOffset = pointer / Float64Array.BYTES_PER_ELEMENT;
   dates.forEach((date, index) => {
+    // eslint-disable-next-line no-param-reassign
     module.HEAPF64[startOffset + index] = jday(date);
   });
 }

@@ -1,7 +1,11 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import compareVectors from './compareVectors.js';
+import {
+  describe, it, expect, beforeAll,
+} from 'vitest';
+import { compareVectors } from './compareVectors.js';
 
-import { jday, invjday, twoline2satrec, propagate, gstime } from '../src/index.js';
+import {
+  jday, invjday, twoline2satrec, propagate, gstime,
+} from '../src/index.js';
 
 describe('Julian date / time', () => {
   let now: Date;

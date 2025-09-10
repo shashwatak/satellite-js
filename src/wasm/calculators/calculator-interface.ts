@@ -12,7 +12,12 @@ export interface Calculator<
 > {
   readonly name: Name;
   readonly dependencies: Dependencies;
-  init(module: MainModule, outputPointer: number, satellitesCount: number, datesCount: number): void;
+  init(
+    module: MainModule,
+    outputPointer: number,
+    satellitesCount: number,
+    datesCount: number
+  ): void;
   getFormattedOutput(satelliteIndex: number, dateIndex: number): FormattedOutput;
   getOutputBufferSize(satellitesCount: number, datesCount: number): number;
   getRawOutput(): RawOutputs;
