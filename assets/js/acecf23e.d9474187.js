@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksatellite_js_docs=self.webpackChunksatellite_js_docs||[]).push([[903],{1912:s=>{s.exports=JSON.parse('{"blogBasePath":"/satellite-js/blog","blogTitle":"Blog","authorsListPath":"/satellite-js/blog/authors"}')}}]);

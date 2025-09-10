@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://shashwatak.github.io/satellite-js/blog</id>
+    <title>🛰️ Satellite.js Blog</title>
+    <updated>2025-08-29T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://shashwatak.github.io/satellite-js/blog"/>
+    <subtitle>🛰️ Satellite.js Blog</subtitle>
+    <icon>https://shashwatak.github.io/satellite-js/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[WASM: Making the Fastest SGP4 for the web]]></title>
+        <id>https://shashwatak.github.io/satellite-js/blog/wasm</id>
+        <link href="https://shashwatak.github.io/satellite-js/blog/wasm"/>
+        <updated>2025-08-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[If you tried running this, you know the results: slowdowns which are not suitable for realtime applications.]]></summary>
+        <content type="html"><![CDATA[<div class="language-ts codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-ts codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> now </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token class-name">Date</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> results </span><span class="token operator">=</span><span class="token plain"> entireSatelliteDatabase</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">map</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">satRec </span><span class="token operator">=&gt;</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">propagate</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">satRec</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> now</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre></div></div>
+<p>If you tried running this, you know the results: slowdowns which are not suitable for realtime applications.</p>
+<p>This is where we went for a mission to make the <strong>fastest theoretically possible SGP4/SDP4 implementation</strong> available in JavaScript. Meet WebAssembly and <em>a lot</em> of optimization techniques under the hood.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="background">Background<a href="https://shashwatak.github.io/satellite-js/blog/wasm#background" class="hash-link" aria-label="Direct link to Background" title="Direct link to Background">​</a></h2>
+<p>The satellite.js library has originally started as a port of the <a href="https://pypi.org/project/sgp4/" target="_blank" rel="noopener noreferrer">Python sgp4 library</a>, which in turn
+has its roots in <a href="https://github.com/CelesTrak/fundamentals-of-astrodynamics" target="_blank" rel="noopener noreferrer">the C++ code by David Vallado</a>.</p>
+<p>My idea of trying out WASM on this library has been lingering from around 2023 - pretty much the very moment I found out about the library.
+The library is pure calculations - and it's exactly one of the main use cases for WASM. Since propagations can be highly parallel
+(each SatRec can be computed independently), and further coordinate transforms (ECI -&gt; ECF -&gt; LookAngles etc) are completely independent,
+there are huge benefits to have from Single Instruction Multiple Data (SIMD further down) and multithreaded processing.</p>
+<p>A recap on SIMD: to the existing <code>i32</code>, <code>i64</code>, <code>f32</code>, <code>f64</code> types it adds <code>v128</code> type, which is a 128-bit vector where you can pack, for example, 4 32-bit values, or 2 64-bit ones. You can create two of these and then use an instruction that multiplies the values in them. This means that, for 64-bit values, you can do 2 multiplications in one CPU cycle; and for 32-bit values - 4 multiplications, at once. There are a bunch of interpretations of <code>v128</code> vectors and instructions of them available and already implemented for WASM.</p>
+<p>Going back to the roots of SGP4 - the C++ code - happened to appear the best choice for performance. Not only because it's, well, C++,
+but also because of its powerful compiler optimizations.</p>]]></content>
+        <author>
+            <name>Vladyslav Huba</name>
+            <uri>https://www.linkedin.com/in/vladyslav-huba-a85b4414b/</uri>
+        </author>
+    </entry>
+</feed>
