@@ -1,4 +1,6 @@
-import { Degrees, EcfVec3, EciVec3, GeodeticLocation, GMSTime, Kilometer, LookAngles, Radians } from './common-types.js';
+import {
+  Degrees, EcfVec3, EciVec3, GeodeticLocation, GMSTime, Kilometer, LookAngles, Radians,
+} from './common-types.js';
 import {
   pi,
   twoPi,
@@ -87,6 +89,7 @@ export function eciToGeodetic(eci: EciVec3<Kilometer>, gmst: GMSTime): GeodeticL
     Math.sqrt((eci.x * eci.x) + (eci.y * eci.y)),
   );
   let C: number;
+  // eslint-disable-next-line no-plusplus
   while (k++ < kmax) {
     C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
     latitude = Math.atan2(eci.z + (a * C * e2 * Math.sin(latitude)), R);
@@ -147,7 +150,10 @@ interface Topocentric {
   topZ: number;
 }
 
-function topocentric(observerGeodetic: GeodeticLocation, satelliteEcf: EcfVec3<Kilometer>): Topocentric {
+function topocentric(
+  observerGeodetic: GeodeticLocation,
+  satelliteEcf: EcfVec3<Kilometer>,
+): Topocentric {
   // http://www.celestrak.com/columns/v02n02/
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
@@ -190,7 +196,10 @@ function topocentricToLookAngles(tc: Topocentric): LookAngles {
   };
 }
 
-export function ecfToLookAngles(observerGeodetic: GeodeticLocation, satelliteEcf: EcfVec3<Kilometer>): LookAngles {
+export function ecfToLookAngles(
+  observerGeodetic: GeodeticLocation,
+  satelliteEcf: EcfVec3<Kilometer>,
+): LookAngles {
   const topocentricCoords = topocentric(observerGeodetic, satelliteEcf);
   return topocentricToLookAngles(topocentricCoords);
 }

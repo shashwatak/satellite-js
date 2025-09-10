@@ -5,7 +5,7 @@ import {
   x2o3,
 } from '../constants.js';
 
-import gstime from './gstime.js';
+import { gstime } from './gstime.js';
 
 interface InitlOptions {
   opsmode: 'a' | 'i';
@@ -65,7 +65,7 @@ interface InitlOptions {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function initl(options: InitlOptions) {
+export function initl(options: InitlOptions) {
   const {
     ecco,
     epoch,
@@ -116,10 +116,12 @@ export default function initl(options: InitlOptions) {
     const ds70 = Math.floor(ts70 + 1.0e-8);
     const tfrac = ts70 - ds70;
 
-    //  find greenwich location at epoch
-    const c1 = 1.72027916940703639e-2; // eslint-disable-line no-loss-of-precision
-    const thgr70 = 1.7321343856509374; // eslint-disable-line no-loss-of-precision
-    const fk5r = 5.07551419432269442e-15; // eslint-disable-line no-loss-of-precision
+    // find greenwich location at epoch
+    /* eslint-disable @typescript-eslint/no-loss-of-precision */
+    const c1 = 1.72027916940703639e-2;
+    const thgr70 = 1.7321343856509374;
+    const fk5r = 5.07551419432269442e-15;
+    /* eslint-enable @typescript-eslint/no-loss-of-precision */
     const c1p2p = c1 + twoPi;
     gsto = (thgr70 + (c1 * ds70) + (c1p2p * tfrac) + (ts70 * ts70 * fk5r)) % twoPi;
     if (gsto < 0.0) {

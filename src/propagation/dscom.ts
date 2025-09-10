@@ -77,7 +77,7 @@ interface DscomOptions {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dscom(options: DscomOptions) {
+export function dscom(options: DscomOptions) {
   const {
     epoch,
     ep,

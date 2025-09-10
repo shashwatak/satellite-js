@@ -8,11 +8,11 @@ import {
   tumin,
 } from '../constants.js';
 
-import dpper from './dpper.js';
-import dscom from './dscom.js';
-import dsinit from './dsinit.js';
-import initl from './initl.js';
-import sgp4 from './sgp4.js';
+import { dpper } from './dpper.js';
+import { dscom } from './dscom.js';
+import { dsinit } from './dsinit.js';
+import { initl } from './initl.js';
+import { sgp4 } from './sgp4.js';
 import { SatRec, SatRecInit } from './SatRec.js';
 
 export interface Sgp4InitOptions {
@@ -109,7 +109,10 @@ export interface Sgp4InitOptions {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function sgp4init(satrecInit: SatRecInit, options: Sgp4InitOptions): asserts satrecInit is SatRec {
+export function sgp4init(
+  satrecInit: SatRecInit,
+  options: Sgp4InitOptions,
+): asserts satrecInit is SatRec {
   const {
     opsmode,
     satn,

@@ -18,10 +18,11 @@
     "declaration": true,
     "declarationDir": "./types",
     "outDir": "./compiled",
+    "lib": ["ES2022"]
   },
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Strictest (minus esModuleInterop)",
   "include": [
-    "src/**.ts",
+    "src/**/*.ts"
   ],
 }

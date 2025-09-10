@@ -132,12 +132,12 @@ type StartsWith<T extends string> = `${T}${string}`
 /**
  * This is the base interface for the OMM JSON object as specified in Orbit Data Messages
  * recommended standard, version 3.0.
- * 
+ *
  * Note that this is not a 1:1 mapping. Only the fields that are necessary to propagate
  * a satellite orbit are made required. For example, CCSDS_OMM_VERS is required by the spec,
  * but is not present in Celestrak OMM output, and is not required to propagate the satellite,
  * so it is made optional here.
- * 
+ *
  * Numeric fields may be represented as strings or numbers in the original json, depending on
  * the source. This is because the spec doesn't specify the type, and different sources use
  * different types: at the time of writing, Celestrak uses numbers, while SpaceTrack uses strings.
@@ -146,7 +146,7 @@ export interface OMMJsonObjectV3 {
   /**
    * The version is restricted in TypeScript to only among the ones this library supports.
    * Versions are incremented on breaking changes, so it is adviced you validate this field.
-   * 
+   *
    * NOTE: This is required field in OMM spec, but Celestrak omits it, so we make it optional
    * and assume version 3.0 if not present.
    */
@@ -222,9 +222,9 @@ export interface OMMJsonObjectV3 {
   /**
    * The only value supported by this library
    */
-  EPHEMERIS_TYPE?: 0 | "0";
+  EPHEMERIS_TYPE?: 0 | '0';
 
-  CLASSIFICATION_TYPE?: "U" | "C";
+  CLASSIFICATION_TYPE?: 'U' | 'C';
 
   NORAD_CAT_ID: string | number;
   ELEMENT_SET_NO: string | number;
