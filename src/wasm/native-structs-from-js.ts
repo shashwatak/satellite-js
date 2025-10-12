@@ -122,7 +122,7 @@ export function allocateAndWriteNativeStructArrayFromSatrecArray(
   const layout = getNativeStructFieldLayout(module);
   const nativeSize = getNativeStructSize(module);
   const pointer = module._malloc(satrecArray.length * nativeSize);
-  const writer = new CppMemoryWriter(module.HEAPU8.buffer);
+  const writer = new CppMemoryWriter(module.HEAP8.buffer);
   satrecArray.forEach((satrec, index) => {
     const currentOffset = index * nativeSize;
     writer.setBaseOffset(pointer + currentOffset);
