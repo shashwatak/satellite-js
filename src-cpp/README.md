@@ -1,6 +1,9 @@
 This folder contains the most recent available SGP4 source code (`SGP4.cpp`), along with an adaptation for JS
 (`SGP4-for-js.cpp`). Functions which are exported from this C++ are used in `/src/wasm` Typescript code.
 
+There is also a separate `debug.cpp` file. It is compiled only for debug build, since it's needed for tests but NOT
+for user-facing code.
+
 To set up VSCode for C++ with syntax highlight, Emscripten autocompletions, and debugger being able to step in C++ code:
 1. Install Emscripten SDK, see https://github.com/emscripten-core/emsdk. Check by running `em++ -v` in console.
 2. In `.vscode` folder, rename `settings.example.json` to `settings.json`, and `c_cpp_properties.example.json` to
