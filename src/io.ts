@@ -81,7 +81,7 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
   // ---- find standard orbital elements ----
   const inclo = parseFloat(longstr2.substring(8, 16)) * deg2rad;
   const nodeo = parseFloat(longstr2.substring(17, 25)) * deg2rad;
-  const ecco = parseFloat(`.${longstr2.substring(26, 33)}`);
+  const ecco = parseFloat(`.${longstr2.substring(26, 33).replace(/\s/g, '0')}`);
   const argpo = parseFloat(longstr2.substring(34, 42)) * deg2rad;
   const mo = parseFloat(longstr2.substring(43, 51)) * deg2rad;
 
