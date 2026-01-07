@@ -1,6 +1,6 @@
 {
   "name": "satellite.js",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "description": "SGP4/SDP4 calculation library",
   "main": "lib/index.js",
   "jsnext:main": "dist/satellite.es.js",
@@ -73,7 +73,7 @@
   "jest": {
     "testPathIgnorePatterns": [
       "node_modules",
-      "test/propagation/sgp4prop"
+      "test/propagation/sgp4Catalog.test.js"
     ]
   },
   "homepage": "https://github.com/shashwatak/satellite-js",
