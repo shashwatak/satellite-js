@@ -1,3 +1,7 @@
+/**
+ * This file is only included in debug builds, to save size in production builds. It defines some functions used for unit tests and sanity checks.
+ */
+
 #include <stdio.h>
 #include <emscripten/emscripten.h>
 #include "SGP4.h"
