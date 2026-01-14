@@ -13,9 +13,9 @@
 
 typedef struct {
   // inputs
-  elsetrec* __restrict satellitesPointer;
+  elsetrec *__restrict satellitesPointer;
   int satellitesCount;
-  double* __restrict jdaysPointer;
+  double *__restrict jdaysPointer;
   int jdaysCount;
 
   // outputs and output-specific parameters
@@ -43,6 +43,7 @@ typedef struct {
   double longitudeRadians;
   double latitudeRadians;
   double heightKm;
+  double *__restrict lookAngles;
 
   double observerEcfX;
   double observerEcfY;
@@ -205,7 +206,7 @@ extern "C"
     return return_string;
   }
 
-  char *EMSCRIPTEN_KEEPALIVE create_run_data_struct_layout_string_pointer()
+  char *EMSCRIPTEN_KEEPALIVE create_rundata_struct_layout_string_pointer()
   {
     RunData *zero_rec = ((RunData *)0);
     std::string result = "[";
@@ -235,6 +236,7 @@ extern "C"
     result += "[\"longitudeRadians\",\"double\"," + std::to_string(offsetof(RunData, longitudeRadians)) + "," + std::to_string(sizeof(zero_rec->longitudeRadians)) + "],";
     result += "[\"latitudeRadians\",\"double\"," + std::to_string(offsetof(RunData, latitudeRadians)) + "," + std::to_string(sizeof(zero_rec->latitudeRadians)) + "],";
     result += "[\"heightKm\",\"double\"," + std::to_string(offsetof(RunData, heightKm)) + "," + std::to_string(sizeof(zero_rec->heightKm)) + "],";
+    result += "[\"lookAngles\",\"int\"," + std::to_string(offsetof(RunData, lookAngles)) + "," + std::to_string(sizeof(zero_rec->lookAngles)) + "],";
 
     result += "[\"dopplerFactorEnabled\",\"bool\"," + std::to_string(offsetof(RunData, dopplerFactorEnabled)) + "," + std::to_string(sizeof(zero_rec->dopplerFactorEnabled)) + "],";
     result += "[\"observerEcfX\",\"double\"," + std::to_string(offsetof(RunData, observerEcfX)) + "," + std::to_string(sizeof(zero_rec->observerEcfX)) + "],";
@@ -562,4 +564,8 @@ extern "C"
   //     sgp4forJs(satrecs[i], unix_ms, &positions[i * 3], &velocities[i * 3]);
   //   }
   // }
+
+  void* EMSCRIPTEN_KEEPALIVE calloc_one(int size) {
+    return std::calloc(size, 1);
+  }
 }

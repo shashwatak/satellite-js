@@ -21,15 +21,13 @@ declare namespace RuntimeExports {
 }
 interface WasmModule {
   _get_elsetrec_size(): number;
-  _create_struct_layout_string_pointer(): number;
-  _free_offsets_string(_0: number): void;
+  _get_rundata_size(): number;
+  _create_elsetrec_struct_layout_string_pointer(): number;
+  _create_rundata_struct_layout_string_pointer(): number;
+  _free_struct_layout_string(_0: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
-  _calculate_eci_base(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
-  _calculate_gmst(_0: number, _1: number, _2: number): void;
-  _calculate_ecf_position_or_velocity(_0: number, _1: number, _2: number, _3: number, _4: number): void;
-  _calculate_geodetic_positions(_0: number, _1: number, _2: number, _3: number, _4: number): void;
-  _calculate_look_angles(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
-  _calculate_doppler_factor(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number, _7: number): void;
+  _calloc_one(_0: number): number;
+  _compute(_0: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
 }
