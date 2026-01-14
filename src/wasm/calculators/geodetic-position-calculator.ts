@@ -1,4 +1,4 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { GeodeticLocation } from '../../common-types.js';
 import type { Calculator } from './calculator-interface.js';
 
@@ -29,12 +29,12 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
 
   private datesCount!: number;
 
-  private module!: MainModule;
+  private module!: WasmModuleBase;
 
   private outputPointer!: number;
 
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     satellitesCount: number,
     datesCount: number,
@@ -67,20 +67,10 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
     );
   }
 
-  run(
-    _satellitesPointer: number,
-    _satellitesCount: number,
-    _datesPointer: number,
-    _datesCount: number,
-    dependenciesOutputsPointers: [number, number],
-  ): void {
-    const [eciBasePointer, gmstPointer] = dependenciesOutputsPointers;
-    this.module._calculate_geodetic_positions(
-      eciBasePointer,
-      this.satellitesCount,
-      gmstPointer,
-      this.datesCount,
-      this.outputPointer,
-    );
+  getExecutionDescriptor() {
+    return {
+      geodeticPositionEnabled: true,
+      geodeticPositions: this.outputPointer,
+    };
   }
 }

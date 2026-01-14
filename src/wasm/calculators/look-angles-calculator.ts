@@ -1,4 +1,4 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { GeodeticLocation, LookAngles } from '../../common-types.js';
 import type { Calculator } from './calculator-interface.js';
 
@@ -45,12 +45,12 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
 
   private datesCount!: number;
 
-  private module!: MainModule;
+  private module!: WasmModuleBase;
 
   private outputPointer!: number;
 
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     satellitesCount: number,
     datesCount: number,
@@ -83,24 +83,14 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
     return satellitesCount * datesCount * OUTPUTS_PER_SATELLITE * Float64Array.BYTES_PER_ELEMENT;
   }
 
-  run(
-    _satellitesPointer: number,
-    _satellitesCount: number,
-    _datesPointer: number,
-    _datesCount: number,
-    dependenciesOutputsPointers: [number],
-    runParameters: { observer: GeodeticLocation },
-  ): void {
-    const [ecfPointer] = dependenciesOutputsPointers;
+  getExecutionDescriptor(runParameters: { observer: GeodeticLocation; }) {
     const { latitude, longitude, height } = runParameters.observer;
-    this.module._calculate_look_angles(
-      ecfPointer,
-      this.satellitesCount,
-      this.datesCount,
-      longitude,
-      latitude,
-      height,
-      this.outputPointer,
-    );
+    return {
+      lookAnglesEnabled: true,
+      observerGeodeticLatitude: latitude,
+      observerGeodeticLongitude: longitude,
+      observerGeodeticHeight: height,
+      lookAngles: this.outputPointer,
+    };
   }
 }

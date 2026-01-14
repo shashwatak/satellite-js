@@ -1,5 +1,5 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
 import type { EcfVec3, Kilometer } from '../../common-types.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
 /**
@@ -23,12 +23,12 @@ export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, [
 
   private datesCount!: number;
 
-  private module!: MainModule;
+  private module!: WasmModuleBase;
 
   private outputPointer!: number;
 
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     satellitesCount: number,
     datesCount: number,
@@ -57,25 +57,13 @@ export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, [
     return satellitesCount * datesCount * Float64Array.BYTES_PER_ELEMENT;
   }
 
-  run(
-    _satellitesPointer: number,
-    _satellitesCount: number,
-    _datesPointer: number,
-    _datesCount: number,
-    dependenciesOutputsPointers: [number, number],
-    runParameters: { observer: EcfVec3<Kilometer> },
-  ): void {
-    const [ecfPositionPointer, ecfVelocityPointer] = dependenciesOutputsPointers;
-    const { x, y, z } = runParameters.observer;
-    this.module._calculate_doppler_factor(
-      ecfPositionPointer,
-      ecfVelocityPointer,
-      this.satellitesCount,
-      this.datesCount,
-      x,
-      y,
-      z,
-      this.outputPointer,
-    );
+  getExecutionDescriptor(runParameters: { observer: EcfVec3<Kilometer>; }) {
+    return {
+      dopplerFactorEnabled: true,
+      observerEcfX: runParameters.observer.x,
+      observerEcfY: runParameters.observer.y,
+      observerEcfZ: runParameters.observer.z,
+      dopplerFactors: this.outputPointer,
+    };
   }
 }
