@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "SGP4.h"
 #include <vector>
+#include "common.h"
 
 #define pi 3.14159265358979323846
 
@@ -29,7 +30,7 @@ void* thread_function(void* arg) {
 }
 
 extern "C" {
-  int EMSCRIPTEN_KEEPALIVE parallel_compute(int threads_count, elsetrec *__restrict satellites, int satellites_count, double *__restrict jdays, int dates_count, double *__restrict eci_positions, double *__restrict eci_velocities, int8_t *__restrict sgp4_errors) {
+  int EMSCRIPTEN_KEEPALIVE compute(int threads_count, elsetrec *__restrict satellites, int satellites_count, double *__restrict jdays, int dates_count, double *__restrict eci_positions, double *__restrict eci_velocities, int8_t *__restrict sgp4_errors) {
     pthread_t thread[threads_count];
     void* status[threads_count];
     int join_status[threads_count];
