@@ -17,7 +17,7 @@ export async function createSingleThreadRuntime(): Promise<SingleThreadRuntime> 
   const compute = async (runData: RunData) => {
     const runDataPointer = passRunDataToWasm(wasmModule, runDataLayout, runData);
     try {
-      return wasmModule._compute(runDataPointer);
+      wasmModule._compute(runDataPointer);
     } finally {
       wasmModule._free(runDataPointer);
     }
@@ -26,6 +26,7 @@ export async function createSingleThreadRuntime(): Promise<SingleThreadRuntime> 
   return {
     mode: 'single',
     module: wasmModule,
+    compute,
     dispose: () => {
       // noop
     },

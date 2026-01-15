@@ -35,6 +35,7 @@ export async function createMultiThreadRuntime(options: {
   };
 
   const runtime: MultiThreadRuntime = {
+    mode: 'multi',
     module: wasmModule,
     compute,
     dispose: () => {

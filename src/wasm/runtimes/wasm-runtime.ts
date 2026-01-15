@@ -9,14 +9,13 @@ export interface BaseWasmRuntime extends Disposable {
 export interface SingleThreadRuntime extends BaseWasmRuntime {
   readonly mode: 'single';
   module: WasmModuleSingleThread;
-  compute(runDataPointer: number): void;
+  compute(runData: RunData): void;
 }
 
 export interface MultiThreadRuntime extends BaseWasmRuntime {
   readonly mode: 'multi';
   module: WasmModuleMultiThread;
   compute(runData: RunData): Promise<void>;
-  isBusy(): boolean;
   dispose(): void;
   [Symbol.dispose](): void;
 }

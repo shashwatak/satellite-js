@@ -20,7 +20,7 @@ export interface WasmModuleBase {
 }
 
 export interface WasmModuleSingleThread extends WasmModuleBase {
-  _compute(runDataPointer: number): number;
+  _compute(runDataPointer: number): void;
 }
 
 export interface WasmModuleMultiThread extends WasmModuleBase {
