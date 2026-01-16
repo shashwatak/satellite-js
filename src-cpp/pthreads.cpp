@@ -277,17 +277,17 @@ extern "C" {
     pthread_barrier_init(&gstimeBarrier, NULL, threads_count);
     for (int i=0; i < threads_count; ++i) {
       thread_data[i] = ThreadData{
-        .satellitesCount = runData->satellitesCount,
-        .satellites = runData->satellitesPointer,
         .datesCount = runData->jdaysCount,
-        .jdays = runData->jdaysPointer,
+        .satellitesCount = runData->satellitesCount,
         .threadIndex = i,
         .threadsCount = threads_count,
+        .satellites = runData->satellitesPointer,
+        .jdays = runData->jdaysPointer,
         .eciPositions = runData->eciPositions,
         .eciVelocities = runData->eciVelocities,
         .sgp4Errors = runData->sgp4Errors,
-        .runData = runData,
         .gstimeBarrier = &gstimeBarrier,
+        .runData = runData,
       };
       pthread_create(&thread[i], NULL, thread_function, &thread_data[i]);
       // std::cout << "Thread created " << thread[i] << std::endl;
@@ -308,5 +308,6 @@ extern "C" {
         return 1;
       }
     }
+    return 0;
   }
 }
