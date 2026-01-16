@@ -1,8 +1,25 @@
-This folder contains the most recent available SGP4 source code (`SGP4.cpp`), along with an adaptation for JS
-(`SGP4-for-js.cpp`). Functions which are exported from this C++ are used in `/src/wasm` Typescript code.
+This folder contains the most recent available original SGP4 source code (`SGP4.cpp`), along with an adaptation with changes/optimizations for JS.
+Functions which are exported from this C++ are used in `/src/wasm` Typescript code.
+
+There are multiple compilations available depending on user's capabilities:
+- base (single thread, SIMD-enabled)
+- pthreads (multi thread, SIMD-enabled)
+
+The code is split into the following files:
+- `common.cpp` contains code common for all compilations
+- `base.cpp` contains code specific to base compilation
+- `pthreads.cpp` contains code for pthreads compilation
+- `SGP4.cpp` and `SGP4.h` are reference code of SGP4 algorithm by David Vallado. Since satellite.js can use SGP4 with changes and optimizations,
+the original is there to compare against.
 
 There is also a separate `debug.cpp` file. It is compiled only for debug build, since it's needed for tests but NOT
 for user-facing code.
+
+Hence, compilations consist of the following files:
+- `debug`:            `common.cpp` + `base.cpp`     + `debug.cpp`
+- `debug-pthreads`:   `common.cpp` + `pthreads.cpp` + `debug.cpp`
+- `release`:          `common.cpp` + `base.cpp`
+- `release-pthreads`: `common.cpp` + `threads.cpp`
 
 To set up VSCode for C++ with syntax highlight, Emscripten autocompletions, and debugger being able to step in C++ code:
 1. Install Emscripten SDK, see https://github.com/emscripten-core/emsdk. Check by running `em++ -v` in console.
@@ -19,9 +36,8 @@ A few things to note:
 * `elsetrec` struct, while unlikely, might have different offsets on different compilations, and different `sizeof` as well.
 * `char` type is signed on current compilation, and so is written with `DataView#setInt8()`
 
-The Calculators written in Typescript call the corresponding C++ functions. Most of the functions are able to be vectorized
-automatically by Emscripten on high optimization levels, except for the `sgp4` function and that's an area for a possible
-improvement.
+While most of the functions are able to be vectorized automatically by Emscripten on high optimization levels, the `sgp4` function
+is not, and that's an area for a possible improvement.
 
 Areas to experiment:
 - structure of arrays vs array of structures
