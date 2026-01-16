@@ -1,5 +1,5 @@
 export class CppMemoryReader {
-  constructor(buffer: ArrayBuffer, public baseOffset = 0) {
+  constructor(buffer: ArrayBufferLike, public baseOffset = 0) {
     this.view = new DataView(buffer);
   }
 

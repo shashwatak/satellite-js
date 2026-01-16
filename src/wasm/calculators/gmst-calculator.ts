@@ -1,4 +1,4 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
 /**
@@ -14,7 +14,7 @@ export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, n
 
   readonly dependencies: [] = [];
 
-  private module!: MainModule;
+  private module!: WasmModuleBase;
 
   private outputPointer!: number;
 
@@ -25,7 +25,7 @@ export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, n
   }
 
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     _satellitesCount: number,
     datesCount: number,
@@ -35,20 +35,18 @@ export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, n
     this.datesCount = datesCount;
   }
 
-  run(
-    _satellitesPointer: number,
-    _satellitesCount: number,
-    datesPointer: number,
-    datesCount: number,
-  ): void {
-    this.module._calculate_gmst(datesPointer, datesCount, this.outputPointer);
-  }
-
   getRawOutput(): Float64Array {
     return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.datesCount);
   }
 
   getFormattedOutput(_satelliteIndex: number, dateIndex: number): number {
     return this.getRawOutput()[dateIndex]!;
+  }
+
+  getExecutionDescriptor() {
+    return {
+      gmstEnabled: true,
+      gmstValues: this.outputPointer,
+    };
   }
 }

@@ -1,6 +1,7 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { TupleOf } from './tuple-of.js';
 import type { TypedArray } from '../typed-array.js';
+import { RunData } from '../run-data.js';
 
 export interface Calculator<
   Name extends string,
@@ -8,12 +9,13 @@ export interface Calculator<
   Dependencies extends TupleOf<string, DependenciesCount>,
   RawOutputs extends TypedArray | Record<string, TypedArray>,
   FormattedOutput,
-  RunParameters extends Record<string, unknown> = {}
+  RunParameters extends Record<string, unknown> = {},
+  ExecutionDescriptor extends Partial<RunData> = Partial<RunData>
 > {
   readonly name: Name;
   readonly dependencies: Dependencies;
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     satellitesCount: number,
     datesCount: number
@@ -21,12 +23,5 @@ export interface Calculator<
   getFormattedOutput(satelliteIndex: number, dateIndex: number): FormattedOutput;
   getOutputBufferSize(satellitesCount: number, datesCount: number): number;
   getRawOutput(): RawOutputs;
-  run(
-    elsetrecsPointer: number,
-    elsetrecsCount: number,
-    datesPointer: number,
-    datesCount: number,
-    dependenciesOutputsPointers: TupleOf<number, DependenciesCount>,
-    runParameters: RunParameters
-  ): void;
+  getExecutionDescriptor(runParameters: RunParameters): ExecutionDescriptor;
 }
