@@ -25,9 +25,11 @@
     "raise": "raise-version",
     "prepublishOnly": "npm run lint && npm run lint:test && npm test && npm run build",
     "wasm:serve": "vite serve simd-test",
-    "wasm:build:debug": "em++ src-cpp/SGP4-for-js.cpp src-cpp/SGP4.cpp src-cpp/debug.cpp --emit-tsd index.d.ts -g -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free,___lsan_do_recoverable_leak_check -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/debug/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,HEAP8,HEAPF64 -fsanitize=leak",
-    "wasm:build:release": "em++ src-cpp/SGP4-for-js.cpp src-cpp/SGP4.cpp --emit-tsd index.d.ts -O3 -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/release/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,HEAP8,HEAPF64",
-    "wasm:build": "npm run wasm:build:debug && npm run wasm:build:release",
+    "wasm:build:debug": "em++ src-cpp/common.cpp src-cpp/base.cpp src-cpp/SGP4.cpp src-cpp/debug.cpp --emit-tsd index.d.ts -g -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free,___lsan_do_recoverable_leak_check -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/debug/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,HEAP8,HEAPF64 -sEXIT_RUNTIME=1 -fsanitize=leak",
+    "wasm:build:release": "em++ src-cpp/common.cpp src-cpp/base.cpp src-cpp/SGP4.cpp --emit-tsd index.d.ts -O3 -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/release/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,HEAP8,HEAPF64 -sEXIT_RUNTIME=1",
+    "wasm:build-pthreads:debug": "em++ src-cpp/common.cpp src-cpp/pthreads.cpp src-cpp/SGP4.cpp src-cpp/debug.cpp -pthread -sASYNCIFY=1 -sPTHREAD_POOL_SIZE_STRICT=0 --emit-tsd index.d.ts -g -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free,___lsan_do_recoverable_leak_check -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/debug-pthreads/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,ccall,cwrap,PThread,HEAP8,HEAPF64 -sEXIT_RUNTIME=1 -fsanitize=leak",
+    "wasm:build-pthreads:release": "em++ src-cpp/common.cpp src-cpp/pthreads.cpp src-cpp/SGP4.cpp -pthread -sASYNCIFY=1 -sPTHREAD_POOL_SIZE_STRICT=0 --emit-tsd index.d.ts -O3 -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -o wasm-build/release-pthreads/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,ccall,cwrap,PThread,HEAP8,HEAPF64 -sEXIT_RUNTIME=1",
+    "wasm:build": "npm run wasm:build:debug && npm run wasm:build:release && npm run wasm:build-pthreads",
     "wasm:bench": "vitest bench --run --project wasm_release"
   },
   "repository": {
@@ -70,6 +72,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^9.35.0",
     "eslint-config-airbnb-extended": "^2.3.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "jest": "^29.7.0",
     "prepend-file": "^2.0.1",
     "raise-version": "^0.5.0",
