@@ -1,15 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import WasmModuleFactory from 'wasm-module/index.js';
+import createSingleThreadModule from 'wasm-module-single-thread/index.js';
 import {
-  getNativeStructSize,
   getNativeStructFieldLayout,
   NativeStructLayout,
-  allocateAndWriteNativeStructArrayFromSatrecArray,
 } from '../../src/wasm/native-structs-from-js.js';
 import { CppMemoryReader } from '../../src/wasm/struct-read.js';
 import { twoline2satrec } from '../../src/io.js';
+import { allocateAndWriteNativeStructArrayFromSatrecArray } from '../../src/wasm/elsetrec-struct.js';
 
-const wasmModule = await WasmModuleFactory();
+const wasmModule = await createSingleThreadModule();
 
 /**
  * This test ensures that C++ struct stays constant and does not change
@@ -159,20 +158,24 @@ const knownGoodLayout = {
   rcs_m2: ['double', 984, 8],
 };
 
-function layoutToObject(layout: NativeStructLayout) {
+function layoutToObject(layout: NativeStructLayout<keyof typeof knownGoodLayout>) {
   return Object.fromEntries(
     Array.from(layout.entries())
       .map((entry) => [entry[0], [entry[1].type, entry[1].offset, entry[1].size]]),
   );
 }
 
-describe('WASM elsetrec struct (debug only)', () => {
+describe('WASM elsetrec struct', () => {
   it(`has size exactly ${knownGoodSize} bytes`, async () => {
-    expect(getNativeStructSize(wasmModule)).toBe(knownGoodSize);
+    expect(wasmModule._get_elsetrec_size()).toBe(knownGoodSize);
   });
 
   it('layout string has no unknown changes', () => {
-    const layout = getNativeStructFieldLayout(wasmModule);
+    const layoutStringPointer = wasmModule._create_elsetrec_struct_layout_string_pointer();
+    const layout = getNativeStructFieldLayout<
+      keyof typeof knownGoodLayout
+    >(layoutStringPointer, wasmModule);
+    wasmModule._free(layoutStringPointer);
 
     expect(layoutToObject(layout)).toEqual(knownGoodLayout);
   });
@@ -207,7 +210,11 @@ describe('WASM elsetrec struct (debug only)', () => {
       satrecInitializedFromJSSatrec,
     );
 
-    const layout = getNativeStructFieldLayout(wasmModule);
+    const layoutStringPointer = wasmModule._create_elsetrec_struct_layout_string_pointer();
+    const layout = getNativeStructFieldLayout<
+      keyof typeof knownGoodLayout
+    >(layoutStringPointer, wasmModule);
+    wasmModule._free(layoutStringPointer);
     layout.forEach(({ type, offset, size }, field) => {
       if (field === 'jdsatepoch') {
         const jdsatepochTlePart1 = readerOfInitializedFromTLE.readDouble(offset);
@@ -260,5 +267,51 @@ describe('WASM elsetrec struct (debug only)', () => {
           break;
       }
     });
+  });
+});
+
+const knownRunDataLayout = {
+  satellitesPointer: ['int', 0, 4],
+  satellitesCount: ['int', 4, 4],
+  jdaysPointer: ['int', 8, 4],
+  jdaysCount: ['int', 12, 4],
+  eciPositions: ['int', 16, 4],
+  eciVelocities: ['int', 20, 4],
+  sgp4Errors: ['int', 24, 4],
+  gmstEnabled: ['bool', 28, 1],
+  gmstValues: ['int', 36, 4],
+  ecfPositionEnabled: ['bool', 29, 1],
+  ecfPositions: ['int', 40, 4],
+  ecfVelocityEnabled: ['bool', 30, 1],
+  ecfVelocities: ['int', 44, 4],
+  geodeticPositionEnabled: ['bool', 31, 1],
+  geodeticPositions: ['int', 48, 4],
+  lookAnglesEnabled: ['bool', 32, 1],
+  longitudeRadians: ['double', 56, 8],
+  latitudeRadians: ['double', 64, 8],
+  heightKm: ['double', 72, 8],
+  lookAngles: ['int', 80, 4],
+  dopplerFactorEnabled: ['bool', 33, 1],
+  observerEcfX: ['double', 88, 8],
+  observerEcfY: ['double', 96, 8],
+  observerEcfZ: ['double', 104, 8],
+  dopplerFactors: ['int', 112, 4],
+};
+
+const knownGoodRunDataSize = 120;
+
+describe('WASM run data struct', () => {
+  it(`has size exactly ${knownGoodRunDataSize} bytes`, async () => {
+    expect(wasmModule._get_rundata_size()).toBe(knownGoodRunDataSize);
+  });
+
+  it('layout string has no unknown changes', () => {
+    const layoutStringPointer = wasmModule._create_rundata_struct_layout_string_pointer();
+    const layout = getNativeStructFieldLayout<
+      keyof typeof knownGoodLayout
+    >(layoutStringPointer, wasmModule);
+    wasmModule._free(layoutStringPointer);
+
+    expect(layoutToObject(layout)).toEqual(knownRunDataLayout);
   });
 });

@@ -43,7 +43,8 @@ export default defineConfig({
         },
         resolve: {
           alias: {
-            'wasm-module/index.js': path.resolve('./wasm-build/release/index.js'),
+            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/release/index.js'),
+            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/release-pthreads/index.js'),
           },
         },
       },
@@ -59,7 +60,8 @@ export default defineConfig({
         },
         resolve: {
           alias: {
-            'wasm-module/index.js': path.resolve('./wasm-build/debug/index.js'),
+            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/debug/index.js'),
+            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/release-pthreads/index.js'),
           },
         },
       }

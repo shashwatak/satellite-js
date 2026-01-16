@@ -1,6 +1,7 @@
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { GeodeticLocation, LookAngles } from '../../common-types.js';
 import type { Calculator } from './calculator-interface.js';
+import { RunData } from '../run-data.js';
 
 const OUTPUTS_PER_SATELLITE = 3;
 
@@ -87,10 +88,10 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
     const { latitude, longitude, height } = runParameters.observer;
     return {
       lookAnglesEnabled: true,
-      observerGeodeticLatitude: latitude,
-      observerGeodeticLongitude: longitude,
-      observerGeodeticHeight: height,
+      latitudeRadians: latitude,
+      longitudeRadians: longitude,
+      heightKm: height,
       lookAngles: this.outputPointer,
-    };
+    } satisfies Partial<RunData>;
   }
 }

@@ -25,4 +25,13 @@ export interface WasmModuleSingleThread extends WasmModuleBase {
 
 export interface WasmModuleMultiThread extends WasmModuleBase {
   _compute(threadsCount: number, runDataPointer: number): number;
+  cwrap(
+    ident: any,
+    returnType?: string | undefined,
+    argTypes?: any[] | undefined,
+    opts?: any | undefined
+  ): any;
+  PThread: {
+    terminateAllThreads(): void;
+  }
 }
