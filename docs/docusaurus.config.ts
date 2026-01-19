@@ -26,7 +26,6 @@ const config: Config = {
   projectName: 'satellite-js', // Usually your repo name.
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -36,22 +35,31 @@ const config: Config = {
     locales: ['en'],
   },
 
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownImages: 'warn',
+    }
+  },
+
   presets: [
     [
       'classic',
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          // versions: {
-          //   current: {
-          //     label: 'v7 - current',
-          //     path: 'v7'
-          //   },
-          //   '6.x.x': {
-          //     label: 'v6',
-          //     path: 'v6'
-          //   }
-          // }
+          lastVersion: '6.0.x',
+          versions: {
+            '6.0.x': {
+              label: 'v6 - stable',
+              banner: 'none',
+            },
+            current: {
+              label: 'v7 - release candidate',
+              path: 'v7',
+              banner: 'unreleased',
+            }
+          }
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -100,7 +108,8 @@ const config: Config = {
           position: 'left',
           label: 'Tutorial',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
+        { type: 'docsVersionDropdown', position: 'right' },
         {
           href: 'https://github.com/shashwatak/satellite-js',
           label: 'GitHub',
