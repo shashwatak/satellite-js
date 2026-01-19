@@ -16,6 +16,33 @@ declare namespace RuntimeExports {
     function UTF8ToString(ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined): string;
     function stringToUTF8(str: any, outPtr: any, maxBytesToWrite: any): any;
     function lengthBytesUTF8(str: any): number;
+    /**
+     * @param {string|null=} returnType
+     * @param {Array=} argTypes
+     * @param {Array=} args
+     * @param {Object=} opts
+     */
+    function ccall(ident: any, returnType?: (string | null) | undefined, argTypes?: any[] | undefined, args?: any[] | undefined, opts?: any | undefined): any;
+    /**
+     * @param {string=} returnType
+     * @param {Array=} argTypes
+     * @param {Object=} opts
+     */
+    function cwrap(ident: any, returnType?: string | undefined, argTypes?: any[] | undefined, opts?: any | undefined): any;
+    namespace PThread {
+        let unusedWorkers: any[];
+        let runningWorkers: any[];
+        let tlsInitFunctions: any[];
+        let pthreads: {};
+        function init(): void;
+        function initMainThread(): void;
+        function terminateAllThreads(): void;
+        function returnWorkerToPool(worker: any): void;
+        function threadInitTLS(): void;
+        function loadWasmModuleToWorker(worker: any): any;
+        function allocateUnusedWorker(): void;
+        function getNewWorker(): any;
+    }
     let HEAP8: any;
     let HEAPF64: any;
 }
@@ -27,11 +54,9 @@ interface WasmModule {
   _free_struct_layout_string(_0: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
   _calloc_one(_0: number): number;
-  _compute(_0: number): void;
-  _init_satrec_from_tle(_0: number, _1: number, _2: number): void;
+  _compute(_0: number, _1: number): number;
   _malloc(_0: number): number;
   _free(_0: number): void;
-  ___lsan_do_recoverable_leak_check(): number;
 }
 
 export type MainModule = WasmModule & typeof RuntimeExports;

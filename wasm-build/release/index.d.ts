@@ -9,39 +9,25 @@ declare namespace RuntimeExports {
      *   maximum number of bytes to read. You can omit this parameter to scan the
      *   string until the first 0 byte. If maxBytesToRead is passed, and the string
      *   at [ptr, ptr+maxBytesToReadr[ contains a null byte in the middle, then the
-     *   string will cut short at that byte index (i.e. maxBytesToRead will not
-     *   produce a string of exact length [ptr, ptr+maxBytesToRead[) N.B. mixing
-     *   frequent uses of UTF8ToString() with and without maxBytesToRead may throw
-     *   JS JIT optimizations off, so it is worth to consider consistently using one
+     *   string will cut short at that byte index.
+     * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
      * @return {string}
      */
-    function UTF8ToString(ptr: number, maxBytesToRead?: number | undefined): string;
+    function UTF8ToString(ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined): string;
     function stringToUTF8(str: any, outPtr: any, maxBytesToWrite: any): any;
     function lengthBytesUTF8(str: any): number;
-    let HEAPF32: any;
-    let HEAPF64: any;
-    let HEAP_DATA_VIEW: any;
     let HEAP8: any;
-    let HEAPU8: any;
-    let HEAP16: any;
-    let HEAPU16: any;
-    let HEAP32: any;
-    let HEAPU32: any;
-    let HEAP64: any;
-    let HEAPU64: any;
+    let HEAPF64: any;
 }
 interface WasmModule {
   _get_elsetrec_size(): number;
-  _create_struct_layout_string_pointer(): number;
-  _free_offsets_string(_0: number): void;
-  _init_satrec_from_tle(_0: number, _1: number, _2: number): void;
+  _get_rundata_size(): number;
+  _create_elsetrec_struct_layout_string_pointer(): number;
+  _create_rundata_struct_layout_string_pointer(): number;
+  _free_struct_layout_string(_0: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
-  _calculate_eci_base(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
-  _calculate_gmst(_0: number, _1: number, _2: number): void;
-  _calculate_ecf_position_or_velocity(_0: number, _1: number, _2: number, _3: number, _4: number): void;
-  _calculate_geodetic_positions(_0: number, _1: number, _2: number, _3: number, _4: number): void;
-  _calculate_look_angles(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number): void;
-  _calculate_doppler_factor(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number, _6: number, _7: number): void;
+  _calloc_one(_0: number): number;
+  _compute(_0: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
 }

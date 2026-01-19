@@ -1,17 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import path from 'node:path';
 import fs from 'node:fs';
+import { createSingleThreadRuntime, createMultiThreadRuntime } from '../../src/wasm/runtimes/index.js';
 import {
-  BulkPropagator, createWasmModule, EciBaseCalculator, propagate, sgp4, twoline2satrec,
+  BulkPropagator, EciBaseCalculator, propagate, sgp4, twoline2satrec,
 } from '../../src/index.js';
 import expectedData from './sgp4CatalogResults.json' with { type: 'json' };
 import { days2mdhms, JDay } from '../../src/ext.js';
 
+const singleThreadRuntime = await createSingleThreadRuntime();
+const multiThreadRuntime = await createMultiThreadRuntime(
+  { threadsCount: 4 },
+);
+
 const satellitesPerTestSuite = 500;
 
 type NumericValues<T> = { [K in keyof T]: number };
-
-const wasmModule = await createWasmModule();
 
 function haveValuesClose<
   T extends NumericValues<T>
@@ -100,16 +104,23 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
   describe(`${testSuiteName} (${satellitesRange})`, () => {
     tleSuite.forEach((tle, tleIndex) => {
       const satrec = twoline2satrec(tle.line1, tle.line2);
-      it(`satellite ${String(satrec.satnum).padStart(5, '0')} measurements`, () => {
+      it(`satellite ${String(satrec.satnum).padStart(5, '0')} measurements`, async () => {
         using bp = new BulkPropagator({
           datesCount: 5,
           calculators: [new EciBaseCalculator()],
           satRecs: [satrec],
-          wasmModule,
+          runtime: singleThreadRuntime,
+        });
+        using bpMultiThread = new BulkPropagator({
+          datesCount: 5,
+          calculators: [new EciBaseCalculator()],
+          satRecs: [satrec],
+          runtime: multiThreadRuntime,
         });
         const satelliteEpoch = satrec.jdsatepoch;
         const dates = tsince.map((ts) => invjdayFull(satelliteEpoch + ts / 1440));
         bp.run({ dates });
+        await bpMultiThread.run({ dates });
 
         tsince.forEach((time, timeIndex) => {
           const result = sgp4(satrec, time);
@@ -128,9 +139,20 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
           // it's impossible to compare them directly to the expected output of sgp4()
           const resultPropagate = propagate(satrec, dates[timeIndex]!);
           const wasmResult = bp.getFormattedOutput(0, timeIndex)!.eci;
+          const wasmResultMultiThread = bpMultiThread.getFormattedOutput(0, timeIndex)!.eci;
           if (resultPropagate) {
             expect(haveValuesClose(wasmResult.position, resultPropagate.position, 9)).toBe(true);
             expect(haveValuesClose(wasmResult.velocity, resultPropagate.velocity, 9)).toBe(true);
+            expect(haveValuesClose(
+              wasmResultMultiThread.position,
+              resultPropagate.position,
+              9,
+            )).toBe(true);
+            expect(haveValuesClose(
+              wasmResultMultiThread.velocity,
+              resultPropagate.velocity,
+              9,
+            )).toBe(true);
           } else {
             expect(satrec.error).toEqual(wasmResult.error);
           }

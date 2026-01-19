@@ -1,6 +1,7 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
-import type { SatRecError } from '../../propagation/SatRec.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
+import { SatRecError } from '../../propagation/SatRec.js';
 import type { Calculator } from './calculator-interface.js';
+import { RunData } from '../run-data.js';
 
 const DIMENSIONS = 3;
 const BYTES_PER_VECTOR = DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
@@ -34,12 +35,12 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: F
 
   private datesCount!: number;
 
-  private module!: MainModule;
+  private module!: WasmModuleBase;
 
   private outputPointer!: number;
 
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     satellitesCount: number,
     datesCount: number,
@@ -93,24 +94,14 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: F
       + Int8Array.BYTES_PER_ELEMENT * satellitesCount * datesCount;
   }
 
-  run(
-    satellitesPointer: number,
-    satellitesCount: number,
-    datesPointer: number,
-    datesCount: number,
-  ): void {
-    const velocitiesPointer = this.outputPointer
+  getExecutionDescriptor() {
+    const eciVelocitiesPointer = this.outputPointer
       + BYTES_PER_VECTOR * this.satellitesCount * this.datesCount;
-    const errorsPointer = velocitiesPointer
-      + BYTES_PER_VECTOR * this.satellitesCount * this.datesCount;
-    this.module._calculate_eci_base(
-      satellitesPointer,
-      satellitesCount,
-      datesPointer,
-      datesCount,
-      this.outputPointer,
-      velocitiesPointer,
-      errorsPointer,
-    );
+    return {
+      eciPositions: this.outputPointer,
+      eciVelocities: eciVelocitiesPointer,
+      sgp4Errors: eciVelocitiesPointer
+        + BYTES_PER_VECTOR * this.satellitesCount * this.datesCount,
+    } satisfies Partial<RunData>;
   }
 }

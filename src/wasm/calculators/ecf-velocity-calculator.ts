@@ -1,4 +1,4 @@
-import type { MainModule } from '../../../wasm-build/release/index.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
@@ -28,12 +28,12 @@ export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci
 
   private datesCount!: number;
 
-  private module!: MainModule;
+  private module!: WasmModuleBase;
 
   private outputPointer!: number;
 
   init(
-    module: MainModule,
+    module: WasmModuleBase,
     outputPointer: number,
     satellitesCount: number,
     datesCount: number,
@@ -66,22 +66,10 @@ export class EcfVelocityCalculator implements Calculator<'ecfVelocity', 2, ['eci
     );
   }
 
-  run(
-    _satellitesPointer: number,
-    _satellitesCount: number,
-    _datesPointer: number,
-    _datesCount: number,
-    dependenciesOutputsPointers: [number, number],
-  ): void {
-    const [eciBasePointer, gmstPointer] = dependenciesOutputsPointers;
-    const eciVelocityPointer = eciBasePointer
-      + this.satellitesCount * this.datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
-    this.module._calculate_ecf_position_or_velocity(
-      eciVelocityPointer,
-      this.satellitesCount,
-      gmstPointer,
-      this.datesCount,
-      this.outputPointer,
-    );
+  getExecutionDescriptor() {
+    return {
+      ecfVelocityEnabled: true,
+      ecfVelocities: this.outputPointer,
+    };
   }
 }
