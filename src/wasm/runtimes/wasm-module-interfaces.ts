@@ -17,6 +17,7 @@ export interface WasmModuleBase {
   _malloc(bytes: number): number;
   _calloc_one(bytes: number): number;
   _free(ptr: number): void;
+  _exit_runtime(): void;
 }
 
 export interface WasmModuleSingleThread extends WasmModuleBase {
@@ -31,7 +32,4 @@ export interface WasmModuleMultiThread extends WasmModuleBase {
     argTypes?: any[] | undefined,
     opts?: any | undefined
   ): any;
-  PThread: {
-    terminateAllThreads(): void;
-  }
 }

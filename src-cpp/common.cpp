@@ -267,7 +267,7 @@ extern "C"
 
   // changes from the original sgp4 function:
   // 1. tsince parameter is replaced with unix_ms
-  // and local tsince is calculated from unix_ms and satrec.jdsatepoch(F)
+  // and local tsince is calculated from unix_ms and satrec.jdsatepoch[F]
   // 2. returns void instead of boolean indicating propagation success
   // 3. `if (mrt < 1.0)` check was moved into a place right after `mrt` calculation, instead of the very end of the sgp4 function.
   void EMSCRIPTEN_KEEPALIVE sgp4forJs(
@@ -559,13 +559,11 @@ extern "C"
     return;
   }
 
-  // void EMSCRIPTEN_KEEPALIVE propagate_many(elsetrec* __restrict satrecs, int count, double unix_ms, double* __restrict positions, double* __restrict velocities) {
-  //   for (int i = 0; i < count; i++) {
-  //     sgp4forJs(satrecs[i], unix_ms, &positions[i * 3], &velocities[i * 3]);
-  //   }
-  // }
-
   void* EMSCRIPTEN_KEEPALIVE calloc_one(int size) {
-    return std::calloc(size, 1);
+    return calloc(size, 1);
+  }
+
+  void EMSCRIPTEN_KEEPALIVE exit_runtime() {
+    exit(0);
   }
 }

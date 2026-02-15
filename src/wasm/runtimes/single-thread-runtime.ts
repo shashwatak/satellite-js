@@ -14,7 +14,7 @@ export async function createSingleThreadRuntimeFromModule(
   );
   wasmModule._free(runDataStructLayoutStringPointer);
 
-  const compute = async (runData: RunData) => {
+  const compute = (runData: RunData) => {
     const runDataPointer = passRunDataToWasm(wasmModule, runDataLayout, runData);
     try {
       wasmModule._compute(runDataPointer);
@@ -28,7 +28,7 @@ export async function createSingleThreadRuntimeFromModule(
     module: wasmModule,
     compute,
     dispose: () => {
-      // noop
+      wasmModule._exit_runtime();
     },
     [Symbol.dispose]: () => {},
   };
