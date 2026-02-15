@@ -7,8 +7,8 @@
     "module": "nodenext",
     "target": "esnext",
     "paths": {
-      "wasm-module-single-thread/*": ["../wasm-build/debug/*"],
-      "wasm-module-multi-thread/*": ["../wasm-build/debug-pthreads/*"]
+      "wasm-module-single-thread/*": ["../wasm-build/base-debug/*"],
+      "wasm-module-multi-thread/*": ["../wasm-build/pthreads-debug/*"]
     }
   }
 }

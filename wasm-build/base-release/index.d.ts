@@ -27,6 +27,7 @@ interface WasmModule {
   _free_struct_layout_string(_0: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
   _calloc_one(_0: number): number;
+  _exit_runtime(): void;
   _compute(_0: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
