@@ -28,10 +28,12 @@ describe('BulkPropagator memory disposal', () => {
       using bp = new BulkPropagator({
         runtime,
         calculators: [new EciBaseCalculator()],
-        satRecs: [sat],
+        satRecsCount: 1,
         datesCount: 2,
       });
-      bp.run({ dates });
+      bp.setSatRecs([sat]);
+      bp.setDates(dates);
+      bp.run();
       const out = bp.getFormattedOutput(0, 0)!.eci;
       expect(out).toHaveProperty('position');
       expect(runtime.module.___lsan_do_recoverable_leak_check()).not.toBe(0);
@@ -44,10 +46,12 @@ describe('BulkPropagator memory disposal', () => {
     const bp = new BulkPropagator({
       runtime,
       calculators: [new EciBaseCalculator()],
-      satRecs: [sat],
+      satRecsCount: 1,
       datesCount: 2,
     });
-    bp.run({ dates });
+    bp.setSatRecs([sat]);
+    bp.setDates(dates);
+    bp.run();
     const out = bp.getFormattedOutput(0, 0)!.eci;
     expect(out).toHaveProperty('position');
     expect(runtime.module.___lsan_do_recoverable_leak_check()).not.toBe(0);

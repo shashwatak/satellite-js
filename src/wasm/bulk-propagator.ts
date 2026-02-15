@@ -3,7 +3,7 @@ import type { Calculator } from './calculators/calculator-interface.js';
 import type { TupleOf } from './calculators/tuple-of.js';
 import type { TypedArray } from './typed-array.js';
 import { topologicalSort } from './toposort.js';
-import { allocateAndWriteNativeStructArrayFromSatrecArray } from './elsetrec-struct.js';
+import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from './elsetrec-struct.js';
 import { allocateDatesArray, writeDatesArray } from './date-to-wasm.js';
 import { RunData } from './run-data.js';
 import { MultiThreadRuntime, WasmRuntime } from './runtimes/wasm-runtime.js';
@@ -38,13 +38,13 @@ type CalculatorsToRunParameters<
     : never]: RunParametersOf<C>
 };
 
-type BulkPropagatorBaseRunArgs = { dates: readonly Date[] }
-
-type BulkPropagatorBaseRunArgsWithCalculatorParams<
+type BulkPropagatorRunArgs<
   Calculators extends readonly Calculator<
     string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
   >[]
-> = BulkPropagatorBaseRunArgs & CalculatorsToRunParameters<Calculators>;
+> = CalculatorsToRunParameters<Calculators> extends infer P
+  ? {} extends P ? void : P
+  : never;
 
 function ceilToMultipleOf64Bit(bytes: number): number {
   const bytesPer64Bit = 8;
@@ -84,11 +84,13 @@ function ceilToMultipleOf64Bit(bytes: number): number {
  *     // depends on EcfPosition; requires observer parameter in propagator.run()
  *     new LookAnglesCalculator(),
  *   ],
- *   satRecs: satellites, // satellites are fixed for the propagator lifetime
- *   datesCount: dates.length // dates length is fixed for the propagator lifetime
+ *   satRecsCount: satellites.length,
+ *   datesCount: dates.length,
  * });
  *
- * propagator.run({ dates, lookAngles: { observer: observerGeodetic } });
+ * propagator.setSatRecs(satellites);
+ * propagator.setDates(dates);
+ * propagator.run({ lookAngles: { observer: observerGeodetic } });
  *
  * // Get formatted output for satellite 0 at date 0
  * const result = propagator.getFormattedOutput(0, 0);
@@ -124,23 +126,39 @@ export class BulkPropagator<
 > implements Disposable {
   private readonly calculators: Calculators;
 
-  private readonly satrecsPointer: number;
+  private satrecsPointer: number;
 
-  private readonly satrecsCount: number;
+  private allocatedSatrecsCount: number;
 
-  private readonly datesPointer: number;
+  private usedSatrecsCount: number = 0;
 
-  private readonly datesCount: number;
+  private datesPointer: number;
+
+  private allocatedDatesCount: number;
+
+  private usedDatesCount: number = 0;
 
   private readonly runtime: Runtime;
 
-  private readonly outputPointer: number;
+  private outputPointer: number;
 
-  private readonly outputPointersByCalculator: Map<Calculators[number]['name'], number>;
+  private allocatedOutputSizeBytes: number;
 
-  private readonly calculatorDependenciesOutputsPointers: Map<Calculators[number]['name'], number[]>;
+  private outputPointersByCalculator: Map<Calculators[number]['name'], number>;
+
+  private calculatorDependenciesOutputsPointers: Map<Calculators[number]['name'], number[]>;
 
   private isDisposed: boolean = false;
+
+  private isRunning: boolean = false;
+
+  private runCompletionPromise: Promise<void> | null = null;
+
+  private needsOutputRedistribution: boolean = true;
+
+  private hasSatRecs: boolean = false;
+
+  private hasDates: boolean = false;
 
   /**
    * Creates a BulkPropagator instance.
@@ -153,16 +171,16 @@ export class BulkPropagator<
    * (use `createWasmModule()` to create one and reuse it)
    * @param options.calculators - Array of calculator instances
    * to run during propagation; they all named as `*Calculator` for easy discovery
-   * @param options.satRecs - Readonly array of SatRec objects
-   * @param options.datesCount - Number of dates that will be propagated
+   * @param options.satRecsCount - Initial allocation size for satellite records
+   * @param options.datesCount - Initial allocation size for dates
    *
    * @example
    * ```ts
    * const propagator = new BulkPropagator({
    *   wasmModule: await createWasmModule(),
    *   calculators: [new EciPositionCalculator()],
-   *   satRecs: [satrec1, satrec2],
-   *   datesCount: 60, // Will be called to propagate 60 timestamps
+   *   satRecsCount: 60, // Initial allocation for 60 satellites
+   *   datesCount: 60, // Initial allocation for 60 timestamps
    * });
    * ```
    *
@@ -172,12 +190,12 @@ export class BulkPropagator<
   constructor({
     runtime,
     calculators,
-    satRecs,
+    satRecsCount,
     datesCount,
   }: {
     runtime: Runtime;
     calculators: Calculators;
-    satRecs: SatRec[];
+    satRecsCount: number;
     datesCount: number;
   }) {
     this.runtime = runtime;
@@ -185,10 +203,11 @@ export class BulkPropagator<
       this[Symbol.dispose] = () => this.dispose();
     }
 
-    this.satrecsPointer = allocateAndWriteNativeStructArrayFromSatrecArray(runtime.module, satRecs);
-    this.satrecsCount = satRecs.length;
+    this.satrecsPointer = allocateNativeStructArray(runtime.module, satRecsCount);
+    this.allocatedSatrecsCount = satRecsCount;
+
     this.datesPointer = allocateDatesArray(runtime.module, datesCount);
-    this.datesCount = datesCount;
+    this.allocatedDatesCount = datesCount;
 
     const sorted = topologicalSort(
       calculators.map((calculator) => ({
@@ -201,21 +220,100 @@ export class BulkPropagator<
       return calculator;
     }) as unknown as Calculators;
 
-    const outputOffsetsByCalculator = new Map();
+    this.allocatedOutputSizeBytes = this.computeTotalOutputSizeBytes(satRecsCount, datesCount);
+    this.outputPointer = runtime.module._malloc(this.allocatedOutputSizeBytes);
+    this.outputPointersByCalculator = new Map();
+    this.calculatorDependenciesOutputsPointers = new Map();
+  }
+
+  /**
+   * Sets the satellite records. Can be called between runs to change satellites.
+   * If the provided array is larger than the current allocation, the native array
+   * will be freed and reallocated with the new size.
+   *
+   * @param satRecs - Array of SatRec objects
+   * @throws If the instance is disposed
+   * @throws If a run is currently in progress
+   */
+  setSatRecs(satRecs: SatRec[]): void {
+    this.checkIfDisposed();
+    this.checkIfRunning('set satellite records');
+
+    if (satRecs.length > this.allocatedSatrecsCount) {
+      this.runtime.module._free(this.satrecsPointer);
+      this.satrecsPointer = allocateNativeStructArray(this.runtime.module, satRecs.length);
+      this.allocatedSatrecsCount = satRecs.length;
+    }
+
+    writeNativeStructArrayFromSatrecArray(this.runtime.module, this.satrecsPointer, satRecs);
+
+    if (satRecs.length !== this.usedSatrecsCount) {
+      this.needsOutputRedistribution = true;
+    }
+    this.usedSatrecsCount = satRecs.length;
+    this.hasSatRecs = true;
+  }
+
+  /**
+   * Sets the dates for propagation. Can be called between runs to change dates.
+   * If the provided array is larger than the current allocation, the native array
+   * will be freed and reallocated with the new size.
+   *
+   * @param dates - Array of Date objects
+   * @throws If the instance is disposed
+   * @throws If a run is currently in progress
+   */
+  setDates(dates: readonly Date[]): void {
+    this.checkIfDisposed();
+    this.checkIfRunning('set dates');
+
+    if (dates.length > this.allocatedDatesCount) {
+      this.runtime.module._free(this.datesPointer);
+      this.datesPointer = allocateDatesArray(this.runtime.module, dates.length);
+      this.allocatedDatesCount = dates.length;
+    }
+
+    writeDatesArray(this.runtime.module, this.datesPointer, dates);
+
+    if (dates.length !== this.usedDatesCount) {
+      this.needsOutputRedistribution = true;
+    }
+    this.usedDatesCount = dates.length;
+    this.hasDates = true;
+  }
+
+  private computeTotalOutputSizeBytes(satRecsCount: number, datesCount: number): number {
+    let totalBytes = 0;
+    for (const calculator of this.calculators) {
+      totalBytes += ceilToMultipleOf64Bit(
+        calculator.getOutputBufferSize(satRecsCount, datesCount),
+      );
+    }
+    return totalBytes;
+  }
+
+  private redistributeOutputBuffer(): void {
+    const requiredBytes = this.computeTotalOutputSizeBytes(
+      this.usedSatrecsCount,
+      this.usedDatesCount,
+    );
+
+    if (requiredBytes > this.allocatedOutputSizeBytes) {
+      this.runtime.module._free(this.outputPointer);
+      this.outputPointer = this.runtime.module._malloc(requiredBytes);
+      this.allocatedOutputSizeBytes = requiredBytes;
+    }
+
     let offsetBytes = 0;
+    this.outputPointersByCalculator = new Map();
     for (const calculator of this.calculators) {
       const sizeBytes = ceilToMultipleOf64Bit(
-        calculator.getOutputBufferSize(satRecs.length, datesCount),
+        calculator.getOutputBufferSize(this.usedSatrecsCount, this.usedDatesCount),
       );
-      outputOffsetsByCalculator.set(calculator.name, offsetBytes);
+      this.outputPointersByCalculator.set(calculator.name, this.outputPointer + offsetBytes);
       offsetBytes += sizeBytes;
     }
-    // offsetBytes is total size at this point
-    this.outputPointer = runtime.module._malloc(offsetBytes);
-    this.outputPointersByCalculator = new Map(
-      Array.from(outputOffsetsByCalculator)
-        .map(([name, offset]) => [name, this.outputPointer + offset]),
-    );
+
     this.calculatorDependenciesOutputsPointers = new Map();
     for (const calculator of this.calculators) {
       const dependenciesPointers = calculator.dependencies.map(
@@ -224,12 +322,14 @@ export class BulkPropagator<
       this.calculatorDependenciesOutputsPointers.set(calculator.name, dependenciesPointers);
 
       calculator.init(
-        runtime.module,
+        this.runtime.module,
         this.outputPointersByCalculator.get(calculator.name)!,
-        satRecs.length,
-        datesCount,
+        this.usedSatrecsCount,
+        this.usedDatesCount,
       );
     }
+
+    this.needsOutputRedistribution = false;
   }
 
   /**
@@ -238,22 +338,23 @@ export class BulkPropagator<
    * void on calculation completion for single-threaded runtime, or a Promise
    * for multi-threaded runtime.
    *
+   * `setSatRecs` and `setDates` must be called before calling `run`.
+   *
    * @param args - Run arguments including dates and calculator-specific parameters
-   * @param args.dates - Array of Date objects to propagate satellites for
-   * (length must match datesCount from constructor)
+   * (if any calculator requires them).
    * @param args[calculatorName] - Some calculators require additional parameters
    * (example: `LookAnglesCalculator` requires observer position).
    *
    * @example
    * ```typescript
-   * // Basic run with just dates
-   * propagator.run({
-   *   dates: [new Date(), new Date(Date.now() + 3600000)]
-   * });
+   * propagator.setSatRecs(satellites);
+   * propagator.setDates(dates);
+   *
+   * // Basic run (no calculator params needed)
+   * propagator.run();
    *
    * // Run with calculator parameters
    * propagator.run({
-   *   dates: dateArray,
    *   lookAngles: { observer: {
    *     latitude: degreesToRadians(41),
    *     longitude: degreesToRadians(-71),
@@ -262,22 +363,29 @@ export class BulkPropagator<
    * });
    * ```
    *
-   * @throws If dates array length doesn't match the datesCount from constructor
    * @throws If the instance is disposed
+   * @throws If setSatRecs or setDates has not been called
    */
   run(
-    args: BulkPropagatorBaseRunArgsWithCalculatorParams<Calculators>,
+    args?: BulkPropagatorRunArgs<Calculators>,
   ): Runtime extends MultiThreadRuntime ? Promise<void> : void {
     this.checkIfDisposed();
-    if (args.dates.length !== this.datesCount) {
-      throw new Error('length of `dates` must be the same as the `datesCount` passed to the BulkPropagator constructor');
+
+    if (!this.hasSatRecs) {
+      throw new Error('setSatRecs() must be called before run()');
     }
-    writeDatesArray(this.runtime.module, this.datesPointer, args.dates);
+    if (!this.hasDates) {
+      throw new Error('setDates() must be called before run()');
+    }
+
+    if (this.needsOutputRedistribution) {
+      this.redistributeOutputBuffer();
+    }
 
     const runDataItems = this.calculators.map(
       (calculator) => {
         const runParams = (
-          args as Record<string, RunParametersOf<Calculators>> & BulkPropagatorBaseRunArgs
+          (args ?? {}) as Record<string, RunParametersOf<Calculators>>
         )[calculator.name];
         return calculator.getExecutionDescriptor(runParams!);
       },
@@ -285,20 +393,32 @@ export class BulkPropagator<
 
     const runData = Object.assign({
       satellitesPointer: this.satrecsPointer,
-      satellitesCount: this.satrecsCount,
+      satellitesCount: this.usedSatrecsCount,
       jdaysPointer: this.datesPointer,
-      jdaysCount: this.datesCount,
+      jdaysCount: this.usedDatesCount,
     } satisfies Partial<RunData>, ...runDataItems);
 
-    return this.runtime.compute(runData) as Runtime extends MultiThreadRuntime
-      ? Promise<void> : void;
+    this.isRunning = true;
+
+    const result = this.runtime.compute(runData);
+
+    if (result instanceof Promise) {
+      this.runCompletionPromise = result.finally(() => {
+        this.isRunning = false;
+        this.runCompletionPromise = null;
+      });
+    } else {
+      this.isRunning = false;
+    }
+
+    return result as Runtime extends MultiThreadRuntime ? Promise<void> : void;
   }
 
   /**
    * Retrieves formatted output for a specific satellite at a specific time index.
    *
-   * @param satelliteIndex - Zero-based index of the satellite (0 to `satRecs.length` - 1)
-   * @param dateIndex - Zero-based index of the date (0 to `dates.length` - 1)
+   * @param satelliteIndex - Zero-based index of the satellite (0 to `satRecsCount` - 1)
+   * @param dateIndex - Zero-based index of the date (0 to `datesCount` - 1)
    * @returns Formatted output object with results from all calculators,
    * or `undefined` if indices are out of bounds
    *
@@ -326,7 +446,7 @@ export class BulkPropagator<
     dateIndex: number,
   ): CalculatorsToFormattedOutput<Calculators> | undefined {
     this.checkIfDisposed();
-    if (satelliteIndex >= this.satrecsCount || dateIndex >= this.datesCount) {
+    if (satelliteIndex >= this.usedSatrecsCount || dateIndex >= this.usedDatesCount) {
       return undefined;
     }
     const result: Record<string, unknown> = {};
@@ -382,6 +502,12 @@ export class BulkPropagator<
     }
   }
 
+  private checkIfRunning(action: string) {
+    if (this.isRunning) {
+      throw new Error(`Cannot ${action} while a run is in progress`);
+    }
+  }
+
   /**
    * Releases all allocated WebAssembly memory.
    *
@@ -403,11 +529,20 @@ export class BulkPropagator<
    * @throws If the instance is disposed already
    */
   dispose(): void {
-    this.checkIfDisposed();
-    this.runtime.module._free(this.satrecsPointer);
-    this.runtime.module._free(this.outputPointer);
-    this.runtime.module._free(this.datesPointer);
+    if (this.isDisposed) return;
     this.isDisposed = true;
+
+    const freeMemory = () => {
+      this.runtime.module._free(this.satrecsPointer);
+      this.runtime.module._free(this.datesPointer);
+      this.runtime.module._free(this.outputPointer);
+    };
+
+    if (this.runCompletionPromise) {
+      this.runCompletionPromise.finally(freeMemory);
+    } else {
+      freeMemory();
+    }
   }
 
   [Symbol.dispose]!: () => void;

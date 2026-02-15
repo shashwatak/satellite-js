@@ -40,14 +40,23 @@ type NativeField =
   | 'not_orbital'
   | 'rcs_m2';
 
-export function allocateAndWriteNativeStructArrayFromSatrecArray(
+export function allocateNativeStructArray(
   module: WasmModuleBase,
-  satrecArray: SatRec[],
+  count: number,
 ): number {
+  const nativeSize = module._get_elsetrec_size();
+  return module._calloc_one(count * nativeSize);
+}
+
+export function writeNativeStructArrayFromSatrecArray(
+  module: WasmModuleBase,
+  pointer: number,
+  satrecArray: SatRec[],
+): void {
   const structLayoutStringPointer = module._create_elsetrec_struct_layout_string_pointer();
   const layout = getNativeStructFieldLayout<NativeField>(structLayoutStringPointer, module);
+  module._free_struct_layout_string(structLayoutStringPointer);
   const nativeSize = module._get_elsetrec_size();
-  const pointer = module._malloc(satrecArray.length * nativeSize);
   const writer = new CppMemoryWriter(module.HEAP8.buffer);
   satrecArray.forEach((satrec, index) => {
     const currentOffset = index * nativeSize;
@@ -74,5 +83,4 @@ export function allocateAndWriteNativeStructArrayFromSatrecArray(
       writer.writeValue(field, offset, type, satrec[field as keyof SatRec], size);
     });
   });
-  return pointer;
 }

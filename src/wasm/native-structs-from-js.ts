@@ -14,7 +14,6 @@ export function getNativeStructFieldLayout<NativeField extends string>(
   module: WasmModuleBase,
 ): NativeStructLayout<NativeField> {
   const structureJsonString = module.UTF8ToString(structLayoutStringPointer);
-  module._free_struct_layout_string(structLayoutStringPointer);
   const structureJson = JSON.parse(structureJsonString) as
     [NativeField, NativeFieldType, number, number][];
   return new Map(structureJson.map(
