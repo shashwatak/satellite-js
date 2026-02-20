@@ -18,7 +18,11 @@
     "declaration": true,
     "declarationDir": "./types",
     "outDir": "./compiled",
-    "lib": ["ES2022"]
+    "lib": ["ES2022"],
+    "paths": {
+      "wasm-module-single-thread/*": ["./wasm-build/base-release/*"],
+      "wasm-module-multi-thread/*": ["./wasm-build/pthreads-release/*"]
+    }
   },
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Strictest (minus esModuleInterop)",

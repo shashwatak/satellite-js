@@ -19,7 +19,6 @@ const typescriptConfig = [
   ...configs.base.typescript,
 ];
 
-
 export default [
   includeIgnoreFile(gitignorePath),
   ...jsConfig,
