@@ -40,9 +40,7 @@ export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: numbe
 
   const meanlong = (280.460 + 36000.77 * tut1) % 360; // deg
 
-  const ttdb = tut1; // is this declaration required instead of replacing `ttdb` with `tut1`
-
-  let meananomaly = (357.5277233 + 35999.05034 * ttdb * deg2rad) % twoPi; // rad
+  let meananomaly = (357.5277233 + 35999.05034 * tut1 * deg2rad) % twoPi; // rad
   if (meananomaly < 0) {
     meananomaly += twoPi;
   }
@@ -51,7 +49,7 @@ export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: numbe
     meanlong + 1.914666471 * Math.sin(meananomaly) + 0.019994643 * Math.sin(2.0 * meananomaly)
   ) % 360.0) * deg2rad; // rad
 
-  const obliquity = (23.439291 - 0.0130042 * ttdb) * deg2rad; // rad
+  const obliquity = (23.439291 - 0.0130042 * tut1) * deg2rad; // rad
 
   // --------- find magnitude of sun vector, and it's components ------
   const magr = 1.000140612
