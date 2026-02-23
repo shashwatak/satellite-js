@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { AU, EciVec3 } from './common-types.js';
 import { deg2rad, pi, twoPi } from './constants.js';
 import { JDay } from './ext.js';
 
@@ -33,7 +34,7 @@ import { JDay } from './ext.js';
  *      Computer software in MATLAB: http://celestrak.org/software/vallado-sw.php
  *  --------------------------------------------------------------------------- */
 
-export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: number } {
+export function sunPos(jday: JDay): { rsun: EciVec3<AU>; rtasc: number; decl: number } {
   // -------------------------  implementation   -----------------
   // -------------------  initialize values   --------------------
   const tut1 = (jday - 2451545) / 36525;
@@ -56,11 +57,11 @@ export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: numbe
     - 0.016708617 * Math.cos(meananomaly)
     - 0.000139589 * Math.cos(2.0 * meananomaly); // in au's
 
-  const rsun = [
-    magr * Math.cos(eclplong_raw),
-    magr * Math.cos(obliquity) * Math.sin(eclplong_raw),
-    magr * Math.sin(obliquity) * Math.sin(eclplong_raw),
-  ];
+  const rsun: EciVec3<AU> = {
+    x: magr * Math.cos(eclplong_raw),
+    y: magr * Math.cos(obliquity) * Math.sin(eclplong_raw),
+    z: magr * Math.sin(obliquity) * Math.sin(eclplong_raw),
+  };
 
   const rtasc_raw = Math.atan(Math.cos(obliquity) * Math.tan(eclplong_raw));
 
