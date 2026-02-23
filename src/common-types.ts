@@ -4,6 +4,11 @@
 export type Kilometer = number;
 
 /**
+   * Type alias documents units are Astronomical Units (AU)
+   */
+export type AU = number;
+
+/**
  * Type alias documents units are kilometer per second (km/s)
  */
 export type KilometerPerSecond = number;
