@@ -71,3 +71,46 @@ extern "C"
 
   void* EMSCRIPTEN_KEEPALIVE calloc_one(int size);
 }
+
+// Transform functions shared between base and pthreads builds.
+// All functions accept start/end range parameters for both satellite and date
+// dimensions, allowing partitioned execution across threads.
+// The total dates_count parameter is used as stride for 2D output indexing.
+
+void calculate_eci(
+    elsetrec *__restrict satellites, int satellites_start, int satellites_end,
+    double *__restrict jdays, int jdays_start, int jdays_end, int jdays_count,
+    double *__restrict eci_positions, double *__restrict eci_velocities,
+    int8_t *__restrict sgp4_errors);
+
+void calculate_gmst(
+    double *__restrict jdays, int jdays_start, int jdays_end,
+    double *__restrict gmst_values);
+
+void calculate_ecf_position_or_velocity(
+    double *__restrict eci_vectors,
+    int satellites_start, int satellites_end,
+    double *__restrict gmst_values,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict ecf_vectors);
+
+void calculate_geodetic_positions(
+    double *__restrict eci_positions,
+    int satellites_start, int satellites_end,
+    double *__restrict gmst_values,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict geodetic_positions);
+
+void calculate_look_angles(
+    double *__restrict ecf_positions,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double longitude, double latitude, double height,
+    double *__restrict look_angles);
+
+void calculate_doppler_factor(
+    double *__restrict ecf_positions, double *__restrict ecf_velocities,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double observer_ecf_x, double observer_ecf_y, double observer_ecf_z,
+    double *__restrict doppler_factors);
