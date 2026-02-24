@@ -16,10 +16,10 @@ There is also a separate `debug.cpp` file. It is compiled only for debug build, 
 for user-facing code.
 
 Hence, compilations consist of the following files:
-- `debug`:            `common.cpp` + `base.cpp`     + `debug.cpp`
-- `debug-pthreads`:   `common.cpp` + `pthreads.cpp` + `debug.cpp`
-- `release`:          `common.cpp` + `base.cpp`
-- `release-pthreads`: `common.cpp` + `threads.cpp`
+- `base-debug`:       `common.cpp` + `base.cpp`     + `debug.cpp`
+- `pthreads-debug`:   `common.cpp` + `pthreads.cpp` + `debug.cpp`
+- `base-release`:     `common.cpp` + `base.cpp`
+- `pthreads-release`: `common.cpp` + `pthreads.cpp`
 
 To set up VSCode for C++ with syntax highlight, Emscripten autocompletions, and debugger being able to step in C++ code:
 1. Install Emscripten SDK, see https://github.com/emscripten-core/emsdk. Check by running `em++ -v` in console.
@@ -32,7 +32,7 @@ files linked by the settings exist, by following that path and sub-folders.
    "Launch current in Node" debugger option any BulkPropagator that uses a *debug* build of WASM module.
 
 A few things to note:
-* the code was written to run on exactly Emscripten 4.0.16. There might be breaking changes even on patch versions so take care bumping the EMSDK version.
+* the code was written to run on exactly Emscripten 5.0.1. There might be breaking changes even on patch versions so take care bumping the EMSDK version (study changelog).
 * `elsetrec` struct, while unlikely, might have different offsets on different compilations, and different `sizeof` as well.
 * `char` type is signed on current compilation, and so is written with `DataView#setInt8()`
 
@@ -41,8 +41,15 @@ is not, and that's an area for a possible improvement.
 
 Areas to experiment:
 - structure of arrays vs array of structures
-- branch hinting (isn't supported by emscripten as of 4.0 but should land at some point)
 - sgp4 can't be vectorized automatically because it contains multiple uncountable cycles, so either:
   - try to vectorize by hand
   - move uncountable loops away from the main function body, calculate separately, and let the rest be vectorized automatically
-- batching calculations (calculate a small portion of satellites across multiple calculators thus never leave CPU cache for them)
+
+Tested but appeared to have no benefit:
+- batching calculations (calculate a small portion of satellites across multiple calculators thus never leave CPU cache for them): tested using batches ranging from 4 to 2048 items, benchmarks appear to be identical
+
+Watch for Emscripten side developments on:
+- [branch hinting](https://github.com/emscripten-core/emscripten/issues/25059) (isn't supported by emscripten as of 5.0.1 but should land at some point)
+- [nested loop vectorization](https://github.com/emscripten-core/emscripten/issues/26322) (very limited support by LLVM and currently not very useful)
+
+Also watch for WebAssembly state in general to see what can be used for the WASM build.
