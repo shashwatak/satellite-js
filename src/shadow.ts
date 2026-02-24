@@ -35,7 +35,7 @@ function vecScale(v: Vec3, s: number): Vec3 {
  * @returns Shadow fraction: 0 = fully lit, 1 = umbra,
  *          values between 0 and 1 indicate the fraction of the Sun covered by Earth.
  */
-export function umbraFraction(
+export function shadowFraction(
   sunEciAU: EciVec3<AU>,
   satelliteEciKm: EciVec3<Kilometer>,
 ): number {
