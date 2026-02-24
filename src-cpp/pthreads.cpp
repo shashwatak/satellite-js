@@ -9,6 +9,7 @@ typedef struct ThreadData {
   int threadIndex;
   int threadsCount;
   pthread_barrier_t *__restrict gstimeBarrier;
+  pthread_barrier_t *__restrict sunPositionBarrier;
   const RunData* runData;
 } ThreadData;
 
@@ -21,6 +22,39 @@ void* thread_function(void* arg) {
   const int datesStart = (dateCount * data->threadIndex) / data->threadsCount;
   const int datesEnd = (dateCount * (data->threadIndex + 1)) / data->threadsCount;
 
+  // wait for just one barrier instead of two if both gmst and sun position calculations are enabled
+  if (data->runData->gmstEnabled && data->runData->sunPositionEnabled) {
+    calculate_gmst(
+      data->runData->jdaysPointer,
+      datesStart, datesEnd,
+      data->runData->gmstValues);
+
+    calculate_sun_positions(
+      data->runData->jdaysPointer,
+      datesStart, datesEnd,
+      data->runData->sunPositions);
+
+    pthread_barrier_wait(data->sunPositionBarrier);
+  } else {
+    if (data->runData->gmstEnabled)
+    {
+      calculate_gmst(
+        data->runData->jdaysPointer,
+        datesStart, datesEnd,
+        data->runData->gmstValues);
+      pthread_barrier_wait(data->gstimeBarrier);
+    }
+
+    if (data->runData->sunPositionEnabled)
+    {
+      calculate_sun_positions(
+        data->runData->jdaysPointer,
+        datesStart, datesEnd,
+        data->runData->sunPositions);
+      pthread_barrier_wait(data->sunPositionBarrier);
+    }
+  }
+
   calculate_eci(
     data->runData->satellitesPointer,
     satellitesStart, satellitesEnd,
@@ -29,17 +63,6 @@ void* thread_function(void* arg) {
     data->runData->eciPositions,
     data->runData->eciVelocities,
     data->runData->sgp4Errors);
-
-  if (data->runData->gmstEnabled)
-  {
-    const int jdaysStart = (data->datesCount * data->threadIndex) / data->threadsCount;
-    const int jdaysEnd = (data->datesCount * (data->threadIndex + 1)) / data->threadsCount;
-    calculate_gmst(
-      data->runData->jdaysPointer,
-      datesStart, datesEnd,
-      data->runData->gmstValues);
-    pthread_barrier_wait(data->gstimeBarrier);
-  }
 
   if (data->runData->ecfPositionEnabled)
   {
@@ -95,6 +118,17 @@ void* thread_function(void* arg) {
       data->runData->observerEcfZ,
       data->runData->dopplerFactors);
   }
+
+  if (data->runData->shadowFractionEnabled)
+  {
+    calculate_shadow_fraction(
+      data->runData->eciPositions,
+      data->runData->sunPositions,
+      satellitesStart, satellitesEnd,
+      0, dateCount, dateCount,
+      data->runData->shadowFractionValues);
+  }
+
   return NULL;
 }
 
@@ -106,11 +140,14 @@ extern "C" {
     ThreadData thread_data[threads_count];
     pthread_barrier_t gstimeBarrier;
     pthread_barrier_init(&gstimeBarrier, NULL, threads_count);
+    pthread_barrier_t sunPositionBarrier;
+    pthread_barrier_init(&sunPositionBarrier, NULL, threads_count);
     for (int i=0; i < threads_count; ++i) {
       thread_data[i] = ThreadData{
         .threadIndex = i,
         .threadsCount = threads_count,
         .gstimeBarrier = &gstimeBarrier,
+        .sunPositionBarrier = &sunPositionBarrier,
         .runData = runData,
       };
       pthread_create(&thread[i], NULL, thread_function, &thread_data[i]);
@@ -125,6 +162,7 @@ extern "C" {
       }
     }
     pthread_barrier_destroy(&gstimeBarrier);
+    pthread_barrier_destroy(&sunPositionBarrier);
     for (int i = 0; i < threads_count; ++i) {
       if (status[i] != NULL || join_status[i] != 0) {
         return 1;

@@ -8,48 +8,9 @@
 #include "iostream"
 #include "stdio.h"
 #include <emscripten/emscripten.h>
+#include "common.h"
 
 #define pi 3.14159265358979323846
-
-typedef struct {
-  // inputs
-  elsetrec *__restrict satellitesPointer;
-  int satellitesCount;
-  double *__restrict jdaysPointer;
-  int jdaysCount;
-
-  // outputs and output-specific parameters
-  // ECI is enabled by default (no eciPositionEnabled flag)
-  double *__restrict eciPositions;
-  double *__restrict eciVelocities;
-  int8_t *__restrict sgp4Errors;
-
-  // keeping flags together to save struct memory space
-  bool gmstEnabled;
-  bool ecfPositionEnabled;
-  bool ecfVelocityEnabled;
-  bool geodeticPositionEnabled;
-  bool lookAnglesEnabled;
-  bool dopplerFactorEnabled;
-
-  double *__restrict gmstValues;
-
-  double *__restrict ecfPositions;
-
-  double *__restrict ecfVelocities;
-
-  double *__restrict geodeticPositions;
-
-  double longitudeRadians;
-  double latitudeRadians;
-  double heightKm;
-  double *__restrict lookAngles;
-
-  double observerEcfX;
-  double observerEcfY;
-  double observerEcfZ;
-  double *__restrict dopplerFactors;
-} RunData;
 
 extern "C"
 {
@@ -242,7 +203,13 @@ extern "C"
     result += "[\"observerEcfX\",\"double\"," + std::to_string(offsetof(RunData, observerEcfX)) + "," + std::to_string(sizeof(zero_rec->observerEcfX)) + "],";
     result += "[\"observerEcfY\",\"double\"," + std::to_string(offsetof(RunData, observerEcfY)) + "," + std::to_string(sizeof(zero_rec->observerEcfY)) + "],";
     result += "[\"observerEcfZ\",\"double\"," + std::to_string(offsetof(RunData, observerEcfZ)) + "," + std::to_string(sizeof(zero_rec->observerEcfZ)) + "],";
-    result += "[\"dopplerFactors\",\"int\"," + std::to_string(offsetof(RunData, dopplerFactors)) + "," + std::to_string(sizeof(zero_rec->dopplerFactors)) + "]";
+    result += "[\"dopplerFactors\",\"int\"," + std::to_string(offsetof(RunData, dopplerFactors)) + "," + std::to_string(sizeof(zero_rec->dopplerFactors)) + "],";
+
+    result += "[\"sunPositionEnabled\",\"bool\"," + std::to_string(offsetof(RunData, sunPositionEnabled)) + "," + std::to_string(sizeof(zero_rec->sunPositionEnabled)) + "],";
+    result += "[\"sunPositions\",\"int\"," + std::to_string(offsetof(RunData, sunPositions)) + "," + std::to_string(sizeof(zero_rec->sunPositions)) + "],";
+
+    result += "[\"shadowFractionEnabled\",\"bool\"," + std::to_string(offsetof(RunData, shadowFractionEnabled)) + "," + std::to_string(sizeof(zero_rec->shadowFractionEnabled)) + "],";
+    result += "[\"shadowFractionValues\",\"int\"," + std::to_string(offsetof(RunData, shadowFractionValues)) + "," + std::to_string(sizeof(zero_rec->shadowFractionValues)) + "]";
 
     result += "]";
 
@@ -756,3 +723,106 @@ void calculate_doppler_factor(
   }
 }
 
+void calculate_sun_positions(
+    double *__restrict jdays, int jdays_start, int jdays_end,
+    double *__restrict sun_positions)
+{
+  const double deg2rad_local = pi / 180.0;
+  const double twopi = 2.0 * pi;
+
+  for (int i = jdays_start; i < jdays_end; i++)
+  {
+    double tut1 = (jdays[i] - 2451545.0) / 36525.0;
+    double meanlong = fmod(280.460 + 36000.77 * tut1, 360.0);
+    double meananomaly = fmod(357.5277233 + 35999.05034 * tut1 * deg2rad_local, twopi);
+    if (meananomaly < 0.0)
+      meananomaly += twopi;
+
+    double eclplong_raw = fmod(
+        meanlong + 1.914666471 * sin(meananomaly) + 0.019994643 * sin(2.0 * meananomaly),
+        360.0) * deg2rad_local;
+
+    double obliquity = (23.439291 - 0.0130042 * tut1) * deg2rad_local;
+
+    double magr = 1.000140612
+        - 0.016708617 * cos(meananomaly)
+        - 0.000139589 * cos(2.0 * meananomaly);
+
+    int output_index = i * 3;
+    sun_positions[output_index]     = magr * cos(eclplong_raw);
+    sun_positions[output_index + 1] = magr * cos(obliquity) * sin(eclplong_raw);
+    sun_positions[output_index + 2] = magr * sin(obliquity) * sin(eclplong_raw);
+  }
+}
+
+void calculate_shadow_fraction(
+    double *__restrict eci_positions, double *__restrict sun_positions,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict shadow_fraction_values)
+{
+  const double SUN_RADIUS = 695700.0;
+  const double KM_PER_AU = 149597870.69098932;
+  const double EARTH_RADIUS = 6378.135;
+
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int eci_index = (i * dates_count + j) * 3;
+      int sun_index = j * 3;
+      int output_index = i * dates_count + j;
+
+      double sunKmX = sun_positions[sun_index] * KM_PER_AU;
+      double sunKmY = sun_positions[sun_index + 1] * KM_PER_AU;
+      double sunKmZ = sun_positions[sun_index + 2] * KM_PER_AU;
+      double sunKmLen = sqrt(sunKmX * sunKmX + sunKmY * sunKmY + sunKmZ * sunKmZ);
+
+      double antiX = -sunKmX / sunKmLen;
+      double antiY = -sunKmY / sunKmLen;
+      double antiZ = -sunKmZ / sunKmLen;
+
+      double posX = eci_positions[eci_index];
+      double posY = eci_positions[eci_index + 1];
+      double posZ = eci_positions[eci_index + 2];
+      double posLen = sqrt(posX * posX + posY * posY + posZ * posZ);
+
+      double dotPosAnti = posX * antiX + posY * antiY + posZ * antiZ;
+
+      if (dotPosAnti <= 0.0)
+      {
+        shadow_fraction_values[output_index] = 0.0;
+        continue;
+      }
+
+      double angRadEarth = asin(EARTH_RADIUS / posLen);
+      double angRadSun = asin(SUN_RADIUS / sunKmLen);
+      double angSep = acos(dotPosAnti / posLen);
+
+      if (angSep <= angRadEarth - angRadSun)
+      {
+        shadow_fraction_values[output_index] = 1.0;
+        continue;
+      }
+
+      if (angSep >= angRadEarth + angRadSun)
+      {
+        shadow_fraction_values[output_index] = 0.0;
+        continue;
+      }
+
+      double rE = angRadEarth;
+      double rS = angRadSun;
+      double d = angSep;
+
+      double part1 = rS * rS * acos((d * d + rS * rS - rE * rE) / (2.0 * d * rS));
+      double part2 = rE * rE * acos((d * d + rE * rE - rS * rS) / (2.0 * d * rE));
+      double part3 = 0.5 * sqrt(
+          (-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
+      double overlapArea = part1 + part2 - part3;
+      double sunDiscArea = pi * rS * rS;
+
+      shadow_fraction_values[output_index] = overlapArea / sunDiscArea;
+    }
+  }
+}

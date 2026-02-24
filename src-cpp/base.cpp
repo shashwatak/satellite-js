@@ -77,5 +77,23 @@ extern "C" {
           runData->observerEcfZ,
           runData->dopplerFactors);
     }
+
+    if (runData->sunPositionEnabled)
+    {
+      calculate_sun_positions(
+          runData->jdaysPointer,
+          0, dateCount,
+          runData->sunPositions);
+    }
+
+    if (runData->shadowFractionEnabled)
+    {
+      calculate_shadow_fraction(
+          runData->eciPositions,
+          runData->sunPositions,
+          0, satCount,
+          0, dateCount, dateCount,
+          runData->shadowFractionValues);
+    }
   }
 }

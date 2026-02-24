@@ -31,6 +31,8 @@ typedef struct {
   bool geodeticPositionEnabled;
   bool lookAnglesEnabled;
   bool dopplerFactorEnabled;
+  bool sunPositionEnabled;
+  bool shadowFractionEnabled;
 
   double *__restrict gmstValues;
 
@@ -49,6 +51,10 @@ typedef struct {
   double observerEcfY;
   double observerEcfZ;
   double *__restrict dopplerFactors;
+
+  double *__restrict sunPositions;
+
+  double *__restrict shadowFractionValues;
 } RunData;
 
 extern "C"
@@ -114,3 +120,13 @@ void calculate_doppler_factor(
     int dates_start, int dates_end, int dates_count,
     double observer_ecf_x, double observer_ecf_y, double observer_ecf_z,
     double *__restrict doppler_factors);
+
+void calculate_sun_positions(
+    double *__restrict jdays, int jdays_start, int jdays_end,
+    double *__restrict sun_positions);
+
+void calculate_shadow_fraction(
+    double *__restrict eci_positions, double *__restrict sun_positions,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict shadow_fraction_values);

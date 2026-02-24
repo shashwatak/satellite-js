@@ -40,6 +40,12 @@ export interface RunData {
   observerEcfY: number;
   observerEcfZ: number;
   dopplerFactors: number;
+
+  sunPositionEnabled: boolean;
+  sunPositions: number;
+
+  shadowFractionEnabled: boolean;
+  shadowFractionValues: number;
 }
 
 export function passRunDataToWasm(
