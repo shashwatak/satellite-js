@@ -1,5 +1,5 @@
-import createWasmModuleSingleThread from '../../../wasm-build/base-release/index.js';
-import createWasmModuleMultiThread from '../../../wasm-build/pthreads-release/index.js';
+import createWasmModuleSingleThread from 'wasm-module-single-thread/index.js';
+import createWasmModuleMultiThread from 'wasm-module-multi-thread/index.js';
 import { createMultiThreadRuntimeFromModule } from './multi-thread-runtime.js';
 import { createSingleThreadRuntimeFromModule } from './single-thread-runtime.js';
 import { MultiThreadRuntime, SingleThreadRuntime } from './wasm-runtime.js';
