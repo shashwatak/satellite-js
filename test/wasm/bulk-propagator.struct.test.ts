@@ -294,9 +294,13 @@ const knownRunDataLayout = {
   observerEcfY: ['double', 96, 8],
   observerEcfZ: ['double', 104, 8],
   dopplerFactors: ['int', 112, 4],
+  sunPositionEnabled: ['bool', 34, 1],
+  sunPositions: ['int', 116, 4],
+  shadowFractionEnabled: ['bool', 35, 1],
+  shadowFractionValues: ['int', 120, 4],
 };
 
-const knownGoodRunDataSize = 120;
+const knownGoodRunDataSize = 128;
 
 describe('WASM run data struct', () => {
   it(`has size exactly ${knownGoodRunDataSize} bytes`, async () => {

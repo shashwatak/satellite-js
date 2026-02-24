@@ -10,6 +10,8 @@ import {
   GeodeticPositionCalculator,
   DopplerFactorCalculator,
   LookAnglesCalculator,
+  SunPositionCalculator,
+  ShadowFractionCalculator,
 } from '../../src/wasm/index.js';
 import { twoline2satrec } from '../../src/io.js';
 import { propagate } from '../../src/propagation.js';
@@ -18,6 +20,9 @@ import {
 } from '../../src/transforms.js';
 import { dopplerFactor } from '../../src/dopplerFactor.js';
 import { gstime } from '../../src/propagation/gstime.js';
+import { sunPos } from '../../src/sun.js';
+import { shadowFraction } from '../../src/shadow.js';
+import { jday } from '../../src/ext.js';
 import { compareVectors } from '../compareVectors.js';
 import { topologicalSort } from '../../src/wasm/toposort.js';
 import badTleData from '../io-edge.json' with { type: 'json' };
@@ -485,6 +490,54 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
     });
   });
 
+  it('SunPositionCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator(), new SunPositionCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
+
+    dates.forEach((date, j) => {
+      const jsSunPosition = sunPos(jday(date)).rsun;
+      const wasmSunPosition = bp.getFormattedOutput(0, j)!.sunPosition;
+
+      expect(wasmSunPosition.x).toBeCloseTo(jsSunPosition.x, 11);
+      expect(wasmSunPosition.y).toBeCloseTo(jsSunPosition.y, 11);
+      expect(wasmSunPosition.z).toBeCloseTo(jsSunPosition.z, 11);
+    });
+  });
+
+  it('ShadowFractionCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [
+        new EciBaseCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
+      ],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const jsSunPosition = sunPos(jday(date)).rsun;
+        const jsShadowFraction = shadowFraction(jsSunPosition, eciResult!.position);
+        const wasmShadowFraction = bp.getFormattedOutput(i, j)!.shadowFraction;
+
+        expect(wasmShadowFraction).toBeCloseTo(jsShadowFraction, 11);
+      });
+    });
+  });
+
   it('BulkPropagator and Calculators raw results are the same as formatted results', () => {
     const observerEcf = geodeticToEcf(observerGeodetic);
 
@@ -497,6 +550,8 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
         new EcfVelocityCalculator(),
         new DopplerFactorCalculator(),
         new LookAnglesCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
       ],
       satRecsCount: satRecs.length,
       datesCount: dates.length,
@@ -541,6 +596,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
       elevation: rawResults.lookAngles[3 * 2 + 1],
       rangeSat: rawResults.lookAngles[3 * 2 + 2],
     });
+    expect(formattedResults.sunPosition).toEqual({
+      x: rawResults.sunPosition[3 * 0],
+      y: rawResults.sunPosition[3 * 0 + 1],
+      z: rawResults.sunPosition[3 * 0 + 2],
+    });
+    expect(formattedResults.shadowFraction).toEqual(rawResults.shadowFraction[2]);
   });
 });
 
@@ -921,6 +982,54 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
     });
   });
 
+  it('SunPositionCalculator returns values close to pure JS implementation', async () => {
+    using bp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator(), new SunPositionCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
+
+    dates.forEach((date, j) => {
+      const jsSunPosition = sunPos(jday(date)).rsun;
+      const wasmSunPosition = bp.getFormattedOutput(0, j)!.sunPosition;
+
+      expect(wasmSunPosition.x).toBeCloseTo(jsSunPosition.x, 11);
+      expect(wasmSunPosition.y).toBeCloseTo(jsSunPosition.y, 11);
+      expect(wasmSunPosition.z).toBeCloseTo(jsSunPosition.z, 11);
+    });
+  });
+
+  it('ShadowFractionCalculator returns values close to pure JS implementation', async () => {
+    using bp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [
+        new EciBaseCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
+      ],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const jsSunPosition = sunPos(jday(date)).rsun;
+        const jsShadowFraction = shadowFraction(jsSunPosition, eciResult!.position);
+        const wasmShadowFraction = bp.getFormattedOutput(i, j)!.shadowFraction;
+
+        expect(wasmShadowFraction).toBeCloseTo(jsShadowFraction, 11);
+      });
+    });
+  });
+
   it('BulkPropagator and Calculators raw results are the same as formatted results', async () => {
     const observerEcf = geodeticToEcf(observerGeodetic);
 
@@ -933,6 +1042,8 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
         new EcfVelocityCalculator(),
         new DopplerFactorCalculator(),
         new LookAnglesCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
       ],
       satRecsCount: satRecs.length,
       datesCount: dates.length,
@@ -977,6 +1088,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
       elevation: rawResults.lookAngles[3 * 2 + 1],
       rangeSat: rawResults.lookAngles[3 * 2 + 2],
     });
+    expect(formattedResults.sunPosition).toEqual({
+      x: rawResults.sunPosition[3 * 0],
+      y: rawResults.sunPosition[3 * 0 + 1],
+      z: rawResults.sunPosition[3 * 0 + 2],
+    });
+    expect(formattedResults.shadowFraction).toEqual(rawResults.shadowFraction[2]);
   });
 });
 
