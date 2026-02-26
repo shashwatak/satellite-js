@@ -20,7 +20,7 @@ const multiThreadRuntime = await createMultiThreadRuntimeFromModule(
   { threadsCount: 4 },
 );
 
-const DATES_COUNT = 24 * 365;
+const DATES_COUNT = 1;
 const DATE_START = new Date('2025-07-12T00:00:00.123Z');
 const DATE_STEP_MS = 60 * 60 * 1000;
 
@@ -41,18 +41,21 @@ describe('ECI', () => {
   const bp = new BulkPropagator({
     runtime: singleThreadRuntime,
     calculators: [new EciBaseCalculator()],
-    satRecs: satrecs,
+    satRecsCount: satrecs.length,
     datesCount: dates.length,
   });
+  bp.setSatRecs(satrecs);
   const multiThreadBp = new BulkPropagator({
     runtime: multiThreadRuntime,
     calculators: [new EciBaseCalculator()],
-    satRecs: satrecs,
+    satRecsCount: satrecs.length,
     datesCount: dates.length,
   });
+  multiThreadBp.setSatRecs(satrecs);
 
   bench('WASM Single-Thread BulkPropagator', () => {
-    bp.run({ dates });
+    bp.setDates(dates);
+    bp.run();
     let local = 0;
     for (let si = 0; si < satrecs.length; si++) {
       for (let di = 0; di < dates.length; di++) {
@@ -66,11 +69,12 @@ describe('ECI', () => {
   }, iterationSettings);
 
   bench('WASM Multi-Thread BulkPropagator', async () => {
-    await multiThreadBp.run({ dates });
+    multiThreadBp.setDates(dates);
+    await multiThreadBp.run();
     let local = 0;
     for (let si = 0; si < satrecs.length; si++) {
       for (let di = 0; di < dates.length; di++) {
-        const out = bp.getFormattedOutput(si, di)!.eci;
+        const out = multiThreadBp.getFormattedOutput(si, di)!.eci;
         if (out.error === SatRecError.None) {
           local += out.position.x + out.velocity.y;
         }
@@ -102,9 +106,11 @@ describe('LookAngles', () => {
       new EcfPositionCalculator(),
       new LookAnglesCalculator(),
     ],
-    satRecs: satrecs,
+    satRecsCount: satrecs.length,
     datesCount: dates.length,
   });
+  bp.setSatRecs(satrecs);
+
   const multiThreadBp = new BulkPropagator({
     runtime: multiThreadRuntime,
     calculators: [
@@ -113,12 +119,14 @@ describe('LookAngles', () => {
       new EcfPositionCalculator(),
       new LookAnglesCalculator(),
     ],
-    satRecs: satrecs,
+    satRecsCount: satrecs.length,
     datesCount: dates.length,
   });
+  multiThreadBp.setSatRecs(satrecs);
 
   bench('WASM LookAngles Single-Thread BulkPropagator', () => {
-    bp.run({ dates, lookAngles: { observer: { longitude: 0, latitude: 0, height: 0 } } });
+    bp.setDates(dates);
+    bp.run({ lookAngles: { observer: { longitude: 0, latitude: 0, height: 0 } } });
     let local = 0;
     for (let si = 0; si < satrecs.length; si++) {
       for (let di = 0; di < dates.length; di++) {
@@ -132,8 +140,9 @@ describe('LookAngles', () => {
   }, iterationSettings);
 
   bench('WASM LookAngles Multi-Thread BulkPropagator', async () => {
+    multiThreadBp.setDates(dates);
     await multiThreadBp.run(
-      { dates, lookAngles: { observer: { longitude: 0, latitude: 0, height: 0 } } },
+      { lookAngles: { observer: { longitude: 0, latitude: 0, height: 0 } } },
     );
     let local = 0;
     for (let si = 0; si < satrecs.length; si++) {

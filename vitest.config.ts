@@ -31,7 +31,13 @@ export default defineConfig({
             'test/*.test.ts',
           ],
           environment: 'node',
-        }
+        },
+        resolve: {
+          alias: {
+            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/base-release/index.js'),
+            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/pthreads-release/index.js'),
+          },
+        },
       },
       {
         test: {
@@ -43,8 +49,8 @@ export default defineConfig({
         },
         resolve: {
           alias: {
-            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/release/index.js'),
-            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/release-pthreads/index.js'),
+            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/base-release/index.js'),
+            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/pthreads-release/index.js'),
           },
         },
       },
@@ -60,8 +66,8 @@ export default defineConfig({
         },
         resolve: {
           alias: {
-            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/debug/index.js'),
-            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/release-pthreads/index.js'),
+            'wasm-module-single-thread/index.js': path.resolve('./wasm-build/base-debug/index.js'),
+            'wasm-module-multi-thread/index.js': path.resolve('./wasm-build/pthreads-debug/index.js'),
           },
         },
       }

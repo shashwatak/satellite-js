@@ -28,21 +28,7 @@ declare namespace RuntimeExports {
      * @param {Array=} argTypes
      * @param {Object=} opts
      */
-    function cwrap(ident: any, returnType?: string | undefined, argTypes?: any[] | undefined, opts?: any | undefined): any;
-    namespace PThread {
-        let unusedWorkers: any[];
-        let runningWorkers: any[];
-        let tlsInitFunctions: any[];
-        let pthreads: {};
-        function init(): void;
-        function initMainThread(): void;
-        function terminateAllThreads(): void;
-        function returnWorkerToPool(worker: any): void;
-        function threadInitTLS(): void;
-        function loadWasmModuleToWorker(worker: any): any;
-        function allocateUnusedWorker(): void;
-        function getNewWorker(): any;
-    }
+    function cwrap(ident: any, returnType?: string | undefined, argTypes?: any[] | undefined, opts?: any | undefined): (...args: any[]) => any;
     let HEAP8: any;
     let HEAPF64: any;
 }
@@ -54,9 +40,14 @@ interface WasmModule {
   _free_struct_layout_string(_0: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
   _calloc_one(_0: number): number;
+  _exit_runtime(): void;
   _compute(_0: number, _1: number): number;
+  _init_satrec_from_tle(_0: number, _1: number, _2: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
+  __ZN6__asan9FakeStack17AddrIsInFakeStackEm(_0: number, _1: number): number;
+  __ZN6__asan9FakeStack8AllocateEmmm(_0: number, _1: number, _2: number, _3: number): number;
+  ___lsan_do_recoverable_leak_check(): number;
 }
 
 export type MainModule = WasmModule & typeof RuntimeExports;

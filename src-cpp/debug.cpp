@@ -14,6 +14,7 @@
  */
 
 extern "C" {
+  // same as the original but cleaned up of MSVC defines and console input
   void twoline2rv(
       char longstr1[130], char longstr2[130],
       char opsmode,

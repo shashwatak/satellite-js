@@ -40,7 +40,7 @@ export async function createMultiThreadRuntimeFromModule(
     module: wasmModule,
     compute,
     dispose: () => {
-      wasmModule.PThread.terminateAllThreads();
+      wasmModule._exit_runtime();
     },
     [Symbol.dispose]() {
       this.dispose();

@@ -8,48 +8,9 @@
 #include "iostream"
 #include "stdio.h"
 #include <emscripten/emscripten.h>
+#include "common.h"
 
 #define pi 3.14159265358979323846
-
-typedef struct {
-  // inputs
-  elsetrec *__restrict satellitesPointer;
-  int satellitesCount;
-  double *__restrict jdaysPointer;
-  int jdaysCount;
-
-  // outputs and output-specific parameters
-  // ECI is enabled by default (no eciPositionEnabled flag)
-  double *__restrict eciPositions;
-  double *__restrict eciVelocities;
-  int8_t *__restrict sgp4Errors;
-
-  // keeping flags together to save struct memory space
-  bool gmstEnabled;
-  bool ecfPositionEnabled;
-  bool ecfVelocityEnabled;
-  bool geodeticPositionEnabled;
-  bool lookAnglesEnabled;
-  bool dopplerFactorEnabled;
-
-  double *__restrict gmstValues;
-
-  double *__restrict ecfPositions;
-
-  double *__restrict ecfVelocities;
-
-  double *__restrict geodeticPositions;
-
-  double longitudeRadians;
-  double latitudeRadians;
-  double heightKm;
-  double *__restrict lookAngles;
-
-  double observerEcfX;
-  double observerEcfY;
-  double observerEcfZ;
-  double *__restrict dopplerFactors;
-} RunData;
 
 extern "C"
 {
@@ -242,7 +203,13 @@ extern "C"
     result += "[\"observerEcfX\",\"double\"," + std::to_string(offsetof(RunData, observerEcfX)) + "," + std::to_string(sizeof(zero_rec->observerEcfX)) + "],";
     result += "[\"observerEcfY\",\"double\"," + std::to_string(offsetof(RunData, observerEcfY)) + "," + std::to_string(sizeof(zero_rec->observerEcfY)) + "],";
     result += "[\"observerEcfZ\",\"double\"," + std::to_string(offsetof(RunData, observerEcfZ)) + "," + std::to_string(sizeof(zero_rec->observerEcfZ)) + "],";
-    result += "[\"dopplerFactors\",\"int\"," + std::to_string(offsetof(RunData, dopplerFactors)) + "," + std::to_string(sizeof(zero_rec->dopplerFactors)) + "]";
+    result += "[\"dopplerFactors\",\"int\"," + std::to_string(offsetof(RunData, dopplerFactors)) + "," + std::to_string(sizeof(zero_rec->dopplerFactors)) + "],";
+
+    result += "[\"sunPositionEnabled\",\"bool\"," + std::to_string(offsetof(RunData, sunPositionEnabled)) + "," + std::to_string(sizeof(zero_rec->sunPositionEnabled)) + "],";
+    result += "[\"sunPositions\",\"int\"," + std::to_string(offsetof(RunData, sunPositions)) + "," + std::to_string(sizeof(zero_rec->sunPositions)) + "],";
+
+    result += "[\"shadowFractionEnabled\",\"bool\"," + std::to_string(offsetof(RunData, shadowFractionEnabled)) + "," + std::to_string(sizeof(zero_rec->shadowFractionEnabled)) + "],";
+    result += "[\"shadowFractionValues\",\"int\"," + std::to_string(offsetof(RunData, shadowFractionValues)) + "," + std::to_string(sizeof(zero_rec->shadowFractionValues)) + "]";
 
     result += "]";
 
@@ -267,7 +234,7 @@ extern "C"
 
   // changes from the original sgp4 function:
   // 1. tsince parameter is replaced with unix_ms
-  // and local tsince is calculated from unix_ms and satrec.jdsatepoch(F)
+  // and local tsince is calculated from unix_ms and satrec.jdsatepoch[F]
   // 2. returns void instead of boolean indicating propagation success
   // 3. `if (mrt < 1.0)` check was moved into a place right after `mrt` calculation, instead of the very end of the sgp4 function.
   void EMSCRIPTEN_KEEPALIVE sgp4forJs(
@@ -559,13 +526,303 @@ extern "C"
     return;
   }
 
-  // void EMSCRIPTEN_KEEPALIVE propagate_many(elsetrec* __restrict satrecs, int count, double unix_ms, double* __restrict positions, double* __restrict velocities) {
-  //   for (int i = 0; i < count; i++) {
-  //     sgp4forJs(satrecs[i], unix_ms, &positions[i * 3], &velocities[i * 3]);
-  //   }
-  // }
-
   void* EMSCRIPTEN_KEEPALIVE calloc_one(int size) {
-    return std::calloc(size, 1);
+    return calloc(size, 1);
+  }
+
+  void EMSCRIPTEN_KEEPALIVE exit_runtime() {
+    exit(0);
+  }
+}
+
+void calculate_eci(
+    elsetrec *__restrict satellites, int satellites_start, int satellites_end,
+    double *__restrict jdays, int jdays_start, int jdays_end, int jdays_count,
+    double *__restrict eci_positions, double *__restrict eci_velocities,
+    int8_t *__restrict sgp4_errors)
+{
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = jdays_start; j < jdays_end; j++)
+    {
+      int output_index = (i * jdays_count + j) * 3;
+      sgp4forJs(satellites[i], jdays[j], &eci_positions[output_index], &eci_velocities[output_index], sgp4_errors[output_index / 3]);
+    }
+  }
+}
+
+void calculate_gmst(
+    double *__restrict jdays, int jdays_start, int jdays_end,
+    double *__restrict gmst_values)
+{
+  for (int i = jdays_start; i < jdays_end; i++)
+  {
+    // identical to SGP4Funcs::gstime_SGP4
+    const double twopi = 2.0 * pi;
+		const double deg2rad = pi / 180.0;
+		double       temp, tut1;
+
+		tut1 = (jdays[i] - 2451545.0) / 36525.0;
+		temp = -6.2e-6* tut1 * tut1 * tut1 + 0.093104 * tut1 * tut1 +
+			(876600.0 * 3600 + 8640184.812866) * tut1 + 67310.54841;  // sec
+		temp = fmod(temp * deg2rad / 240.0, twopi); //360/86400 = 1/240, to deg, to rad
+
+		// ------------------------ check quadrants ---------------------
+		if (temp < 0.0)
+			temp += twopi;
+
+		gmst_values[i] = temp;
+  }
+}
+
+void calculate_ecf_position_or_velocity(
+    double *__restrict eci_vectors,
+    int satellites_start, int satellites_end,
+    double *__restrict gmst_values,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict ecf_vectors)
+{
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int input_vector_index = (i * dates_count + j) * 3;
+      double x = eci_vectors[input_vector_index] * cos(gmst_values[j]) + eci_vectors[input_vector_index + 1] * sin(gmst_values[j]);
+      double y = eci_vectors[input_vector_index] * (-sin(gmst_values[j])) + eci_vectors[input_vector_index + 1] * cos(gmst_values[j]);
+      double z = eci_vectors[input_vector_index + 2];
+      ecf_vectors[input_vector_index] = x;
+      ecf_vectors[input_vector_index + 1] = y;
+      ecf_vectors[input_vector_index + 2] = z;
+    }
+  }
+}
+
+void calculate_geodetic_positions(
+    double *__restrict eci_positions,
+    int satellites_start, int satellites_end,
+    double *__restrict gmst_values,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict geodetic_positions)
+{
+  // http://www.celestrak.com/columns/v02n03/
+  double a = 6378.137,
+         b = 6356.7523142,
+         f = (a - b) / a,
+         e2 = ((2 * f) - (f * f));
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int position_index = (i * dates_count + j) * 3;
+      double R = sqrt((eci_positions[position_index] * eci_positions[position_index]) + (eci_positions[position_index + 1] * eci_positions[position_index + 1]));
+      double longitude = atan2(eci_positions[position_index + 1], eci_positions[position_index]) - gmst_values[j];
+      while (longitude < -pi)
+      {
+        longitude += pi * 2;
+      }
+      while (longitude > pi)
+      {
+        longitude -= pi * 2;
+      }
+
+      int kmax = 20,
+          k = 0;
+      double latitude = atan2(
+          eci_positions[position_index + 2],
+          sqrt((eci_positions[position_index] * eci_positions[position_index]) + (eci_positions[position_index + 1] * eci_positions[position_index + 1])));
+      double C;
+      while (k++ < kmax)
+      {
+        C = 1 / sqrt(1 - (e2 * (sin(latitude) * sin(latitude))));
+        latitude = atan2(eci_positions[position_index + 2] + (a * C * e2 * sin(latitude)), R);
+      }
+      double height = (R / cos(latitude)) - (a * C);
+      geodetic_positions[position_index] = longitude;
+      geodetic_positions[position_index + 1] = latitude;
+      geodetic_positions[position_index + 2] = height;
+    }
+  }
+}
+
+void calculate_look_angles(
+    double *__restrict ecf_positions,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double longitude, double latitude, double height,
+    double *__restrict look_angles)
+{
+  double a = 6378.137;
+  double b = 6356.7523142;
+  double f = (a - b) / a;
+  double e2 = ((2 * f) - (f * f));
+  double normal = a / sqrt(1 - (e2 * (sin(latitude) * sin(latitude))));
+
+  double observerEcfX = (normal + height) * cos(latitude) * cos(longitude);
+  double observerEcfY = (normal + height) * cos(latitude) * sin(longitude);
+  double observerEcfZ = ((normal * (1 - e2)) + height) * sin(latitude);
+
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int position_index = (i * dates_count + j) * 3;
+      double satelliteEcfX = ecf_positions[position_index];
+      double satelliteEcfY = ecf_positions[position_index + 1];
+      double satelliteEcfZ = ecf_positions[position_index + 2];
+
+      double rx = satelliteEcfX - observerEcfX;
+      double ry = satelliteEcfY - observerEcfY;
+      double rz = satelliteEcfZ - observerEcfZ;
+
+      double topS = ((sin(latitude) * cos(longitude) * rx) + (sin(latitude) * sin(longitude) * ry)) - (cos(latitude) * rz);
+
+      double topE = (-sin(longitude) * rx) + (cos(longitude) * ry);
+
+      double topZ = (cos(latitude) * cos(longitude) * rx) + (cos(latitude) * sin(longitude) * ry) + (sin(latitude) * rz);
+
+      double rangeSat = sqrt((topS * topS) + (topE * topE) + (topZ * topZ));
+      double El = asin(topZ / rangeSat);
+      double Az = atan2(-topE, topS) + pi;
+
+      look_angles[position_index] = Az;
+      look_angles[position_index + 1] = El;
+      look_angles[position_index + 2] = rangeSat;
+    }
+  }
+}
+
+void calculate_doppler_factor(
+    double *__restrict ecf_positions, double *__restrict ecf_velocities,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double observer_ecf_x, double observer_ecf_y, double observer_ecf_z,
+    double *__restrict doppler_factors)
+{
+  double earthRotation = 7.292115E-5,
+         c = 299792.458;
+  // #pragma clang loop vectorize(enable) vectorize_width(2)
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int doppler_factor_index = (i * dates_count + j);
+      int position_velocity_index = doppler_factor_index * 3;
+      double rangeX = ecf_positions[position_velocity_index] - observer_ecf_x;
+      double rangeY = ecf_positions[position_velocity_index + 1] - observer_ecf_y;
+      double rangeZ = ecf_positions[position_velocity_index + 2] - observer_ecf_z;
+
+      double length = sqrt(rangeX * rangeX + rangeY * rangeY + rangeZ * rangeZ);
+      double rangeVelX = ecf_velocities[position_velocity_index] + earthRotation * observer_ecf_y;
+      double rangeVelY = ecf_velocities[position_velocity_index + 1] - earthRotation * observer_ecf_x;
+      double rangeVelZ = ecf_velocities[position_velocity_index + 2];
+
+      double rangeRate = (rangeX * rangeVelX + rangeY * rangeVelY + rangeZ * rangeVelZ) / length;
+
+      doppler_factors[doppler_factor_index] = 1.0 - rangeRate / c;
+    }
+  }
+}
+
+void calculate_sun_positions(
+    double *__restrict jdays, int jdays_start, int jdays_end,
+    double *__restrict sun_positions)
+{
+  const double deg2rad_local = pi / 180.0;
+  const double twopi = 2.0 * pi;
+
+  for (int i = jdays_start; i < jdays_end; i++)
+  {
+    double tut1 = (jdays[i] - 2451545.0) / 36525.0;
+    double meanlong = fmod(280.460 + 36000.77 * tut1, 360.0);
+    double meananomaly = fmod(357.5277233 + 35999.05034 * tut1 * deg2rad_local, twopi);
+    if (meananomaly < 0.0)
+      meananomaly += twopi;
+
+    double eclplong_raw = fmod(
+        meanlong + 1.914666471 * sin(meananomaly) + 0.019994643 * sin(2.0 * meananomaly),
+        360.0) * deg2rad_local;
+
+    double obliquity = (23.439291 - 0.0130042 * tut1) * deg2rad_local;
+
+    double magr = 1.000140612
+        - 0.016708617 * cos(meananomaly)
+        - 0.000139589 * cos(2.0 * meananomaly);
+
+    int output_index = i * 3;
+    sun_positions[output_index]     = magr * cos(eclplong_raw);
+    sun_positions[output_index + 1] = magr * cos(obliquity) * sin(eclplong_raw);
+    sun_positions[output_index + 2] = magr * sin(obliquity) * sin(eclplong_raw);
+  }
+}
+
+void calculate_shadow_fraction(
+    double *__restrict eci_positions, double *__restrict sun_positions,
+    int satellites_start, int satellites_end,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict shadow_fraction_values)
+{
+  const double SUN_RADIUS = 695700.0;
+  const double KM_PER_AU = 149597870.69098932;
+  const double EARTH_RADIUS = 6378.135;
+
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int eci_index = (i * dates_count + j) * 3;
+      int sun_index = j * 3;
+      int output_index = i * dates_count + j;
+
+      double sunKmX = sun_positions[sun_index] * KM_PER_AU;
+      double sunKmY = sun_positions[sun_index + 1] * KM_PER_AU;
+      double sunKmZ = sun_positions[sun_index + 2] * KM_PER_AU;
+      double sunKmLen = sqrt(sunKmX * sunKmX + sunKmY * sunKmY + sunKmZ * sunKmZ);
+
+      double antiX = -sunKmX / sunKmLen;
+      double antiY = -sunKmY / sunKmLen;
+      double antiZ = -sunKmZ / sunKmLen;
+
+      double posX = eci_positions[eci_index];
+      double posY = eci_positions[eci_index + 1];
+      double posZ = eci_positions[eci_index + 2];
+      double posLen = sqrt(posX * posX + posY * posY + posZ * posZ);
+
+      double dotPosAnti = posX * antiX + posY * antiY + posZ * antiZ;
+
+      if (dotPosAnti <= 0.0)
+      {
+        shadow_fraction_values[output_index] = 0.0;
+        continue;
+      }
+
+      double angRadEarth = asin(EARTH_RADIUS / posLen);
+      double angRadSun = asin(SUN_RADIUS / sunKmLen);
+      double angSep = acos(dotPosAnti / posLen);
+
+      if (angSep <= angRadEarth - angRadSun)
+      {
+        shadow_fraction_values[output_index] = 1.0;
+        continue;
+      }
+
+      if (angSep >= angRadEarth + angRadSun)
+      {
+        shadow_fraction_values[output_index] = 0.0;
+        continue;
+      }
+
+      double rE = angRadEarth;
+      double rS = angRadSun;
+      double d = angSep;
+
+      double part1 = rS * rS * acos((d * d + rS * rS - rE * rE) / (2.0 * d * rS));
+      double part2 = rE * rE * acos((d * d + rE * rE - rS * rS) / (2.0 * d * rE));
+      double part3 = 0.5 * sqrt(
+          (-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
+      double overlapArea = part1 + part2 - part3;
+      double sunDiscArea = pi * rS * rS;
+
+      shadow_fraction_values[output_index] = overlapArea / sunDiscArea;
+    }
   }
 }

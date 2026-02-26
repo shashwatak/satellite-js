@@ -6,7 +6,7 @@ import {
 } from '../../src/wasm/native-structs-from-js.js';
 import { CppMemoryReader } from '../../src/wasm/struct-read.js';
 import { twoline2satrec } from '../../src/io.js';
-import { allocateAndWriteNativeStructArrayFromSatrecArray } from '../../src/wasm/elsetrec-struct.js';
+import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from '../../src/wasm/elsetrec-struct.js';
 
 const wasmModule = await createSingleThreadModule();
 
@@ -191,15 +191,13 @@ describe('WASM elsetrec struct', () => {
     const pointer2 = wasmModule._malloc(wasmModule.lengthBytesUTF8(TLE2) + 1);
     wasmModule.stringToUTF8(TLE2, pointer2, wasmModule.lengthBytesUTF8(TLE2) + 1);
     const elsetrecSize = wasmModule._get_elsetrec_size();
-    const satrecInitializedFromTlePointer = wasmModule._malloc(elsetrecSize);
+    const satrecInitializedFromTlePointer = wasmModule._calloc_one(elsetrecSize);
     wasmModule._init_satrec_from_tle(satrecInitializedFromTlePointer, pointer1, pointer2);
     wasmModule._free(pointer1);
     wasmModule._free(pointer2);
 
-    const satrecInitializedFromJSSatrec = allocateAndWriteNativeStructArrayFromSatrecArray(
-      wasmModule,
-      [satrec],
-    );
+    const satrecInitializedFromJSSatrec = allocateNativeStructArray(wasmModule, 1);
+    writeNativeStructArrayFromSatrecArray(wasmModule, satrecInitializedFromJSSatrec, [satrec]);
 
     const readerOfInitializedFromTLE = new CppMemoryReader(
       wasmModule.HEAP8.buffer,
@@ -296,9 +294,13 @@ const knownRunDataLayout = {
   observerEcfY: ['double', 96, 8],
   observerEcfZ: ['double', 104, 8],
   dopplerFactors: ['int', 112, 4],
+  sunPositionEnabled: ['bool', 34, 1],
+  sunPositions: ['int', 116, 4],
+  shadowFractionEnabled: ['bool', 35, 1],
+  shadowFractionValues: ['int', 120, 4],
 };
 
-const knownGoodRunDataSize = 120;
+const knownGoodRunDataSize = 128;
 
 describe('WASM run data struct', () => {
   it(`has size exactly ${knownGoodRunDataSize} bytes`, async () => {

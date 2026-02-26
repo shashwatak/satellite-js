@@ -98,6 +98,19 @@ export function invjdayFull(jd: JDay) {
 
 const tsince = [0, 360, 720, 1080, 1440];
 
+const bp = new BulkPropagator({
+  datesCount: 5,
+  calculators: [new EciBaseCalculator()],
+  satRecsCount: 1,
+  runtime: singleThreadRuntime,
+});
+const bpMultiThread = new BulkPropagator({
+  datesCount: 5,
+  calculators: [new EciBaseCalculator()],
+  satRecsCount: 1,
+  runtime: multiThreadRuntime,
+});
+
 tleSuites.forEach((tleSuite, tleSuiteIndex) => {
   const testSuiteName = `sgp4catalog ${(tleSuiteIndex + 1).toString().padStart(2, '0')}`;
   const satellitesRange = `${tleSuiteIndex * satellitesPerTestSuite + 1} — ${(tleSuiteIndex + 1) * satellitesPerTestSuite}`;
@@ -105,22 +118,14 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
     tleSuite.forEach((tle, tleIndex) => {
       const satrec = twoline2satrec(tle.line1, tle.line2);
       it(`satellite ${String(satrec.satnum).padStart(5, '0')} measurements`, async () => {
-        using bp = new BulkPropagator({
-          datesCount: 5,
-          calculators: [new EciBaseCalculator()],
-          satRecs: [satrec],
-          runtime: singleThreadRuntime,
-        });
-        using bpMultiThread = new BulkPropagator({
-          datesCount: 5,
-          calculators: [new EciBaseCalculator()],
-          satRecs: [satrec],
-          runtime: multiThreadRuntime,
-        });
+        bp.setSatRecs([satrec]);
+        bpMultiThread.setSatRecs([satrec]);
         const satelliteEpoch = satrec.jdsatepoch;
         const dates = tsince.map((ts) => invjdayFull(satelliteEpoch + ts / 1440));
-        bp.run({ dates });
-        await bpMultiThread.run({ dates });
+        bp.setDates(dates);
+        bpMultiThread.setDates(dates);
+        bp.run();
+        await bpMultiThread.run();
 
         tsince.forEach((time, timeIndex) => {
           const result = sgp4(satrec, time);

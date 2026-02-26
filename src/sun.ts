@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { AU, EciVec3 } from './common-types.js';
 import { deg2rad, pi, twoPi } from './constants.js';
 import { JDay } from './ext.js';
 
@@ -33,16 +34,14 @@ import { JDay } from './ext.js';
  *      Computer software in MATLAB: http://celestrak.org/software/vallado-sw.php
  *  --------------------------------------------------------------------------- */
 
-export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: number } {
+export function sunPos(jday: JDay): { rsun: EciVec3<AU>; rtasc: number; decl: number } {
   // -------------------------  implementation   -----------------
   // -------------------  initialize values   --------------------
   const tut1 = (jday - 2451545) / 36525;
 
   const meanlong = (280.460 + 36000.77 * tut1) % 360; // deg
 
-  const ttdb = tut1; // is this declaration required instead of replacing `ttdb` with `tut1`
-
-  let meananomaly = (357.5277233 + 35999.05034 * ttdb * deg2rad) % twoPi; // rad
+  let meananomaly = (357.5277233 + 35999.05034 * tut1 * deg2rad) % twoPi; // rad
   if (meananomaly < 0) {
     meananomaly += twoPi;
   }
@@ -51,18 +50,18 @@ export function sunPos(jday: JDay): { rsun: number[]; rtasc: number; decl: numbe
     meanlong + 1.914666471 * Math.sin(meananomaly) + 0.019994643 * Math.sin(2.0 * meananomaly)
   ) % 360.0) * deg2rad; // rad
 
-  const obliquity = (23.439291 - 0.0130042 * ttdb) * deg2rad; // rad
+  const obliquity = (23.439291 - 0.0130042 * tut1) * deg2rad; // rad
 
   // --------- find magnitude of sun vector, and it's components ------
   const magr = 1.000140612
     - 0.016708617 * Math.cos(meananomaly)
     - 0.000139589 * Math.cos(2.0 * meananomaly); // in au's
 
-  const rsun = [
-    magr * Math.cos(eclplong_raw),
-    magr * Math.cos(obliquity) * Math.sin(eclplong_raw),
-    magr * Math.sin(obliquity) * Math.sin(eclplong_raw),
-  ];
+  const rsun: EciVec3<AU> = {
+    x: magr * Math.cos(eclplong_raw),
+    y: magr * Math.cos(obliquity) * Math.sin(eclplong_raw),
+    z: magr * Math.sin(obliquity) * Math.sin(eclplong_raw),
+  };
 
   const rtasc_raw = Math.atan(Math.cos(obliquity) * Math.tan(eclplong_raw));
 

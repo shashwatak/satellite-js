@@ -10,6 +10,8 @@ import {
   GeodeticPositionCalculator,
   DopplerFactorCalculator,
   LookAnglesCalculator,
+  SunPositionCalculator,
+  ShadowFractionCalculator,
 } from '../../src/wasm/index.js';
 import { twoline2satrec } from '../../src/io.js';
 import { propagate } from '../../src/propagation.js';
@@ -18,6 +20,9 @@ import {
 } from '../../src/transforms.js';
 import { dopplerFactor } from '../../src/dopplerFactor.js';
 import { gstime } from '../../src/propagation/gstime.js';
+import { sunPos } from '../../src/sun.js';
+import { shadowFraction } from '../../src/shadow.js';
+import { jday } from '../../src/ext.js';
 import { compareVectors } from '../compareVectors.js';
 import { topologicalSort } from '../../src/wasm/toposort.js';
 import badTleData from '../io-edge.json' with { type: 'json' };
@@ -48,15 +53,78 @@ const observerGeodetic = {
   height: 1,
 };
 
+describe('BulkPropagator basic flow errors', () => {
+  it('should throw if run is called before setting satRecs', () => {
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setDates(dates);
+    expect(() => bp.run()).toThrow(/setSatRecs/);
+  });
+  it('should throw if run is called before setting dates', () => {
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    expect(() => bp.run()).toThrow(/setDates/);
+  });
+  it('should throw if setDates is called during a run', async () => {
+    using multiThreadBp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    multiThreadBp.setSatRecs(satRecs);
+    multiThreadBp.setDates(dates);
+    const runPromise = multiThreadBp.run();
+    expect(() => multiThreadBp.setDates(dates)).toThrow(/Cannot set dates while a run is in progress/);
+    await runPromise;
+  });
+  it('should throw if used after disposal', () => {
+    using multiThreadBp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    multiThreadBp.setSatRecs(satRecs);
+    multiThreadBp.setDates(dates);
+    multiThreadBp.dispose();
+    expect(() => multiThreadBp.run()).toThrow();
+  });
+  it('should not throw during dispose even if run is in progress', async () => {
+    using multiThreadBp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    multiThreadBp.setSatRecs(satRecs);
+    multiThreadBp.setDates(dates);
+    const promise = multiThreadBp.run();
+    multiThreadBp.dispose();
+    await promise;
+  });
+});
+
 describe('BulkPropagator single thread sanity check', () => {
   it('propagates and returns finite values', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     const out0 = bp.getFormattedOutput(0, 0)!.eci;
     const out1 = bp.getFormattedOutput(0, 1)!.eci;
@@ -69,10 +137,12 @@ describe('BulkPropagator single thread sanity check', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     const pureJsResults = satRecs.flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
     const wasmResults = satRecs.flatMap(
@@ -89,36 +159,27 @@ describe('BulkPropagator single thread sanity check', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     const out0 = bp.getFormattedOutput(satRecs.length, 0);
     expect(out0).toBeUndefined();
-  });
-
-  it("throws if dates.length doesn't match datesCount", () => {
-    using bp = new BulkPropagator({
-      runtime: singleThreadRuntime,
-      calculators: [new EciBaseCalculator()],
-      satRecs,
-      datesCount: dates.length + 1,
-    });
-
-    expect(() => {
-      bp.run({ dates });
-    }).toThrow();
   });
 
   it('returns the same results after the memory is grown', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     const pureJsResults = satRecs.flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
     const wasmResults = satRecs.flatMap(
@@ -142,6 +203,112 @@ describe('BulkPropagator single thread sanity check', () => {
     });
     singleThreadRuntime.module._free(dummyMemory);
   });
+
+  it('returns correct results when increasing input sizes between runs', async () => {
+    const smallerDatesBatch = dates.slice(0, 1);
+    const smallerSatRecsBatch = satRecs.slice(0, 1);
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: smallerSatRecsBatch.length,
+      datesCount: smallerDatesBatch.length,
+    });
+    bp.setSatRecs(smallerSatRecsBatch);
+    bp.setDates(smallerDatesBatch);
+    bp.run();
+
+    const pureJsResults = smallerSatRecsBatch
+      .flatMap((satRec) => smallerDatesBatch.map((date) => propagate(satRec, date)));
+    const wasmResults = smallerSatRecsBatch.flatMap(
+      (_satRec, i) => smallerDatesBatch.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResults.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
+    });
+
+    bp.setDates(dates);
+    bp.run();
+
+    const pureJsResultsAfterIncreasedDates = smallerSatRecsBatch
+      .flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterIncreasedDates = smallerSatRecsBatch.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterIncreasedDates.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterIncreasedDates[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterIncreasedDates[i]!.velocity, 11);
+    });
+
+    bp.setSatRecs(satRecs);
+    bp.run();
+
+    const pureJsResultsAfterIncreasedSatRecs = satRecs
+      .flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterIncreasedSatRecs = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterIncreasedSatRecs.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterIncreasedSatRecs[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterIncreasedSatRecs[i]!.velocity, 11);
+    });
+  });
+
+  it('returns correct results when decreasing input sizes between runs', async () => {
+    const smallerDatesBatch = dates.slice(0, 1);
+    const smallerSatRecsBatch = satRecs.slice(0, 1);
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
+
+    const pureJsResults = satRecs
+      .flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResults = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResults.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
+    });
+
+    bp.setDates(smallerDatesBatch);
+    bp.run();
+
+    const pureJsResultsAfterDecreasedDates = satRecs
+      .flatMap((satRec) => smallerDatesBatch.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterDecreasedDates = satRecs.flatMap(
+      (_satRec, i) => smallerDatesBatch.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterDecreasedDates.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterDecreasedDates[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterDecreasedDates[i]!.velocity, 11);
+    });
+
+    bp.setSatRecs(smallerSatRecsBatch);
+    bp.run();
+
+    const pureJsResultsAfterDecreasedSatRecs = smallerSatRecsBatch
+      .flatMap((satRec) => smallerDatesBatch.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterDecreasedSatRecs = smallerSatRecsBatch.flatMap(
+      (_satRec, i) => smallerDatesBatch.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterDecreasedSatRecs.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterDecreasedSatRecs[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterDecreasedSatRecs[i]!.velocity, 11);
+    });
+  });
 });
 
 describe('BulkPropagator single thread errors', () => {
@@ -152,10 +319,12 @@ describe('BulkPropagator single thread errors', () => {
         runtime: singleThreadRuntime,
         calculators: [new EciBaseCalculator()],
         datesCount: 1,
-        satRecs: [satRec],
+        satRecsCount: 1,
       });
       const date = new Date((satRec.jdsatepoch - 2440587.5) * 86400000);
-      bp.run({ dates: [date] });
+      bp.setSatRecs([satRec]);
+      bp.setDates([date]);
+      bp.run();
       expect(bp.getFormattedOutput(0, 0)!.eci.error).toEqual(tleDataItem.results[0]!.error);
     });
   });
@@ -165,11 +334,13 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
   it('GmstCalculator returns values close to pure JS implementation', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
-      calculators: [new GmstCalculator()],
-      satRecs,
+      calculators: [new EciBaseCalculator(), new GmstCalculator()],
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     dates.forEach((date, j) => {
       const jsGmst = gstime(date);
@@ -182,10 +353,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
       calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -203,10 +376,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
     using bp = new BulkPropagator({
       runtime: singleThreadRuntime,
       calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfVelocityCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -228,10 +403,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
         new GmstCalculator(),
         new GeodeticPositionCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -256,10 +433,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
         new EcfPositionCalculator(),
         new LookAnglesCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates, lookAngles: { observer: observerGeodetic } });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run({ lookAngles: { observer: observerGeodetic } });
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -289,10 +468,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
         new EcfVelocityCalculator(),
         new DopplerFactorCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    bp.run({ dates, dopplerFactor: { observer: observerEcf } });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run({ dopplerFactor: { observer: observerEcf } });
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -309,6 +490,54 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
     });
   });
 
+  it('SunPositionCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator(), new SunPositionCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
+
+    dates.forEach((date, j) => {
+      const jsSunPosition = sunPos(jday(date)).rsun;
+      const wasmSunPosition = bp.getFormattedOutput(0, j)!.sunPosition;
+
+      expect(wasmSunPosition.x).toBeCloseTo(jsSunPosition.x, 11);
+      expect(wasmSunPosition.y).toBeCloseTo(jsSunPosition.y, 11);
+      expect(wasmSunPosition.z).toBeCloseTo(jsSunPosition.z, 11);
+    });
+  });
+
+  it('ShadowFractionCalculator returns values close to pure JS implementation', () => {
+    using bp = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [
+        new EciBaseCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
+      ],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    bp.run();
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const jsSunPosition = sunPos(jday(date)).rsun;
+        const jsShadowFraction = shadowFraction(jsSunPosition, eciResult!.position);
+        const wasmShadowFraction = bp.getFormattedOutput(i, j)!.shadowFraction;
+
+        expect(wasmShadowFraction).toBeCloseTo(jsShadowFraction, 11);
+      });
+    });
+  });
+
   it('BulkPropagator and Calculators raw results are the same as formatted results', () => {
     const observerEcf = geodeticToEcf(observerGeodetic);
 
@@ -321,13 +550,16 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
         new EcfVelocityCalculator(),
         new DopplerFactorCalculator(),
         new LookAnglesCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
 
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
     bp.run({
-      dates,
       dopplerFactor: { observer: observerEcf },
       lookAngles: { observer: observerGeodetic },
     });
@@ -364,6 +596,12 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
       elevation: rawResults.lookAngles[3 * 2 + 1],
       rangeSat: rawResults.lookAngles[3 * 2 + 2],
     });
+    expect(formattedResults.sunPosition).toEqual({
+      x: rawResults.sunPosition[3 * 0],
+      y: rawResults.sunPosition[3 * 0 + 1],
+      z: rawResults.sunPosition[3 * 0 + 2],
+    });
+    expect(formattedResults.shadowFraction).toEqual(rawResults.shadowFraction[2]);
   });
 });
 
@@ -372,10 +610,12 @@ describe('BulkPropagator multi thread sanity check', () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     const out0 = bp.getFormattedOutput(0, 0)!.eci;
     const out1 = bp.getFormattedOutput(0, 1)!.eci;
@@ -388,10 +628,12 @@ describe('BulkPropagator multi thread sanity check', () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     const pureJsResults = satRecs.flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
     const wasmResults = satRecs.flatMap(
@@ -408,36 +650,27 @@ describe('BulkPropagator multi thread sanity check', () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     const out0 = bp.getFormattedOutput(satRecs.length, 0);
     expect(out0).toBeUndefined();
-  });
-
-  it("throws if dates.length doesn't match datesCount", async () => {
-    using bp = new BulkPropagator({
-      runtime: multiThreadRuntime,
-      calculators: [new EciBaseCalculator()],
-      satRecs,
-      datesCount: dates.length + 1,
-    });
-
-    await expect(async () => {
-      await bp.run({ dates });
-    }).rejects.toThrow();
   });
 
   it('returns the same results after the memory is grown', async () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
       calculators: [new EciBaseCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     const pureJsResults = satRecs.flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
     const wasmResults = satRecs.flatMap(
@@ -461,6 +694,112 @@ describe('BulkPropagator multi thread sanity check', () => {
     });
     multiThreadRuntime.module._free(dummyMemory);
   });
+
+  it('returns correct results when increasing input sizes between runs', async () => {
+    const smallerDatesBatch = dates.slice(0, 1);
+    const smallerSatRecsBatch = satRecs.slice(0, 1);
+    using bp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: smallerSatRecsBatch.length,
+      datesCount: smallerDatesBatch.length,
+    });
+    bp.setSatRecs(smallerSatRecsBatch);
+    bp.setDates(smallerDatesBatch);
+    await bp.run();
+
+    const pureJsResults = smallerSatRecsBatch
+      .flatMap((satRec) => smallerDatesBatch.map((date) => propagate(satRec, date)));
+    const wasmResults = smallerSatRecsBatch.flatMap(
+      (_satRec, i) => smallerDatesBatch.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResults.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
+    });
+
+    bp.setDates(dates);
+    await bp.run();
+
+    const pureJsResultsAfterIncreasedDates = smallerSatRecsBatch
+      .flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterIncreasedDates = smallerSatRecsBatch.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterIncreasedDates.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterIncreasedDates[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterIncreasedDates[i]!.velocity, 11);
+    });
+
+    bp.setSatRecs(satRecs);
+    await bp.run();
+
+    const pureJsResultsAfterIncreasedSatRecs = satRecs
+      .flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterIncreasedSatRecs = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterIncreasedSatRecs.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterIncreasedSatRecs[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterIncreasedSatRecs[i]!.velocity, 11);
+    });
+  });
+
+  it('returns correct results when decreasing input sizes between runs', async () => {
+    const smallerDatesBatch = dates.slice(0, 1);
+    const smallerSatRecsBatch = satRecs.slice(0, 1);
+    using bp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
+
+    const pureJsResults = satRecs
+      .flatMap((satRec) => dates.map((date) => propagate(satRec, date)));
+    const wasmResults = satRecs.flatMap(
+      (_satRec, i) => dates.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResults.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResults[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResults[i]!.velocity, 11);
+    });
+
+    bp.setDates(smallerDatesBatch);
+    await bp.run();
+
+    const pureJsResultsAfterDecreasedDates = satRecs
+      .flatMap((satRec) => smallerDatesBatch.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterDecreasedDates = satRecs.flatMap(
+      (_satRec, i) => smallerDatesBatch.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterDecreasedDates.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterDecreasedDates[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterDecreasedDates[i]!.velocity, 11);
+    });
+
+    bp.setSatRecs(smallerSatRecsBatch);
+    await bp.run();
+
+    const pureJsResultsAfterDecreasedSatRecs = smallerSatRecsBatch
+      .flatMap((satRec) => smallerDatesBatch.map((date) => propagate(satRec, date)));
+    const wasmResultsAfterDecreasedSatRecs = smallerSatRecsBatch.flatMap(
+      (_satRec, i) => smallerDatesBatch.map((_date, j) => bp.getFormattedOutput(i, j)!.eci),
+    );
+
+    pureJsResultsAfterDecreasedSatRecs.forEach((jsResult, i) => {
+      compareVectors(jsResult!.position, wasmResultsAfterDecreasedSatRecs[i]!.position, 11);
+      compareVectors(jsResult!.velocity, wasmResultsAfterDecreasedSatRecs[i]!.velocity, 11);
+    });
+  });
 });
 
 describe('BulkPropagator multi thread errors', () => {
@@ -471,11 +810,13 @@ describe('BulkPropagator multi thread errors', () => {
         runtime: multiThreadRuntime,
         calculators: [new EciBaseCalculator()],
         datesCount: 1,
-        satRecs: [satRec],
+        satRecsCount: 1,
       });
       const date = new Date((satRec.jdsatepoch - 2440587.5) * 86400000);
+      bp.setSatRecs([satRec]);
+      bp.setDates([date]);
       // eslint-disable-next-line no-await-in-loop
-      await bp.run({ dates: [date] });
+      await bp.run();
       expect(bp.getFormattedOutput(0, 0)!.eci.error).toEqual(tleDataItem.results[0]!.error);
     }
   });
@@ -485,11 +826,13 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
   it('GmstCalculator returns values close to pure JS implementation', async () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
-      calculators: [new GmstCalculator()],
-      satRecs,
+      calculators: [new EciBaseCalculator(), new GmstCalculator()],
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     dates.forEach((date, j) => {
       const jsGmst = gstime(date);
@@ -502,10 +845,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
       calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfPositionCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -523,10 +868,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
     using bp = new BulkPropagator({
       runtime: multiThreadRuntime,
       calculators: [new EciBaseCalculator(), new GmstCalculator(), new EcfVelocityCalculator()],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -548,10 +895,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
         new GmstCalculator(),
         new GeodeticPositionCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -576,10 +925,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
         new EcfPositionCalculator(),
         new LookAnglesCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates, lookAngles: { observer: observerGeodetic } });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run({ lookAngles: { observer: observerGeodetic } });
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -609,10 +960,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
         new EcfVelocityCalculator(),
         new DopplerFactorCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
-    await bp.run({ dates, dopplerFactor: { observer: observerEcf } });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run({ dopplerFactor: { observer: observerEcf } });
 
     satRecs.forEach((satRec, i) => {
       dates.forEach((date, j) => {
@@ -629,6 +982,54 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
     });
   });
 
+  it('SunPositionCalculator returns values close to pure JS implementation', async () => {
+    using bp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator(), new SunPositionCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
+
+    dates.forEach((date, j) => {
+      const jsSunPosition = sunPos(jday(date)).rsun;
+      const wasmSunPosition = bp.getFormattedOutput(0, j)!.sunPosition;
+
+      expect(wasmSunPosition.x).toBeCloseTo(jsSunPosition.x, 11);
+      expect(wasmSunPosition.y).toBeCloseTo(jsSunPosition.y, 11);
+      expect(wasmSunPosition.z).toBeCloseTo(jsSunPosition.z, 11);
+    });
+  });
+
+  it('ShadowFractionCalculator returns values close to pure JS implementation', async () => {
+    using bp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [
+        new EciBaseCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
+      ],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
+    await bp.run();
+
+    satRecs.forEach((satRec, i) => {
+      dates.forEach((date, j) => {
+        const eciResult = propagate(satRec, date);
+        const jsSunPosition = sunPos(jday(date)).rsun;
+        const jsShadowFraction = shadowFraction(jsSunPosition, eciResult!.position);
+        const wasmShadowFraction = bp.getFormattedOutput(i, j)!.shadowFraction;
+
+        expect(wasmShadowFraction).toBeCloseTo(jsShadowFraction, 11);
+      });
+    });
+  });
+
   it('BulkPropagator and Calculators raw results are the same as formatted results', async () => {
     const observerEcf = geodeticToEcf(observerGeodetic);
 
@@ -641,13 +1042,16 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
         new EcfVelocityCalculator(),
         new DopplerFactorCalculator(),
         new LookAnglesCalculator(),
+        new SunPositionCalculator(),
+        new ShadowFractionCalculator(),
       ],
-      satRecs,
+      satRecsCount: satRecs.length,
       datesCount: dates.length,
     });
 
+    bp.setSatRecs(satRecs);
+    bp.setDates(dates);
     await bp.run({
-      dates,
       dopplerFactor: { observer: observerEcf },
       lookAngles: { observer: observerGeodetic },
     });
@@ -684,6 +1088,12 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
       elevation: rawResults.lookAngles[3 * 2 + 1],
       rangeSat: rawResults.lookAngles[3 * 2 + 2],
     });
+    expect(formattedResults.sunPosition).toEqual({
+      x: rawResults.sunPosition[3 * 0],
+      y: rawResults.sunPosition[3 * 0 + 1],
+      z: rawResults.sunPosition[3 * 0 + 2],
+    });
+    expect(formattedResults.shadowFraction).toEqual(rawResults.shadowFraction[2]);
   });
 });
 

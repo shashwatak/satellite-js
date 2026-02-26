@@ -19,7 +19,7 @@ const typescriptConfig = [
   ...configs.base.typescript,
 ];
 
-
+// eslint-disable-next-line import/no-default-export
 export default [
   includeIgnoreFile(gitignorePath),
   ...jsConfig,
@@ -41,7 +41,6 @@ export default [
       'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
       // the first is disabled, and the second covers this
       'default-case': 'off',
-      // '@typescript-eslint/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
       // prefer named exports since they autocomplete and refactor easily
       'import/prefer-default-export': 'off',
       'import/no-default-export': 'error',

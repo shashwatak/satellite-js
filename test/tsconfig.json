@@ -5,10 +5,12 @@
   ],
   "compilerOptions": {
     "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "esnext",
+    "rootDir": "../",
     "paths": {
-      "wasm-module-single-thread/*": ["../wasm-build/debug/*"],
-      "wasm-module-multi-thread/*": ["../wasm-build/debug-pthreads/*"]
+      "wasm-module-single-thread/*": ["../wasm-build/base-debug/*"],
+      "wasm-module-multi-thread/*": ["../wasm-build/pthreads-debug/*"]
     }
   }
 }

@@ -27,10 +27,13 @@ interface WasmModule {
   _free_struct_layout_string(_0: number): void;
   _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
   _calloc_one(_0: number): number;
+  _exit_runtime(): void;
   _compute(_0: number): void;
   _init_satrec_from_tle(_0: number, _1: number, _2: number): void;
   _malloc(_0: number): number;
   _free(_0: number): void;
+  __ZN6__asan9FakeStack17AddrIsInFakeStackEm(_0: number, _1: number): number;
+  __ZN6__asan9FakeStack8AllocateEmmm(_0: number, _1: number, _2: number, _3: number): number;
   ___lsan_do_recoverable_leak_check(): number;
 }
 
