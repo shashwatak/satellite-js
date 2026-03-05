@@ -1,7 +1,7 @@
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { TupleOf } from './tuple-of.js';
 import type { TypedArray } from '../typed-array.js';
-import { RunData } from '../run-data.js';
+import type { RunData } from '../run-data.js';
 
 export interface Calculator<
   Name extends string,

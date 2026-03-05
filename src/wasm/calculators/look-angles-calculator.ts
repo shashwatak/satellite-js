@@ -1,11 +1,9 @@
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { GeodeticLocation, LookAngles } from '../../common-types.js';
 import type { Calculator } from './calculator-interface.js';
-import { RunData } from '../run-data.js';
+import type { RunData } from '../run-data.js';
 
 const OUTPUTS_PER_SATELLITE = 3;
-
-export type LookAnglesFormattedOutput = LookAngles;
 
 /**
  * Calculator for Look Angles (azimuth, elevation, rangeSat).
@@ -19,7 +17,7 @@ export type LookAnglesFormattedOutput = LookAngles;
  *   - `Float64Array`, packed as [az0, el0, range0, az1, el1, range1, ...]
  * for each satellite/date pair
  *
- * Provides formatted output under `lookAngles` property, @see LookAnglesFormattedOutput.
+ * Provides formatted output under `lookAngles` property.
  *
  * @example
  * ```ts
@@ -37,7 +35,7 @@ export type LookAnglesFormattedOutput = LookAngles;
  * bulkPropagator.getFormattedOutput(satelliteIndex, dateIndex).lookAngles.azimuth;
  * ```
  */
-export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPosition'], Float64Array, LookAnglesFormattedOutput, { observer: GeodeticLocation }> {
+export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPosition'], Float64Array, LookAngles, { observer: GeodeticLocation }> {
   readonly name = 'lookAngles';
 
   readonly dependencies: ['ecfPosition'] = ['ecfPosition'];

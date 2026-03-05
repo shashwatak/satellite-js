@@ -1,3 +1,4 @@
+import type { GMSTime } from '../../common-types.js';
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
@@ -9,7 +10,7 @@ import type { Calculator } from './calculator-interface.js';
  *
  * Provides formatted output as a number under `gmst` property.
  */
-export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, number> {
+export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, GMSTime> {
   readonly name = 'gmst';
 
   readonly dependencies: [] = [];
@@ -39,7 +40,7 @@ export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, n
     return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.datesCount);
   }
 
-  getFormattedOutput(_satelliteIndex: number, dateIndex: number): number {
+  getFormattedOutput(_satelliteIndex: number, dateIndex: number): GMSTime {
     return this.getRawOutput()[dateIndex]!;
   }
 

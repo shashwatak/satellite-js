@@ -4,8 +4,6 @@ import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
 
-export type GeodeticPositionFormattedOutput = GeodeticLocation;
-
 /**
  * Calculator for Geodetic position (latitude, longitude, height).
  *
@@ -20,7 +18,7 @@ export type GeodeticPositionFormattedOutput = GeodeticLocation;
  * Provides formatted output under `geodeticPosition` property,
  * @see GeodeticPositionFormattedOutput.
  */
-export class GeodeticPositionCalculator implements Calculator<'geodeticPosition', 2, ['eci', 'gmst'], Float64Array, GeodeticPositionFormattedOutput> {
+export class GeodeticPositionCalculator implements Calculator<'geodeticPosition', 2, ['eci', 'gmst'], Float64Array, GeodeticLocation> {
   readonly name = 'geodeticPosition';
 
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -45,7 +43,7 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): GeodeticPositionFormattedOutput {
+  getFormattedOutput(satelliteIndex: number, dateIndex: number): GeodeticLocation {
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
