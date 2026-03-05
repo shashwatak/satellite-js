@@ -1,4 +1,5 @@
 ---
+sidebar_position: 5
 title: Bulk Propagation API
 description: C++ to WASM compilation of SGP4 and transforms, for fastest performance
 ---
@@ -7,10 +8,9 @@ The **Bulk Propagation API** is a C++ compiled to WASM alternative to pure JS fu
 - propagate an entire satellite catalog for a point in time, as fast as possible (example: sky visualization)
 - propagate a satellite for many points in time (example: trajectory/ephemeris)
 
-It is generally faster, but with fewer capabilities, opt-in alternative to existing pure JS methods.
-It is not intended as a full replacement.
-
-It is currently clocking at ~2x the performance of pure JS functions for a single thread in our benchmarks.
+:::note
+While this API should in general be faster than pure JS alternative, it not necessarily will be for your use case. JS engines are incredibly good at optimization and your JS code, optimized by the engine, can still beat WASM. Please measure the performance difference for your case.
+:::
 
 :::danger
 Classes of this API make use of unmanaged memory, hence you need to manually dispose them (see **[Disposal](#disposal)**
@@ -41,14 +41,15 @@ The **Calculators** represent both SGP4 itself as well as individual transforms 
 
 ### 0. Decide if you need it
 
-This API outperforms pure JS only when counting hundreds of satellite–time pairs at a time.
+This API can outperform pure JS only when counting hundreds of satellite–time pairs at a time.
 It also has a smaller set of possible outputs compared to pure JS.
 
-✅ Use Bulk Propagation API for:
+✅ Bulk Propagation API is best for:
 - Real-time sky simulation, calculating positions of tens of thousands of satellites
 - Trajectory / ephemeris / events such as rise/set times, culmination and passes calculation, with hundreds of time
   points for a number of satellites
-❌ Use pure JS functions and properties for:
+
+❌ Pure JS functions and properties is best for:
 - Calculation for a single satellite and date/time (for example, by clicking a satellite on a sky simulator and displaying
   its properties at the current moment)
 - Calculation of extended properties of a satellite, such as singly averaged mean elements
@@ -56,9 +57,8 @@ It also has a smaller set of possible outputs compared to pure JS.
 ### 1. Choose a Runtime
 
 - **SingleThreadRuntime** is synchronous and does not create any threads. When you run a calculation,
-  it blocks the thread where it was created. Good for smaller batches of calculations, console applications, and environments where
-  [`SharedArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) is not available,
-  where it can still be used in a separate worker.
+  it blocks the thread where it was created. Good for workers, smaller batches of calculations, console applications, and environments where
+  [`SharedArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) is not available.
   An instance of this runtime may support many **BulkPropagator** instances at the same time (but since calculations are blocking,
   only one calculation runs at a time).
 
@@ -112,11 +112,12 @@ Available Calculators:
 - `GeodeticPositionCalculator` calculates geodetic position. This is like `eciToGeodetic()`.
 - `LookAnglesCalculator` calculates Look Angles (azimuth, altitude, range). This is like `ecfToLookAngles()`.
 - `DopplerFactorCalculator` calculates Doppler factor. This is like `dopplerFactor()`.
+- `SunPositionCalculator` calculates the Sun's position in AU (ECI frame). This is like `sunPos()`.
+- `ShadowFractionCalculator` calculates the fraction of the Sun's disc obscured by Earth. This is like `shadowFraction()`.
+
+See [Calculator Reference](calculators.md) for detailed information about each calculator, including raw data layouts and dependency graph.
 
 ### 3. Construct a BulkPropagator
-
-To optimize the hot path, the memory for inputs and outputs is allocated at construction time,
-so you need to know the satellites and the **count** of dates for which you will propagate.
 
 Here's an example with all available calculators. You can use a smaller combination of only the ones you need.
 
@@ -130,6 +131,8 @@ import {
   DopplerFactorCalculator,
   GeodeticPositionCalculator,
   LookAnglesCalculator,
+  SunPositionCalculator,
+  ShadowFractionCalculator,
 } from 'satellite.js';
 
 const satRecs = [json2satrec(omm)];
@@ -145,8 +148,10 @@ using bulkPropagator = new BulkPropagator({
     new DopplerFactorCalculator(),
     new GeodeticPositionCalculator(),
     new LookAnglesCalculator(),
+    new SunPositionCalculator(),
+    new ShadowFractionCalculator(),
   ],
-  satRecs,
+  satRecsCount: satRecs.length,
   datesCount: dates.length,
 });
 ```
@@ -156,11 +161,18 @@ We recommend that you reuse the Runtime and the BulkPropagator instances as much
 the heavy lifting as possible to construction time of these entities, so that the hot path, encompassed in `.run()`, is as light as possible.
 :::
 
-### 4. Run propagation (`run()`)
+### 4. Set satellites, dates, and run propagation (`run()`)
+
+At this point BulPropagator only knows counts of satellites and dates, so let's supply actual data (it may be changed before each propagation):
+
+```ts
+bulkPropagator.setSatRecs(satRecs);
+bulkPropagator.setDates(dates);
+```
+
+Now call `.run()`.
 
 This call is **synchronous** in case of `SingleThreadRuntime`, and **asynchronous** in case of `MultiThreadRuntime`.
-
-Make sure `dates.length` matches the `datesCount` you provided at construction time.
 
 ```ts title="If runtime is SingleThreadRuntime"
 const observerGeodetic = {
@@ -172,7 +184,6 @@ const observerEcf = geodeticToEcf(observerGeodetic);
 
 // highlight-next-line
 bulkPropagator.run({
-  dates,
   dopplerFactor: { observer: observerEcf },
   lookAngles: { observer: observerGeodetic },
 });
@@ -206,6 +217,8 @@ Once the `run()` call completes, you can:
     dopplerFactor,
     geodeticPosition: { latitude, longitude, height },
     lookAngles: { azimuth, elevation, rangeSat },
+    sunPosition: { x: sunX, y: sunY, z: sunZ },
+    shadowFraction,
   } = bulkPropagator.getFormattedOutput(0, 0)!;
   ```
 
@@ -224,8 +237,15 @@ Once the `run()` call completes, you can:
     gmst, // Float64Array
     dopplerFactor, // Float64Array
     lookAngles, // Float64Array
+    sunPosition, // Float64Array
+    shadowFraction, // Float64Array
   } = bulkPropagator.getRawOutput();
   ```
+
+:::warning
+Memory behind outputs is reused for every run. This means that `getRawOutput` and the data behind `TypedArray` is only valid
+before the start of the next `run()` call. 
+:::
 
 ### 6. Disposal {#disposal}
 

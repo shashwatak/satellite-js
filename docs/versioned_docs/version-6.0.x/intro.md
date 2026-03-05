@@ -228,12 +228,5 @@ const longitudeDeg = degreesLong(longitude),
 ## Next steps
 
 Now that you know how to calculate satellite position in different coordinate frames, you can:
-- Get more information about **the satellite and its orbit**: check out `SatRec` interface type,
-which has JSDoc for many properties of a satellite, such as NORAD number, NSSDC ID, epoch,
-and orbit properties such as eccentricity
-- Get more information aimed at **observing the satellite**: calculate sun position and umbra status,
-doppler factor, etc
-- **Propagate tens of thousands of satellites faster** with a performance-tailored `BulkPropagator` API,
-compiled to WASM from C++.
-
-(Links to the docs to be added when the docs are ready)
+- Learn more about **[Coordinate Transforms](transforms.md)**: all available frame conversions and angle helpers
+- Calculate frequency shift for radio communication: **[Doppler Factor](doppler-factor.md)**

@@ -106,7 +106,7 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Docs',
         },
         { to: '/blog', label: 'Blog', position: 'left' },
         { type: 'docsVersionDropdown', position: 'right' },
@@ -124,7 +124,7 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Quick Start',
               to: '/docs/intro',
             },
           ],
