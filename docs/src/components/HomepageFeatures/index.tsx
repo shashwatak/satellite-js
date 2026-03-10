@@ -22,17 +22,6 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: 'Propagate thousands of satellites in milliseconds',
-    // Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
-    description: (
-      <>
-        Propagating the entire catalog is computationally expensive. Satellite.js
-        provides an optional WebAssembly module compiled from optimized C++ for maximum
-        theoretical performance.
-      </>
-    ),
-  },
-    {
     title: 'Coordinate transforms and other utilities',
     // Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
@@ -40,6 +29,17 @@ const FeatureList: FeatureItem[] = [
         Satellite.js also provides functions for coordinate transforms: ECF, Geodetic,
         Look Angles. It also has essentials like Doppler factor calculation, Earth umbra/penumbra
         determination, and more.
+      </>
+    ),
+  },
+  {
+    title: 'Propagate thousands of satellites in milliseconds',
+    // Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    description: (
+      <>
+        Propagating the entire catalog is computationally expensive. Satellite.js
+        provides an optional WebAssembly module compiled from optimized C++ for maximum
+        theoretical performance.
       </>
     ),
   },

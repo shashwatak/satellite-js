@@ -14,7 +14,7 @@ These functions convert satellite state vectors between reference frames.
 - Angles are in **radians** unless stated otherwise
 
 For this reason, the library provides synonyms for
-- `number` type: `Kilometer`, `KilometerPerSecond`, `AU`, `Radians` etc
+- `number` type: `Kilometer`, `AU`, `KilometerPerSecond`, `Radians` etc
 - `{ x: number, y: number, z: number }` type: `EciVec3`, `EcfVec3` etc
 
 They are **not structurally distinct**, they are only here to remind you of units passed around.

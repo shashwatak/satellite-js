@@ -6,8 +6,7 @@ description: Calculate the Sun's geocentric equatorial position
 
 ## Sun position
 
-`sunPos` returns the Sun's geocentric equatorial position vector in **AU** (Astronomical Units),
-plus its right ascension and declination.
+`sunPos` returns the Sun's geocentric equatorial position vector in **AU** (Astronomical Units), plus its right ascension and declination.
 
 ```ts
 import { sunPos, jday } from 'satellite.js';

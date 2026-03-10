@@ -8,9 +8,7 @@ description: Complete reference of all BulkPropagator calculators
 
 This page documents every **Calculator** class available for the [Bulk Propagation API](index.md).
 
-Each calculator represents an output that can be computed in WASM. You pick only the calculators
-you need: less work means faster runs. Calculators have **dependencies** - if a calculator requires
-another one, both must be present in the `calculators` array passed to `BulkPropagator`.
+Each calculator represents an output that can be computed in WASM. You pick only the calculators you need: less work means faster runs. Calculators have **dependencies** - if a calculator requires another one, both must be present in the `calculators` array passed to `BulkPropagator`.
 
 :::tip
 Outputs are packed in [`TypedArray`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) buffers, and indices are always sorted **satellite-first, date-second**: index = `satelliteIndex * datesCount + dateIndex`.
@@ -20,8 +18,7 @@ Outputs are packed in [`TypedArray`](https://developer.mozilla.org/docs/Web/Java
 
 ## `EciBaseCalculator` {#eci}
 
-Runs SGP4 propagation and produces ECI position and velocity vectors.
-This is the WASM equivalent of the pure JS `propagate()`. As the base of calculations, it must be always present.
+Runs SGP4 propagation and produces ECI position and velocity vectors. This is the WASM equivalent of the pure JS `propagate()`. As the base of calculations, it must be always present.
 
 | Property | Value |
 |---|---|
@@ -40,8 +37,7 @@ This is the WASM equivalent of the pure JS `propagate()`. As the base of calcula
 
 ## `GmstCalculator` {#gmst}
 
-Calculates Greenwich Mean Sidereal Time, needed by coordinate-transform calculators.
-WASM equivalent of `gstime()`.
+Calculates Greenwich Mean Sidereal Time, needed by coordinate-transform calculators. WASM equivalent of `gstime()`.
 
 | Property | Value |
 |---|---|

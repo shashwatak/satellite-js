@@ -69,14 +69,10 @@ description: Migrations from v4 to current
     meanElements: MeanElements
   }
   ```
-  Where, if propagation failed, `null` is returned instead of individual keys set to `false`.
-  This should simplify your TypeScript code a bit.
+  Where, if propagation failed, `null` is returned instead of individual keys set to `false`. This should simplify your TypeScript code a bit.
 
-- There were overloads of `gstime` and return types of `sgp4` and `propagate` that were not documented
-  by TypeScript definitions as of v5, but could happen in runtime. If your code doesn't rely on those,
-  or if you use TypeScript and your code compiles with v5, this doesn't impact you.
+- There were overloads of `gstime` and return types of `sgp4` and `propagate` that were not documented by TypeScript definitions as of v5, but could happen in runtime. If your code doesn't rely on those, or if you use TypeScript and your code compiles with v5, this doesn't impact you.
 
 ## v4 to v5
 
-This release aligns the Satellite.js output to official USSF output by fixing errors in calculations
-and using WGS72 instead of WGS84. There are no other changes.
+This release aligns the Satellite.js output to official USSF output by fixing errors in calculations and using WGS72 instead of WGS84. There are no other changes.

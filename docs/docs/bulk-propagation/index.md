@@ -13,8 +13,7 @@ While this API should in general be faster than pure JS alternative, it not nece
 :::
 
 :::danger
-Classes of this API make use of unmanaged memory, hence you need to manually dispose them (see **[Disposal](#disposal)**
-below). If you don't, **your app will leak memory**.
+Classes of this API make use of unmanaged memory, hence you need to manually dispose them (see **[Disposal](#disposal)** below). If you don't, **your app will leak memory**.
 :::
 
 ## Key concepts
@@ -23,62 +22,44 @@ below). If you don't, **your app will leak memory**.
 
 A **Runtime** is an object that encompasses and manages a WASM instance, its creation, and disposal. There are currently two Runtimes:
 - **SingleThreadRuntime**. In this runtime, all SGP4 calculations and transforms happen *in the main thread*, *synchronously*.
-- **MultiThreadRuntime**. Here, the calculations happen *in a set of separate threads*, *asynchronously*. This
-runtime needs [`SharedArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)
-support by your environment (in the context of browsers, the page must be cross-origin isolated and in a secure context).
+- **MultiThreadRuntime**. Here, the calculations happen *in a set of separate threads*, *asynchronously*. This runtime needs [`SharedArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) support by your environment (in the context of browsers, the page must be cross-origin isolated and in a secure context).
 
 ### BulkPropagator
 
-**BulkPropagator** is a class that is your main interface to the API. You pass it a **Runtime**, an array of
-**SatRec** objects, a count of dates for propagation (but not the dates themselves), and an array of **Calculator** instances.
+**BulkPropagator** is a class that is your main interface to the API. You pass it a **Runtime**, estimated **counts of dates and satellites**, and an array of **Calculator** instances.
 
 ### Calculators
 
-One of the vectors to achieve the best performance is to only calculate what's necessary and no more.
-The **Calculators** represent both SGP4 itself as well as individual transforms applied to its outputs.
+One of the vectors to achieve the best performance is to only calculate what's necessary and no more. The **Calculators** represent both SGP4 itself as well as individual transforms applied to its outputs.
 
 ## Usage
 
 ### 0. Decide if you need it
 
-This API can outperform pure JS only when counting hundreds of satellite–time pairs at a time.
-It also has a smaller set of possible outputs compared to pure JS.
+This API can outperform pure JS only when counting hundreds of satellite–time pairs at a time. It also has a smaller set of possible outputs compared to pure JS.
 
 ✅ Bulk Propagation API is best for:
 - Real-time sky simulation, calculating positions of tens of thousands of satellites
-- Trajectory / ephemeris / events such as rise/set times, culmination and passes calculation, with hundreds of time
-  points for a number of satellites
+- Trajectory / ephemeris / events such as rise/set times, culmination and passes calculation, with hundreds of time points for a number of satellites
 
 ❌ Pure JS functions and properties is best for:
-- Calculation for a single satellite and date/time (for example, by clicking a satellite on a sky simulator and displaying
-  its properties at the current moment)
+- Calculation for a single satellite and date/time (for example, by clicking a satellite on a sky simulator and displaying its properties at the current moment)
 - Calculation of extended properties of a satellite, such as singly averaged mean elements
 
 ### 1. Choose a Runtime
 
-- **SingleThreadRuntime** is synchronous and does not create any threads. When you run a calculation,
-  it blocks the thread where it was created. Good for workers, smaller batches of calculations, console applications, and environments where
-  [`SharedArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) is not available.
-  An instance of this runtime may support many **BulkPropagator** instances at the same time (but since calculations are blocking,
-  only one calculation runs at a time).
+- **SingleThreadRuntime** is synchronous and does not create any threads. When you run a calculation, it blocks the thread where it was created. Good for workers, smaller batches of calculations, console applications, and environments where [`SharedArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer) is not available. An instance of this runtime may support many **BulkPropagator** instances at the same time (but since calculations are blocking, only one calculation runs at a time).
 
-- **MultiThreadRuntime** is asynchronous and uses a number of threads which you specify. It does most of the work in the
-  worker threads and doesn't block the main thread. While you may create many **BulkPropagator** instances referencing a single
-  **MultiThreadRuntime**, **you can run only one such instance at a time**. Running more than one on a single Runtime will throw.
+- **MultiThreadRuntime** is asynchronous and uses a number of threads which you specify. It does most of the work in the worker threads and doesn't block the main thread. While you may create many **BulkPropagator** instances referencing a single **MultiThreadRuntime**, **you can run only one such instance at a time**. Running more than one on a single Runtime will throw.
 
 <details>
   <summary>Why only one BulkPropagator per MultiThreadRuntime?</summary>
 
-  In the C++ world, which lies in the WASM instance, a multithreaded run of the propagation is actually synchronous.
-  After the work is spread across threads, there is a `while(true)` loop that checks for threads to finish and if any of them
-  still didn't, it yields to the event loop of the "outside world". In a short while it iterates the loop again and so on.
+  In the C++ world, which lies in the WASM instance, a multithreaded run of the propagation is actually synchronous. After the work is spread across threads, there is a `while(true)` loop that checks for threads to finish and if any of them still didn't, it yields to the event loop of the "outside world". In a short while it iterates the loop again and so on.
 
-  Hence, despite in the JS environment many separate things can happen, in the meantime only one C++ function call is in progress,
-  albeit with interruptions. It is impossible to make another C++ function call before the previous completes.
+  Hence, despite in the JS environment many separate things can happen, in the meantime only one C++ function call is in progress, albeit with interruptions. It is impossible to make another C++ function call before the previous completes.
 
-  The [Stack Switching proposal for WASM](https://github.com/WebAssembly/stack-switching/tree/main), which would allow this by
-  saving a "snapshot" of the stack of currently run function, and resume its execution later, has not yet been implemented.
-  When it reaches wide implementation, and Emscripten makes it available for us, we'll try to get rid of that limitation.
+  The [Stack Switching proposal for WASM](https://github.com/WebAssembly/stack-switching/tree/main), which would allow this by saving a "snapshot" of the stack of currently run function, and resume its execution later, has not yet been implemented. When it reaches wide implementation, and Emscripten makes it available for us, we'll try to get rid of that limitation.
 </details>
 
 Create a SingleThreadRuntime:
@@ -97,12 +78,9 @@ using runtime = await createMultiThreadRuntime({ threadsCount: 4 });
 
 ### 2. Choose Calculators (outputs)
 
-The outputs correspond to **Calculators**. Some Calculators are **dependent on the others**.
-For example, you can't calculate Look Angles without calculating ECF positions first; dependencies must be present in the array of
-Calculators passed to BulkPropagator.
+The outputs correspond to **Calculators**. Some Calculators are **dependent on the others**. For example, you can't calculate Look Angles without calculating ECF positions first; dependencies must be present in the array of Calculators passed to BulkPropagator.
 
-Some Calculators need input parameters. For example, to get Look Angles, you need to provide
-observer coordinates. As these inputs can vary, they are passed at run time, not at construction time.
+Some Calculators need input parameters. For example, to get Look Angles, you need to provide observer coordinates. As these inputs can vary, they are passed at run time, not at construction time.
 
 Available Calculators:
 - `EciBaseCalculator` calculates positions and velocities using SGP4. Also outputs SGP4 errors.
@@ -157,8 +135,7 @@ using bulkPropagator = new BulkPropagator({
 ```
 
 :::tip
-We recommend that you reuse the Runtime and the BulkPropagator instances as much as possible. We have moved as much of
-the heavy lifting as possible to construction time of these entities, so that the hot path, encompassed in `.run()`, is as light as possible.
+We recommend that you reuse the Runtime and the BulkPropagator instances as much as possible. We have moved as much of the heavy lifting as possible to construction time of these entities, so that the hot path, encompassed in `.run()`, is as light as possible.
 :::
 
 ### 4. Set satellites, dates, and run propagation (`run()`)
@@ -202,8 +179,7 @@ await bulkPropagator.run({
 
 Once the `run()` call completes, you can:
 
-- Get the formatted result for a given satellite and date pair with `.getFormattedOutput(satelliteIndex: number, dateIndex: number)`.
-  It returns results depending on what Calculators were passed at construction time, with full TypeScript support.
+- Get the formatted result for a given satellite and date pair with `.getFormattedOutput(satelliteIndex: number, dateIndex: number)`. It returns results depending on what Calculators were passed at construction time, with full TypeScript support.
   ```ts
   const {
     eci: {
@@ -222,9 +198,7 @@ Once the `run()` call completes, you can:
   } = bulkPropagator.getFormattedOutput(0, 0)!;
   ```
 
-- Get raw results as [`TypedArray`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)
-  views into WASM memory. This can be useful for further bulk processing or uploading to WebGL buffers.
-  The docs on Calculators explain how the data is packed in those arrays for each specific calculator.
+- Get raw results as [`TypedArray`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray) views into WASM memory. This can be useful for further bulk processing or uploading to WebGL buffers. The docs on Calculators explain how the data is packed in those arrays for each specific calculator.
   ```ts
   const {
     eci: {
@@ -243,18 +217,14 @@ Once the `run()` call completes, you can:
   ```
 
 :::warning
-Memory behind outputs is reused for every run. This means that `getRawOutput` and the data behind `TypedArray` is only valid
-before the start of the next `run()` call. 
+Memory behind outputs is reused for every run. This means that `getRawOutput` and the data behind `TypedArray` is only valid before the start of the next `run()` call. 
 :::
 
 ### 6. Disposal {#disposal}
 
 Dispose the `BulkPropagator` and the `runtime`. **If you don't, your app will leak memory.**
 
-You might have noticed the [`using`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/using) syntax above. This is
-a part of the Explicit Resource Management proposal, which is getting widely implemented. It allows cleanup of Runtime and BulkPropagator
-as soon as they exit the scope. This is the recommended approach. Node.js supports it; see
-[browser support](https://caniuse.com/wf-explicit-resource-management).
+You might have noticed the [`using`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/using) syntax above. This is a part of the Explicit Resource Management proposal, which is getting widely implemented. It allows cleanup of Runtime and BulkPropagator as soon as they exit the scope. This is the recommended approach. Node.js supports it; see [browser support](https://caniuse.com/wf-explicit-resource-management).
 
 ```ts title="Use the using syntax"
 using runtime = await createSingleThreadRuntime();
@@ -263,7 +233,7 @@ using bulkPropagator = new BulkPropagator(options);
 // disposal methods are automatically called at the end of the scope
 ```
 
-If your environment doesn't support Explicit Resource Management (and you don't use polyfills), you can clean up by calling `.dispose()`:
+If your environment doesn't support Explicit Resource Management and you don't use polyfills, you can clean up by calling `.dispose()`:
 ```ts title="Explicitly call dispose methods"
 const runtime = await createSingleThreadRuntime();
 const bulkPropagator = new BulkPropagator(options);

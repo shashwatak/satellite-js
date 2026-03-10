@@ -12,8 +12,7 @@ This tutorial covers the basic usage of the library:
 
 :::note
 
-For this tutorial it is assumed that you are familiar with the basics of orbital mechanics (what is SGP4)
-and the concept of different orbital coordinate systems (*Earth-Centered Inertial*, *Earth-Centered Fixed* etc).
+For this tutorial it is assumed that you are familiar with the basics of orbital mechanics (what is SGP4) and the concept of different orbital coordinate systems (*Earth-Centered Inertial*, *Earth-Centered Fixed* etc).
 
 Otherwise, please first refer to the following:
 - [TS Kelso's Columns for Satellite Times](https://celestrak.com/columns/), specifically:
@@ -26,23 +25,12 @@ Otherwise, please first refer to the following:
 ## Key concepts
 
 1. Orbital elements formats:
-    - **Two-Line Element Set (TLE)** is an old established format of orbital elements, that usually consists
-    of - funny enough - three lines of text. This is because the first line contains satellite identifiers, and
-    only the following two - hence the "Two-Line" - contain actual parameters of its orbit. It has multiple
-    issues which led to the introduction of OMM.
-    - **Orbit Mean-Elements Message (OMM)** - is a new format of orbital elements. It has no issues of its
-    predecessor, it's more universal and is human-readable.
+    - **Two-Line Element Set (TLE)** is an old established format of orbital elements, that usually consists of - funny enough - three lines of text. This is because the first line contains satellite identifiers, and only the following two - hence the "Two-Line" - contain actual parameters of its orbit. It has multiple issues which led to the introduction of OMM.
+    - **Orbit Mean-Elements Message (OMM)** - is a new format of orbital elements. It has no issues of its predecessor, it's more universal and is human-readable.
 
-    The library supports both TLE and OMM formats of orbital elements, although for new apps,
-    we recommend using OMM. For the OMM format, the library supports **JSON** flavour only.
-2. `SatRec` - is an object that you will get by parsing TLE or OMM. It is complex, but for this tutorial you
-    don't need to do anything with it except passing around to library functions and accessing the `error`
-    property.
-3. Coordinate frames:
-    This tutorial uses *Earth-Centered Inertial (ECI)* and *Earth-Centered Fixed (ECF)* coordinate frames, but
-    you don't need to know exactly how they work. The final step of the tutorial is getting Look Angles of a
-    satellite: its azimuth and elevation in the sky. The other coordinate frames are used only in coordinate
-    transform steps to arrive to Look Angles.
+    The library supports both TLE and OMM formats of orbital elements, although for new apps, we recommend using OMM. For the OMM format, the library supports **JSON** flavour only.
+2. `SatRec` - is an object that you will get by parsing TLE or OMM. It is complex, but for this tutorial you don't need to do anything with it except passing around to library functions and accessing the `error`property.
+3. Coordinate frames: This tutorial uses *Earth-Centered Inertial (ECI)* and *Earth-Centered Fixed (ECF)* coordinate frames, but you don't need to know exactly how they work. The final step of the tutorial is getting Look Angles of a satellite: its azimuth and elevation in the sky. The other coordinate frames are used only in coordinate transform steps to arrive to Look Angles.
 
 ## Get orbital elements
 
@@ -53,19 +41,14 @@ It all starts from orbital elements. Use your favourite source to obtain them; w
 <details>
   <summary>How to obtain OMM as JSON from Celestrak and Space-Track</summary>
 
-  To obtain OMM as JSON from Celestrak, select "JSON" option at the top of "Current GP Element Sets" page or
-  follow [this link](https://celestrak.org/NORAD/elements/index.php?FORMAT=json) where it will be already
-  selected.
+  To obtain OMM as JSON from Celestrak, select "JSON" option at the top of "Current GP Element Sets" page or follow [this link](https://celestrak.org/NORAD/elements/index.php?FORMAT=json) where it will be already selected.
 
-  Space-Track doesn't expose the JSON format in their UI, so to get JSON encoded OMM, on "Recent ELSETs" page,
-  from "Current Catalog Files", copy a URL for the needed category and change the ending part of the URL from
-  `/format/xml` to be `/format/json`.
+  Space-Track doesn't expose the JSON format in their UI, so to get JSON encoded OMM, on "Recent ELSETs" page, from "Current Catalog Files", copy a URL for the needed category and change the ending part of the URL from `/format/xml` to be `/format/json`. If you just need full catalog in JSON format, simply download [this link](https://www.space-track.org/basicspacedata/query/class/gp/EPOCH/%3Enow-30/orderby/NORAD_CAT_ID,EPOCH/format/json) (you have to be logged in).
 </details>
 
 ## Initialize a *SatRec*
 
-A **SatRec** is a container object that holds the information about the satellite orbit, needed for the SGP4.
-For this tutorial you can treat it as a black box, except for the `error` property, which is covered later.
+A **SatRec** is a container object that holds the information about the satellite orbit, needed for the SGP4. For this tutorial you can treat it as a black box, except for the `error` property, which is covered later.
 
 ```js title="Parsing OMM"
 import { json2satrec } from 'satellite.js';
@@ -105,8 +88,7 @@ const satrec = twoline2satrec(tleLine1, tleLine2);
 
 ## Calculate ECI state vector
 
-Given a `SatRec` instance and a moment of time, you can calculate the state vector of the satellite,
-comprising of **position and velocity**, in **Earth-Centered Inertial (ECI)** frame.
+Given a `SatRec` instance and a moment of time, you can calculate the state vector of the satellite, comprising of **position and velocity**, in **Earth-Centered Inertial (ECI)** frame.
 
 :::note
 
@@ -146,8 +128,7 @@ const positionEci = state.position,
       velocityEci = state.velocity;
 ```
 
-Internally `propagate` converts the date to minutes since epoch and then calls `sgp4`,
-however you can call `sgp4` directly as well:
+Internally `propagate` converts the date to minutes since epoch and then calls `sgp4`, however you can call `sgp4` directly as well:
 ```js
 import { sgp4 } from 'satellite.js';
 
@@ -155,13 +136,9 @@ const minutesSinceEpoch = 60;
 const state = sgp4(satrec, minutesSinceEpoch);
 ```
 
-The cases of propagation errors are very rare, thus in practice, if you're propagating
-many satellites, you can simply filter out errored states by `!state` condition, and/or
-errored `SatRec` objects by `.error !== SatRecError.None`.
+The cases of propagation errors are very rare, thus in practice, if you're propagating many satellites, you can simply filter out errored states by `!state` condition, and/or errored `SatRec` objects by `.error !== SatRecError.None`.
 
-The `error` property of a `SatRec` instance is updated every time it is passed to
-a `propagate` or `sgp4` function. This way, it may error at one moment of time, but propagate
-successfully for another.
+The `error` property of a `SatRec` instance is updated every time it is passed to a `propagate` or `sgp4` function. This way, it may error at one moment of time, but propagate successfully for another.
 
 ## Transform the state vector
 
@@ -170,8 +147,7 @@ You can transform the basic ECI position and velocity into:
 - **Geodetic** coordinates: longitude, latitude, height
 - **Look Angles** for an observer: elevation, azimuth, range
 
-For some of the coordinate transforms you will need GMST (see
-[Wiki: Sidereal time](http://en.wikipedia.org/wiki/Sidereal_time#Definition)).
+For some of the coordinate transforms you will need GMST (see [Wiki: Sidereal time](http://en.wikipedia.org/wiki/Sidereal_time#Definition)).
 
 ```js title="Coordinate transforms"
 import {

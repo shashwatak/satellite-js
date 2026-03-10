@@ -6,11 +6,9 @@ description: Calculate the relativistic Doppler factor for a satellite–observe
 
 # Doppler Factor
 
-The `dopplerFactor` function computes the relativistic Doppler ratio for a satellite
-as seen from a ground observer.
+The `dopplerFactor` function computes the relativistic Doppler ratio for a satellite as seen from a ground observer.
 
-A value **less than 1** means the satellite is approaching (frequency shifted higher);
-a value **greater than 1** means it is receding (frequency shifted lower).
+A value **less than 1** means the satellite is approaching (frequency shifted higher); a value **greater than 1** means it is receding (frequency shifted lower).
 
 ```ts
 import { dopplerFactor } from 'satellite.js';
