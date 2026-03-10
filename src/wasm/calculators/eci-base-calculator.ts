@@ -1,14 +1,15 @@
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
-import { SatRecError } from '../../propagation/SatRec.js';
+import type { SatRecError } from '../../propagation/SatRec.js';
 import type { Calculator } from './calculator-interface.js';
-import { RunData } from '../run-data.js';
+import type { RunData } from '../run-data.js';
+import type { EciVec3, Kilometer, KilometerPerSecond } from '../../common-types.js';
 
 const DIMENSIONS = 3;
 const BYTES_PER_VECTOR = DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
 
 export interface EciBaseFormattedOutput {
-  position: { x: number; y: number; z: number };
-  velocity: { x: number; y: number; z: number };
+  position: EciVec3<Kilometer>;
+  velocity: EciVec3<KilometerPerSecond>;
   error: SatRecError;
 }
 

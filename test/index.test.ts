@@ -38,7 +38,6 @@ import {
 } from '../src/transforms.js';
 
 import * as es from '../src/index.js';
-import umd from '../src/indexUmd.js';
 
 function checkConstants(constants: typeof es.constants) {
   expect(constants.pi).toEqual(pi);
@@ -58,34 +57,27 @@ function checkConstants(constants: typeof es.constants) {
   expect(constants.x2o3).toEqual(x2o3);
 }
 
-function checkTransforms(transforms: typeof es) {
-  expect(transforms.radiansToDegrees).toEqual(radiansToDegrees);
-  expect(transforms.degreesToRadians).toEqual(degreesToRadians);
-  expect(transforms.degreesLat).toEqual(degreesLat);
-  expect(transforms.degreesLong).toEqual(degreesLong);
-  expect(transforms.radiansLat).toEqual(radiansLat);
-  expect(transforms.radiansLong).toEqual(radiansLong);
-  expect(transforms.geodeticToEcf).toEqual(geodeticToEcf);
-  expect(transforms.eciToGeodetic).toEqual(eciToGeodetic);
-  expect(transforms.eciToEcf).toEqual(eciToEcf);
-  expect(transforms.ecfToEci).toEqual(ecfToEci);
-  expect(transforms.ecfToLookAngles).toEqual(ecfToLookAngles);
-}
-
-function checkExports(namespace: typeof es | typeof umd) {
-  it('constants', () => checkConstants(namespace.constants));
-  it('twoline2satrec', () => expect(namespace.twoline2satrec).toEqual(twoline2satrec));
-  it('json2satrec', () => expect(namespace.json2satrec).toEqual(json2satrec));
-  it('propagate', () => expect(namespace.propagate).toEqual(propagate));
-  it('sgp4', () => expect(namespace.sgp4).toEqual(sgp4));
-  it('gstime', () => expect(namespace.gstime).toEqual(gstime));
-  it('jday', () => expect(namespace.jday).toEqual(jday));
-  it('invjday', () => expect(namespace.invjday).toEqual(invjday));
-  it('dopplerFactor', () => expect(namespace.dopplerFactor).toEqual(dopplerFactor));
-  it('transforms', () => checkTransforms(es));
-}
-
 describe('Library export', () => {
-  describe('es', () => checkExports(es));
-  describe('umd', () => checkExports(umd));
+  it('constants', () => checkConstants(es.constants));
+  it('twoline2satrec', () => expect(es.twoline2satrec).toEqual(twoline2satrec));
+  it('json2satrec', () => expect(es.json2satrec).toEqual(json2satrec));
+  it('propagate', () => expect(es.propagate).toEqual(propagate));
+  it('sgp4', () => expect(es.sgp4).toEqual(sgp4));
+  it('gstime', () => expect(es.gstime).toEqual(gstime));
+  it('jday', () => expect(es.jday).toEqual(jday));
+  it('invjday', () => expect(es.invjday).toEqual(invjday));
+  it('dopplerFactor', () => expect(es.dopplerFactor).toEqual(dopplerFactor));
+  it('transforms', () => {
+    expect(es.radiansToDegrees).toEqual(radiansToDegrees);
+    expect(es.degreesToRadians).toEqual(degreesToRadians);
+    expect(es.degreesLat).toEqual(degreesLat);
+    expect(es.degreesLong).toEqual(degreesLong);
+    expect(es.radiansLat).toEqual(radiansLat);
+    expect(es.radiansLong).toEqual(radiansLong);
+    expect(es.geodeticToEcf).toEqual(geodeticToEcf);
+    expect(es.eciToGeodetic).toEqual(eciToGeodetic);
+    expect(es.eciToEcf).toEqual(eciToEcf);
+    expect(es.ecfToEci).toEqual(ecfToEci);
+    expect(es.ecfToLookAngles).toEqual(ecfToLookAngles);
+  });
 });

@@ -1,11 +1,8 @@
+import type { AU, EciVec3 } from '../../index.js';
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
-
-export interface SunPositionFormattedOutput {
-  x: number; y: number; z: number
-}
 
 /**
  * Calculator for Sun position in AU (equatorial ECI frame).
@@ -16,9 +13,9 @@ export interface SunPositionFormattedOutput {
  * Raw output format:
  *   - `Float64Array`, packed as [x0, y0, z0, x1, y1, z1, ...] for each date.
  *
- * Provides formatted output under `sunPosition` property, @see SunPositionFormattedOutput.
+ * Provides formatted output under `sunPosition` property.
  */
-export class SunPositionCalculator implements Calculator<'sunPosition', 0, [], Float64Array, SunPositionFormattedOutput> {
+export class SunPositionCalculator implements Calculator<'sunPosition', 0, [], Float64Array, EciVec3<AU>> {
   readonly name = 'sunPosition';
 
   readonly dependencies: [] = [];
@@ -52,7 +49,7 @@ export class SunPositionCalculator implements Calculator<'sunPosition', 0, [], F
     );
   }
 
-  getFormattedOutput(_satelliteIndex: number, dateIndex: number): SunPositionFormattedOutput {
+  getFormattedOutput(_satelliteIndex: number, dateIndex: number): EciVec3<AU> {
     const rawOutput = this.getRawOutput();
     const index = dateIndex * DIMENSIONS;
     return {

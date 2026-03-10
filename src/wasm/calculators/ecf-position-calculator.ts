@@ -1,11 +1,8 @@
+import type { EcfVec3, Kilometer } from '../../index.js';
 import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
-
-export interface EcfPositionFormattedOutput {
-  x: number; y: number; z: number
-}
 
 /**
  * Calculator for ECF (Earth-Centered Fixed) position.
@@ -17,9 +14,9 @@ export interface EcfPositionFormattedOutput {
  * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
  *   - `Float64Array`, packed as [x0, y0, z0, x1, y1, z1, ...] for each satellite/date pair
  *
- * Provides formatted output under `ecfPosition` property, @see EcfPositionFormattedOutput.
+ * Provides formatted output under `ecfPosition` property.
  */
-export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci', 'gmst'], Float64Array, EcfPositionFormattedOutput> {
+export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci', 'gmst'], Float64Array, EcfVec3<Kilometer>> {
   readonly name = 'ecfPosition';
 
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -44,7 +41,7 @@ export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): EcfPositionFormattedOutput {
+  getFormattedOutput(satelliteIndex: number, dateIndex: number): EcfVec3<Kilometer> {
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
