@@ -26,7 +26,7 @@
 
 .heroTitle {
   color: var(--ifm-color-primary-light);
-  background: radial-gradient(circle at right center,#4b296980,#503277 25%,#4a378c,#5340a8 65%,#39327380);
+  background: radial-gradient(circle at right center,#4b296960,#50327760 25%,#4a378c60,#5340a860 65%,#39327360);
   mask-image: radial-gradient(ellipse 50% 50% at center center, #000 30%, #00000080 60%, #0000);
   padding: 2rem;
 }
