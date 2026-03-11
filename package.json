@@ -1,6 +1,6 @@
 {
   "name": "satellite.js",
-  "version": "6.0.2",
+  "version": "7.0.0-rc.0",
   "description": "SGP4/SDP4 calculation library",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
