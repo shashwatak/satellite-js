@@ -12,7 +12,7 @@ import FlyingSatellite from '@site/src/components/HomepageFeatures/FlyingSatelli
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)} style={{position: 'relative', overflow: 'hidden'}}>
+    <header className={clsx('hero hero--primary', styles.heroBanner)} style={{position: 'relative', overflow: 'hidden'}} data-theme="dark">
       <FlyingSatellite />
       <div className="container" style={{zIndex: 2}}>
         <Heading as="h1" className={clsx('hero__title', styles.heroTitle)}>
