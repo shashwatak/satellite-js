@@ -21,7 +21,6 @@
     "copy": "copyfiles -u 1 'dist/**/*' sgp4_verification/lib/sgp4",
     "lint": "eslint",
     "test": "vitest run --project js --project wasm_release --project wasm_debug",
-    "wasm:test": "vitest run --project wasm_release --project wasm_debug",
     "test:catalog": "vitest run --project catalog",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage --project js --project wasm_release --project wasm_debug",
@@ -33,6 +32,7 @@
     "wasm:pthreads:build:release": "mkdirp wasm-build/pthreads-release && em++ src-cpp/common.cpp src-cpp/pthreads.cpp src-cpp/SGP4.cpp -pthread -sASYNCIFY=1 -sPTHREAD_POOL_SIZE_STRICT=0 --emit-tsd index.d.ts -O3 -msimd128 -sEXPORTED_FUNCTIONS=_malloc,_free -sMODULARIZE -sEXPORT_ES6 -sEXPORT_NAME=\"Module\" -sSINGLE_FILE -o wasm-build/pthreads-release/index.js -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize -sALLOW_MEMORY_GROWTH -sEXPORTED_RUNTIME_METHODS=UTF8ToString,stringToUTF8,lengthBytesUTF8,ccall,cwrap,HEAP8,HEAPF64 -sEXIT_RUNTIME=1",
     "wasm:build": "npm run wasm:base:build:debug && npm run wasm:base:build:release && npm run wasm:pthreads:build:debug && npm run wasm:pthreads:build:release",
     "wasm:build:release": "npm run wasm:base:build:release && npm run wasm:pthreads:build:release",
+    "wasm:test": "vitest run --project wasm_release --project wasm_debug",
     "wasm:bench": "vitest bench --run --project wasm_release"
   },
   "repository": {
@@ -64,7 +64,6 @@
     "eslint": "^9.35.0",
     "eslint-config-airbnb-extended": "^2.3.3",
     "mkdirp": "^3.0.1",
-    "raise-version": "^0.5.0",
     "rimraf": "^6.1.2",
     "tsx": "^4.21.0",
     "typescript": "~5.9.2",
