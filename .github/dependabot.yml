@@ -6,3 +6,5 @@ updates:
       interval: "weekly"
     allow:
       - dependency-type: "production"
+    exclude-paths:
+      - "docs/**"
