@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunksatellite_js_docs=self.webpackChunksatellite_js_docs||[]).push([[217],{8379:e=>{e.exports=JSON.parse('{"metadata":{"permalink":"/satellite-js/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
