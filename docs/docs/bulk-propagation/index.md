@@ -140,7 +140,7 @@ We recommend that you reuse the Runtime and the BulkPropagator instances as much
 
 ### 4. Set satellites, dates, and run propagation (`run()`)
 
-At this point BulPropagator only knows counts of satellites and dates, so let's supply actual data (it may be changed before each propagation):
+At this point BulkPropagator only knows counts of satellites and dates, so let's supply actual data (it may be changed before each propagation):
 
 ```ts
 bulkPropagator.setSatRecs(satRecs);

@@ -29,7 +29,7 @@ Otherwise, please first refer to the following:
     - **Orbit Mean-Elements Message (OMM)** - is a new format of orbital elements. It has no issues of its predecessor, it's more universal and is human-readable.
 
     The library supports both TLE and OMM formats of orbital elements, although for new apps, we recommend using OMM. For the OMM format, the library supports **JSON** flavour only.
-2. `SatRec` - is an object that you will get by parsing TLE or OMM. It is complex, but for this tutorial you don't need to do anything with it except passing around to library functions and accessing the `error`property.
+2. `SatRec` - is an object that you will get by parsing TLE or OMM. It is complex, but for this tutorial you don't need to do anything with it except passing around to library functions and accessing the `error` property.
 3. Coordinate frames: This tutorial uses *Earth-Centered Inertial (ECI)* and *Earth-Centered Fixed (ECF)* coordinate frames, but you don't need to know exactly how they work. The final step of the tutorial is getting Look Angles of a satellite: its azimuth and elevation in the sky. The other coordinate frames are used only in coordinate transform steps to arrive to Look Angles.
 
 ## Get orbital elements
