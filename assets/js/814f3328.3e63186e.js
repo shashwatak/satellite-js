@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunksatellite_js_docs=globalThis.webpackChunksatellite_js_docs||[]).push([[472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"WASM: Making the Fastest SGP4 for the web","permalink":"/satellite-js/blog/wasm","unlisted":false,"date":"2026-03-11T00:00:00.000Z"}]}')}}]);

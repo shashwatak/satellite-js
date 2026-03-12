@@ -4,7 +4,7 @@
         <title>🛰️ Satellite.js Blog</title>
         <link>https://shashwatak.github.io/satellite-js/blog</link>
         <description>🛰️ Satellite.js Blog</description>
-        <lastBuildDate>Fri, 29 Aug 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 11 Mar 2026 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
@@ -12,7 +12,7 @@
             <title><![CDATA[WASM: Making the Fastest SGP4 for the web]]></title>
             <link>https://shashwatak.github.io/satellite-js/blog/wasm</link>
             <guid>https://shashwatak.github.io/satellite-js/blog/wasm</guid>
-            <pubDate>Fri, 29 Aug 2025 00:00:00 GMT</pubDate>
+            <pubDate>Wed, 11 Mar 2026 00:00:00 GMT</pubDate>
             <description><![CDATA[If you tried running this, you know the results: slowdowns which are not suitable for realtime applications.]]></description>
             <content:encoded><![CDATA[<div class="language-ts codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-ts codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> now </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token class-name">Date</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> results </span><span class="token operator">=</span><span class="token plain"> entireSatelliteDatabase</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  </span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">map</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">satRec </span><span class="token operator">=&gt;</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">propagate</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">satRec</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> now</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre></div></div>
 <p>If you tried running this, you know the results: slowdowns which are not suitable for realtime applications.</p>
