@@ -167,11 +167,11 @@ export interface SatRec {
   // fractional part is not needed for JS as it's retained in the `jdsatepoch` field
   // jdsatepochF: number;
   /**
-   * Second time derivative of the mean motion (ignored by SGP4).
+   * Second time derivative of the mean motion, in radians/minute^3 (ignored by SGP4).
    */
   nddot: number;
   /**
-   * First time derivative of the mean motion (ignored by SGP4).
+   * First time derivative of the mean motion, in radians/minute^2 (ignored by SGP4).
    */
   ndot: number;
   /**
