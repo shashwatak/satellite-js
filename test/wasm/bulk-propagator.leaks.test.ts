@@ -33,10 +33,10 @@ describe('BulkPropagator memory disposal', () => {
       });
       bp.setSatRecs([sat]);
       bp.setDates(dates);
+      expect(runtime.module.___lsan_do_recoverable_leak_check()).not.toBe(0);
       bp.run();
       const out = bp.getFormattedOutput(0, 0)!.eci;
       expect(out).toHaveProperty('position');
-      expect(runtime.module.___lsan_do_recoverable_leak_check()).not.toBe(0);
     }
 
     expect(runtime.module.___lsan_do_recoverable_leak_check()).toBe(0);

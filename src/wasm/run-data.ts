@@ -48,13 +48,17 @@ export interface RunData {
   shadowFractionValues: number;
 }
 
+export function allocateRunData(module: WasmModuleBase): number {
+  const runDataSize = module._get_rundata_size();
+  return module._calloc_one(runDataSize);
+} 
+
 export function passRunDataToWasm(
   module: WasmModuleBase,
   runDataStruct: NativeStructLayout<keyof RunData>,
   runData: RunData,
+  runDataPointer: number,
 ): number {
-  const runDataSize = module._get_rundata_size();
-  const runDataPointer = module._calloc_one(runDataSize);
   const writer = new CppMemoryWriter(module.HEAP8.buffer, runDataPointer);
   Object.entries(runData).forEach(([fieldName, value]) => {
     const fieldLayout = runDataStruct.get(fieldName as keyof RunData);

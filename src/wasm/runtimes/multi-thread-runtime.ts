@@ -21,17 +21,16 @@ export async function createMultiThreadRuntimeFromModule(
     => Promise<number> = wasmModule.cwrap('compute', 'number', ['number', 'number'], { async: true });
   let isRunning = false;
 
-  const compute = async (runData: RunData) => {
+  const compute = async (runData: RunData, runDataPointer: number) => {
     if (isRunning) {
       throw new Error('Cannot run multiple computations in parallel on the same WASM runtime. Make sure to await for the previous computation to finish before starting a new one.');
     }
     isRunning = true;
-    const runDataPointer = passRunDataToWasm(wasmModule, runDataLayout, runData);
+    passRunDataToWasm(wasmModule, runDataLayout, runData, runDataPointer);
     try {
       await originalCompute(options.threadsCount, runDataPointer);
     } finally {
       isRunning = false;
-      wasmModule._free(runDataPointer);
     }
   };
 

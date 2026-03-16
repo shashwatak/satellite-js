@@ -5,7 +5,7 @@ import type { TypedArray } from './typed-array.js';
 import { topologicalSort } from './toposort.js';
 import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from './elsetrec-struct.js';
 import { allocateDatesArray, writeDatesArray } from './date-to-wasm.js';
-import { RunData } from './run-data.js';
+import { allocateRunData, RunData } from './run-data.js';
 import { MultiThreadRuntime, WasmRuntime } from './runtimes/wasm-runtime.js';
 
 export type CalculatorsToFormattedOutput<
@@ -140,6 +140,8 @@ export class BulkPropagator<
 
   private readonly runtime: Runtime;
 
+  private readonly runDataPointer: number;
+
   private outputPointer: number;
 
   private allocatedOutputSizeBytes: number;
@@ -219,6 +221,8 @@ export class BulkPropagator<
       const calculator = calculators.find((calc) => calc.name === name);
       return calculator;
     }) as unknown as Calculators;
+
+    this.runDataPointer = allocateRunData(runtime.module);
 
     this.allocatedOutputSizeBytes = this.computeTotalOutputSizeBytes(satRecsCount, datesCount);
     this.outputPointer = runtime.module._malloc(this.allocatedOutputSizeBytes);
@@ -400,7 +404,7 @@ export class BulkPropagator<
 
     this.isRunning = true;
 
-    const result = this.runtime.compute(runData);
+    const result = this.runtime.compute(runData, this.runDataPointer);
 
     if (result instanceof Promise) {
       this.runCompletionPromise = result.finally(() => {
@@ -535,6 +539,7 @@ export class BulkPropagator<
     const freeMemory = () => {
       this.runtime.module._free(this.satrecsPointer);
       this.runtime.module._free(this.datesPointer);
+      this.runtime.module._free(this.runDataPointer);
       this.runtime.module._free(this.outputPointer);
     };
 

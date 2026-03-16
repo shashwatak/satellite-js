@@ -14,13 +14,9 @@ export async function createSingleThreadRuntimeFromModule(
   );
   wasmModule._free(runDataStructLayoutStringPointer);
 
-  const compute = (runData: RunData) => {
-    const runDataPointer = passRunDataToWasm(wasmModule, runDataLayout, runData);
-    try {
-      wasmModule._compute(runDataPointer);
-    } finally {
-      wasmModule._free(runDataPointer);
-    }
+  const compute = (runData: RunData, runDataPointer: number) => {
+    passRunDataToWasm(wasmModule, runDataLayout, runData, runDataPointer);
+    wasmModule._compute(runDataPointer);
   };
 
   return {
