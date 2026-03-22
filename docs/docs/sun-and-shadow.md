@@ -12,6 +12,8 @@ These functions let you determine whether a satellite is in sunlight, penumbra, 
 
 `sunPos` returns the Sun's geocentric equatorial position vector in **AU** (Astronomical Units), plus its right ascension and declination.
 
+This is a fast but low precision function: it has accuracy of apparent coordinates is 0.01 degrees for years between 1950 and 2050.
+
 ```ts
 import { sunPos, jday } from 'satellite.js';
 
@@ -25,6 +27,8 @@ const { rsun, rtasc, decl } = sunPos(jd);
 ## Shadow fraction
 
 `shadowFraction` computes what fraction of the Sun's disc is obscured by the Earth as seen from the satellite.
+
+This function considers Earth a sphere with radius of 6378.135 km.
 
 ```ts
 import { shadowFraction } from 'satellite.js';
