@@ -49,18 +49,6 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          lastVersion: '6.0.x',
-          versions: {
-            '6.0.x': {
-              label: 'v6 - stable',
-              banner: 'none',
-            },
-            current: {
-              label: 'v7 - release candidate',
-              path: 'v7',
-              banner: 'unreleased',
-            }
-          }
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -97,9 +85,9 @@ const config: Config = {
       defaultMode: 'dark'
     },
     navbar: {
-      title: '🛰️ satellite.js',
+      title: '🛰️ Satellite.js',
       // logo: {
-      //   alt: 'satellite.js Logo',
+      //   alt: 'Satellite.js Logo',
       //   src: 'img/logo.svg',
       // },
       items: [
@@ -110,7 +98,7 @@ const config: Config = {
           label: 'Docs',
         },
         { to: '/blog', label: 'Blog', position: 'left' },
-        { type: 'docsVersionDropdown', position: 'right' },
+        // { type: 'docsVersionDropdown', position: 'right' },
         {
           href: 'https://github.com/shashwatak/satellite-js',
           label: 'GitHub',
@@ -130,15 +118,6 @@ const config: Config = {
             },
           ],
         },
-        // {
-        //   title: 'Community',
-        //   items: [
-        //     {
-        //       label: 'Stack Overflow',
-        //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-        //     },
-        //   ],
-        // },
         {
           title: 'More',
           items: [
