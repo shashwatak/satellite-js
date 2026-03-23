@@ -6,14 +6,16 @@ description: Transform between ECI, ECF, geodetic, and look-angle coordinate fra
 
 # Coordinate Transforms
 
-These functions convert satellite state vectors between reference frames.
+These functions implement reference frame and unit conversions.
 
 :::tip Units
+Usually:
+
 - Positions, ranges, and heights are in **km**
 - Velocities are in **km/s**
-- Angles are in **radians** unless stated otherwise
+- Angles are in **radians**
 
-For this reason, the library provides synonyms for
+The library provides synonyms for
 - `number` type: `Kilometer`, `AU`, `KilometerPerSecond`, `Radians` etc
 - `{ x: number, y: number, z: number }` type: `EciVec3`, `EcfVec3` etc
 

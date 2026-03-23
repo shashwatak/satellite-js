@@ -97,8 +97,6 @@ The units of measurement are as follows:
 - Velocity vectors are in *km/s*
 - Angles are measured in *radians*
 
-This is true across the entire library.
-
 :::
 
 ECI frame is the base frame for all further coordinate transforms.

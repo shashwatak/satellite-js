@@ -9,7 +9,7 @@ The code is split into the following files:
 - `common.cpp` contains code common for all compilations
 - `base.cpp` contains code specific to base compilation
 - `pthreads.cpp` contains code for pthreads compilation
-- `SGP4.cpp` and `SGP4.h` are reference code of SGP4 algorithm by David Vallado. Since satellite.js can use SGP4 with changes and optimizations,
+- `SGP4.cpp` and `SGP4.h` are reference code of SGP4 algorithm by David Vallado. Since Satellite.js can use SGP4 with changes and optimizations,
 the original is there to compare against.
 
 There is also a separate `debug.cpp` file. It is compiled only for debug build, since it's needed for tests but NOT
