@@ -74,13 +74,15 @@ export function eciToGeodetic(eci: EciVec3<Kilometer>, gmst: GMSTime): GeodeticL
   const f = (a - b) / a;
   const e2 = ((2 * f) - (f * f));
 
-  let longitude = Math.atan2(eci.y, eci.x) - gmst;
-  while (longitude < -pi) {
-    longitude += twoPi;
-  }
-  while (longitude > pi) {
-    longitude -= twoPi;
-  }
+  // the one-liner below is an alternative to the loops approach used originally:
+  // let longitude = Math.atan2(eci.y, eci.x) - gmst;
+  // while (longitude < -pi) {
+  //   longitude += twoPi;
+  // }
+  // while (longitude > pi) {
+  //   longitude -= twoPi;
+  // }
+  const longitude = ((((Math.atan2(eci.y, eci.x) - gmst + pi) % twoPi) + twoPi) % twoPi) - pi;
 
   const kmax = 20;
   let k = 0;

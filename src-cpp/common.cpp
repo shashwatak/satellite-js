@@ -616,14 +616,7 @@ void calculate_geodetic_positions(
       int position_index = (i * dates_count + j) * 3;
       double R = sqrt((eci_positions[position_index] * eci_positions[position_index]) + (eci_positions[position_index + 1] * eci_positions[position_index + 1]));
       double longitude = atan2(eci_positions[position_index + 1], eci_positions[position_index]) - gmst_values[j];
-      while (longitude < -pi)
-      {
-        longitude += pi * 2;
-      }
-      while (longitude > pi)
-      {
-        longitude -= pi * 2;
-      }
+      longitude = remainder(longitude, 2 * pi);
 
       int kmax = 20,
           k = 0;
