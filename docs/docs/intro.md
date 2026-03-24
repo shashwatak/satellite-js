@@ -134,7 +134,7 @@ const minutesSinceEpoch = 60;
 const state = sgp4(satrec, minutesSinceEpoch);
 ```
 
-The cases of propagation errors are very rare, thus in practice, if you're propagating many satellites, you can simply filter out errored states by `!state` condition, and/or errored `SatRec` objects by `.error !== SatRecError.None`.
+For a full catalog propagation run at a given date, **there will always be some errored satellites**, so you need to handle that case. In practice, if you're propagating many satellites, for example to visualise the sky, you can simply filter out errored states by `!state` condition.
 
 The `error` property of a `SatRec` instance is updated every time it is passed to a `propagate` or `sgp4` function. This way, it may error at one moment of time, but propagate successfully for another.
 
