@@ -50,7 +50,7 @@ It all starts from orbital elements. Use your favourite source to obtain them; w
 
 A **SatRec** is a container object that holds the information about the satellite orbit, needed for the SGP4. For this tutorial you can treat it as a black box, except for the `error` property, which is covered later.
 
-```js title="Parsing OMM"
+```ts title="Parsing OMM"
 import { json2satrec } from 'satellite.js';
 
 // Sample OMM
@@ -77,7 +77,7 @@ const omm = {
 const satrec = json2satrec(omm);
 ```
 
-```js title="Parsing TLE"
+```ts title="Parsing TLE"
 import { twoline2satrec } from 'satellite.js';
 // Sample TLE
 const tleLine1 = '1 25544U 98067A   19156.50900463  .00003075  00000-0  59442-4 0  9992',
@@ -101,7 +101,7 @@ The units of measurement are as follows:
 
 ECI frame is the base frame for all further coordinate transforms.
 
-```js
+```ts
 import { propagate, SatRecError } from 'satellite.js';
 
 // you can propagate using a JS Date...
@@ -127,7 +127,7 @@ const positionEci = state.position,
 ```
 
 Internally `propagate` converts the date to minutes since epoch and then calls `sgp4`, however you can call `sgp4` directly as well:
-```js
+```ts
 import { sgp4 } from 'satellite.js';
 
 const minutesSinceEpoch = 60;
@@ -147,7 +147,7 @@ You can transform the basic ECI position and velocity into:
 
 For some of the coordinate transforms you will need GMST (see [Wiki: Sidereal time](http://en.wikipedia.org/wiki/Sidereal_time#Definition)).
 
-```js title="Coordinate transforms"
+```ts title="Coordinate transforms"
 import {
   gstime,
   degreesToRadians, radiansToDegrees, degreesLong, degreesLat,

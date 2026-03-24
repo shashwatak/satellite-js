@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 7
 title: Bulk Propagation API
 description: C++ to WASM compilation of SGP4 and transforms, for fastest performance
 ---

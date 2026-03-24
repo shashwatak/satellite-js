@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 8
 title: Calculator Reference
 description: Complete reference of all BulkPropagator calculators
 ---

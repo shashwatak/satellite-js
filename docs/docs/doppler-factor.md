@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 6
 title: Doppler Factor
 description: Calculate the relativistic Doppler factor for a satellite–observer pair
 ---

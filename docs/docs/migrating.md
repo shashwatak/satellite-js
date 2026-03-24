@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 9
 title: Migrating
 description: Migrations from v4 to current
 ---
