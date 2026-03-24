@@ -1,5 +1,5 @@
 ---
-sidebar_position: 8
+sidebar_position: 10
 title: Contributing
 description: Guide for contributors
 ---
@@ -15,6 +15,12 @@ Make sure that your changes don't break the existing code by running
 
 ```bash
 npm test
+```
+
+If you have made changes to SGP4 algorithm, also check the full catalog run:
+
+```bash
+npm run test:catalog
 ```
 
 In order to get test code coverage run the following:
@@ -45,6 +51,8 @@ The source code is written in [TypeScript](https://www.typescriptlang.org/) and 
 In order to build the library follow these steps:
 
 - install [Node.js](https://nodejs.org/) and [Node Package Manager](https://www.npmjs.com/);
+
+- install Emscripten using [Emscripten SDK](https://emscripten.org/docs/tools_reference/emsdk.html);
 
 - install all required packages with NPM by running the following command from repository's root directory:
 
@@ -144,10 +152,7 @@ The WASM code is compiled into four variants:
 
 ## TypeScript Conventions
 
-The project uses the strictest TypeScript configuration. Key settings:
-
-- `strict: true` with all additional strict flags enabled (`exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, etc.)
-- target: `ES2022`
+The project uses the strictest TypeScript configuration. It uses `strict: true` with many additional strict flags enabled (`exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` etc.)
 
 ### Type System
 
@@ -167,15 +172,15 @@ export interface EcfVec3<T> { x: T; y: T; z: T; }
 
 ## Linting
 
-ESLint is configured with `eslint-config-airbnb-extended` (the Airbnb style guide). Notable project-specific overrides:
+ESLint is configured with `eslint-config-airbnb-extended` (the Airbnb style guide). There are some project-specific overrides:
 
 - **`no-param-reassign`**: Allowed for `satrec` properties, because `sgp4` and `sgp4init` extensively mutate the satellite record.
 - **`no-underscore-dangle`**: Turned off, since Emscripten exports C++ functions with leading underscores (e.g. `_malloc`, `_free`).
 - **`import/no-default-export`**: Default exports are **not allowed**. Use named exports, which autocomplete and refactor more easily.
-- **`no-restricted-syntax`**: `for...of` loops are allowed (unlike vanilla Airbnb) since they are used for performance.
+- **`no-restricted-syntax`**: `for...of` loops are allowed (unlike vanilla Airbnb) as they are used for performance.
 - **`no-plusplus`**: `++` is allowed in for-loop afterthoughts.
 
-Linting ignores `sgp4_verification/`, `wasm-build/`, `docs/`, and config files.
+Linting ignores `wasm-build/`, `docs/`, and config files.
 
 ## Testing
 
