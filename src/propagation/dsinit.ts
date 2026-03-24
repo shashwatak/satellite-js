@@ -3,7 +3,7 @@ import {
   twoPi,
   xke,
   x2o3,
-} from '../constants';
+} from '../constants.js';
 
 interface DsinitOptions {
   cosim: number;
@@ -158,7 +158,7 @@ interface DsinitOptions {
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function dsinit(options: DsinitOptions) {
+export function dsinit(options: DsinitOptions) {
   const {
     cosim,
     argpo,
@@ -275,7 +275,7 @@ export default function dsinit(options: DsinitOptions) {
   const root22 = 1.7891679e-6;
   const root44 = 7.3636953e-9;
   const root54 = 2.1765803e-9;
-  // eslint-disable-next-line no-loss-of-precision
+  // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const root32 = 3.7393792e-7;
   const root52 = 1.1428639e-7;

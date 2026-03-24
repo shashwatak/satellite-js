@@ -27,13 +27,14 @@ export enum SatRecError {
 }
 
 /**
- * A structure that contains all the information needed to propagate a satellite's orbit using the SGP4 model.
- * 
+ * A structure that contains all the information needed to propagate
+ * a satellite's orbit using the SGP4 model.
+ *
  * Mostly you can consider it opaque as you only need to pass it to `propagate` function.
  * All properties should be considered read-only as they're used and set by SGP4 model internally.
- * 
- * This interface is a direct translation of C++ struct `elsetrec` from the source code by David Vallado;
- * all changes to the original struct are documented.
+ *
+ * This interface is a direct translation of C++ struct `elsetrec`
+ * from the source code by David Vallado; all changes to the original struct are documented.
  */
 export interface SatRec {
   /**
@@ -166,11 +167,11 @@ export interface SatRec {
   // fractional part is not needed for JS as it's retained in the `jdsatepoch` field
   // jdsatepochF: number;
   /**
-   * Second time derivative of the mean motion (ignored by SGP4).
+   * Second time derivative of the mean motion, in radians/minute^3 (ignored by SGP4).
    */
   nddot: number;
   /**
-   * First time derivative of the mean motion (ignored by SGP4).
+   * First time derivative of the mean motion, in radians/minute^2 (ignored by SGP4).
    */
   ndot: number;
   /**
@@ -203,11 +204,11 @@ export interface SatRec {
    * Mean motion in radians per minute.
    */
   no: number;
-  
+
   // sgp4fix add unkozai'd variable
   // not used by the library
   // no_unkozai: number;
-  
+
   // sgp4fix add singly averaged variables
   // this is instead returned in propagation results
   // am: number;
@@ -220,18 +221,18 @@ export interface SatRec {
 }
 
 export type SatRecInit = Pick<SatRec,
-  "error" |
-  "satnum" |
-  "epochyr" |
-  "epochdays" |
-  "ndot" |
-  "nddot" |
-  "bstar" |
-  "inclo" |
-  "nodeo" |
-  "ecco" |
-  "argpo" |
-  "mo" |
-  "no" |
-  "jdsatepoch"
+  'error' |
+  'satnum' |
+  'epochyr' |
+  'epochdays' |
+  'ndot' |
+  'nddot' |
+  'bstar' |
+  'inclo' |
+  'nodeo' |
+  'ecco' |
+  'argpo' |
+  'mo' |
+  'no' |
+  'jdsatepoch'
 >

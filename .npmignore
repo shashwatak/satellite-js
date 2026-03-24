@@ -1,9 +1,9 @@
 .idea
 commands
 coverage
-compiled
 sgp4_verification
 src
+src-cpp
 test
 .babelrc
 .eslintignore
@@ -11,6 +11,12 @@ test
 .npmignore
 .raiseverrc
 .travis.yml
+.github
+.vscode
 copyright-template.txt
 rollup.*
 *.log
+docs
+wasm-build/base-debug
+wasm-build/pthreads-debug
+vitest.config.ts

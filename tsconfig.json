@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
@@ -16,12 +18,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
-    "declarationDir": "./types",
-    "outDir": "./compiled",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "lib": ["ES2022"]
   },
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Strictest (minus esModuleInterop)",
   "include": [
-    "src/**.ts",
+    "src/**/*.ts"
   ],
 }

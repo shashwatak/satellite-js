@@ -2,9 +2,9 @@ import { GMSTime } from '../common-types.js';
 import {
   deg2rad,
   twoPi,
-} from '../constants';
+} from '../constants.js';
 
-import { jday } from '../ext';
+import { jday } from '../ext.js';
 
 /* -----------------------------------------------------------------------------
  *
@@ -47,33 +47,31 @@ function gstimeInternal(jdut1: number) {
   return temp;
 }
 
-function gstime(jd: number): GMSTime;
-function gstime(date: Date): GMSTime;
-function gstime(
-  year: number, 
-  month: number, 
-  day: number, 
-  hour: number, 
-  minute: number, 
-  second: number, 
+export function gstime(jd: number): GMSTime;
+export function gstime(date: Date): GMSTime;
+export function gstime(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  second: number,
   millisecond?: number
 ): GMSTime;
-function gstime(
+export function gstime(
   first: Date | number,
   month?: number,
   day?: number,
   hour?: number,
   minute?: number,
   second?: number,
-  millisecond?: number
+  millisecond?: number,
 ): GMSTime {
   if (first instanceof Date) {
     return gstimeInternal(jday(first));
-  } else if (month !== undefined) {
-    return gstimeInternal(jday(first, month, day!, hour!, minute!, second!, millisecond));
-  } else {
-    return gstimeInternal(first);
   }
+  if (month !== undefined) {
+    return gstimeInternal(jday(first, month, day!, hour!, minute!, second!, millisecond));
+  }
+  return gstimeInternal(first);
 }
-
-export default gstime;

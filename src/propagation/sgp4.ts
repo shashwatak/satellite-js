@@ -8,10 +8,10 @@ import {
   j2,
   j3oj2,
   x2o3,
-} from '../constants';
+} from '../constants.js';
 
-import dpper from './dpper';
-import dspace from './dspace';
+import { dpper } from './dpper.js';
+import { dspace } from './dspace.js';
 import { SatRec, SatRecError } from './SatRec.js';
 
 /*----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ import { SatRec, SatRecError } from './SatRec.js';
  *    hoots, schumacher and glover 2004
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
-export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocity | null {
+export function sgp4(satrec: SatRec, tsince: number): PositionAndVelocity | null {
   let coseo1;
   let sineo1;
   let cosip;
@@ -256,13 +256,13 @@ export default function sgp4(satrec: SatRec, tsince: number): PositionAndVelocit
   mm = (xlm - argpm - nodem) % twoPi;
 
   const meanElements = {
-    am: am,
-    em: em,
+    am,
+    em,
     im: inclm,
     Om: nodem,
     om: argpm,
-    mm: mm,
-    nm: nm,
+    mm,
+    nm,
   };
 
   // ----------------- compute extra mean quantities -------------
