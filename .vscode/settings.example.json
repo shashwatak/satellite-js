@@ -1,8 +1,4 @@
 {
-  "C_Cpp.intelliSenseEngine": "default",
-  "C_Cpp.default.includePath": [
-    "path_to_emsdk/upstream/emscripten/system/**"
-  ],
   "debug.allowBreakpointsEverywhere": true,
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  "js/ts.tsdk.path": "node_modules\\typescript\\lib"
 }

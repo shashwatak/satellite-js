@@ -2,11 +2,7 @@
     "configurations": [
         {
             "name": "Win32",
-            "includePath": [
-                "${workspaceFolder}",
-                "path_to_emsdk/upstream/emscripten/system/include/**",
-                "path_to_emsdk/upstream/lib/clang/21/include/**"
-            ],
+            "includePath": ["${workspaceFolder}"],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
