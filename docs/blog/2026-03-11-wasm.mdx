@@ -18,13 +18,11 @@ This is where we went for a mission to make the **fastest theoretically possible
 
 ## Background
 
-The Satellite.js library has originally started as a port of the [Python sgp4 library](https://pypi.org/project/sgp4/), which in turn has its roots in [the C++ code by David Vallado](https://github.com/CelesTrak/fundamentals-of-astrodynamics).
-
-My idea of trying out WASM on this library has been lingering from around 2023 - pretty much the very moment I found out about the library. The library is pure calculations - and it's exactly one of the main use cases for WASM.
+The Satellite.js library has originally started as a port of the [Python sgp4 library](https://pypi.org/project/sgp4/), which in turn has its roots in [the C++ code by David Vallado](https://github.com/CelesTrak/fundamentals-of-astrodynamics). The library is pure calculations - and it's exactly one of the main use cases for WASM.
 
 ## Prior art
 
-I was not the first person with this idea, however. I know of 2 previous attempts to make SGP4 on WASM, one of which was never open-sourced, and the second, Rust-based, was apparently abandoned a few years ago due to the worse performance than expected.
+There were at least 2 previous attempts to make SGP4 on WASM, one of which was never open-sourced, and the second, Rust-based, was apparently abandoned a few years ago due to the worse performance than expected.
 
 One of the hard parts about WASM is: **you can only pass numbers between WASM and JS**. You can't simply pass Objects and Arrays between the JS and the WebAssembly worlds with no overhead.
 
