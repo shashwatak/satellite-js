@@ -4,7 +4,7 @@ import { jday } from '../ext.js';
 import { sgp4 } from './sgp4.js';
 import { SatRec } from './SatRec.js';
 
-export function propagate (satrec: SatRec, date: Date): PositionAndVelocity;
+export function propagate (satrec: SatRec, date: Date): PositionAndVelocity | null;
 export function propagate (
   satrec: SatRec,
   year: number,
@@ -14,7 +14,7 @@ export function propagate (
   minute: number,
   second: number,
   ms?: number
-): PositionAndVelocity;
+): PositionAndVelocity | null;
 export function propagate(
   satrec: SatRec,
   ...jdayArgs: [Date] | [number, number, number, number, number, number, (number | undefined)?]
