@@ -118,7 +118,6 @@ Requires observer geodetic coordinates at run time.
 **Run-time usage:**
 ```ts
 bulkPropagator.run({
-  dates,
   lookAngles: {
     observer: {
       latitude: degreesToRadians(41),
@@ -156,7 +155,6 @@ const observerGeodetic = {
 };
 
 bulkPropagator.run({
-  dates,
   dopplerFactor: {
     observer: geodeticToEcf(observerGeodetic),
   },

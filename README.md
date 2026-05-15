@@ -27,6 +27,7 @@ npm install satellite.js
 ## Sample Usage: calculate Look Angles, Geodetic Position etc
     
 ```js
+// of course you would only import what you need; namespace import is here just for brevity
 import * as satellite from 'satellite.js';
 
 // Sample TLE

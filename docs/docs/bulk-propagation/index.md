@@ -169,7 +169,6 @@ bulkPropagator.run({
 ```ts title="If runtime is MultiThreadRuntime"
 // highlight-next-line
 await bulkPropagator.run({
-  dates,
   dopplerFactor: { observer: observerEcf },
   lookAngles: { observer: observerGeodetic },
 });
