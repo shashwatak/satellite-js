@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.0.1 (2026-05-15)
+
+- Fix: `propagate` function did not have a `null` return type in its overloads.
+
 ## 7.0.0 (2026-03-24)
 
 - Feature: [Official docs site](https://shashwatak.github.io/satellite-js/). Because of that, Readme is now more concise.
