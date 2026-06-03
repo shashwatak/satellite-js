@@ -57,10 +57,27 @@ import { sgp4init } from './propagation/sgp4init.js';
  * `sgp4.propagation.wgs84` - More recent WGS 84 model
  * `sgp4.propagation.wgs72old` - Legacy support for old SGP4 behavior
  *
- * Normally, computations are made using letious recent improvements
+ * Normally, computations are made using various recent improvements
  * to the algorithm.  If you want to turn some of these off and go
  * back into "afspc" mode, then set `afspc_mode` to `True`.
  */
+
+function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i') {
+  sgp4init(satrec, {
+    opsmode,
+    satn: satrec.satnum,
+    epoch: satrec.jdsatepoch - 2433281.5,
+    xbstar: satrec.bstar,
+    xecco: satrec.ecco,
+    xargpo: satrec.argpo,
+    xinclo: satrec.inclo,
+    xmo: satrec.mo,
+    xno: satrec.no,
+    xnodeo: satrec.nodeo,
+  });
+}
+
+
 export function twoline2satrec(longstr1: string, longstr2: string) {
   const opsmode = 'i';
   const error = 0;
@@ -128,20 +145,8 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
     jdsatepoch,
   };
 
-  //  ---------------- initialize the orbit at sgp4epoch -------------------
-  sgp4init(satrec, {
-    opsmode,
-    satn: satrec.satnum,
-    epoch: satrec.jdsatepoch - 2433281.5,
-    xbstar: satrec.bstar,
-    xecco: satrec.ecco,
-    xargpo: satrec.argpo,
-    xinclo: satrec.inclo,
-    xmo: satrec.mo,
-    xno: satrec.no,
-    xnodeo: satrec.nodeo,
-  });
-
+  //  ---------------- initialize SGP4 model -------------------
+  initSatrec(satrec, opsmode);
   return satrec;
 }
 
@@ -242,19 +247,7 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
     jdsatepoch,
   };
 
-  //  ---------------- initialize the orbit at sgp4epoch -------------------
-  sgp4init(satrec, {
-    opsmode,
-    satn: satrec.satnum,
-    epoch: satrec.jdsatepoch - 2433281.5,
-    xbstar: satrec.bstar,
-    xecco: satrec.ecco,
-    xargpo: satrec.argpo,
-    xinclo: satrec.inclo,
-    xmo: satrec.mo,
-    xno: satrec.no,
-    xnodeo: satrec.nodeo,
-  });
-
+  //  ---------------- initialize SGP4 model -------------------
+  initSatrec(satrec, opsmode);
   return satrec;
 }
