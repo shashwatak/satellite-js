@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Test: Add unit tests for `sunPos` and `shadowFraction`.
+
 ## 7.0.1 (2026-05-15)
 
 - Fix: `propagate` function did not have a `null` return type in its overloads.
