@@ -22,6 +22,8 @@ import { twoline2satrec, json2satrec } from '../src/io.js';
 import { propagate, sgp4, gstime } from '../src/propagation.js';
 
 import { dopplerFactor } from '../src/dopplerFactor.js';
+import { sunPos } from '../src/sun.js';
+import { shadowFraction } from '../src/shadow.js';
 
 import {
   radiansToDegrees,
@@ -67,6 +69,8 @@ describe('Library export', () => {
   it('jday', () => expect(es.jday).toEqual(jday));
   it('invjday', () => expect(es.invjday).toEqual(invjday));
   it('dopplerFactor', () => expect(es.dopplerFactor).toEqual(dopplerFactor));
+  it('sunPos', () => expect(es.sunPos).toEqual(sunPos));
+  it('shadowFraction', () => expect(es.shadowFraction).toEqual(shadowFraction));
   it('transforms', () => {
     expect(es.radiansToDegrees).toEqual(radiansToDegrees);
     expect(es.degreesToRadians).toEqual(degreesToRadians);
