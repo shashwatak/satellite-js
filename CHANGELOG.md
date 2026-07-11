@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Test: Add unit tests for `sunPos` and `shadowFraction`.
+- Feature: Exposed mean motion with kozai in `SatRec` as `nokozai`.
 
 ## 7.0.1 (2026-05-15)
 
