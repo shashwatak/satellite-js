@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Test: Add unit tests for `sunPos` and `shadowFraction`.
+- Test: Export checks for `sunPos` and `shadowFraction` in `index.test.ts`.
 
 ## 7.0.1 (2026-05-15)
 
