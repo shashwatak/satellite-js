@@ -201,9 +201,13 @@ export interface SatRec {
    */
   mo: number;
   /**
-   * Mean motion in radians per minute.
+   * Mean motion in radians per minute without kozai.
    */
   no: number;
+  /**
+   * Mean motion in radians per minute with kozai.
+   */
+  nokozai: number;
 
   // sgp4fix add unkozai'd variable
   // not used by the library

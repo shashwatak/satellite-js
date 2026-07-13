@@ -234,6 +234,7 @@ export function sgp4init(
   satrec.inclo = xinclo;
   satrec.mo = xmo;
   satrec.no = xno;
+  satrec.nokozai = xno;
   satrec.nodeo = xnodeo;
 
   //  sgp4fix add opsmode
