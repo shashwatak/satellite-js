@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  twoline2satrec, json2satrec, OMMJsonObject, SatRec,
+  twoline2satrec, json2satrec, OMMJsonObject, SatRec, constants
 } from '../src/index.js';
 import badTleData from './io-edge.json' with { type: 'json' };
 import goodData from './io.json' with { type: 'json' };
@@ -74,6 +74,6 @@ describe('mean motion', () => {
     const satrec = twoline2satrec(tle1, tle2);
     expect(satrec.no).toBeCloseTo(0.06428212791307905, 10);
     expect(satrec.nokozai).toBeCloseTo(0.06429242548587555, 10);
-    expect(satrec.nokozai * rad2deg * 4).toBeCloseTo(14.73473854, 10);
+    expect(satrec.nokozai * constants.rad2deg * 4).toBeCloseTo(14.73473854, 10);
   });
 });
