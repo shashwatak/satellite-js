@@ -201,7 +201,7 @@ export interface SatRec {
    */
   mo: number;
   /**
-   * Mean motion in radians per minute.
+   * Mean motion in radians per minute without kozai.
    */
   no: number;
   /**
