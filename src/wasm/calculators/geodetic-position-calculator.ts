@@ -1,5 +1,5 @@
-import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { GeodeticLocation } from '../../common-types.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
@@ -18,7 +18,16 @@ const DIMENSIONS = 3;
  * Provides formatted output under `geodeticPosition` property,
  * @see GeodeticPositionFormattedOutput.
  */
-export class GeodeticPositionCalculator implements Calculator<'geodeticPosition', 2, ['eci', 'gmst'], Float64Array, GeodeticLocation> {
+export class GeodeticPositionCalculator
+  implements
+    Calculator<
+      'geodeticPosition',
+      2,
+      ['eci', 'gmst'],
+      Float64Array,
+      GeodeticLocation
+    >
+{
   readonly name = 'geodeticPosition';
 
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -43,7 +52,10 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): GeodeticLocation {
+  getFormattedOutput(
+    satelliteIndex: number,
+    dateIndex: number,
+  ): GeodeticLocation {
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
@@ -54,7 +66,9 @@ export class GeodeticPositionCalculator implements Calculator<'geodeticPosition'
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
-    return satellitesCount * datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
+    return (
+      satellitesCount * datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT
+    );
   }
 
   getRawOutput() {

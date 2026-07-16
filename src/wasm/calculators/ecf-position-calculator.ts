@@ -16,7 +16,16 @@ const DIMENSIONS = 3;
  *
  * Provides formatted output under `ecfPosition` property.
  */
-export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci', 'gmst'], Float64Array, EcfVec3<Kilometer>> {
+export class EcfPositionCalculator
+  implements
+    Calculator<
+      'ecfPosition',
+      2,
+      ['eci', 'gmst'],
+      Float64Array,
+      EcfVec3<Kilometer>
+    >
+{
   readonly name = 'ecfPosition';
 
   readonly dependencies: ['eci', 'gmst'] = ['eci', 'gmst'];
@@ -41,7 +50,10 @@ export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): EcfVec3<Kilometer> {
+  getFormattedOutput(
+    satelliteIndex: number,
+    dateIndex: number,
+  ): EcfVec3<Kilometer> {
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
@@ -52,7 +64,9 @@ export class EcfPositionCalculator implements Calculator<'ecfPosition', 2, ['eci
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
-    return satellitesCount * datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
+    return (
+      satellitesCount * datesCount * DIMENSIONS * Float64Array.BYTES_PER_ELEMENT
+    );
   }
 
   getRawOutput() {

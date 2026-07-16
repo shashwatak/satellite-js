@@ -10,7 +10,9 @@ import type { Calculator } from './calculator-interface.js';
  *
  * Provides formatted output as a number under `gmst` property.
  */
-export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, GMSTime> {
+export class GmstCalculator
+  implements Calculator<'gmst', 0, [], Float64Array, GMSTime>
+{
   readonly name = 'gmst';
 
   readonly dependencies: [] = [];
@@ -37,7 +39,11 @@ export class GmstCalculator implements Calculator<'gmst', 0, [], Float64Array, G
   }
 
   getRawOutput(): Float64Array {
-    return new Float64Array(this.module.HEAP8.buffer, this.outputPointer, this.datesCount);
+    return new Float64Array(
+      this.module.HEAP8.buffer,
+      this.outputPointer,
+      this.datesCount,
+    );
   }
 
   getFormattedOutput(_satelliteIndex: number, dateIndex: number): GMSTime {

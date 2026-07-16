@@ -1,50 +1,86 @@
 import type { SatRec } from '../propagation/SatRec.js';
 import type { Calculator } from './calculators/calculator-interface.js';
 import type { TupleOf } from './calculators/tuple-of.js';
-import type { TypedArray } from './typed-array.js';
-import { topologicalSort } from './toposort.js';
-import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from './elsetrec-struct.js';
 import { allocateDatesArray, writeDatesArray } from './date-to-wasm.js';
-import { allocateRunData, RunData } from './run-data.js';
-import { MultiThreadRuntime, WasmRuntime } from './runtimes/wasm-runtime.js';
+import {
+  allocateNativeStructArray,
+  writeNativeStructArrayFromSatrecArray,
+} from './elsetrec-struct.js';
+import { allocateRunData, type RunData } from './run-data.js';
+import type {
+  MultiThreadRuntime,
+  WasmRuntime,
+} from './runtimes/wasm-runtime.js';
+import { topologicalSort } from './toposort.js';
+import type { TypedArray } from './typed-array.js';
 
 export type CalculatorsToFormattedOutput<
   Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    any,
+    any
+  >[],
 > = {
-  [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getFormattedOutput']>;
+  [K in Calculators[number]['name']]: ReturnType<
+    Extract<Calculators[number], { name: K }>['getFormattedOutput']
+  >;
 };
 
 export type CalculatorsToRawOutput<
   Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    any,
+    any
+  >[],
 > = {
-  [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getRawOutput']>;
+  [K in Calculators[number]['name']]: ReturnType<
+    Extract<Calculators[number], { name: K }>['getRawOutput']
+  >;
 };
 
-type RunParametersOf<C> = C extends Calculator<any, any, any, any, any, infer RP> ? RP : never;
+type RunParametersOf<C> =
+  C extends Calculator<any, any, any, any, any, infer RP> ? RP : never;
 
 type IsEmptyRunParams<T> = {} extends T ? (T extends {} ? true : false) : false;
 
 type CalculatorsToRunParameters<
   Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    any,
+    any
+  >[],
 > = {
   [C in Calculators[number] as C extends { name: infer Name extends string }
-    ? (IsEmptyRunParams<RunParametersOf<C>> extends true ? never : Name)
-    : never]: RunParametersOf<C>
+    ? IsEmptyRunParams<RunParametersOf<C>> extends true
+      ? never
+      : Name
+    : never]: RunParametersOf<C>;
 };
 
 type BulkPropagatorRunArgs<
   Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
-> = CalculatorsToRunParameters<Calculators> extends infer P
-  ? {} extends P ? void : P
-  : never;
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    any,
+    any
+  >[],
+> =
+  CalculatorsToRunParameters<Calculators> extends infer P
+    ? {} extends P
+      ? void
+      : P
+    : never;
 
 function ceilToMultipleOf64Bit(bytes: number): number {
   const bytesPer64Bit = 8;
@@ -120,10 +156,15 @@ function ceilToMultipleOf64Bit(bytes: number): number {
  */
 export class BulkPropagator<
   const Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, unknown
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    unknown
   >[],
   Runtime extends WasmRuntime,
-> implements Disposable {
+> implements Disposable
+{
   private readonly calculators: Calculators;
 
   private satrecsPointer: number;
@@ -148,7 +189,10 @@ export class BulkPropagator<
 
   private outputPointersByCalculator: Map<Calculators[number]['name'], number>;
 
-  private calculatorDependenciesOutputsPointers: Map<Calculators[number]['name'], number[]>;
+  private calculatorDependenciesOutputsPointers: Map<
+    Calculators[number]['name'],
+    number[]
+  >;
 
   private isDisposed: boolean = false;
 
@@ -205,7 +249,10 @@ export class BulkPropagator<
       this[Symbol.dispose] = () => this.dispose();
     }
 
-    this.satrecsPointer = allocateNativeStructArray(runtime.module, satRecsCount);
+    this.satrecsPointer = allocateNativeStructArray(
+      runtime.module,
+      satRecsCount,
+    );
     this.allocatedSatrecsCount = satRecsCount;
 
     this.datesPointer = allocateDatesArray(runtime.module, datesCount);
@@ -224,7 +271,10 @@ export class BulkPropagator<
 
     this.runDataPointer = allocateRunData(runtime.module);
 
-    this.allocatedOutputSizeBytes = this.computeTotalOutputSizeBytes(satRecsCount, datesCount);
+    this.allocatedOutputSizeBytes = this.computeTotalOutputSizeBytes(
+      satRecsCount,
+      datesCount,
+    );
     this.outputPointer = runtime.module._malloc(this.allocatedOutputSizeBytes);
     this.outputPointersByCalculator = new Map();
     this.calculatorDependenciesOutputsPointers = new Map();
@@ -245,11 +295,18 @@ export class BulkPropagator<
 
     if (satRecs.length > this.allocatedSatrecsCount) {
       this.runtime.module._free(this.satrecsPointer);
-      this.satrecsPointer = allocateNativeStructArray(this.runtime.module, satRecs.length);
+      this.satrecsPointer = allocateNativeStructArray(
+        this.runtime.module,
+        satRecs.length,
+      );
       this.allocatedSatrecsCount = satRecs.length;
     }
 
-    writeNativeStructArrayFromSatrecArray(this.runtime.module, this.satrecsPointer, satRecs);
+    writeNativeStructArrayFromSatrecArray(
+      this.runtime.module,
+      this.satrecsPointer,
+      satRecs,
+    );
 
     if (satRecs.length !== this.usedSatrecsCount) {
       this.needsOutputRedistribution = true;
@@ -286,7 +343,10 @@ export class BulkPropagator<
     this.hasDates = true;
   }
 
-  private computeTotalOutputSizeBytes(satRecsCount: number, datesCount: number): number {
+  private computeTotalOutputSizeBytes(
+    satRecsCount: number,
+    datesCount: number,
+  ): number {
     let totalBytes = 0;
     for (const calculator of this.calculators) {
       totalBytes += ceilToMultipleOf64Bit(
@@ -312,9 +372,15 @@ export class BulkPropagator<
     this.outputPointersByCalculator = new Map();
     for (const calculator of this.calculators) {
       const sizeBytes = ceilToMultipleOf64Bit(
-        calculator.getOutputBufferSize(this.usedSatrecsCount, this.usedDatesCount),
+        calculator.getOutputBufferSize(
+          this.usedSatrecsCount,
+          this.usedDatesCount,
+        ),
       );
-      this.outputPointersByCalculator.set(calculator.name, this.outputPointer + offsetBytes);
+      this.outputPointersByCalculator.set(
+        calculator.name,
+        this.outputPointer + offsetBytes,
+      );
       offsetBytes += sizeBytes;
     }
 
@@ -323,7 +389,10 @@ export class BulkPropagator<
       const dependenciesPointers = calculator.dependencies.map(
         (dependency) => this.outputPointersByCalculator.get(dependency)!,
       );
-      this.calculatorDependenciesOutputsPointers.set(calculator.name, dependenciesPointers);
+      this.calculatorDependenciesOutputsPointers.set(
+        calculator.name,
+        dependenciesPointers,
+      );
 
       calculator.init(
         this.runtime.module,
@@ -386,21 +455,22 @@ export class BulkPropagator<
       this.redistributeOutputBuffer();
     }
 
-    const runDataItems = this.calculators.map(
-      (calculator) => {
-        const runParams = (
-          (args ?? {}) as Record<string, RunParametersOf<Calculators>>
-        )[calculator.name];
-        return calculator.getExecutionDescriptor(runParams!);
-      },
-    );
+    const runDataItems = this.calculators.map((calculator) => {
+      const runParams = (
+        (args ?? {}) as Record<string, RunParametersOf<Calculators>>
+      )[calculator.name];
+      return calculator.getExecutionDescriptor(runParams!);
+    });
 
-    const runData = Object.assign({
-      satellitesPointer: this.satrecsPointer,
-      satellitesCount: this.usedSatrecsCount,
-      jdaysPointer: this.datesPointer,
-      jdaysCount: this.usedDatesCount,
-    } satisfies Partial<RunData>, ...runDataItems);
+    const runData = Object.assign(
+      {
+        satellitesPointer: this.satrecsPointer,
+        satellitesCount: this.usedSatrecsCount,
+        jdaysPointer: this.datesPointer,
+        jdaysCount: this.usedDatesCount,
+      } satisfies Partial<RunData>,
+      ...runDataItems,
+    );
 
     this.isRunning = true;
 
@@ -450,7 +520,10 @@ export class BulkPropagator<
     dateIndex: number,
   ): CalculatorsToFormattedOutput<Calculators> | undefined {
     this.checkIfDisposed();
-    if (satelliteIndex >= this.usedSatrecsCount || dateIndex >= this.usedDatesCount) {
+    if (
+      satelliteIndex >= this.usedSatrecsCount ||
+      dateIndex >= this.usedDatesCount
+    ) {
       return undefined;
     }
     const result: Record<string, unknown> = {};
@@ -502,7 +575,9 @@ export class BulkPropagator<
 
   private checkIfDisposed() {
     if (this.isDisposed) {
-      throw new Error('This BulkPropagator instance is disposed and its memory freed; construct a new one, or check `using` scope or `dispose()` call');
+      throw new Error(
+        'This BulkPropagator instance is disposed and its memory freed; construct a new one, or check `using` scope or `dispose()` call',
+      );
     }
   }
 

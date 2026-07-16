@@ -15,7 +15,9 @@ const DIMENSIONS = 3;
  *
  * Provides formatted output under `sunPosition` property.
  */
-export class SunPositionCalculator implements Calculator<'sunPosition', 0, [], Float64Array, EciVec3<AU>> {
+export class SunPositionCalculator
+  implements Calculator<'sunPosition', 0, [], Float64Array, EciVec3<AU>>
+{
   readonly name = 'sunPosition';
 
   readonly dependencies: [] = [];

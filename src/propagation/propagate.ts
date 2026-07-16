@@ -1,11 +1,14 @@
-import { PositionAndVelocity } from '../common-types.js';
+import type { PositionAndVelocity } from '../common-types.js';
 import { minutesPerDay } from '../constants.js';
 import { jday } from '../ext.js';
+import type { SatRec } from './SatRec.js';
 import { sgp4 } from './sgp4.js';
-import { SatRec } from './SatRec.js';
 
-export function propagate (satrec: SatRec, date: Date): PositionAndVelocity | null;
-export function propagate (
+export function propagate(
+  satrec: SatRec,
+  date: Date,
+): PositionAndVelocity | null;
+export function propagate(
   satrec: SatRec,
   year: number,
   month: number,
@@ -13,14 +16,16 @@ export function propagate (
   hour: number,
   minute: number,
   second: number,
-  ms?: number
+  ms?: number,
 ): PositionAndVelocity | null;
 export function propagate(
   satrec: SatRec,
-  ...jdayArgs: [Date] | [number, number, number, number, number, number, (number | undefined)?]
+  ...jdayArgs:
+    | [Date]
+    | [number, number, number, number, number, number, (number | undefined)?]
 ): PositionAndVelocity | null {
   // Return a position and velocity vector for a given date and time.
-  const j = jday(...jdayArgs as Parameters<typeof jday>);
+  const j = jday(...(jdayArgs as Parameters<typeof jday>));
   const m = (j - satrec.jdsatepoch) * minutesPerDay;
   return sgp4(satrec, m);
 }

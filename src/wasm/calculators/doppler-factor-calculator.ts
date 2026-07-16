@@ -14,10 +14,23 @@ import type { Calculator } from './calculator-interface.js';
  *
  * Provides formatted output as a number under `dopplerFactor` property.
  */
-export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, ['ecfPosition', 'ecfVelocity'], Float64Array, number, { observer: EcfVec3<Kilometer> }> {
+export class DopplerFactorCalculator
+  implements
+    Calculator<
+      'dopplerFactor',
+      2,
+      ['ecfPosition', 'ecfVelocity'],
+      Float64Array,
+      number,
+      { observer: EcfVec3<Kilometer> }
+    >
+{
   readonly name = 'dopplerFactor';
 
-  readonly dependencies: ['ecfPosition', 'ecfVelocity'] = ['ecfPosition', 'ecfVelocity'];
+  readonly dependencies: ['ecfPosition', 'ecfVelocity'] = [
+    'ecfPosition',
+    'ecfVelocity',
+  ];
 
   private satellitesCount!: number;
 
@@ -41,7 +54,7 @@ export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, [
 
   getFormattedOutput(satelliteIndex: number, dateIndex: number): number {
     const rawOutput = this.getRawOutput();
-    const index = (satelliteIndex * this.datesCount + dateIndex);
+    const index = satelliteIndex * this.datesCount + dateIndex;
     return rawOutput[index]!;
   }
 
@@ -57,7 +70,7 @@ export class DopplerFactorCalculator implements Calculator<'dopplerFactor', 2, [
     return satellitesCount * datesCount * Float64Array.BYTES_PER_ELEMENT;
   }
 
-  getExecutionDescriptor(runParameters: { observer: EcfVec3<Kilometer>; }) {
+  getExecutionDescriptor(runParameters: { observer: EcfVec3<Kilometer> }) {
     return {
       dopplerFactorEnabled: true,
       observerEcfX: runParameters.observer.x,

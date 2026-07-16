@@ -224,19 +224,20 @@ export interface SatRec {
   // nm: number;
 }
 
-export type SatRecInit = Pick<SatRec,
-  'error' |
-  'satnum' |
-  'epochyr' |
-  'epochdays' |
-  'ndot' |
-  'nddot' |
-  'bstar' |
-  'inclo' |
-  'nodeo' |
-  'ecco' |
-  'argpo' |
-  'mo' |
-  'no' |
-  'jdsatepoch'
->
+export type SatRecInit = Pick<
+  SatRec,
+  | 'error'
+  | 'satnum'
+  | 'epochyr'
+  | 'epochdays'
+  | 'ndot'
+  | 'nddot'
+  | 'bstar'
+  | 'inclo'
+  | 'nodeo'
+  | 'ecco'
+  | 'argpo'
+  | 'mo'
+  | 'no'
+  | 'jdsatepoch'
+>;

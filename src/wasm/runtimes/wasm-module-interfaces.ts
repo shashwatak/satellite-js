@@ -5,7 +5,7 @@ export interface WasmModuleBase {
   UTF8ToString(
     ptr: number,
     maxBytesToRead?: number | undefined,
-    ignoreNul?: boolean | undefined
+    ignoreNul?: boolean | undefined,
   ): string;
   HEAP8: Int8Array;
   HEAPF64: Float64Array;
@@ -30,6 +30,6 @@ export interface WasmModuleMultiThread extends WasmModuleBase {
     ident: any,
     returnType?: string | undefined,
     argTypes?: any[] | undefined,
-    opts?: any | undefined
+    opts?: any | undefined,
   ): any;
 }

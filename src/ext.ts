@@ -37,7 +37,20 @@ export type JDay = number;
  *    none.
  * --------------------------------------------------------------------------- */
 export function days2mdhms(year: number, days: number) {
-  const lmonth = [31, (year % 4) === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const lmonth = [
+    31,
+    year % 4 === 0 ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ];
   const dayofyr = Math.floor(days);
 
   //  ----------------- find month and day of month ----------------
@@ -45,7 +58,7 @@ export function days2mdhms(year: number, days: number) {
   let inttemp = 0;
 
   // i starts from 1 so no null check is needed
-  while ((dayofyr > (inttemp + lmonth[i - 1]!)) && i < 12) {
+  while (dayofyr > inttemp + lmonth[i - 1]! && i < 12) {
     inttemp += lmonth[i - 1]!;
     i += 1;
   }
@@ -111,10 +124,12 @@ function jdayInternal(
   msec = 0,
 ): JDay {
   return (
-    ((367.0 * year) - Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25))
-    + Math.floor((275 * mon) / 9.0)
-    + day + 1721013.5
-    + (((((msec / 60000) + (sec / 60.0) + minute) / 60.0) + hr) / 24.0) // ut in days
+    367.0 * year -
+    Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) +
+    Math.floor((275 * mon) / 9.0) +
+    day +
+    1721013.5 +
+    ((msec / 60000 + sec / 60.0 + minute) / 60.0 + hr) / 24.0 // ut in days
     // # - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
   );
 }
@@ -196,7 +211,14 @@ export function jday(
 export function invjday(
   jd: JDay,
   asArray: true,
-): [year: number, mon: number, day: number, hr: number, minute: number, sec: number];
+): [
+  year: number,
+  mon: number,
+  day: number,
+  hr: number,
+  minute: number,
+  sec: number,
+];
 export function invjday(jd: JDay, asArray?: false): Date;
 export function invjday(jd: JDay, asArray?: boolean) {
   // --------------- find year and days of the year -
@@ -206,26 +228,21 @@ export function invjday(jd: JDay, asArray?: boolean) {
   let leapyrs = Math.floor((year - 1901) * 0.25);
 
   // optional nudge by 8.64x10-7 sec to get even outputs
-  let days = (temp - (((year - 1900) * 365.0) + leapyrs)) + 0.00000000001;
+  let days = temp - ((year - 1900) * 365.0 + leapyrs) + 0.00000000001;
 
   // ------------ check for case of beginning of a year -----------
   if (days < 1.0) {
     year -= 1;
     leapyrs = Math.floor((year - 1901) * 0.25);
-    days = temp - (((year - 1900) * 365.0) + leapyrs);
+    days = temp - ((year - 1900) * 365.0 + leapyrs);
   }
 
   // ----------------- find remaing data  -------------------------
   const mdhms = days2mdhms(year, days);
 
-  const {
-    mon,
-    day,
-    hr,
-    minute,
-  } = mdhms;
+  const { mon, day, hr, minute } = mdhms;
 
-  const sec = mdhms.sec - 0.00000086400;
+  const sec = mdhms.sec - 0.000000864;
 
   if (asArray) {
     return [year, mon, day, hr, minute, Math.floor(sec)];

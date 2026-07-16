@@ -1,12 +1,14 @@
-import {
-  Degrees, EcfVec3, EciVec3, GeodeticLocation, GMSTime, Kilometer, LookAngles, Radians,
+import type {
+  Degrees,
+  EcfVec3,
+  EciVec3,
+  GeodeticLocation,
+  GMSTime,
+  Kilometer,
+  LookAngles,
+  Radians,
 } from './common-types.js';
-import {
-  pi,
-  twoPi,
-  rad2deg,
-  deg2rad,
-} from './constants.js';
+import { deg2rad, pi, rad2deg, twoPi } from './constants.js';
 
 export function radiansToDegrees(radians: Radians): Degrees {
   return radians * rad2deg;
@@ -17,7 +19,7 @@ export function degreesToRadians(degrees: Degrees): Radians {
 }
 
 export function degreesLat(radians: Radians): Degrees {
-  if (radians < (-pi / 2) || radians > (pi / 2)) {
+  if (radians < -pi / 2 || radians > pi / 2) {
     throw new RangeError('Latitude radians must be in range [-pi/2; pi/2].');
   }
   return radiansToDegrees(radians);
@@ -52,12 +54,13 @@ export function geodeticToEcf({
   const a = 6378.137;
   const b = 6356.7523142;
   const f = (a - b) / a;
-  const e2 = ((2 * f) - (f * f));
-  const normal = a / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
+  const e2 = 2 * f - f * f;
+  const normal =
+    a / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
 
   const x = (normal + height) * Math.cos(latitude) * Math.cos(longitude);
   const y = (normal + height) * Math.cos(latitude) * Math.sin(longitude);
-  const z = ((normal * (1 - e2)) + height) * Math.sin(latitude);
+  const z = (normal * (1 - e2) + height) * Math.sin(latitude);
 
   return {
     x,
@@ -66,13 +69,16 @@ export function geodeticToEcf({
   };
 }
 
-export function eciToGeodetic(eci: EciVec3<Kilometer>, gmst: GMSTime): GeodeticLocation {
+export function eciToGeodetic(
+  eci: EciVec3<Kilometer>,
+  gmst: GMSTime,
+): GeodeticLocation {
   // http://www.celestrak.com/columns/v02n03/
   const a = 6378.137;
   const b = 6356.7523142;
-  const R = Math.sqrt((eci.x * eci.x) + (eci.y * eci.y));
+  const R = Math.sqrt(eci.x * eci.x + eci.y * eci.y);
   const f = (a - b) / a;
-  const e2 = ((2 * f) - (f * f));
+  const e2 = 2 * f - f * f;
 
   // the one-liner below is an alternative to the loops approach used originally:
   // let longitude = Math.atan2(eci.y, eci.x) - gmst;
@@ -82,21 +88,19 @@ export function eciToGeodetic(eci: EciVec3<Kilometer>, gmst: GMSTime): GeodeticL
   // while (longitude > pi) {
   //   longitude -= twoPi;
   // }
-  const longitude = ((((Math.atan2(eci.y, eci.x) - gmst + pi) % twoPi) + twoPi) % twoPi) - pi;
+  const longitude =
+    ((((Math.atan2(eci.y, eci.x) - gmst + pi) % twoPi) + twoPi) % twoPi) - pi;
 
   const kmax = 20;
   let k = 0;
-  let latitude = Math.atan2(
-    eci.z,
-    Math.sqrt((eci.x * eci.x) + (eci.y * eci.y)),
-  );
+  let latitude = Math.atan2(eci.z, Math.sqrt(eci.x * eci.x + eci.y * eci.y));
   let C: number;
   // eslint-disable-next-line no-plusplus
   while (k++ < kmax) {
-    C = 1 / Math.sqrt(1 - (e2 * (Math.sin(latitude) * Math.sin(latitude))));
-    latitude = Math.atan2(eci.z + (a * C * e2 * Math.sin(latitude)), R);
+    C = 1 / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
+    latitude = Math.atan2(eci.z + a * C * e2 * Math.sin(latitude), R);
   }
-  const height = (R / Math.cos(latitude)) - (a * C!);
+  const height = R / Math.cos(latitude) - a * C!;
   return { longitude, latitude, height };
 }
 
@@ -107,13 +111,13 @@ export function ecfToEci(ecf: EcfVec3<number>, gmst: GMSTime): EciVec3<number> {
   // [Y]  =  [S  C  0][Y]
   // [Z]eci  [0  0  1][Z]ecf
   //
-  const X = (ecf.x * Math.cos(gmst)) - (ecf.y * Math.sin(gmst));
-  const Y = (ecf.x * (Math.sin(gmst))) + (ecf.y * Math.cos(gmst));
+  const X = ecf.x * Math.cos(gmst) - ecf.y * Math.sin(gmst);
+  const Y = ecf.x * Math.sin(gmst) + ecf.y * Math.cos(gmst);
   const Z = ecf.z;
   return { x: X, y: Y, z: Z };
 }
 
-export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime) : EcfVec3<number> {
+export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime): EcfVec3<number> {
   // ccar.colorado.edu/ASEN5070/handouts/coordsys.doc
   //
   // [X]     [C -S  0][X]
@@ -126,8 +130,8 @@ export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime) : EcfVec3<number> 
   // [Y]  =  [-S C  0][Y]
   // [Z]ecf  [0  0  1][Z]eci
 
-  const x = (eci.x * Math.cos(gmst)) + (eci.y * Math.sin(gmst));
-  const y = (eci.x * (-Math.sin(gmst))) + (eci.y * Math.cos(gmst));
+  const x = eci.x * Math.cos(gmst) + eci.y * Math.sin(gmst);
+  const y = eci.x * -Math.sin(gmst) + eci.y * Math.cos(gmst);
   const { z } = eci;
 
   return {
@@ -160,10 +164,7 @@ function topocentric(
   // TS Kelso's method, except I'm using ECF frame
   // and he uses ECI.
 
-  const {
-    longitude,
-    latitude,
-  } = observerGeodetic;
+  const { longitude, latitude } = observerGeodetic;
 
   const observerEcf = geodeticToEcf(observerGeodetic);
 
@@ -171,23 +172,24 @@ function topocentric(
   const ry = satelliteEcf.y - observerEcf.y;
   const rz = satelliteEcf.z - observerEcf.z;
 
-  const topS = ((Math.sin(latitude) * Math.cos(longitude) * rx)
-      + (Math.sin(latitude) * Math.sin(longitude) * ry))
-    - (Math.cos(latitude) * rz);
+  const topS =
+    Math.sin(latitude) * Math.cos(longitude) * rx +
+    Math.sin(latitude) * Math.sin(longitude) * ry -
+    Math.cos(latitude) * rz;
 
-  const topE = (-Math.sin(longitude) * rx)
-    + (Math.cos(longitude) * ry);
+  const topE = -Math.sin(longitude) * rx + Math.cos(longitude) * ry;
 
-  const topZ = (Math.cos(latitude) * Math.cos(longitude) * rx)
-    + (Math.cos(latitude) * Math.sin(longitude) * ry)
-    + (Math.sin(latitude) * rz);
+  const topZ =
+    Math.cos(latitude) * Math.cos(longitude) * rx +
+    Math.cos(latitude) * Math.sin(longitude) * ry +
+    Math.sin(latitude) * rz;
 
   return { topS, topE, topZ };
 }
 
 function topocentricToLookAngles(tc: Topocentric): LookAngles {
   const { topS, topE, topZ } = tc;
-  const rangeSat = Math.sqrt((topS * topS) + (topE * topE) + (topZ * topZ));
+  const rangeSat = Math.sqrt(topS * topS + topE * topE + topZ * topZ);
   const El = Math.asin(topZ / rangeSat);
   const Az = Math.atan2(-topE, topS) + pi;
 

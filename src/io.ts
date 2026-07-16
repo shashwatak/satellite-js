@@ -1,8 +1,8 @@
-import { OMMJsonObject } from './common-types.js';
+import type { OMMJsonObject } from './common-types.js';
 import { deg2rad, xpdotp } from './constants.js';
 
-import { jday, days2mdhms } from './ext.js';
-import { SatRecInit } from './propagation/SatRec.js';
+import { days2mdhms, jday } from './ext.js';
+import type { SatRecInit } from './propagation/SatRec.js';
 
 import { sgp4init } from './propagation/sgp4init.js';
 
@@ -91,8 +91,8 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
   // ---- convert to sgp4 units ----
-  ndot /= (xpdotp * 1440.0); // ? * minperday
-  nddot /= (xpdotp * 1440.0 * 1440);
+  ndot /= xpdotp * 1440.0; // ? * minperday
+  nddot /= xpdotp * 1440.0 * 1440;
 
   // ----------------------------------------------------------------
   // find sgp4epoch time of element set
@@ -106,9 +106,7 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
 
   const mdhmsResult = days2mdhms(year, epochdays);
 
-  const {
-    mon, day, hr, minute, sec,
-  } = mdhmsResult;
+  const { mon, day, hr, minute, sec } = mdhmsResult;
   const jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
   const satrec: SatRecInit = {
@@ -189,20 +187,23 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
 
-  const epoch = new Date(jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : `${jsonobj.EPOCH}Z`);
+  const epoch = new Date(
+    jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : `${jsonobj.EPOCH}Z`,
+  );
   const year = epoch.getUTCFullYear();
 
   const epochyr = Number(year.toString().slice(-2));
-  const epochdays = (epoch.valueOf() - new Date(
-    Date.UTC(year, 0, 1, 0, 0, 0),
-  ).valueOf()) / (86400 * 1000) + 1;
+  const epochdays =
+    (epoch.valueOf() - new Date(Date.UTC(year, 0, 1, 0, 0, 0)).valueOf()) /
+      (86400 * 1000) +
+    1;
 
   let ndot = Number(jsonobj.MEAN_MOTION_DOT);
   let nddot = Number(jsonobj.MEAN_MOTION_DDOT);
 
   // ---- convert to sgp4 units ----
-  ndot /= (xpdotp * 1440.0); // ? * minperday
-  nddot /= (xpdotp * 1440.0 * 1440);
+  ndot /= xpdotp * 1440.0; // ? * minperday
+  nddot /= xpdotp * 1440.0 * 1440;
 
   const bstar = Number(jsonobj.BSTAR);
 
@@ -220,9 +221,7 @@ export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
   // ----------------------------------------------------------------
   const mdhmsResult = days2mdhms(year, epochdays);
 
-  const {
-    mon, day, hr, minute, sec,
-  } = mdhmsResult;
+  const { mon, day, hr, minute, sec } = mdhmsResult;
   const jdsatepoch = jday(year, mon, day, hr, minute, sec);
 
   const satrec: SatRecInit = {
