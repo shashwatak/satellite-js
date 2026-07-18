@@ -1,3 +1,8 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: due to the fact that
+ * many variables are first assigned within loops and if statements,
+ * Typescript marks many of them as "used before assigned". To keep the algorithm
+ * as is, non null assertion is used there.
+ */
 import { twoPi } from '../constants.js';
 
 interface DspaceOptions {
@@ -152,20 +157,20 @@ export function dspace(options: DspaceOptions) {
   const g44 = 1.8014998;
   const g52 = 1.050833;
   const g54 = 4.4108898;
-  // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+  // biome-ignore lint/correctness/noPrecisionLoss: keep original value for search
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const stepp = 720.0;
   const stepn = -720.0;
   const step2 = 259200.0;
 
-  let delt;
-  let x2li;
-  let x2omi;
-  let xl;
-  let xldot;
-  let xnddt;
-  let xndt;
-  let xomi;
+  let delt: number;
+  let x2li: number;
+  let x2omi: number;
+  let xl: number;
+  let xldot: number;
+  let xnddt: number;
+  let xndt: number;
+  let xomi: number;
   let dndt = 0.0;
   let ft = 0.0;
 

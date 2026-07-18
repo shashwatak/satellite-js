@@ -75,9 +75,11 @@ export class LookAnglesCalculator
     const index =
       (satelliteIndex * this.datesCount + dateIndex) * OUTPUTS_PER_SATELLITE;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       azimuth: rawOutput[index]!,
       elevation: rawOutput[index + 1]!,
       rangeSat: rawOutput[index + 2]!,
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
     };
   }
 

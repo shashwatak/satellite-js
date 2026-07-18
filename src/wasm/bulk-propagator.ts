@@ -14,15 +14,38 @@ import type {
 import { topologicalSort } from './toposort.js';
 import type { TypedArray } from './typed-array.js';
 
+/**
+ * An object type with no properties, used on the *left* of `extends` to test
+ * whether some other type has any required properties.
+ *
+ * Note this is deliberately not the same as {@link NoRunParameters}: as an
+ * assignment *target* this type accepts excess properties, so it cannot be used
+ * to reject unwanted keys.
+ */
+type EmptyObject = Record<never, never>;
+
+/**
+ * Accepts `{}` and nothing else: any property at all fails to be assignable to
+ * `never`. Used as the argument type of `BulkPropagator.run()` when no calculator
+ * requires parameters, so that stray calculator keys are still rejected.
+ */
+type NoRunParameters = Record<string, never>;
+
+/**
+ * The widest `Calculator` shape: matches any calculator regardless of its name,
+ * dependencies, outputs or run parameters. Used purely as a generic constraint.
+ */
+type AnyCalculator = Calculator<
+  string,
+  number,
+  TupleOf<string, number>,
+  TypedArray | Record<string, TypedArray>,
+  unknown,
+  Record<string, unknown>
+>;
+
 export type CalculatorsToFormattedOutput<
-  Calculators extends readonly Calculator<
-    string,
-    number,
-    TupleOf<string, number>,
-    TypedArray | Record<string, TypedArray>,
-    any,
-    any
-  >[],
+  Calculators extends readonly AnyCalculator[],
 > = {
   [K in Calculators[number]['name']]: ReturnType<
     Extract<Calculators[number], { name: K }>['getFormattedOutput']
@@ -30,14 +53,7 @@ export type CalculatorsToFormattedOutput<
 };
 
 export type CalculatorsToRawOutput<
-  Calculators extends readonly Calculator<
-    string,
-    number,
-    TupleOf<string, number>,
-    TypedArray | Record<string, TypedArray>,
-    any,
-    any
-  >[],
+  Calculators extends readonly AnyCalculator[],
 > = {
   [K in Calculators[number]['name']]: ReturnType<
     Extract<Calculators[number], { name: K }>['getRawOutput']
@@ -45,41 +61,43 @@ export type CalculatorsToRawOutput<
 };
 
 type RunParametersOf<C> =
-  C extends Calculator<any, any, any, any, any, infer RP> ? RP : never;
-
-type IsEmptyRunParams<T> = {} extends T ? (T extends {} ? true : false) : false;
-
-type CalculatorsToRunParameters<
-  Calculators extends readonly Calculator<
+  C extends Calculator<
     string,
     number,
     TupleOf<string, number>,
     TypedArray | Record<string, TypedArray>,
-    any,
-    any
-  >[],
-> = {
-  [C in Calculators[number] as C extends { name: infer Name extends string }
-    ? IsEmptyRunParams<RunParametersOf<C>> extends true
-      ? never
-      : Name
-    : never]: RunParametersOf<C>;
-};
+    unknown,
+    infer RunParameters
+  >
+    ? RunParameters
+    : never;
 
-type BulkPropagatorRunArgs<
-  Calculators extends readonly Calculator<
-    string,
-    number,
-    TupleOf<string, number>,
-    TypedArray | Record<string, TypedArray>,
-    any,
-    any
-  >[],
-> =
+/**
+ * True when a calculator's run parameters have no required properties, meaning
+ * the user must not be forced to pass a key for it in `BulkPropagator.run()`.
+ */
+type IsEmptyRunParams<T> = EmptyObject extends T ? true : false;
+
+type CalculatorsToRunParameters<Calculators extends readonly AnyCalculator[]> =
+  {
+    [C in Calculators[number] as C extends { name: infer Name extends string }
+      ? IsEmptyRunParams<RunParametersOf<C>> extends true
+        ? never
+        : Name
+      : never]: RunParametersOf<C>;
+  };
+
+/**
+ * The parameter list of `BulkPropagator.run()`, expressed as a rest tuple so that
+ * the argument is *required* when at least one calculator needs run parameters,
+ * and optional when none do. Passing `{}` is always allowed; passing a key for a
+ * calculator that needs no parameters is not.
+ */
+type BulkPropagatorRunArgs<Calculators extends readonly AnyCalculator[]> =
   CalculatorsToRunParameters<Calculators> extends infer P
-    ? {} extends P
-      ? void
-      : P
+    ? EmptyObject extends P
+      ? [runParameters?: NoRunParameters]
+      : [runParameters: P]
     : never;
 
 function ceilToMultipleOf64Bit(bytes: number): number {
@@ -387,6 +405,7 @@ export class BulkPropagator<
     this.calculatorDependenciesOutputsPointers = new Map();
     for (const calculator of this.calculators) {
       const dependenciesPointers = calculator.dependencies.map(
+        // biome-ignore lint/style/noNonNullAssertion: set for every calculator in the loop above
         (dependency) => this.outputPointersByCalculator.get(dependency)!,
       );
       this.calculatorDependenciesOutputsPointers.set(
@@ -396,6 +415,7 @@ export class BulkPropagator<
 
       calculator.init(
         this.runtime.module,
+        // biome-ignore lint/style/noNonNullAssertion: set for every calculator in the loop above
         this.outputPointersByCalculator.get(calculator.name)!,
         this.usedSatrecsCount,
         this.usedDatesCount,
@@ -408,15 +428,15 @@ export class BulkPropagator<
   /**
    * Executes the bulk propagation for all satellites across all specified dates.
    * Overwrites previous results since allocalted memory is reused. Returns
-   * void on calculation completion for single-threaded runtime, or a Promise
+   * `undefined` on calculation completion for single-threaded runtime, or a Promise
    * for multi-threaded runtime.
    *
    * `setSatRecs` and `setDates` must be called before calling `run`.
    *
-   * @param args - Run arguments including dates and calculator-specific parameters
-   * (if any calculator requires them).
-   * @param args[calculatorName] - Some calculators require additional parameters
-   * (example: `LookAnglesCalculator` requires observer position).
+   * @param runParameters - Calculator-specific parameters, keyed by calculator name.
+   * Required (and type checked) if any configured calculator needs parameters
+   * (example: `LookAnglesCalculator` requires observer position); optional otherwise.
+   * Calculators that need no parameters must not be given a key.
    *
    * @example
    * ```typescript
@@ -440,8 +460,8 @@ export class BulkPropagator<
    * @throws If setSatRecs or setDates has not been called
    */
   run(
-    args?: BulkPropagatorRunArgs<Calculators>,
-  ): Runtime extends MultiThreadRuntime ? Promise<void> : void {
+    ...[runParameters]: BulkPropagatorRunArgs<Calculators>
+  ): Runtime extends MultiThreadRuntime ? Promise<void> : undefined {
     this.checkIfDisposed();
 
     if (!this.hasSatRecs) {
@@ -455,12 +475,19 @@ export class BulkPropagator<
       this.redistributeOutputBuffer();
     }
 
-    const runDataItems = this.calculators.map((calculator) => {
-      const runParams = (
-        (args ?? {}) as Record<string, RunParametersOf<Calculators>>
-      )[calculator.name];
-      return calculator.getExecutionDescriptor(runParams!);
-    });
+    // `runParameters` is keyed by calculator name, but only for calculators that
+    // actually require parameters; the rest read `undefined` and ignore it.
+    const runParametersByName = (runParameters ?? {}) as Record<
+      string,
+      Record<string, unknown> | undefined
+    >;
+    const runDataItems = this.calculators.map((calculator) =>
+      // Calculators whose run parameters are empty get `{}` and ignore it; the
+      // ones that need parameters are guaranteed a key by `BulkPropagatorRunArgs`.
+      calculator.getExecutionDescriptor(
+        runParametersByName[calculator.name] ?? {},
+      ),
+    );
 
     const runData = Object.assign(
       {
@@ -485,7 +512,11 @@ export class BulkPropagator<
       this.isRunning = false;
     }
 
-    return result as Runtime extends MultiThreadRuntime ? Promise<void> : void;
+    // `compute` returns `void` for the single-threaded runtime, which is always
+    // `undefined` at runtime.
+    return result as Runtime extends MultiThreadRuntime
+      ? Promise<void>
+      : undefined;
   }
 
   /**

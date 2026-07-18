@@ -1,12 +1,13 @@
-import { describe, it, expect } from 'vitest';
-import path from 'node:path';
+/** biome-ignore-all lint/style/noNonNullAssertion: lots of index arithmetic */
 import fs from 'node:fs';
-import { createSingleThreadRuntime, createMultiThreadRuntime } from '../../src/wasm/runtimes/index.js';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { days2mdhms, type JDay } from '../../src/ext.js';
 import {
-  BulkPropagator, EciBaseCalculator, propagate, sgp4, twoline2satrec,
+  BulkPropagator, EciBaseCalculator, type PositionAndVelocity, propagate, sgp4, twoline2satrec,
 } from '../../src/index.js';
+import { createMultiThreadRuntime, createSingleThreadRuntime } from '../../src/wasm/runtimes/index.js';
 import expectedData from './sgp4CatalogResults.json' with { type: 'json' };
-import { days2mdhms, JDay } from '../../src/ext.js';
 
 const singleThreadRuntime = await createSingleThreadRuntime();
 const multiThreadRuntime = await createMultiThreadRuntime(
@@ -129,8 +130,8 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
 
         tsince.forEach((time, timeIndex) => {
           const result = sgp4(satrec, time);
-          const expectedResult = (expectedData as any)[tleSuiteIndex][tleIndex][timeIndex];
-          if (!result) {
+          const expectedResult = (expectedData as Array<Array<Array<PositionAndVelocity | null>>>)[tleSuiteIndex]?.[tleIndex]?.[timeIndex];
+          if (!result || !expectedResult) {
             expect(result).toEqual(expectedResult);
             return;
           }

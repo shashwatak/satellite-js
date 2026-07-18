@@ -72,6 +72,7 @@ export class EciBaseCalculator
     const { position, velocity, error } = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       position: {
         x: position[index]!,
         y: position[index + 1]!,
@@ -82,6 +83,7 @@ export class EciBaseCalculator
         y: velocity[index + 1]!,
         z: velocity[index + 2]!,
       },
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
       error: error[satelliteIndex * this.datesCount + dateIndex] as SatRecError,
     };
   }

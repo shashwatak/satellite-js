@@ -17,10 +17,7 @@ export async function createMultiThreadRuntimeFromModule(
   );
   wasmModule._free(runDataStructLayoutStringPointer);
 
-  const originalCompute: (
-    threadCount: number,
-    runDataPointer: number,
-  ) => Promise<number> = wasmModule.cwrap(
+  const originalCompute = wasmModule.cwrap(
     'compute',
     'number',
     ['number', 'number'],

@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import createSingleThreadModule from 'wasm-module-single-thread/index.js';
+import { twoline2satrec } from '../../src/io.js';
+import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from '../../src/wasm/elsetrec-struct.js';
 import {
   getNativeStructFieldLayout,
   NativeStructLayout,
 } from '../../src/wasm/native-structs-from-js.js';
 import { CppMemoryReader } from '../../src/wasm/struct-read.js';
-import { twoline2satrec } from '../../src/io.js';
-import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from '../../src/wasm/elsetrec-struct.js';
 
 const wasmModule = await createSingleThreadModule();
 
@@ -216,9 +216,10 @@ describe('WASM elsetrec struct', () => {
     layout.forEach(({ type, offset, size }, field) => {
       if (field === 'jdsatepoch') {
         const jdsatepochTlePart1 = readerOfInitializedFromTLE.readDouble(offset);
-        const jsatepochPart2Field = layout.get('jdsatepochF');
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        const jsatepochPart2Field = layout.get('jdsatepochF')!;
         const jdsatepochTlePart2 = readerOfInitializedFromTLE.readDouble(
-          jsatepochPart2Field!.offset,
+          jsatepochPart2Field.offset,
         );
         const jdsatepochJS = readerOfInitializedFromJS.readDouble(offset);
         expect(jdsatepochTlePart1 + jdsatepochTlePart2, field).toEqual(jdsatepochJS);

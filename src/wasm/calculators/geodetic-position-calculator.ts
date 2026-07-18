@@ -59,9 +59,11 @@ export class GeodeticPositionCalculator
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       latitude: rawOutput[index]!,
       longitude: rawOutput[index + 1]!,
       height: rawOutput[index + 2]!,
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
     };
   }
 

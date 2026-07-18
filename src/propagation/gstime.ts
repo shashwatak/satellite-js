@@ -71,6 +71,7 @@ export function gstime(
   }
   if (month !== undefined) {
     return gstimeInternal(
+      // biome-ignore lint/style/noNonNullAssertion: overloads make sure those are non-null
       jday(first, month, day!, hour!, minute!, second!, millisecond),
     );
   }

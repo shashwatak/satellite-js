@@ -99,7 +99,7 @@ export function initl(options: InitlOptions) {
   const method = 'n';
 
   //  sgp4fix modern approach to finding sidereal time
-  let gsto;
+  let gsto: number;
   if (opsmode === 'a') {
     //  sgp4fix use old way of finding gst
     //  count integer number of days from 0 jan 1970
@@ -108,11 +108,11 @@ export function initl(options: InitlOptions) {
     const tfrac = ts70 - ds70;
 
     // find greenwich location at epoch
-    /* eslint-disable @typescript-eslint/no-loss-of-precision */
+    // biome-ignore-start lint/correctness/noPrecisionLoss: keep original values for search
     const c1 = 1.72027916940703639e-2;
     const thgr70 = 1.7321343856509374;
     const fk5r = 5.07551419432269442e-15;
-    /* eslint-enable @typescript-eslint/no-loss-of-precision */
+    // biome-ignore-end lint/correctness/noPrecisionLoss: keep original values for search
     const c1p2p = c1 + twoPi;
     gsto = (thgr70 + c1 * ds70 + c1p2p * tfrac + ts70 * ts70 * fk5r) % twoPi;
     if (gsto < 0.0) {

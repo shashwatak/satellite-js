@@ -1,33 +1,34 @@
-import { describe, it, expect } from 'vitest';
-import createSingleThreadModule from 'wasm-module-single-thread/index.js';
+/** biome-ignore-all lint/style/noNonNullAssertion: lots of index arithmetic */
+import { describe, expect, it } from 'vitest';
 import createMultiThreadModule from 'wasm-module-multi-thread/index.js';
-import {
-  BulkPropagator,
-  EciBaseCalculator,
-  GmstCalculator,
-  EcfPositionCalculator,
-  EcfVelocityCalculator,
-  GeodeticPositionCalculator,
-  DopplerFactorCalculator,
-  LookAnglesCalculator,
-  SunPositionCalculator,
-  ShadowFractionCalculator,
-} from '../../src/wasm/index.js';
+import createSingleThreadModule from 'wasm-module-single-thread/index.js';
+import { dopplerFactor } from '../../src/dopplerFactor.js';
+import { jday } from '../../src/ext.js';
 import { twoline2satrec } from '../../src/io.js';
+import { gstime } from '../../src/propagation/gstime.js';
 import { propagate } from '../../src/propagation.js';
+import { shadowFraction } from '../../src/shadow.js';
+import { sunPos } from '../../src/sun.js';
 import {
   degreesToRadians, ecfToLookAngles, eciToEcf, eciToGeodetic, geodeticToEcf,
 } from '../../src/transforms.js';
-import { dopplerFactor } from '../../src/dopplerFactor.js';
-import { gstime } from '../../src/propagation/gstime.js';
-import { sunPos } from '../../src/sun.js';
-import { shadowFraction } from '../../src/shadow.js';
-import { jday } from '../../src/ext.js';
-import { compareVectors } from '../compareVectors.js';
-import { topologicalSort } from '../../src/wasm/toposort.js';
-import badTleData from '../io-edge.json' with { type: 'json' };
-import { createSingleThreadRuntimeFromModule } from '../../src/wasm/runtimes/single-thread-runtime.js';
+import {
+  BulkPropagator,
+  DopplerFactorCalculator,
+  EcfPositionCalculator,
+  EcfVelocityCalculator,
+  EciBaseCalculator,
+  GeodeticPositionCalculator,
+  GmstCalculator,
+  LookAnglesCalculator,
+  ShadowFractionCalculator,
+  SunPositionCalculator,
+} from '../../src/wasm/index.js';
 import { createMultiThreadRuntimeFromModule } from '../../src/wasm/runtimes/multi-thread-runtime.js';
+import { createSingleThreadRuntimeFromModule } from '../../src/wasm/runtimes/single-thread-runtime.js';
+import { topologicalSort } from '../../src/wasm/toposort.js';
+import { compareVectors } from '../compareVectors.js';
+import badTleData from '../io-edge.json' with { type: 'json' };
 
 const singleThreadRuntime = await createSingleThreadRuntimeFromModule(
   await createSingleThreadModule(),
@@ -815,7 +816,6 @@ describe('BulkPropagator multi thread errors', () => {
       const date = new Date((satRec.jdsatepoch - 2440587.5) * 86400000);
       bp.setSatRecs([satRec]);
       bp.setDates([date]);
-      // eslint-disable-next-line no-await-in-loop
       await bp.run();
       expect(bp.getFormattedOutput(0, 0)!.eci.error).toEqual(tleDataItem.results[0]!.error);
     }

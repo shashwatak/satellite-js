@@ -94,13 +94,12 @@ export function eciToGeodetic(
   const kmax = 20;
   let k = 0;
   let latitude = Math.atan2(eci.z, Math.sqrt(eci.x * eci.x + eci.y * eci.y));
-  let C: number;
-  // eslint-disable-next-line no-plusplus
+  let C = 0;
   while (k++ < kmax) {
     C = 1 / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
     latitude = Math.atan2(eci.z + a * C * e2 * Math.sin(latitude), R);
   }
-  const height = R / Math.cos(latitude) - a * C!;
+  const height = R / Math.cos(latitude) - a * C;
   return { longitude, latitude, height };
 }
 

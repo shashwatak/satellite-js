@@ -171,6 +171,7 @@ export function writeNativeStructArrayFromSatrecArray(
           field,
           offset,
           type,
+          // biome-ignore lint/performance/noDynamicNamespaceImportAccess: all constants needed here
           constants[field as keyof typeof constants],
           size,
         );

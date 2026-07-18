@@ -58,8 +58,10 @@ export function days2mdhms(year: number, days: number) {
   let inttemp = 0;
 
   // i starts from 1 so no null check is needed
+  // biome-ignore-start lint/style/noNonNullAssertion: index arithmetic
   while (dayofyr > inttemp + lmonth[i - 1]! && i < 12) {
     inttemp += lmonth[i - 1]!;
+    // biome-ignore-end lint/style/noNonNullAssertion: index arithmetic
     i += 1;
   }
 
@@ -166,6 +168,7 @@ export function jday(
     );
   }
 
+  // biome-ignore lint/style/noNonNullAssertion: overloads make them non-nullable
   return jdayInternal(yearOrDate, mon!, day!, hr!, minute!, sec!, msec);
 }
 

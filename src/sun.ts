@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type { AU, EciVec3 } from './common-types.js';
 import { deg2rad, pi, twoPi } from './constants.js';
 import type { JDay } from './ext.js';

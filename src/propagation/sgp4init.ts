@@ -1,3 +1,8 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: due to the fact that
+ * many variables are first assigned within loops and if statements,
+ * Typescript marks many of them as "used before assigned". To keep the algorithm
+ * as is, non null assertion is used there.
+ */
 import { earthRadius, j2, j3oj2, j4, pi, tumin, x2o3 } from '../constants.js';
 
 import { dpper } from './dpper.js';
@@ -118,62 +123,62 @@ export function sgp4init(
     xnodeo,
   } = options;
 
-  let cosim;
-  let sinim;
-  let cc1sq;
-  let cc2;
-  let cc3;
-  let coef;
-  let coef1;
-  let cosio4;
-  let em;
-  let emsq;
-  let eeta;
-  let etasq;
-  let argpm;
-  let nodem;
-  let inclm;
-  let mm;
-  let nm;
-  let perige;
-  let pinvsq;
-  let psisq;
-  let qzms24;
-  let s1;
-  let s2;
-  let s3;
-  let s4;
-  let s5;
-  let sfour;
-  let ss1;
-  let ss2;
-  let ss3;
-  let ss4;
-  let ss5;
-  let sz1;
-  let sz3;
-  let sz11;
-  let sz13;
-  let sz21;
-  let sz23;
-  let sz31;
-  let sz33;
-  let tc;
-  let temp;
-  let temp1;
-  let temp2;
-  let temp3;
-  let tsi;
-  let xpidot;
-  let xhdot1;
-  let z1;
-  let z3;
-  let z11;
-  let z13;
-  let z21;
-  let z23;
-  let z31;
-  let z33;
+  let cosim: number;
+  let sinim: number;
+  let cc1sq: number;
+  let cc2: number;
+  let cc3: number;
+  let coef: number;
+  let coef1: number;
+  let cosio4: number;
+  let em: number;
+  let emsq: number;
+  let eeta: number;
+  let etasq: number;
+  let argpm: number;
+  let nodem: number;
+  let inclm: number;
+  let mm: number;
+  let nm: number;
+  let perige: number;
+  let pinvsq: number;
+  let psisq: number;
+  let qzms24: number;
+  let s1: number;
+  let s2: number;
+  let s3: number;
+  let s4: number;
+  let s5: number;
+  let sfour: number;
+  let ss1: number;
+  let ss2: number;
+  let ss3: number;
+  let ss4: number;
+  let ss5: number;
+  let sz1: number;
+  let sz3: number;
+  let sz11: number;
+  let sz13: number;
+  let sz21: number;
+  let sz23: number;
+  let sz31: number;
+  let sz33: number;
+  let tc: number;
+  let temp: number;
+  let temp1: number;
+  let temp2: number;
+  let temp3: number;
+  let tsi: number;
+  let xpidot: number;
+  let xhdot1: number;
+  let z1: number;
+  let z3: number;
+  let z11: number;
+  let z13: number;
+  let z21: number;
+  let z23: number;
+  let z31: number;
+  let z33: number;
 
   /* ------------------------ initialization --------------------- */
   // sgp4fix divisor for divide by zero check on inclination

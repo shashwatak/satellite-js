@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './FlyingSatellite.module.css';
 
 function randomEdgeAndDirection(width, height, margin = 32) {
   // pick a random point along the perimeter
   const perim = 2 * (width + height);
-  let p = Math.random() * perim;
-  let start, end;
+  const p = Math.random() * perim;
+  let start: { x: number, y: number }, end: { x: number, y: number };
   if (p < width) { // top
     const x = p;
     start = { x, y: -margin };
@@ -113,6 +113,7 @@ const FlyingSatellite = () => {
           height={size}
           viewBox={`0 0 ${size} ${size}`}
           style={{ display: 'block', transform: `rotate(${angle}deg)` }}
+          role="presentation"
         >
           {/* four-pointed star */}
           <polygon

@@ -55,6 +55,7 @@ export class DopplerFactorCalculator
   getFormattedOutput(satelliteIndex: number, dateIndex: number): number {
     const rawOutput = this.getRawOutput();
     const index = satelliteIndex * this.datesCount + dateIndex;
+    // biome-ignore lint/style/noNonNullAssertion: index math
     return rawOutput[index]!;
   }
 

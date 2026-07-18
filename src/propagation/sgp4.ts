@@ -1,3 +1,8 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: due to the fact that
+ * many variables are first assigned within loops and if statements,
+ * Typescript marks many of them as "used before assigned". To keep the algorithm
+ * as is, non null assertion is used there.
+ */
 import type { PositionAndVelocity } from '../common-types.js';
 import {
   earthRadius,
@@ -104,33 +109,33 @@ export function sgp4(
   satrec: SatRec,
   tsince: number,
 ): PositionAndVelocity | null {
-  let coseo1;
-  let sineo1;
-  let cosip;
-  let sinip;
-  let cosisq;
-  let delm;
-  let delomg;
-  let eo1;
-  let argpm;
-  let argpp;
-  let su;
-  let t3;
-  let t4;
-  let tc;
-  let tem5;
-  let temp;
-  let tempa;
-  let tempe;
-  let templ;
-  let inclm;
-  let mm;
-  let nm;
-  let nodem;
-  let xincp;
-  let xlm;
-  let mp;
-  let nodep;
+  let coseo1: number;
+  let sineo1: number;
+  let cosip: number;
+  let sinip: number;
+  let cosisq: number;
+  let delm: number;
+  let delomg: number;
+  let eo1: number;
+  let argpm: number;
+  let argpp: number;
+  let su: number;
+  let t3: number;
+  let t4: number;
+  let tc: number;
+  let tem5: number;
+  let temp: number;
+  let tempa: number;
+  let tempe: number;
+  let templ: number;
+  let inclm: number;
+  let mm: number;
+  let nm: number;
+  let nodem: number;
+  let xincp: number;
+  let xlm: number;
+  let mp: number;
+  let nodep: number;
 
   /* ------------------ set mathematical constants --------------- */
   // sgp4fix divisor for divide by zero check on inclination

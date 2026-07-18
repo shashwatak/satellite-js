@@ -231,38 +231,38 @@ export function dsinit(options: DsinitOptions) {
     xni,
   } = options;
 
-  let f220;
-  let f221;
-  let f311;
-  let f321;
-  let f322;
-  let f330;
-  let f441;
-  let f442;
-  let f522;
-  let f523;
-  let f542;
-  let f543;
-  let g200;
-  let g201;
-  let g211;
-  let g300;
-  let g310;
-  let g322;
-  let g410;
-  let g422;
-  let g520;
-  let g521;
-  let g532;
-  let g533;
-  let sini2;
-  let temp;
-  let temp1;
-  let xno2;
-  let ainv2;
-  let aonv;
-  let cosisq;
-  let eoc;
+  let f220: number;
+  let f221: number;
+  let f311: number;
+  let f321: number;
+  let f322: number;
+  let f330: number;
+  let f441: number;
+  let f442: number;
+  let f522: number;
+  let f523: number;
+  let f542: number;
+  let f543: number;
+  let g200: number;
+  let g201: number;
+  let g211: number;
+  let g300: number;
+  let g310: number;
+  let g322: number;
+  let g410: number;
+  let g422: number;
+  let g520: number;
+  let g521: number;
+  let g532: number;
+  let g533: number;
+  let sini2: number;
+  let temp: number;
+  let temp1: number;
+  let xno2: number;
+  let ainv2: number;
+  let aonv: number;
+  let cosisq: number;
+  let eoc: number;
 
   const q22 = 1.7891679e-6;
   const q31 = 2.1460748e-6;
@@ -270,7 +270,7 @@ export function dsinit(options: DsinitOptions) {
   const root22 = 1.7891679e-6;
   const root44 = 7.3636953e-9;
   const root54 = 2.1765803e-9;
-  // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+  // biome-ignore lint/correctness/noPrecisionLoss: keep original value for search
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const root32 = 3.7393792e-7;
   const root52 = 1.1428639e-7;
@@ -442,7 +442,7 @@ export function dsinit(options: DsinitOptions) {
       f311 =
         0.9375 * sinim * sinim * (1.0 + 3.0 * cosim) - 0.75 * (1.0 + cosim);
       f330 = 1.0 + cosim;
-      f330 *= 1.875 * f330 * f330;
+      f330 = 1.875 * f330 * f330 * f330;
       del1 = 3.0 * nm * nm * aonv * aonv;
       del2 = 2.0 * del1 * f220 * g200 * q22;
       del3 = 3.0 * del1 * f330 * g300 * q33 * aonv;

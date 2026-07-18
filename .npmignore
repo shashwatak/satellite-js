@@ -6,8 +6,6 @@ src
 src-cpp
 test
 .babelrc
-.eslintignore
-.eslintrc.json
 .npmignore
 .raiseverrc
 .travis.yml

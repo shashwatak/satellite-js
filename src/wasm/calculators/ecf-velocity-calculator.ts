@@ -57,9 +57,11 @@ export class EcfVelocityCalculator
     const rawOutput = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       x: rawOutput[index]!,
       y: rawOutput[index + 1]!,
       z: rawOutput[index + 2]!,
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
     };
   }
 

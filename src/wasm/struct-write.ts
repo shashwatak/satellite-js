@@ -32,6 +32,7 @@ export class CppMemoryWriter {
     );
 
     for (let i = 0; i < lengthWithNullTerminator - 1; i++) {
+      // biome-ignore lint/style/noNonNullAssertion: index arithmetic
       bytes[i] = i < encoded.length ? encoded[i]! : 0;
     }
     bytes[lengthWithNullTerminator - 1] = 0; // null-terminate the string

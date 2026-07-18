@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import createSingleThreadModule from 'wasm-module-single-thread/index.js';
+import { twoline2satrec } from '../../src/io.js';
 import { BulkPropagator, EciBaseCalculator } from '../../src/wasm/index.js';
 import { createSingleThreadRuntimeFromModule } from '../../src/wasm/runtimes/single-thread-runtime.js';
-import { twoline2satrec } from '../../src/io.js';
 import { SingleThreadRuntime } from '../../src/wasm/runtimes/wasm-runtime.js';
 
 type DebugRuntime = SingleThreadRuntime & {

@@ -47,6 +47,7 @@ export class GmstCalculator
   }
 
   getFormattedOutput(_satelliteIndex: number, dateIndex: number): GMSTime {
+    // biome-ignore lint/style/noNonNullAssertion: index math
     return this.getRawOutput()[dateIndex]!;
   }
 

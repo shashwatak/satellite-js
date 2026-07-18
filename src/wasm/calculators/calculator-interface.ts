@@ -8,8 +8,8 @@ export interface Calculator<
   DependenciesCount extends number,
   Dependencies extends TupleOf<string, DependenciesCount>,
   RawOutputs extends TypedArray | Record<string, TypedArray>,
-  FormattedOutput,
-  RunParameters extends Record<string, unknown> = {},
+  FormattedOutput = unknown,
+  RunParameters extends Record<string, unknown> = Record<string, unknown>,
   ExecutionDescriptor extends Partial<RunData> = Partial<RunData>,
 > {
   readonly name: Name;
