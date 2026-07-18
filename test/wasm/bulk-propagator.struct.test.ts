@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import createSingleThreadModule from 'wasm-module-single-thread/index.js';
 import { twoline2satrec } from '../../src/io.js';
-import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from '../../src/wasm/elsetrec-struct.js';
+import {
+  allocateNativeStructArray,
+  writeNativeStructArrayFromSatrecArray,
+} from '../../src/wasm/elsetrec-struct.js';
 import {
   getNativeStructFieldLayout,
-  NativeStructLayout,
+  type NativeStructLayout,
 } from '../../src/wasm/native-structs-from-js.js';
 import { CppMemoryReader } from '../../src/wasm/struct-read.js';
 
@@ -158,10 +161,14 @@ const knownGoodLayout = {
   rcs_m2: ['double', 984, 8],
 };
 
-function layoutToObject(layout: NativeStructLayout<keyof typeof knownGoodLayout>) {
+function layoutToObject(
+  layout: NativeStructLayout<keyof typeof knownGoodLayout>,
+) {
   return Object.fromEntries(
-    Array.from(layout.entries())
-      .map((entry) => [entry[0], [entry[1].type, entry[1].offset, entry[1].size]]),
+    Array.from(layout.entries()).map((entry) => [
+      entry[0],
+      [entry[1].type, entry[1].offset, entry[1].size],
+    ]),
   );
 }
 
@@ -171,33 +178,57 @@ describe('WASM elsetrec struct', () => {
   });
 
   it('layout string has no unknown changes', () => {
-    const layoutStringPointer = wasmModule._create_elsetrec_struct_layout_string_pointer();
-    const layout = getNativeStructFieldLayout<
-      keyof typeof knownGoodLayout
-    >(layoutStringPointer, wasmModule);
+    const layoutStringPointer =
+      wasmModule._create_elsetrec_struct_layout_string_pointer();
+    const layout = getNativeStructFieldLayout<keyof typeof knownGoodLayout>(
+      layoutStringPointer,
+      wasmModule,
+    );
     wasmModule._free(layoutStringPointer);
 
     expect(layoutToObject(layout)).toEqual(knownGoodLayout);
   });
 
   it('has correct properties in case of writing directly to memory instead of parsing TLE', () => {
-    const TLE1 = '1 25544U 98067A   20344.91782528  .00001264  00000-0  29621-4 0  9993';
-    const TLE2 = '2 25544  51.6466  54.5795 0002012  70.2257  59.7266 15.49390871257157';
+    const TLE1 =
+      '1 25544U 98067A   20344.91782528  .00001264  00000-0  29621-4 0  9993';
+    const TLE2 =
+      '2 25544  51.6466  54.5795 0002012  70.2257  59.7266 15.49390871257157';
 
     const satrec = twoline2satrec(TLE1, TLE2);
 
     const pointer1 = wasmModule._malloc(wasmModule.lengthBytesUTF8(TLE1) + 1);
-    wasmModule.stringToUTF8(TLE1, pointer1, wasmModule.lengthBytesUTF8(TLE1) + 1);
+    wasmModule.stringToUTF8(
+      TLE1,
+      pointer1,
+      wasmModule.lengthBytesUTF8(TLE1) + 1,
+    );
     const pointer2 = wasmModule._malloc(wasmModule.lengthBytesUTF8(TLE2) + 1);
-    wasmModule.stringToUTF8(TLE2, pointer2, wasmModule.lengthBytesUTF8(TLE2) + 1);
+    wasmModule.stringToUTF8(
+      TLE2,
+      pointer2,
+      wasmModule.lengthBytesUTF8(TLE2) + 1,
+    );
     const elsetrecSize = wasmModule._get_elsetrec_size();
-    const satrecInitializedFromTlePointer = wasmModule._calloc_one(elsetrecSize);
-    wasmModule._init_satrec_from_tle(satrecInitializedFromTlePointer, pointer1, pointer2);
+    const satrecInitializedFromTlePointer =
+      wasmModule._calloc_one(elsetrecSize);
+    wasmModule._init_satrec_from_tle(
+      satrecInitializedFromTlePointer,
+      pointer1,
+      pointer2,
+    );
     wasmModule._free(pointer1);
     wasmModule._free(pointer2);
 
-    const satrecInitializedFromJSSatrec = allocateNativeStructArray(wasmModule, 1);
-    writeNativeStructArrayFromSatrecArray(wasmModule, satrecInitializedFromJSSatrec, [satrec]);
+    const satrecInitializedFromJSSatrec = allocateNativeStructArray(
+      wasmModule,
+      1,
+    );
+    writeNativeStructArrayFromSatrecArray(
+      wasmModule,
+      satrecInitializedFromJSSatrec,
+      [satrec],
+    );
 
     const readerOfInitializedFromTLE = new CppMemoryReader(
       wasmModule.HEAP8.buffer,
@@ -208,21 +239,26 @@ describe('WASM elsetrec struct', () => {
       satrecInitializedFromJSSatrec,
     );
 
-    const layoutStringPointer = wasmModule._create_elsetrec_struct_layout_string_pointer();
-    const layout = getNativeStructFieldLayout<
-      keyof typeof knownGoodLayout
-    >(layoutStringPointer, wasmModule);
+    const layoutStringPointer =
+      wasmModule._create_elsetrec_struct_layout_string_pointer();
+    const layout = getNativeStructFieldLayout<keyof typeof knownGoodLayout>(
+      layoutStringPointer,
+      wasmModule,
+    );
     wasmModule._free(layoutStringPointer);
     layout.forEach(({ type, offset, size }, field) => {
       if (field === 'jdsatepoch') {
-        const jdsatepochTlePart1 = readerOfInitializedFromTLE.readDouble(offset);
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        const jdsatepochTlePart1 =
+          readerOfInitializedFromTLE.readDouble(offset);
+        // biome-ignore lint/style/noNonNullAssertion: exists in C struct
         const jsatepochPart2Field = layout.get('jdsatepochF')!;
         const jdsatepochTlePart2 = readerOfInitializedFromTLE.readDouble(
           jsatepochPart2Field.offset,
         );
         const jdsatepochJS = readerOfInitializedFromJS.readDouble(offset);
-        expect(jdsatepochTlePart1 + jdsatepochTlePart2, field).toEqual(jdsatepochJS);
+        expect(jdsatepochTlePart1 + jdsatepochTlePart2, field).toEqual(
+          jdsatepochJS,
+        );
         return;
       }
       /**
@@ -238,31 +274,57 @@ describe('WASM elsetrec struct', () => {
        * - no_kozai is skipped because it is transformed into no_unkozai and then only used as
        * no_unkozai in further propagations in C++ SGP4
        */
-      if (['jdsatepochF', 'classification', 'intldesg', 'elnum', 'revnum', 'am', 'em', 'im', 'om', 'Om', 'nm', 'mm', 'mus', 'no_kozai'].includes(field)) return;
+      if (
+        [
+          'jdsatepochF',
+          'classification',
+          'intldesg',
+          'elnum',
+          'revnum',
+          'am',
+          'em',
+          'im',
+          'om',
+          'Om',
+          'nm',
+          'mm',
+          'mus',
+          'no_kozai',
+        ].includes(field)
+      )
+        return;
       switch (type) {
         case 'int':
-          expect(readerOfInitializedFromTLE.readInt(offset), field)
-            .toEqual(readerOfInitializedFromJS.readInt(offset));
+          expect(readerOfInitializedFromTLE.readInt(offset), field).toEqual(
+            readerOfInitializedFromJS.readInt(offset),
+          );
           break;
         case 'long':
-          expect(readerOfInitializedFromTLE.readLong(offset), field)
-            .toEqual(readerOfInitializedFromJS.readLong(offset));
+          expect(readerOfInitializedFromTLE.readLong(offset), field).toEqual(
+            readerOfInitializedFromJS.readLong(offset),
+          );
           break;
         case 'double':
-          expect(readerOfInitializedFromTLE.readDouble(offset), field)
-            .toEqual(readerOfInitializedFromJS.readDouble(offset));
+          expect(readerOfInitializedFromTLE.readDouble(offset), field).toEqual(
+            readerOfInitializedFromJS.readDouble(offset),
+          );
           break;
         case 'char[]':
-          expect(readerOfInitializedFromTLE.readString(offset, size), field)
-            .toEqual(readerOfInitializedFromJS.readString(offset, size));
+          expect(
+            readerOfInitializedFromTLE.readString(offset, size),
+            field,
+          ).toEqual(readerOfInitializedFromJS.readString(offset, size));
           break;
         case 'char':
-          expect(readerOfInitializedFromTLE.readChar(offset), field)
-            .toEqual(readerOfInitializedFromJS.readChar(offset));
+          expect(readerOfInitializedFromTLE.readChar(offset), field).toEqual(
+            readerOfInitializedFromJS.readChar(offset),
+          );
           break;
         case 'unsigned char':
-          expect(readerOfInitializedFromTLE.readUnsignedChar(offset), field)
-            .toEqual(readerOfInitializedFromJS.readUnsignedChar(offset));
+          expect(
+            readerOfInitializedFromTLE.readUnsignedChar(offset),
+            field,
+          ).toEqual(readerOfInitializedFromJS.readUnsignedChar(offset));
           break;
       }
     });
@@ -309,10 +371,12 @@ describe('WASM run data struct', () => {
   });
 
   it('layout string has no unknown changes', () => {
-    const layoutStringPointer = wasmModule._create_rundata_struct_layout_string_pointer();
-    const layout = getNativeStructFieldLayout<
-      keyof typeof knownGoodLayout
-    >(layoutStringPointer, wasmModule);
+    const layoutStringPointer =
+      wasmModule._create_rundata_struct_layout_string_pointer();
+    const layout = getNativeStructFieldLayout<keyof typeof knownGoodLayout>(
+      layoutStringPointer,
+      wasmModule,
+    );
     wasmModule._free(layoutStringPointer);
 
     expect(layoutToObject(layout)).toEqual(knownRunDataLayout);

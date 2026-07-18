@@ -1,6 +1,6 @@
 import type * as Preset from '@docusaurus/preset-classic';
-import type {Config} from '@docusaurus/types';
-import {themes as prismThemes} from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -40,7 +40,7 @@ const config: Config = {
     hooks: {
       onBrokenMarkdownLinks: 'warn',
       onBrokenMarkdownImages: 'warn',
-    }
+    },
   },
 
   presets: [
@@ -82,7 +82,7 @@ const config: Config = {
     // image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       respectPrefersColorScheme: true,
-      defaultMode: 'dark'
+      defaultMode: 'dark',
     },
     navbar: {
       title: '🛰️ Satellite.js',

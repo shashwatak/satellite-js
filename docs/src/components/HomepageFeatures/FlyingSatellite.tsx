@@ -1,24 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './FlyingSatellite.module.css';
 
-function randomEdgeAndDirection(width, height, margin = 32) {
+function randomEdgeAndDirection(width: number, height: number, margin = 32) {
   // pick a random point along the perimeter
   const perim = 2 * (width + height);
   const p = Math.random() * perim;
-  let start: { x: number, y: number }, end: { x: number, y: number };
-  if (p < width) { // top
+  let start: { x: number; y: number }, end: { x: number; y: number };
+  if (p < width) {
+    // top
     const x = p;
     start = { x, y: -margin };
     end = { x: width - x, y: height + margin };
-  } else if (p < width + height) { // right
+  } else if (p < width + height) {
+    // right
     const y = p - width;
     start = { x: width + margin, y };
     end = { x: -margin, y: height - y };
-  } else if (p < 2 * width + height) { // bottom
+  } else if (p < 2 * width + height) {
+    // bottom
     const x = width - (p - (width + height));
     start = { x, y: height + margin };
     end = { x: width - x, y: -margin };
-  } else { // left
+  } else {
+    // left
     const y = height - (p - (2 * width + height));
     start = { x: -margin, y };
     end = { x: width + margin, y: height - y };
@@ -38,8 +42,14 @@ const RUN_MAX = 30; // seconds
 
 const SATELLITE_SPEED = 0.5; // px/sec, controls how fast satellite moves
 const FlyingSatellite = () => {
-  const containerRef = useRef(null);
-  const [params, setParams] = useState(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [params, setParams] = useState<{
+    start: { x: number; y: number };
+    end: { x: number; y: number };
+    angle: number;
+    runDuration: number;
+    size: number;
+  } | null>(null);
   const [key, setKey] = useState(0); // for re-rendering
 
   useEffect(() => {
@@ -48,9 +58,15 @@ const FlyingSatellite = () => {
       if (!container) return;
       const width = container.offsetWidth;
       const height = container.offsetHeight;
-      const { start, end, angle, distance } = randomEdgeAndDirection(width, height);
+      const { start, end, angle, distance } = randomEdgeAndDirection(
+        width,
+        height,
+      );
 
-      const runDuration = Math.max(RUN_MIN, Math.min(RUN_MAX, distance / SATELLITE_SPEED + (Math.random() - 0.5)));
+      const runDuration = Math.max(
+        RUN_MIN,
+        Math.min(RUN_MAX, distance / SATELLITE_SPEED + (Math.random() - 0.5)),
+      );
       setParams({
         start,
         end,
@@ -58,7 +74,7 @@ const FlyingSatellite = () => {
         runDuration,
         size: SATELLITE_SIZE * (0.8 + Math.random() * 0.4),
       });
-      setKey(k => k + 1); // force re-render for animation restart
+      setKey((k) => k + 1); // force re-render for animation restart
     }
     startNewRun();
   }, []);
@@ -66,22 +82,34 @@ const FlyingSatellite = () => {
   useEffect(() => {
     if (!params) return;
     const timer = setTimeout(() => {
-      setTimeout(() => {
-        const container = containerRef.current;
-        if (!container) return;
-        const width = container.offsetWidth;
-        const height = container.offsetHeight;
-        const { start, end, angle, distance } = randomEdgeAndDirection(width, height);
-        const runDuration = Math.max(RUN_MIN, Math.min(RUN_MAX, distance / SATELLITE_SPEED + (Math.random() - 0.5)));
-        setParams({
-          start,
-          end,
-          angle,
-          runDuration,
-          size: SATELLITE_SIZE * (0.8 + Math.random() * 0.4),
-        });
-        setKey(k => k + 1);
-      }, 1000 + Math.random() * 4000);
+      setTimeout(
+        () => {
+          const container = containerRef.current;
+          if (!container) return;
+          const width = container.offsetWidth;
+          const height = container.offsetHeight;
+          const { start, end, angle, distance } = randomEdgeAndDirection(
+            width,
+            height,
+          );
+          const runDuration = Math.max(
+            RUN_MIN,
+            Math.min(
+              RUN_MAX,
+              distance / SATELLITE_SPEED + (Math.random() - 0.5),
+            ),
+          );
+          setParams({
+            start,
+            end,
+            angle,
+            runDuration,
+            size: SATELLITE_SIZE * (0.8 + Math.random() * 0.4),
+          });
+          setKey((k) => k + 1);
+        },
+        1000 + Math.random() * 4000,
+      );
     }, params.runDuration * 1000);
     return () => clearTimeout(timer);
   }, [params]);

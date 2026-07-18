@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { dsinit } from '../../src/propagation/dsinit.js';
 import dsOptionSets from './dsinit.json' with { type: 'json' };
 

@@ -6,7 +6,14 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": [
+      "docs/**",
+      "src/**",
+      "test/**",
+      "!test/omm.json",
+      "!test/propagation/sgp4CatalogResults.json"
+    ]
   },
   "formatter": {
     "enabled": true,
