@@ -1,5 +1,5 @@
-import { NativeStructLayout } from './native-structs-from-js.js';
-import { WasmModuleBase } from './runtimes/wasm-module-interfaces.js';
+import type { NativeStructLayout } from './native-structs-from-js.js';
+import type { WasmModuleBase } from './runtimes/wasm-module-interfaces.js';
 import { CppMemoryWriter } from './struct-write.js';
 
 export interface RunData {
@@ -51,7 +51,7 @@ export interface RunData {
 export function allocateRunData(module: WasmModuleBase): number {
   const runDataSize = module._get_rundata_size();
   return module._calloc_one(runDataSize);
-} 
+}
 
 export function passRunDataToWasm(
   module: WasmModuleBase,
@@ -63,9 +63,17 @@ export function passRunDataToWasm(
   Object.entries(runData).forEach(([fieldName, value]) => {
     const fieldLayout = runDataStruct.get(fieldName as keyof RunData);
     if (!fieldLayout) {
-      throw new Error(`Field ${fieldName} not found in RunData struct layout. Please file an issue to satellite.js.`);
+      throw new Error(
+        `Field ${fieldName} not found in RunData struct layout. Please file an issue to satellite.js.`,
+      );
     }
-    writer.writeValue(fieldName, fieldLayout.offset, fieldLayout.type, value, fieldLayout.size);
+    writer.writeValue(
+      fieldName,
+      fieldLayout.offset,
+      fieldLayout.type,
+      value,
+      fieldLayout.size,
+    );
   });
   return runDataPointer;
 }

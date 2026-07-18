@@ -5,7 +5,8 @@ export const rad2deg = 180 / pi;
 export const minutesPerDay = 1440.0;
 export const mu = 398600.8; // in km3 / s2
 export const earthRadius = 6378.135; // in km
-export const xke = 60.0 / Math.sqrt((earthRadius * earthRadius * earthRadius) / mu);
+export const xke =
+  60.0 / Math.sqrt((earthRadius * earthRadius * earthRadius) / mu);
 export const vkmpersec = (earthRadius * xke) / 60.0;
 export const tumin = 1.0 / xke;
 export const j2 = 0.001082616;

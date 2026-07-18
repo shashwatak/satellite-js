@@ -1,13 +1,14 @@
-import { describe, it, expect } from 'vitest';
-import goodData from './io.json' with { type: 'json' };
-import { sunPos } from '../src/sun.js';
-import { shadowFraction } from '../src/shadow.js';
+import { describe, expect, it } from 'vitest';
 import { jday } from '../src/ext.js';
 import { twoline2satrec } from '../src/io.js';
 import { propagate } from '../src/propagation.js';
+import { shadowFraction } from '../src/shadow.js';
+import { sunPos } from '../src/sun.js';
+import goodData from './io.json' with { type: 'json' };
 
 const numDigits = 8;
 
+// biome-ignore lint/style/noNonNullAssertion: no "as const" json import
 const iss = goodData[0]!;
 const issSatrec = twoline2satrec(iss.tleLine1, iss.tleLine2);
 
@@ -16,6 +17,7 @@ function shadowFractionAt(isoDate: string): number {
   const state = propagate(issSatrec, date);
   expect(state).not.toBeNull();
   const { rsun } = sunPos(jday(date));
+  // biome-ignore lint/style/noNonNullAssertion: asserted above
   return shadowFraction(rsun, state!.position);
 }
 
@@ -42,6 +44,7 @@ describe('shadowFraction', () => {
     expect(state).not.toBeNull();
 
     const { rsun } = sunPos(jday(date));
+    // biome-ignore lint/style/noNonNullAssertion: asserted above
     const fraction = shadowFraction(rsun, state!.position);
 
     expect(fraction).toBe(0);

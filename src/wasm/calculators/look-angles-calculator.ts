@@ -1,7 +1,7 @@
-import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
 import type { GeodeticLocation, LookAngles } from '../../common-types.js';
-import type { Calculator } from './calculator-interface.js';
 import type { RunData } from '../run-data.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
+import type { Calculator } from './calculator-interface.js';
 
 const OUTPUTS_PER_SATELLITE = 3;
 
@@ -35,7 +35,17 @@ const OUTPUTS_PER_SATELLITE = 3;
  * bulkPropagator.getFormattedOutput(satelliteIndex, dateIndex).lookAngles.azimuth;
  * ```
  */
-export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPosition'], Float64Array, LookAngles, { observer: GeodeticLocation }> {
+export class LookAnglesCalculator
+  implements
+    Calculator<
+      'lookAngles',
+      1,
+      ['ecfPosition'],
+      Float64Array,
+      LookAngles,
+      { observer: GeodeticLocation }
+    >
+{
   readonly name = 'lookAngles';
 
   readonly dependencies: ['ecfPosition'] = ['ecfPosition'];
@@ -62,11 +72,14 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
 
   getFormattedOutput(satelliteIndex: number, dateIndex: number): LookAngles {
     const rawOutput = this.getRawOutput();
-    const index = (satelliteIndex * this.datesCount + dateIndex) * OUTPUTS_PER_SATELLITE;
+    const index =
+      (satelliteIndex * this.datesCount + dateIndex) * OUTPUTS_PER_SATELLITE;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       azimuth: rawOutput[index]!,
       elevation: rawOutput[index + 1]!,
       rangeSat: rawOutput[index + 2]!,
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
     };
   }
 
@@ -79,10 +92,15 @@ export class LookAnglesCalculator implements Calculator<'lookAngles', 1, ['ecfPo
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
-    return satellitesCount * datesCount * OUTPUTS_PER_SATELLITE * Float64Array.BYTES_PER_ELEMENT;
+    return (
+      satellitesCount *
+      datesCount *
+      OUTPUTS_PER_SATELLITE *
+      Float64Array.BYTES_PER_ELEMENT
+    );
   }
 
-  getExecutionDescriptor(runParameters: { observer: GeodeticLocation; }) {
+  getExecutionDescriptor(runParameters: { observer: GeodeticLocation }) {
     const { latitude, longitude, height } = runParameters.observer;
     return {
       lookAnglesEnabled: true,

@@ -1,33 +1,46 @@
-import { describe, it, expect } from 'vitest';
-import path from 'node:path';
+/** biome-ignore-all lint/style/noNonNullAssertion: lots of index arithmetic */
 import fs from 'node:fs';
-import { createSingleThreadRuntime, createMultiThreadRuntime } from '../../src/wasm/runtimes/index.js';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { days2mdhms, type JDay } from '../../src/ext.js';
 import {
-  BulkPropagator, EciBaseCalculator, propagate, sgp4, twoline2satrec,
+  BulkPropagator,
+  EciBaseCalculator,
+  type PositionAndVelocity,
+  propagate,
+  sgp4,
+  twoline2satrec,
 } from '../../src/index.js';
+import {
+  createMultiThreadRuntime,
+  createSingleThreadRuntime,
+} from '../../src/wasm/runtimes/index.js';
 import expectedData from './sgp4CatalogResults.json' with { type: 'json' };
-import { days2mdhms, JDay } from '../../src/ext.js';
 
 const singleThreadRuntime = await createSingleThreadRuntime();
-const multiThreadRuntime = await createMultiThreadRuntime(
-  { threadsCount: 4 },
-);
+const multiThreadRuntime = await createMultiThreadRuntime({ threadsCount: 4 });
 
 const satellitesPerTestSuite = 500;
 
 type NumericValues<T> = { [K in keyof T]: number };
 
-function haveValuesClose<
-  T extends NumericValues<T>
->(actual: T, expected: T, precision = 13): boolean {
+function haveValuesClose<T extends NumericValues<T>>(
+  actual: T,
+  expected: T,
+  precision = 13,
+): boolean {
   for (const key in expected) {
     if (Object.hasOwn(expected, key) && Object.hasOwn(actual, key)) {
       const expectedNumber = expected[key];
       const actualNumber = actual[key];
-      if (typeof expectedNumber !== 'number' || typeof actualNumber !== 'number') {
+      if (
+        typeof expectedNumber !== 'number' ||
+        typeof actualNumber !== 'number'
+      ) {
         return false;
       }
-      const pass = Math.abs(actualNumber - expectedNumber) < 10 ** -precision / 2;
+      const pass =
+        Math.abs(actualNumber - expectedNumber) < 10 ** -precision / 2;
       if (!pass) {
         return false;
       }
@@ -38,7 +51,8 @@ function haveValuesClose<
 
 function getTleSuites() {
   const tleSuites: { line1: string; line2: string }[][] = [];
-  const text = fs.readFileSync(path.resolve(import.meta.dirname, './tle.txt'), 'utf-8')
+  const text = fs
+    .readFileSync(path.resolve(import.meta.dirname, './tle.txt'), 'utf-8')
     // remove BOM marker
     .replace(/^\uFEFF/, '');
   const lines = text.split('\n');
@@ -72,28 +86,25 @@ export function invjdayFull(jd: JDay) {
   let leapyrs = Math.floor((year - 1901) * 0.25);
 
   // optional nudge by 8.64x10-7 sec to get even outputs
-  let days = (temp - (((year - 1900) * 365.0) + leapyrs)) + 0.00000000001;
+  let days = temp - ((year - 1900) * 365.0 + leapyrs) + 0.00000000001;
 
   // ------------ check for case of beginning of a year -----------
   if (days < 1.0) {
     year -= 1;
     leapyrs = Math.floor((year - 1901) * 0.25);
-    days = temp - (((year - 1900) * 365.0) + leapyrs);
+    days = temp - ((year - 1900) * 365.0 + leapyrs);
   }
 
   // ----------------- find remaing data  -------------------------
   const mdhms = days2mdhms(year, days);
 
-  const {
-    mon,
-    day,
-    hr,
-    minute,
-  } = mdhms;
+  const { mon, day, hr, minute } = mdhms;
 
-  const sec = mdhms.sec - 0.00000086400;
+  const sec = mdhms.sec - 0.000000864;
 
-  return new Date(Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec), (sec % 1) * 1000));
+  return new Date(
+    Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec), (sec % 1) * 1000),
+  );
 }
 
 const tsince = [0, 360, 720, 1080, 1440];
@@ -121,7 +132,9 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
         bp.setSatRecs([satrec]);
         bpMultiThread.setSatRecs([satrec]);
         const satelliteEpoch = satrec.jdsatepoch;
-        const dates = tsince.map((ts) => invjdayFull(satelliteEpoch + ts / 1440));
+        const dates = tsince.map((ts) =>
+          invjdayFull(satelliteEpoch + ts / 1440),
+        );
         bp.setDates(dates);
         bpMultiThread.setDates(dates);
         bp.run();
@@ -129,35 +142,54 @@ tleSuites.forEach((tleSuite, tleSuiteIndex) => {
 
         tsince.forEach((time, timeIndex) => {
           const result = sgp4(satrec, time);
-          const expectedResult = (expectedData as any)[tleSuiteIndex][tleIndex][timeIndex];
-          if (!result) {
+          const expectedResult = (
+            expectedData as Array<Array<Array<PositionAndVelocity | null>>>
+          )[tleSuiteIndex]?.[tleIndex]?.[timeIndex];
+          if (!result || !expectedResult) {
             expect(result).toEqual(expectedResult);
             return;
           }
           expect(expectedResult).toBeDefined();
-          expect(haveValuesClose(result.position, expectedResult.position)).toBe(true);
-          expect(haveValuesClose(result.velocity, expectedResult.velocity)).toBe(true);
-          expect(haveValuesClose(result.meanElements, expectedResult.meanElements)).toBe(true);
+          expect(
+            haveValuesClose(result.position, expectedResult.position),
+          ).toBe(true);
+          expect(
+            haveValuesClose(result.velocity, expectedResult.velocity),
+          ).toBe(true);
+          expect(
+            haveValuesClose(result.meanElements, expectedResult.meanElements),
+          ).toBe(true);
 
           // this compares propagate() output to BulkPropagator output
           // as mentioned above, due to precision loss in epoch to date conversion,
           // it's impossible to compare them directly to the expected output of sgp4()
           const resultPropagate = propagate(satrec, dates[timeIndex]!);
           const wasmResult = bp.getFormattedOutput(0, timeIndex)!.eci;
-          const wasmResultMultiThread = bpMultiThread.getFormattedOutput(0, timeIndex)!.eci;
+          const wasmResultMultiThread = bpMultiThread.getFormattedOutput(
+            0,
+            timeIndex,
+          )!.eci;
           if (resultPropagate) {
-            expect(haveValuesClose(wasmResult.position, resultPropagate.position, 9)).toBe(true);
-            expect(haveValuesClose(wasmResult.velocity, resultPropagate.velocity, 9)).toBe(true);
-            expect(haveValuesClose(
-              wasmResultMultiThread.position,
-              resultPropagate.position,
-              9,
-            )).toBe(true);
-            expect(haveValuesClose(
-              wasmResultMultiThread.velocity,
-              resultPropagate.velocity,
-              9,
-            )).toBe(true);
+            expect(
+              haveValuesClose(wasmResult.position, resultPropagate.position, 9),
+            ).toBe(true);
+            expect(
+              haveValuesClose(wasmResult.velocity, resultPropagate.velocity, 9),
+            ).toBe(true);
+            expect(
+              haveValuesClose(
+                wasmResultMultiThread.position,
+                resultPropagate.position,
+                9,
+              ),
+            ).toBe(true);
+            expect(
+              haveValuesClose(
+                wasmResultMultiThread.velocity,
+                resultPropagate.velocity,
+                9,
+              ),
+            ).toBe(true);
           } else {
             expect(satrec.error).toEqual(wasmResult.error);
           }

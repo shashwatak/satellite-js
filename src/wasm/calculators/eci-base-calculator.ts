@@ -1,8 +1,12 @@
-import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
+import type {
+  EciVec3,
+  Kilometer,
+  KilometerPerSecond,
+} from '../../common-types.js';
 import type { SatRecError } from '../../propagation/SatRec.js';
-import type { Calculator } from './calculator-interface.js';
 import type { RunData } from '../run-data.js';
-import type { EciVec3, Kilometer, KilometerPerSecond } from '../../common-types.js';
+import type { WasmModuleBase } from '../runtimes/wasm-module-interfaces.js';
+import type { Calculator } from './calculator-interface.js';
 
 const DIMENSIONS = 3;
 const BYTES_PER_VECTOR = DIMENSIONS * Float64Array.BYTES_PER_ELEMENT;
@@ -27,7 +31,16 @@ export interface EciBaseFormattedOutput {
  *
  * Provides formatted output under `eci` property, @see EciBaseFormattedOutput.
  */
-export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: Float64Array, velocity: Float64Array, error: Int8Array }, EciBaseFormattedOutput> {
+export class EciBaseCalculator
+  implements
+    Calculator<
+      'eci',
+      0,
+      [],
+      { position: Float64Array; velocity: Float64Array; error: Int8Array },
+      EciBaseFormattedOutput
+    >
+{
   readonly name = 'eci';
 
   readonly dependencies: [] = [];
@@ -52,10 +65,14 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: F
     this.datesCount = datesCount;
   }
 
-  getFormattedOutput(satelliteIndex: number, dateIndex: number): EciBaseFormattedOutput {
+  getFormattedOutput(
+    satelliteIndex: number,
+    dateIndex: number,
+  ): EciBaseFormattedOutput {
     const { position, velocity, error } = this.getRawOutput();
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       position: {
         x: position[index]!,
         y: position[index + 1]!,
@@ -66,13 +83,22 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: F
         y: velocity[index + 1]!,
         z: velocity[index + 2]!,
       },
-      error: error[(satelliteIndex * this.datesCount + dateIndex)] as SatRecError,
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
+      error: error[satelliteIndex * this.datesCount + dateIndex] as SatRecError,
     };
   }
 
-  getRawOutput(): { position: Float64Array; velocity: Float64Array, error: Int8Array } {
+  getRawOutput(): {
+    position: Float64Array;
+    velocity: Float64Array;
+    error: Int8Array;
+  } {
     const vectorsSize = this.satellitesCount * this.datesCount * DIMENSIONS;
-    const position = new Float64Array(this.module.HEAP8.buffer, this.outputPointer, vectorsSize);
+    const position = new Float64Array(
+      this.module.HEAP8.buffer,
+      this.outputPointer,
+      vectorsSize,
+    );
     const velocity = new Float64Array(
       this.module.HEAP8.buffer,
       position.byteOffset + position.byteLength,
@@ -91,18 +117,22 @@ export class EciBaseCalculator implements Calculator<'eci', 0, [], { position: F
   }
 
   getOutputBufferSize(satellitesCount: number, datesCount: number): number {
-    return BYTES_PER_VECTOR * satellitesCount * datesCount * 2
-      + Int8Array.BYTES_PER_ELEMENT * satellitesCount * datesCount;
+    return (
+      BYTES_PER_VECTOR * satellitesCount * datesCount * 2 +
+      Int8Array.BYTES_PER_ELEMENT * satellitesCount * datesCount
+    );
   }
 
   getExecutionDescriptor() {
-    const eciVelocitiesPointer = this.outputPointer
-      + BYTES_PER_VECTOR * this.satellitesCount * this.datesCount;
+    const eciVelocitiesPointer =
+      this.outputPointer +
+      BYTES_PER_VECTOR * this.satellitesCount * this.datesCount;
     return {
       eciPositions: this.outputPointer,
       eciVelocities: eciVelocitiesPointer,
-      sgp4Errors: eciVelocitiesPointer
-        + BYTES_PER_VECTOR * this.satellitesCount * this.datesCount,
+      sgp4Errors:
+        eciVelocitiesPointer +
+        BYTES_PER_VECTOR * this.satellitesCount * this.datesCount,
     } satisfies Partial<RunData>;
   }
 }

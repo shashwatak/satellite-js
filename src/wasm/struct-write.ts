@@ -1,7 +1,10 @@
-import { NativeFieldType } from './native-field-type.js';
+import type { NativeFieldType } from './native-field-type.js';
 
 export class CppMemoryWriter {
-  constructor(buffer: ArrayBufferLike, private baseOffset = 0) {
+  constructor(
+    buffer: ArrayBufferLike,
+    private baseOffset = 0,
+  ) {
     this.view = new DataView(buffer);
   }
 
@@ -15,7 +18,11 @@ export class CppMemoryWriter {
     this.view.setInt32(this.baseOffset + offset, value, true);
   }
 
-  writeString(offset: number, value: string, lengthWithNullTerminator: number): void {
+  writeString(
+    offset: number,
+    value: string,
+    lengthWithNullTerminator: number,
+  ): void {
     const encoder = new TextEncoder();
     const encoded = encoder.encode(value);
     const bytes = new Uint8Array(
@@ -25,6 +32,7 @@ export class CppMemoryWriter {
     );
 
     for (let i = 0; i < lengthWithNullTerminator - 1; i++) {
+      // biome-ignore lint/style/noNonNullAssertion: index arithmetic
       bytes[i] = i < encoded.length ? encoded[i]! : 0;
     }
     bytes[lengthWithNullTerminator - 1] = 0; // null-terminate the string
@@ -54,46 +62,53 @@ export class CppMemoryWriter {
       case 'bool': {
         // todo test performance without these checks
         if (typeof value !== 'boolean') {
-          throw new Error(`Expected boolean for ${fieldName}, got ${typeof value}`);
+          throw new Error(
+            `Expected boolean for ${fieldName}, got ${typeof value}`,
+          );
         }
         this.writeBoolean(offset, value);
         break;
       }
-      case 'double':
-      {
+      case 'double': {
         if (typeof value !== 'number') {
-          throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
+          throw new Error(
+            `Expected number for ${fieldName}, got ${typeof value}`,
+          );
         }
         this.writeDouble(offset, value);
         break;
       }
-      case 'int':
-      {
+      case 'int': {
         if (typeof value !== 'number') {
-          throw new Error(`Expected number for ${fieldName}, got ${typeof value}`);
+          throw new Error(
+            `Expected number for ${fieldName}, got ${typeof value}`,
+          );
         }
         this.writeInt(offset, value);
         break;
       }
-      case 'char':
-      {
+      case 'char': {
         if (typeof value !== 'string') {
-          throw new Error(`Expected char for ${fieldName}, got "${typeof value}"`);
+          throw new Error(
+            `Expected char for ${fieldName}, got "${typeof value}"`,
+          );
         }
         this.writeChar(offset, value);
         break;
       }
-      case 'char[]':
-      {
+      case 'char[]': {
         if (typeof value !== 'string') {
-          throw new Error(`Expected string for ${fieldName}, got "${typeof value}"`);
+          throw new Error(
+            `Expected string for ${fieldName}, got "${typeof value}"`,
+          );
         }
         this.writeString(offset, value, size);
         break;
       }
-      default:
-      {
-        throw new Error(`Writing type ${type} not implemented (field ${fieldName})`);
+      default: {
+        throw new Error(
+          `Writing type ${type} not implemented (field ${fieldName})`,
+        );
       }
     }
   }

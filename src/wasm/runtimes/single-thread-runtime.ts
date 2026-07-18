@@ -1,13 +1,13 @@
 import { getNativeStructFieldLayout } from '../native-structs-from-js.js';
-import { passRunDataToWasm, RunData } from '../run-data.js';
-import { WasmModuleSingleThread } from './wasm-module-interfaces.js';
-import { SingleThreadRuntime } from './wasm-runtime.js';
+import { passRunDataToWasm, type RunData } from '../run-data.js';
+import type { WasmModuleSingleThread } from './wasm-module-interfaces.js';
+import type { SingleThreadRuntime } from './wasm-runtime.js';
 
 export async function createSingleThreadRuntimeFromModule(
   wasmModule: WasmModuleSingleThread,
 ): Promise<SingleThreadRuntime> {
-  const runDataStructLayoutStringPointer = wasmModule
-    ._create_rundata_struct_layout_string_pointer();
+  const runDataStructLayoutStringPointer =
+    wasmModule._create_rundata_struct_layout_string_pointer();
   const runDataLayout = getNativeStructFieldLayout<keyof RunData>(
     runDataStructLayoutStringPointer,
     wasmModule,
