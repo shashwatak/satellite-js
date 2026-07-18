@@ -29,10 +29,11 @@ In order to get test code coverage run the following:
 npm run test:coverage
 ```
 
-Make sure that your code follows [Airbnb](https://www.npmjs.com/package/eslint-config-airbnb-base) style
+Make sure that your code follows the Biome lint config
 
 ```bash
 npm run lint
+npm run lint:fix
 ```
 
 When implementing new functions or features, provide tests to cover them and mention your works in Changelog.
@@ -80,7 +81,8 @@ These is a full list of all available NPM scripts:
 |---|---|
 | `build` | Builds everything (WASM release + TypeScript) |
 | `copy` | Copies built library from `dist` to the SGP4 verification application's directory |
-| `lint` | Lints source code in `src` with ESLint |
+| `lint` | Lints source code in `src`, `docs`, `test` with Biome without editing |
+| `lint:fix` | Lints and fixes the code in the same directories |
 | `test` | Runs main test projects: `js`, `wasm_release`, `wasm_debug` |
 | `test:catalog` | Runs the full SGP4 satellite catalog verification test |
 | `test:watch` | Runs tests in watch mode |
@@ -172,15 +174,9 @@ export interface EcfVec3<T> { x: T; y: T; z: T; }
 
 ## Linting
 
-ESLint is configured with `eslint-config-airbnb-extended` (the Airbnb style guide). There are some project-specific overrides:
+Linter is [Biome](https://biomejs.dev/) and uses mostly default configuration in `biome.jsonc` for `src`, `test`, `docs` directories. Generated code in `wasm-build` is not included in the lint.
 
-- **`no-param-reassign`**: Allowed for `satrec` properties, because `sgp4` and `sgp4init` extensively mutate the satellite record.
-- **`no-underscore-dangle`**: Turned off, since Emscripten exports C++ functions with leading underscores (e.g. `_malloc`, `_free`).
-- **`import/no-default-export`**: Default exports are **not allowed**. Use named exports, which autocomplete and refactor more easily.
-- **`no-restricted-syntax`**: `for...of` loops are allowed (unlike vanilla Airbnb) as they are used for performance.
-- **`no-plusplus`**: `++` is allowed in for-loop afterthoughts.
-
-Linting ignores `wasm-build/`, `docs/`, and config files.
+On VSCode you can install recommended Biome extension to immediately see warnings and errors; and/or you can use `npm run lint` for read-only style check and `npm run lint:fix` to try to fix style issues automatically.
 
 ## Testing
 
@@ -205,7 +201,7 @@ Running `npm test` runs the `js`, `wasm_release`, and `wasm_debug` projects.
 
 The repository includes VS Code configuration in `.vscode/`:
 
-- **`extensions.json`** - Recommends `ms-vscode.wasm-dwarf-debugging` (for stepping into C++ in WASM) and `ms-vscode.cpptools`.
+- **`extensions.json`** - Recommends `ms-vscode.wasm-dwarf-debugging` (for stepping into C++ in WASM), `ms-vscode.cpptools`, and Biome extension to highlight linting issues.
 - **`launch.json`** - A `tsx` launch configuration for running/debugging individual TypeScript files.
 - **`settings.example.json`** and **`c_cpp_properties.example.json`** - Templates for C++ IntelliSense with Emscripten. Copy and rename them (remove `.example`), then replace `path_to_emsdk` with your Emscripten SDK path.
 
