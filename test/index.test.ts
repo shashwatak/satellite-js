@@ -19,6 +19,7 @@ import {
 import { dopplerFactor } from '../src/dopplerFactor.js';
 import { invjday, jday } from '../src/ext.js';
 import * as es from '../src/index.js';
+import { checkForDecay } from '../src/index.js';
 import { json2satrec, twoline2satrec } from '../src/io.js';
 import { gstime, propagate, sgp4 } from '../src/propagation.js';
 import { shadowFraction } from '../src/shadow.js';
@@ -61,6 +62,7 @@ describe('Library export', () => {
   it('json2satrec', () => expect(es.json2satrec).toEqual(json2satrec));
   it('propagate', () => expect(es.propagate).toEqual(propagate));
   it('sgp4', () => expect(es.sgp4).toEqual(sgp4));
+  it('checkForDecay', () => expect(es.checkForDecay).toEqual(checkForDecay));
   it('gstime', () => expect(es.gstime).toEqual(gstime));
   it('jday', () => expect(es.jday).toEqual(jday));
   it('invjday', () => expect(es.invjday).toEqual(invjday));
