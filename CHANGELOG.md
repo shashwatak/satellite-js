@@ -5,6 +5,7 @@
 - Test: Add unit tests for `sunPos` and `shadowFraction`.
 - Feature: Exposed mean motion with kozai in `SatRec` as `nokozai`.
 - Test: Export checks for `sunPos` and `shadowFraction` in `index.test.ts`.
+- Feature: add `checkForDecay` function that allows filtering satellites decayed long ago
 
 ## 7.0.1 (2026-05-15)
 
