@@ -1,4 +1,4 @@
-import { AU, EciVec3, Kilometer } from './common-types.js';
+import type { AU, EciVec3, Kilometer } from './common-types.js';
 import { earthRadius } from './constants.js';
 
 const SUN_RADIUS = 695700;
@@ -40,12 +40,19 @@ export function shadowFraction(
   satelliteEciKm: EciVec3<Kilometer>,
 ): number {
   // Sun position in km (ECI)
-  const sunECIinKM: Vec3 = vecScale([sunEciAU.x, sunEciAU.y, sunEciAU.z], KM_PER_AU);
+  const sunECIinKM: Vec3 = vecScale(
+    [sunEciAU.x, sunEciAU.y, sunEciAU.z],
+    KM_PER_AU,
+  );
 
   // Antisolar direction (unit vector pointing away from the Sun)
   const antisolar: Vec3 = vecNormalize(vecNegate(sunECIinKM));
 
-  const positionVec: Vec3 = [satelliteEciKm.x, satelliteEciKm.y, satelliteEciKm.z];
+  const positionVec: Vec3 = [
+    satelliteEciKm.x,
+    satelliteEciKm.y,
+    satelliteEciKm.z,
+  ];
   const positionLength = vecLength(positionVec);
   const positionAndAntisolarDot = vecDot(positionVec, antisolar);
 
@@ -79,9 +86,9 @@ export function shadowFraction(
   // circle–circle intersection area formula
   const part1 = rS * rS * Math.acos((d * d + rS * rS - rE * rE) / (2 * d * rS));
   const part2 = rE * rE * Math.acos((d * d + rE * rE - rS * rS) / (2 * d * rE));
-  const part3 = 0.5 * Math.sqrt(
-    (-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE),
-  );
+  const part3 =
+    0.5 *
+    Math.sqrt((-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
   const overlapArea = part1 + part2 - part3;
   const sunDiscArea = Math.PI * rS * rS;
 

@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import goodData from './io.json' with { type: 'json' };
-import { sunPos } from '../src/sun.js';
+import { describe, expect, it } from 'vitest';
 import { jday } from '../src/ext.js';
+import { sunPos } from '../src/sun.js';
+import goodData from './io.json' with { type: 'json' };
 
 const numDigits = 8;
+// biome-ignore lint/style/noNonNullAssertion: no "as const" for json imports
 const mockData = goodData[0]!;
 const regressionDate = new Date(`${mockData.EPOCH}Z`);
 
@@ -21,15 +22,17 @@ describe('sunPos', () => {
   it('gives the same result for jday(Date) and jday(components)', () => {
     const date = regressionDate;
     const fromDate = sunPos(jday(date));
-    const fromComponents = sunPos(jday(
-      date.getUTCFullYear(),
-      date.getUTCMonth() + 1,
-      date.getUTCDate(),
-      date.getUTCHours(),
-      date.getUTCMinutes(),
-      date.getUTCSeconds(),
-      date.getUTCMilliseconds(),
-    ));
+    const fromComponents = sunPos(
+      jday(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds(),
+        date.getUTCMilliseconds(),
+      ),
+    );
 
     expect(fromComponents.rsun.x).toBeCloseTo(fromDate.rsun.x, numDigits);
     expect(fromComponents.rsun.y).toBeCloseTo(fromDate.rsun.y, numDigits);

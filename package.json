@@ -18,7 +18,8 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist wasm-build && npm run wasm:build:release && tsc",
-    "lint": "eslint",
+    "lint": "npx @biomejs/biome check --reporter=concise",
+    "lint:fix": "npx @biomejs/biome check --write",
     "test": "vitest run --project js --project wasm_release --project wasm_debug",
     "test:catalog": "vitest run --project catalog",
     "test:watch": "vitest watch",
@@ -56,16 +57,12 @@
     "url": "https://github.com/shashwatak/satellite-js/issues"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.0.1",
-    "@eslint/js": "^9.35.0",
+    "@biomejs/biome": "^2.5.2",
     "@vitest/coverage-v8": "^4.0.17",
-    "eslint": "^9.35.0",
-    "eslint-config-airbnb-extended": "^2.3.3",
     "mkdirp": "^3.0.1",
     "rimraf": "^6.1.2",
     "tsx": "^4.21.0",
-    "typescript": "~5.9.2",
-    "typescript-eslint": "^8.43.0",
+    "typescript": "^6.0.3",
     "vitest": "^4.0.17"
   },
   "homepage": "https://shashwatak.github.io/satellite-js/",

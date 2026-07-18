@@ -1,3 +1,8 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: due to the fact that
+ * many variables are first assigned within loops and if statements,
+ * Typescript marks many of them as "used before assigned". To keep the algorithm
+ * as is, non null assertion is used there.
+ */
 import { twoPi } from '../constants.js';
 
 interface DscomOptions {
@@ -78,84 +83,76 @@ interface DscomOptions {
  *    vallado, crawford, hujsak, kelso  2006
  ----------------------------------------------------------------------------*/
 export function dscom(options: DscomOptions) {
-  const {
-    epoch,
-    ep,
-    argpp,
-    tc,
-    inclp,
-    nodep,
-    np,
-  } = options;
+  const { epoch, ep, argpp, tc, inclp, nodep, np } = options;
 
-  let a1;
-  let a2;
-  let a3;
-  let a4;
-  let a5;
-  let a6;
-  let a7;
-  let a8;
-  let a9;
-  let a10;
-  let cc;
-  let x1;
-  let x2;
-  let x3;
-  let x4;
-  let x5;
-  let x6;
-  let x7;
-  let x8;
-  let zcosg;
-  let zsing;
-  let zcosh;
-  let zsinh;
-  let zcosi;
-  let zsini;
+  let a1: number;
+  let a2: number;
+  let a3: number;
+  let a4: number;
+  let a5: number;
+  let a6: number;
+  let a7: number;
+  let a8: number;
+  let a9: number;
+  let a10: number;
+  let cc: number;
+  let x1: number;
+  let x2: number;
+  let x3: number;
+  let x4: number;
+  let x5: number;
+  let x6: number;
+  let x7: number;
+  let x8: number;
+  let zcosg: number;
+  let zsing: number;
+  let zcosh: number;
+  let zsinh: number;
+  let zcosi: number;
+  let zsini: number;
 
-  let ss1;
-  let ss2;
-  let ss3;
-  let ss4;
-  let ss5;
-  let ss6;
-  let ss7;
-  let sz1;
-  let sz2;
-  let sz3;
-  let sz11;
-  let sz12;
-  let sz13;
-  let sz21;
-  let sz22;
-  let sz23;
-  let sz31;
-  let sz32;
-  let sz33;
-  let s1;
-  let s2;
-  let s3;
-  let s4;
-  let s5;
-  let s6;
-  let s7;
-  let z1;
-  let z2;
-  let z3;
-  let z11;
-  let z12;
-  let z13;
-  let z21;
-  let z22;
-  let z23;
-  let z31;
-  let z32;
-  let z33;
+  let ss1: number;
+  let ss2: number;
+  let ss3: number;
+  let ss4: number;
+  let ss5: number;
+  let ss6: number;
+  let ss7: number;
+  let sz1: number;
+  let sz2: number;
+  let sz3: number;
+  let sz11: number;
+  let sz12: number;
+  let sz13: number;
+  let sz21: number;
+  let sz22: number;
+  let sz23: number;
+  let sz31: number;
+  let sz32: number;
+  let sz33: number;
+  let s1: number;
+  let s2: number;
+  let s3: number;
+  let s4: number;
+  let s5: number;
+  let s6: number;
+  let s7: number;
+  let z1: number;
+  let z2: number;
+  let z3: number;
+  let z11: number;
+  let z12: number;
+  let z13: number;
+  let z21: number;
+  let z22: number;
+  let z23: number;
+  let z31: number;
+  let z32: number;
+  let z33: number;
 
   // -------------------------- constants -------------------------
   const zes = 0.01675;
-  const zel = 0.05490;
+  const zel = 0.0549;
   const c1ss = 2.9864797e-6;
   const c1l = 4.7968065e-7;
   const zsinis = 0.39785416;
@@ -182,17 +179,17 @@ export function dscom(options: DscomOptions) {
   const plo = 0.0;
   const pgho = 0.0;
   const pho = 0.0;
-  const day = epoch + 18261.5 + (tc / 1440.0);
-  const xnodce = (4.5236020 - (9.2422029e-4 * day)) % twoPi;
+  const day = epoch + 18261.5 + tc / 1440.0;
+  const xnodce = (4.523602 - 9.2422029e-4 * day) % twoPi;
   const stem = Math.sin(xnodce);
   const ctem = Math.cos(xnodce);
-  const zcosil = 0.91375164 - (0.03568096 * ctem);
-  const zsinil = Math.sqrt(1.0 - (zcosil * zcosil));
+  const zcosil = 0.91375164 - 0.03568096 * ctem;
+  const zsinil = Math.sqrt(1.0 - zcosil * zcosil);
   const zsinhl = (0.089683511 * stem) / zsinil;
-  const zcoshl = Math.sqrt(1.0 - (zsinhl * zsinhl));
-  const gam = 5.8351514 + (0.0019443680 * day);
+  const zcoshl = Math.sqrt(1.0 - zsinhl * zsinhl);
+  const gam = 5.8351514 + 0.001944368 * day;
   let zx = (0.39785416 * stem) / zsinil;
-  const zy = (zcoshl * ctem) + (0.91744867 * zsinhl * stem);
+  const zy = zcoshl * ctem + 0.91744867 * zsinhl * stem;
   zx = Math.atan2(zx, zy);
   zx += gam - xnodce;
   const zcosgl = Math.cos(zx);
@@ -211,59 +208,57 @@ export function dscom(options: DscomOptions) {
   let lsflg = 0;
   while (lsflg < 2) {
     lsflg += 1;
-    a1 = (zcosg * zcosh) + (zsing * zcosi * zsinh);
-    a3 = (-zsing * zcosh) + (zcosg * zcosi * zsinh);
-    a7 = (-zcosg * zsinh) + (zsing * zcosi * zcosh);
+    a1 = zcosg * zcosh + zsing * zcosi * zsinh;
+    a3 = -zsing * zcosh + zcosg * zcosi * zsinh;
+    a7 = -zcosg * zsinh + zsing * zcosi * zcosh;
     a8 = zsing * zsini;
-    a9 = (zsing * zsinh) + (zcosg * zcosi * zcosh);
+    a9 = zsing * zsinh + zcosg * zcosi * zcosh;
     a10 = zcosg * zsini;
-    a2 = (cosim * a7) + (sinim * a8);
-    a4 = (cosim * a9) + (sinim * a10);
-    a5 = (-sinim * a7) + (cosim * a8);
-    a6 = (-sinim * a9) + (cosim * a10);
+    a2 = cosim * a7 + sinim * a8;
+    a4 = cosim * a9 + sinim * a10;
+    a5 = -sinim * a7 + cosim * a8;
+    a6 = -sinim * a9 + cosim * a10;
 
-    x1 = (a1 * cosomm) + (a2 * sinomm);
-    x2 = (a3 * cosomm) + (a4 * sinomm);
-    x3 = (-a1 * sinomm) + (a2 * cosomm);
-    x4 = (-a3 * sinomm) + (a4 * cosomm);
+    x1 = a1 * cosomm + a2 * sinomm;
+    x2 = a3 * cosomm + a4 * sinomm;
+    x3 = -a1 * sinomm + a2 * cosomm;
+    x4 = -a3 * sinomm + a4 * cosomm;
     x5 = a5 * sinomm;
     x6 = a6 * sinomm;
     x7 = a5 * cosomm;
     x8 = a6 * cosomm;
 
-    z31 = (12.0 * x1 * x1) - (3.0 * x3 * x3);
-    z32 = (24.0 * x1 * x2) - (6.0 * x3 * x4);
-    z33 = (12.0 * x2 * x2) - (3.0 * x4 * x4);
+    z31 = 12.0 * x1 * x1 - 3.0 * x3 * x3;
+    z32 = 24.0 * x1 * x2 - 6.0 * x3 * x4;
+    z33 = 12.0 * x2 * x2 - 3.0 * x4 * x4;
 
-    z1 = (3.0 * ((a1 * a1) + (a2 * a2))) + (z31 * emsq);
-    z2 = (6.0 * ((a1 * a3) + (a2 * a4))) + (z32 * emsq);
-    z3 = (3.0 * ((a3 * a3) + (a4 * a4))) + (z33 * emsq);
+    z1 = 3.0 * (a1 * a1 + a2 * a2) + z31 * emsq;
+    z2 = 6.0 * (a1 * a3 + a2 * a4) + z32 * emsq;
+    z3 = 3.0 * (a3 * a3 + a4 * a4) + z33 * emsq;
 
-    z11 = (-6.0 * a1 * a5)
-      + (emsq * ((-24.0 * x1 * x7) - (6.0 * x3 * x5)));
-    z12 = (-6.0 * ((a1 * a6) + (a3 * a5)))
-      + (emsq * ((-24.0 * ((x2 * x7) + (x1 * x8))) + (-6.0 * ((x3 * x6) + (x4 * x5)))));
+    z11 = -6.0 * a1 * a5 + emsq * (-24.0 * x1 * x7 - 6.0 * x3 * x5);
+    z12 =
+      -6.0 * (a1 * a6 + a3 * a5) +
+      emsq * (-24.0 * (x2 * x7 + x1 * x8) + -6.0 * (x3 * x6 + x4 * x5));
 
-    z13 = (-6.0 * a3 * a6)
-      + (emsq * ((-24.0 * x2 * x8) - (6.0 * x4 * x6)));
+    z13 = -6.0 * a3 * a6 + emsq * (-24.0 * x2 * x8 - 6.0 * x4 * x6);
 
-    z21 = (6.0 * a2 * a5)
-      + (emsq * ((24.0 * x1 * x5) - (6.0 * x3 * x7)));
-    z22 = (6.0 * ((a4 * a5) + (a2 * a6)))
-      + (emsq * ((24.0 * ((x2 * x5) + (x1 * x6))) - (6.0 * ((x4 * x7) + (x3 * x8)))));
-    z23 = (6.0 * a4 * a6)
-      + (emsq * ((24.0 * x2 * x6) - (6.0 * x4 * x8)));
+    z21 = 6.0 * a2 * a5 + emsq * (24.0 * x1 * x5 - 6.0 * x3 * x7);
+    z22 =
+      6.0 * (a4 * a5 + a2 * a6) +
+      emsq * (24.0 * (x2 * x5 + x1 * x6) - 6.0 * (x4 * x7 + x3 * x8));
+    z23 = 6.0 * a4 * a6 + emsq * (24.0 * x2 * x6 - 6.0 * x4 * x8);
 
-    z1 = z1 + z1 + (betasq * z31);
-    z2 = z2 + z2 + (betasq * z32);
-    z3 = z3 + z3 + (betasq * z33);
+    z1 = z1 + z1 + betasq * z31;
+    z2 = z2 + z2 + betasq * z32;
+    z3 = z3 + z3 + betasq * z33;
     s3 = cc * xnoi;
     s2 = (-0.5 * s3) / rtemsq;
     s4 = s3 * rtemsq;
     s1 = -15.0 * em * s4;
-    s5 = (x1 * x3) + (x2 * x4);
-    s6 = (x2 * x3) + (x1 * x4);
-    s7 = (x2 * x4) - (x1 * x3);
+    s5 = x1 * x3 + x2 * x4;
+    s6 = x2 * x3 + x1 * x4;
+    s7 = x2 * x4 - x1 * x3;
 
     //  ----------------------- do lunar terms -------------------
     if (lsflg === 1) {
@@ -290,14 +285,14 @@ export function dscom(options: DscomOptions) {
       zsing = zsingl;
       zcosi = zcosil;
       zsini = zsinil;
-      zcosh = (zcoshl * cnodm) + (zsinhl * snodm);
-      zsinh = (snodm * zcoshl) - (cnodm * zsinhl);
+      zcosh = zcoshl * cnodm + zsinhl * snodm;
+      zsinh = snodm * zcoshl - cnodm * zsinhl;
       cc = c1l;
     }
   }
 
-  const zmol = (4.7199672 + ((0.22997150 * day) - gam)) % twoPi;
-  const zmos = (6.2565837 + (0.017201977 * day)) % twoPi;
+  const zmol = (4.7199672 + (0.2299715 * day - gam)) % twoPi;
+  const zmos = (6.2565837 + 0.017201977 * day) % twoPi;
 
   //  ------------------------ do solar terms ----------------------
   const se2 = 2.0 * ss1! * ss6!;
@@ -306,7 +301,7 @@ export function dscom(options: DscomOptions) {
   const si3 = 2.0 * ss2! * (sz13! - sz11!);
   const sl2 = -2.0 * ss3! * sz2!;
   const sl3 = -2.0 * ss3! * (sz3! - sz1!);
-  const sl4 = -2.0 * ss3! * (-21.0 - (9.0 * emsq)) * zes;
+  const sl4 = -2.0 * ss3! * (-21.0 - 9.0 * emsq) * zes;
   const sgh2 = 2.0 * ss4! * sz32!;
   const sgh3 = 2.0 * ss4! * (sz33! - sz31!);
   const sgh4 = -18.0 * ss4! * zes;
@@ -320,7 +315,7 @@ export function dscom(options: DscomOptions) {
   const xi3 = 2.0 * s2! * (z13! - z11!);
   const xl2 = -2.0 * s3! * z2!;
   const xl3 = -2.0 * s3! * (z3! - z1!);
-  const xl4 = -2.0 * s3! * (-21.0 - (9.0 * emsq)) * zel;
+  const xl4 = -2.0 * s3! * (-21.0 - 9.0 * emsq) * zel;
   const xgh2 = 2.0 * s4! * z32!;
   const xgh3 = 2.0 * s4! * (z33! - z31!);
   const xgh4 = -18.0 * s4! * zel;
@@ -364,37 +359,37 @@ export function dscom(options: DscomOptions) {
     sl3,
     sl4,
 
-    s1,
-    s2,
-    s3,
-    s4,
-    s5,
+    s1: s1!,
+    s2: s2!,
+    s3: s3!,
+    s4: s4!,
+    s5: s5!,
 
-    s6,
-    s7,
-    ss1,
-    ss2,
-    ss3,
+    s6: s6!,
+    s7: s7!,
+    ss1: ss1!,
+    ss2: ss2!,
+    ss3: ss3!,
 
-    ss4,
-    ss5,
-    ss6,
-    ss7,
-    sz1,
+    ss4: ss4!,
+    ss5: ss5!,
+    ss6: ss6!,
+    ss7: ss7!,
+    sz1: sz1!,
 
-    sz2,
-    sz3,
-    sz11,
-    sz12,
-    sz13,
+    sz2: sz2!,
+    sz3: sz3!,
+    sz11: sz11!,
+    sz12: sz12!,
+    sz13: sz13!,
 
-    sz21,
-    sz22,
-    sz23,
-    sz31,
-    sz32,
+    sz21: sz21!,
+    sz22: sz22!,
+    sz23: sz23!,
+    sz31: sz31!,
+    sz32: sz32!,
 
-    sz33,
+    sz33: sz33!,
     xgh2,
     xgh3,
     xgh4,
@@ -408,20 +403,20 @@ export function dscom(options: DscomOptions) {
 
     xl4,
     nm,
-    z1,
-    z2,
-    z3,
+    z1: z1!,
+    z2: z2!,
+    z3: z3!,
 
-    z11,
-    z12,
-    z13,
-    z21,
-    z22,
+    z11: z11!,
+    z12: z12!,
+    z13: z13!,
+    z21: z21!,
+    z22: z22!,
 
-    z23,
-    z31,
-    z32,
-    z33,
+    z23: z23!,
+    z31: z31!,
+    z32: z32!,
+    z33: z33!,
     zmol,
 
     zmos,

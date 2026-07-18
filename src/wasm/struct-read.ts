@@ -1,5 +1,8 @@
 export class CppMemoryReader {
-  constructor(buffer: ArrayBufferLike, public baseOffset = 0) {
+  constructor(
+    buffer: ArrayBufferLike,
+    public baseOffset = 0,
+  ) {
     this.view = new DataView(buffer);
   }
 
@@ -16,7 +19,11 @@ export class CppMemoryReader {
   }
 
   readString(offset: number, length: number): string {
-    const bytes = new Uint8Array(this.view.buffer, this.baseOffset + offset, length);
+    const bytes = new Uint8Array(
+      this.view.buffer,
+      this.baseOffset + offset,
+      length,
+    );
     const decoder = new TextDecoder();
     return decoder.decode(bytes);
   }

@@ -1,8 +1,5 @@
-import { SatRec } from './SatRec.js';
-import {
-  pi,
-  twoPi,
-} from '../constants.js';
+import { pi, twoPi } from '../constants.js';
+import type { SatRec } from './SatRec.js';
 
 interface DpperOptions {
   init: 'y' | 'n';
@@ -116,83 +113,74 @@ export function dpper(satrec: SatRec, options: DpperOptions) {
     zmos,
   } = satrec;
 
-  const {
-    init,
-    opsmode,
-  } = options;
+  const { init, opsmode } = options;
 
-  let {
-    ep,
-    inclp,
-    nodep,
-    argpp,
-    mp,
-  } = options;
+  let { ep, inclp, nodep, argpp, mp } = options;
 
   // Copy satellite attributes into local variables for convenience
   // and symmetry in writing formulae.
 
-  let alfdp;
-  let betdp;
-  let cosip;
-  let sinip;
-  let cosop;
-  let sinop;
-  let dalf;
-  let dbet;
-  let dls;
-  let f2;
-  let f3;
-  let pe;
-  let pgh;
-  let ph;
-  let pinc;
-  let pl;
-  let sinzf;
-  let xls;
-  let xnoh;
-  let zf;
-  let zm;
+  let alfdp: number;
+  let betdp: number;
+  let cosip: number;
+  let sinip: number;
+  let cosop: number;
+  let sinop: number;
+  let dalf: number;
+  let dbet: number;
+  let dls: number;
+  let f2: number;
+  let f3: number;
+  let pe: number;
+  let pgh: number;
+  let ph: number;
+  let pinc: number;
+  let pl: number;
+  let sinzf: number;
+  let xls: number;
+  let xnoh: number;
+  let zf: number;
+  let zm: number;
 
   //  ---------------------- constants -----------------------------
   const zns = 1.19459e-5;
   const zes = 0.01675;
   const znl = 1.5835218e-4;
-  const zel = 0.05490;
+  const zel = 0.0549;
 
   //  --------------- calculate time varying periodics -----------
-  zm = zmos + (zns * t);
+  zm = zmos + zns * t;
 
   // be sure that the initial call has time set to zero
   if (init === 'y') {
     zm = zmos;
   }
-  zf = zm + (2.0 * zes * Math.sin(zm));
+  zf = zm + 2.0 * zes * Math.sin(zm);
   sinzf = Math.sin(zf);
-  f2 = (0.5 * sinzf * sinzf) - 0.25;
+  f2 = 0.5 * sinzf * sinzf - 0.25;
   f3 = -0.5 * sinzf * Math.cos(zf);
 
-  const ses = (se2 * f2) + (se3 * f3);
-  const sis = (si2 * f2) + (si3 * f3);
-  const sls = (sl2 * f2) + (sl3 * f3) + (sl4 * sinzf);
-  const sghs = (sgh2 * f2) + (sgh3 * f3) + (sgh4 * sinzf);
-  const shs = (sh2 * f2) + (sh3 * f3);
+  const ses = se2 * f2 + se3 * f3;
+  const sis = si2 * f2 + si3 * f3;
+  const sls = sl2 * f2 + sl3 * f3 + sl4 * sinzf;
+  const sghs = sgh2 * f2 + sgh3 * f3 + sgh4 * sinzf;
+  const shs = sh2 * f2 + sh3 * f3;
 
-  zm = zmol + (znl * t);
+  zm = zmol + znl * t;
   if (init === 'y') {
     zm = zmol;
   }
 
-  zf = zm + (2.0 * zel * Math.sin(zm));
+  zf = zm + 2.0 * zel * Math.sin(zm);
   sinzf = Math.sin(zf);
-  f2 = (0.5 * sinzf * sinzf) - 0.25;
+  f2 = 0.5 * sinzf * sinzf - 0.25;
   f3 = -0.5 * sinzf * Math.cos(zf);
 
-  const sel = (ee2 * f2) + (e3 * f3);
-  const sil = (xi2 * f2) + (xi3 * f3);
-  const sll = (xl2 * f2) + (xl3 * f3) + (xl4 * sinzf);
-  const sghl = (xgh2 * f2) + (xgh3 * f3) + (xgh4 * sinzf);
-  const shll = (xh2 * f2) + (xh3 * f3);
+  const sel = ee2 * f2 + e3 * f3;
+  const sil = xi2 * f2 + xi3 * f3;
+  const sll = xl2 * f2 + xl3 * f3 + xl4 * sinzf;
+  const sghl = xgh2 * f2 + xgh3 * f3 + xgh4 * sinzf;
+  const shll = xh2 * f2 + xh3 * f3;
 
   pe = ses + sel;
   pinc = sis + sil;
@@ -232,8 +220,8 @@ export function dpper(satrec: SatRec, options: DpperOptions) {
       cosop = Math.cos(nodep);
       alfdp = sinip * sinop;
       betdp = sinip * cosop;
-      dalf = (ph * cosop) + (pinc * cosip * sinop);
-      dbet = (-ph * sinop) + (pinc * cosip * cosop);
+      dalf = ph * cosop + pinc * cosip * sinop;
+      dbet = -ph * sinop + pinc * cosip * cosop;
       alfdp += dalf;
       betdp += dbet;
       nodep %= twoPi;
@@ -243,8 +231,8 @@ export function dpper(satrec: SatRec, options: DpperOptions) {
       if (nodep < 0.0 && opsmode === 'a') {
         nodep += twoPi;
       }
-      xls = mp + argpp + (cosip * nodep);
-      dls = (pl + pgh) - (pinc * nodep * sinip);
+      xls = mp + argpp + cosip * nodep;
+      dls = pl + pgh - pinc * nodep * sinip;
       xls += dls;
       xnoh = nodep;
       nodep = Math.atan2(alfdp, betdp);
@@ -262,7 +250,7 @@ export function dpper(satrec: SatRec, options: DpperOptions) {
         }
       }
       mp += pl;
-      argpp = xls - mp - (cosip * nodep);
+      argpp = xls - mp - cosip * nodep;
     }
   }
 

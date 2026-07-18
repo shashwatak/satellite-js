@@ -1,11 +1,11 @@
 /**
-   * Type alias documents units are kilometer (km)
-   */
+ * Type alias documents units are kilometer (km)
+ */
 export type Kilometer = number;
 
 /**
-   * Type alias documents units are Astronomical Units (AU)
-   */
+ * Type alias documents units are Astronomical Units (AU)
+ */
 export type AU = number;
 
 /**
@@ -14,8 +14,8 @@ export type AU = number;
 export type KilometerPerSecond = number;
 
 /**
-   * Type alias documents units are radians
-   */
+ * Type alias documents units are radians
+ */
 export type Radians = number;
 
 /**
@@ -34,9 +34,9 @@ export type RadiansPerMinute = number;
 export type EarthRadii = number;
 
 /**
-   * Coordinate frame Earth Centered Inertial (ECI)
-   * https://en.wikipedia.org/wiki/Earth-centered_inertial
-   */
+ * Coordinate frame Earth Centered Inertial (ECI)
+ * https://en.wikipedia.org/wiki/Earth-centered_inertial
+ */
 export interface EciVec3<T> {
   x: T;
   y: T;
@@ -54,15 +54,15 @@ export interface EcfVec3<T> {
 }
 
 /**
-   * A set of "singly averaged mean elements" that describe shape of the
-   * satellite’s orbit at the propagation date. They are averaged
-   * with respect to the mean anomaly and include the effects of secular
-   * gravity, atmospheric drag, and - in Deep Space mode - of those
-   * pertubations from the Sun and Moon that SGP4 averages over an entire
-   * revolution of each of those bodies. They omit both the shorter-term
-   * and longer-term periodic pertubations from the Sun and Moon that
-   * SGP4 applies right before computing each position.
-   */
+ * A set of "singly averaged mean elements" that describe shape of the
+ * satellite’s orbit at the propagation date. They are averaged
+ * with respect to the mean anomaly and include the effects of secular
+ * gravity, atmospheric drag, and - in Deep Space mode - of those
+ * pertubations from the Sun and Moon that SGP4 averages over an entire
+ * revolution of each of those bodies. They omit both the shorter-term
+ * and longer-term periodic pertubations from the Sun and Moon that
+ * SGP4 applies right before computing each position.
+ */
 export interface MeanElements {
   /**
    * Average semi-major axis (earth radii).
@@ -108,8 +108,8 @@ export interface PositionAndVelocity {
 }
 
 /**
-   * https://en.wikipedia.org/wiki/Geographic_coordinate_system#Latitude_and_longitude
-   */
+ * https://en.wikipedia.org/wiki/Geographic_coordinate_system#Latitude_and_longitude
+ */
 export interface GeodeticLocation {
   longitude: Radians;
   latitude: Radians;
@@ -124,15 +124,15 @@ export interface GeodeticLocation {
 export type GMSTime = number;
 
 /**
-   * https://en.wikipedia.org/wiki/Azimuth
-   */
+ * https://en.wikipedia.org/wiki/Azimuth
+ */
 export interface LookAngles {
   azimuth: Radians;
   elevation: Radians;
   rangeSat: Kilometer;
 }
 
-type StartsWith<T extends string> = `${T}${string}`
+type StartsWith<T extends string> = `${T}${string}`;
 
 /**
  * This is the base interface for the OMM JSON object as specified in Orbit Data Messages
@@ -246,4 +246,4 @@ export interface OMMJsonObjectV3 {
 // add here additional supported OMM versions via union type in future
 export type OMMJsonObject = OMMJsonObjectV3;
 
-export type SupportedOMMVersion = NonNullable<OMMJsonObject['CCSDS_OMM_VERS']>
+export type SupportedOMMVersion = NonNullable<OMMJsonObject['CCSDS_OMM_VERS']>;
