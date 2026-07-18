@@ -6,7 +6,10 @@ import type { SatRec, SatRecInit } from './propagation/SatRec.js';
 
 import { sgp4init } from './propagation/sgp4init.js';
 
-function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i'): asserts satrec is SatRec {
+function initSatrec(
+  satrec: SatRecInit,
+  opsmode: 'a' | 'i',
+): asserts satrec is SatRec {
   sgp4init(satrec, {
     opsmode,
     satn: satrec.satnum,
@@ -185,7 +188,10 @@ export function twoline2satrec(longstr1: string, longstr2: string): SatRec {
  *  references    :
  *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
  --------------------------------------------------------------------------- */
-export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i'): SatRec {
+export function json2satrec(
+  jsonobj: OMMJsonObject,
+  opsmode: 'a' | 'i' = 'i',
+): SatRec {
   const error = 0;
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
