@@ -2,11 +2,11 @@ import type { OMMJsonObject } from './common-types.js';
 import { deg2rad, xpdotp } from './constants.js';
 
 import { days2mdhms, jday } from './ext.js';
-import type { SatRecInit } from './propagation/SatRec.js';
+import type { SatRec, SatRecInit } from './propagation/SatRec.js';
 
 import { sgp4init } from './propagation/sgp4init.js';
 
-function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i') {
+function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i'): asserts satrec is SatRec {
   sgp4init(satrec, {
     opsmode,
     satn: satrec.satnum,
@@ -76,7 +76,7 @@ function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i') {
  * to the algorithm.  If you want to turn some of these off and go
  * back into "afspc" mode, then set `afspc_mode` to `True`.
  */
-export function twoline2satrec(longstr1: string, longstr2: string) {
+export function twoline2satrec(longstr1: string, longstr2: string): SatRec {
   const opsmode = 'i';
   const error = 0;
 
@@ -185,7 +185,7 @@ export function twoline2satrec(longstr1: string, longstr2: string) {
  *  references    :
  *    https://celestrak.org/NORAD/documentation/gp-data-formats.php
  --------------------------------------------------------------------------- */
-export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i') {
+export function json2satrec(jsonobj: OMMJsonObject, opsmode: 'a' | 'i' = 'i'): SatRec {
   const error = 0;
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
