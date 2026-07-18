@@ -6,6 +6,21 @@ import type { SatRecInit } from './propagation/SatRec.js';
 
 import { sgp4init } from './propagation/sgp4init.js';
 
+function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i') {
+  sgp4init(satrec, {
+    opsmode,
+    satn: satrec.satnum,
+    epoch: satrec.jdsatepoch - 2433281.5,
+    xbstar: satrec.bstar,
+    xecco: satrec.ecco,
+    xargpo: satrec.argpo,
+    xinclo: satrec.inclo,
+    xmo: satrec.mo,
+    xno: satrec.no,
+    xnodeo: satrec.nodeo,
+  });
+}
+
 /* -----------------------------------------------------------------------------
  *
  *                           function twoline2satrec
@@ -61,23 +76,6 @@ import { sgp4init } from './propagation/sgp4init.js';
  * to the algorithm.  If you want to turn some of these off and go
  * back into "afspc" mode, then set `afspc_mode` to `True`.
  */
-
-function initSatrec(satrec: SatRecInit, opsmode: 'a' | 'i') {
-  sgp4init(satrec, {
-    opsmode,
-    satn: satrec.satnum,
-    epoch: satrec.jdsatepoch - 2433281.5,
-    xbstar: satrec.bstar,
-    xecco: satrec.ecco,
-    xargpo: satrec.argpo,
-    xinclo: satrec.inclo,
-    xmo: satrec.mo,
-    xno: satrec.no,
-    xnodeo: satrec.nodeo,
-  });
-}
-
-
 export function twoline2satrec(longstr1: string, longstr2: string) {
   const opsmode = 'i';
   const error = 0;
