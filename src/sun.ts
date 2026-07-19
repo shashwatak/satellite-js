@@ -44,7 +44,7 @@ export function sunPos(jday: JDay): {
 
   const meanlong = (280.46 + 36000.77 * tut1) % 360; // deg
 
-  let meananomaly = (357.5277233 + 35999.05034 * tut1 * deg2rad) % twoPi; // rad
+  let meananomaly = ((357.5277233 + 35999.05034 * tut1) * deg2rad) % twoPi; // rad
   if (meananomaly < 0) {
     meananomaly += twoPi;
   }

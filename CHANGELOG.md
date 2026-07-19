@@ -5,6 +5,7 @@
 - Test: Add unit tests for `sunPos` and `shadowFraction`.
 - Feature: Exposed mean motion with kozai in `SatRec` as `nokozai`.
 - Test: Export checks for `sunPos` and `shadowFraction` in `index.test.ts`.
+- Fix: `sunPos` mean anomaly was not fully converted to radians, making results up to 1.1° off instead of the documented 0.01°. The WASM `SunPositionCalculator` carried the same error and is fixed too. `shadowFraction` itself is unchanged, but its output shifts when it's given `sunPos` results.
 
 ## 7.0.1 (2026-05-15)
 
