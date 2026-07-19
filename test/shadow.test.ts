@@ -31,11 +31,14 @@ describe('shadowFraction', () => {
   });
 
   it('returns a value between 0 and 1 in penumbra', () => {
-    const fraction = shadowFractionAt('2023-08-22T01:25:27.896Z');
+    // This pass crosses the penumbra in about 8.5 s. The sample sits mid-way
+    // through it; correcting the sunPos mean anomaly moved that crossing 12.9 s
+    // earlier, so this timestamp shifted with it.
+    const fraction = shadowFractionAt('2023-08-22T01:25:14.896Z');
 
     expect(fraction).toBeGreaterThan(0);
     expect(fraction).toBeLessThan(1);
-    expect(fraction).toBeCloseTo(0.5148640536131047, numDigits);
+    expect(fraction).toBeCloseTo(0.500521371489901, numDigits);
   });
 
   it('integrates propagate, sunPos, and shadowFraction for ISS', () => {
