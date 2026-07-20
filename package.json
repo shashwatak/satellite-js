@@ -18,8 +18,8 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist wasm-build && npm run wasm:build:release && tsc",
-    "lint": "npx @biomejs/biome check --reporter=concise",
-    "lint:fix": "npx @biomejs/biome check --write",
+    "lint": "npx @biomejs/biome check && npx @biomejs/biome format",
+    "lint:fix": "npx @biomejs/biome check --write && npx @biomejs/biome format --write",
     "test": "vitest run --project js --project wasm_release --project wasm_debug",
     "test:catalog": "vitest run --project catalog",
     "test:watch": "vitest watch",
