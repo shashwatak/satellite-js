@@ -1,0 +1,9 @@
+{
+  // Dedicated config for the *.test-d.ts type-level tests, run with plain `tsc`
+  // (see the `test:types` npm script). Using tsc directly instead of vitest's
+  // typecheck feature avoids vitest keeping the event loop alive on teardown in
+  // a TTY ("close timed out after 10000ms"). The imported `src` files are pulled
+  // into the program automatically, so their types are checked too.
+  "extends": "./tsconfig.json",
+  "include": ["wasm/**/*.test-d.ts"]
+}

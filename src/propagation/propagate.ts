@@ -10,7 +10,7 @@ export interface PropagateOptions {
    * Opt in to the community fix for satellites that decayed long ago, which SGP4
    * would otherwise propagate to meaningless positions instead of reporting as
    * decayed.
-   * 
+   *
    * This check is NOT part of the official SGP4 algotithm, so if you need completely compliant
    * SGP4 output *despite* it sometimes giving garbage positions for decayed satellites,
    * you should NOT use it.
