@@ -58,12 +58,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.2",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@types/node": "^24.13.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "mkdirp": "^3.0.1",
     "rimraf": "^6.1.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.0.17"
+    "vitest": "^4.1.10"
   },
   "homepage": "https://shashwatak.github.io/satellite-js/",
   "directories": {
