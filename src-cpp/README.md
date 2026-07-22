@@ -32,7 +32,7 @@ files linked by the settings exist, by following that path and sub-folders.
    "Launch current in Node" debugger option any BulkPropagator that uses a *debug* build of WASM module.
 
 A few things to note:
-* the code was written to run on exactly Emscripten 5.0.1. There might be breaking changes even on patch versions so take care bumping the EMSDK version (study changelog).
+* the code was written to run on exactly Emscripten 6.0.3. There might be breaking changes even on patch versions so take care bumping the EMSDK version (study changelog).
 * `elsetrec` struct, while unlikely, might have different offsets on different compilations, and different `sizeof` as well.
 * `char` type is signed on current compilation, and so is written with `DataView#setInt8()`
 
@@ -49,7 +49,7 @@ Tested but appeared to have no benefit:
 - batching calculations (calculate a small portion of satellites across multiple calculators thus never leave CPU cache for them): tested using batches ranging from 4 to 2048 items, benchmarks appear to be identical
 
 Watch for Emscripten side developments on:
-- [branch hinting](https://github.com/emscripten-core/emscripten/issues/25059) (isn't supported by emscripten as of 5.0.1 but should land at some point)
+- [branch hinting](https://github.com/emscripten-core/emscripten/issues/25059) (isn't supported by emscripten as of 6.0.3 but should land at some point)
 - [nested loop vectorization](https://github.com/emscripten-core/emscripten/issues/26322) (very limited support by LLVM and currently not very useful)
 
 Also watch for WebAssembly state in general to see what can be used for the WASM build.

@@ -16,8 +16,8 @@ declare namespace RuntimeExports {
     function UTF8ToString(ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined): string;
     function stringToUTF8(str: any, outPtr: any, maxBytesToWrite: any): any;
     function lengthBytesUTF8(str: any): number;
-    let HEAP8: any;
-    let HEAPF64: any;
+    let HEAP8: Int8Array;
+    let HEAPF64: Float64Array;
 }
 interface WasmModule {
   _get_elsetrec_size(): number;
@@ -25,7 +25,7 @@ interface WasmModule {
   _create_elsetrec_struct_layout_string_pointer(): number;
   _create_rundata_struct_layout_string_pointer(): number;
   _free_struct_layout_string(_0: number): void;
-  _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
+  _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number): void;
   _calloc_one(_0: number): number;
   _exit_runtime(): void;
   _compute(_0: number): void;
