@@ -1,6 +1,6 @@
 ---
-sidebar_position: 3
 title: Propagation
+slug: /propagation
 description: Propagate a satellite orbit using sgp4 or propagate, and handle errors
 ---
 
@@ -106,3 +106,7 @@ if (state === null) {
 ```
 
 For a full catalog propagation run at a given date, **there will always be some errored satellites**, so you need to handle that case. In practice, if you're propagating many satellites, for example to visualise the sky, you can simply filter out errored states by `!state` condition.
+
+:::note
+SGP4 sometimes propagates satellites that decayed long ago to meaningless positions rather than reporting them as decayed. An opt-in [community decay check](community-decay-check.md) can catch these cases - at the cost of departing from strictly standard SGP4 output.
+:::
