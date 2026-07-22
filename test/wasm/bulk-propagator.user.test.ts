@@ -4,6 +4,7 @@ import createMultiThreadModule from 'wasm-module-multi-thread/index.js';
 import createSingleThreadModule from 'wasm-module-single-thread/index.js';
 import { dopplerFactor } from '../../src/dopplerFactor.js';
 import { jday } from '../../src/ext.js';
+import { SatRecError } from '../../src/index.js';
 import { twoline2satrec } from '../../src/io.js';
 import { gstime } from '../../src/propagation/gstime.js';
 import { propagate } from '../../src/propagation.js';
@@ -1284,6 +1285,55 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
     expect(formattedResults.shadowFraction).toEqual(
       rawResults.shadowFraction[2],
     );
+  });
+});
+
+describe('sgp4 decay issue', () => {
+  it('should filter out satellite which has actually decayed, instead of garbage data', async () => {
+    const line1 =
+      '1 45110U 20007A   23232.80903846 0.00110000  00000-0  32750-2 0    04';
+    const line2 =
+      '2 45110  69.9913 111.5649 0009740 159.9373 200.0626 15.34502222    06';
+
+    const satrec = twoline2satrec(line1, line2);
+    const date = new Date('2025-12-17T06:04:00Z');
+
+    using bpSingleThread = new BulkPropagator({
+      runtime: singleThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: 1,
+      datesCount: 1,
+    });
+    bpSingleThread.setDates([date]);
+    bpSingleThread.setSatRecs([satrec]);
+    using bpMultiThread = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: 1,
+      datesCount: 1,
+    });
+    bpMultiThread.setDates([date]);
+    bpMultiThread.setSatRecs([satrec]);
+
+    propagate(satrec, date);
+    bpSingleThread.run();
+    const resultBpSinge = bpSingleThread.getFormattedOutput(0, 0);
+    await bpMultiThread.run();
+    const resultBpMulti = bpMultiThread.getFormattedOutput(0, 0);
+
+    expect(satrec.error).toBe(SatRecError.None);
+    expect(resultBpSinge?.eci.error).toBe(SatRecError.None);
+    expect(resultBpMulti?.eci.error).toBe(SatRecError.None);
+
+    propagate(satrec, date, { communityDecayCheckEnabled: true });
+    bpSingleThread.run({ eci: { communityDecayCheckEnabled: true } });
+    const resultBpSingeWithFlag = bpSingleThread.getFormattedOutput(0, 0);
+    await bpMultiThread.run({ eci: { communityDecayCheckEnabled: true } });
+    const resultBpMultiWithFlag = bpMultiThread.getFormattedOutput(0, 0);
+
+    expect(satrec.error).toBe(SatRecError.Decayed);
+    expect(resultBpSingeWithFlag?.eci.error).toBe(SatRecError.Decayed);
+    expect(resultBpMultiWithFlag?.eci.error).toBe(SatRecError.Decayed);
   });
 });
 
