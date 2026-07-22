@@ -17,16 +17,11 @@
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "lineEnding": "auto"
   },
   "linter": {
     "enabled": true
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "lineEnding": "auto"
-    }
   },
   "assist": {
     "enabled": true,
@@ -34,6 +29,16 @@
       "source": {
         "organizeImports": "on"
       }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  },
+  "json": {
+    "formatter": {
+      "lineEnding": "auto"
     }
   }
 }

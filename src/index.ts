@@ -3,7 +3,13 @@ export * as constants from './constants.js';
 
 export { jday, invjday } from './ext.js';
 export { twoline2satrec, json2satrec } from './io.js';
-export { propagate, sgp4, gstime } from './propagation.js';
+export {
+  propagate,
+  type PropagateOptions,
+  sgp4,
+  gstime,
+} from './propagation.js';
+export { checkForDecay } from './propagation/check-for-decay.js';
 
 export { dopplerFactor } from './dopplerFactor.js';
 

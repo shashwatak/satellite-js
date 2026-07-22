@@ -3,7 +3,9 @@ import {
   constants,
   json2satrec,
   type OMMJsonObject,
+  propagate,
   type SatRec,
+  SatRecError,
   twoline2satrec,
 } from '../src/index.js';
 import goodData from './io.json' with { type: 'json' };
@@ -84,5 +86,29 @@ describe('mean motion', () => {
     expect(satrec.no).toBeCloseTo(0.06428212791307905, 10);
     expect(satrec.nokozai).toBeCloseTo(0.06429242548587555, 10);
     expect(satrec.nokozai * constants.rad2deg * 4).toBeCloseTo(14.73473854, 10);
+  });
+});
+
+describe('sgp4 decay issue', () => {
+  it('should filter out satellite which has actually decayed, instead of garbage data', () => {
+    const line1 =
+      '1 45110U 20007A   23232.80903846 0.00110000  00000-0  32750-2 0    04';
+    const line2 =
+      '2 45110  69.9913 111.5649 0009740 159.9373 200.0626 15.34502222    06';
+
+    const satrec = twoline2satrec(line1, line2);
+
+    const date = new Date('2025-12-17T06:04:00Z');
+
+    const result = propagate(satrec, date);
+
+    expect(satrec.error).toBe(SatRecError.None);
+    expect(result).not.toBeNull();
+
+    const resultWithFlag = propagate(satrec, date, {
+      communityDecayCheckEnabled: true,
+    });
+    expect(satrec.error).toBe(SatRecError.Decayed);
+    expect(resultWithFlag).toBeNull();
   });
 });

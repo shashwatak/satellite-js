@@ -18,9 +18,10 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist wasm-build && npm run wasm:build:release && tsc",
-    "lint": "npx @biomejs/biome check --reporter=concise",
-    "lint:fix": "npx @biomejs/biome check --write",
-    "test": "vitest run --project js --project wasm_release --project wasm_debug",
+    "lint": "npx @biomejs/biome check && npx @biomejs/biome format",
+    "lint:fix": "npx @biomejs/biome check --write && npx @biomejs/biome format --write",
+    "test": "vitest run --project js --project wasm_release --project wasm_debug && npm run test:types",
+    "test:types": "tsc --noEmit -p test/tsconfig.type-tests.json",
     "test:catalog": "vitest run --project catalog",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage --project js --project wasm_release --project wasm_debug",
@@ -58,12 +59,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.2",
-    "@vitest/coverage-v8": "^4.0.17",
+    "@types/node": "^24.13.3",
+    "@vitest/coverage-v8": "^4.1.10",
     "mkdirp": "^3.0.1",
     "rimraf": "^6.1.2",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3",
-    "vitest": "^4.0.17"
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "homepage": "https://shashwatak.github.io/satellite-js/",
   "directories": {

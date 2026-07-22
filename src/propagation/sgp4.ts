@@ -175,6 +175,7 @@ export function sgp4(
     templ =
       templ + satrec.t3cof * t3 + t4 * (satrec.t4cof + satrec.t * satrec.t5cof);
   }
+  satrec.tempa = tempa;
   nm = satrec.no;
   let em = satrec.ecco;
   inclm = satrec.inclo;

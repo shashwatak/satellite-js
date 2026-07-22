@@ -62,7 +62,8 @@ void* thread_function(void* arg) {
     0, dateCount, dateCount,
     data->runData->eciPositions,
     data->runData->eciVelocities,
-    data->runData->sgp4Errors);
+    data->runData->sgp4Errors,
+    data->runData->communityDecayCheckEnabled);
 
   if (data->runData->ecfPositionEnabled)
   {

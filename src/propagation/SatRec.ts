@@ -209,6 +209,11 @@ export interface SatRec {
    */
   nokozai: number;
 
+  /**
+   * sgp4 algorithm internal variable that allows to filter out satellites decayed long ago
+   */
+  tempa: number;
+
   // sgp4fix add unkozai'd variable
   // not used by the library
   // no_unkozai: number;

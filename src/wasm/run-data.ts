@@ -11,6 +11,7 @@ export interface RunData {
 
   // outputs and output-specific parameters
   // ECI is enabled by default (no eciPositionEnabled flag)
+  communityDecayCheckEnabled: boolean;
   eciPositions: number;
   eciVelocities: number;
   sgp4Errors: number;
