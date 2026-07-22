@@ -72,32 +72,72 @@ type RunParametersOf<C> =
     ? RunParameters
     : never;
 
+type NameOf<C> = C extends { name: infer Name extends string } ? Name : never;
+
 /**
- * True when a calculator's run parameters have no required properties, meaning
- * the user must not be forced to pass a key for it in `BulkPropagator.run()`.
+ * The explicitly declared keys of `T`, ignoring those contributed by a string
+ * index signature. `Record<string, unknown>` - the `Calculator` default, meaning
+ * "takes no run parameters" - yields `never`, whereas `{ enabled?: boolean }`
+ * yields `'enabled'`. This is what separates a calculator that accepts nothing
+ * from one that accepts only optional parameters.
  */
-type IsEmptyRunParams<T> = EmptyObject extends T ? true : false;
+type DeclaredKeys<T> = string extends keyof T ? never : keyof T;
 
-type CalculatorsToRunParameters<Calculators extends readonly AnyCalculator[]> =
-  {
-    [C in Calculators[number] as C extends { name: infer Name extends string }
-      ? IsEmptyRunParams<RunParametersOf<C>> extends true
-        ? never
-        : Name
-      : never]: RunParametersOf<C>;
-  };
+/** True when `T` has at least one *required* property. */
+type HasRequiredRunParams<T> = EmptyObject extends T ? false : true;
+
+/** True when `T` declares any property at all, required or optional. */
+type HasAnyRunParams<T> = [DeclaredKeys<T>] extends [never] ? false : true;
 
 /**
- * The parameter list of `BulkPropagator.run()`, expressed as a rest tuple so that
- * the argument is *required* when at least one calculator needs run parameters,
- * and optional when none do. Passing `{}` is always allowed; passing a key for a
- * calculator that needs no parameters is not.
+ * Calculators that *must* be given parameters, because at least one property of
+ * their run parameters is required. Their key is required in `run()`.
+ */
+type RequiredRunParameters<Calculators extends readonly AnyCalculator[]> = {
+  [C in Calculators[number] as HasRequiredRunParams<
+    RunParametersOf<C>
+  > extends true
+    ? NameOf<C>
+    : never]: RunParametersOf<C>;
+};
+
+/**
+ * Calculators that *may* be given parameters: they declare properties, but every
+ * one of them is optional. Their key is optional in `run()` - passable, but never
+ * forced. Calculators that declare no properties at all appear in neither map, so
+ * their key stays rejected.
+ */
+type OptionalRunParameters<Calculators extends readonly AnyCalculator[]> = {
+  [C in Calculators[number] as HasRequiredRunParams<
+    RunParametersOf<C>
+  > extends true
+    ? never
+    : HasAnyRunParams<RunParametersOf<C>> extends true
+      ? NameOf<C>
+      : never]?: RunParametersOf<C>;
+};
+
+/**
+ * The parameter list of `BulkPropagator.run()`, expressed as a rest tuple so the
+ * argument itself can be required or optional. Each configured calculator falls
+ * into exactly one of three buckets, based on its run parameters:
+ *
+ *   - at least one required property -> its key is **required**
+ *   - only optional properties -> its key is **optional**, but accepted
+ *   - no properties at all -> its key is **rejected**
+ *
+ * The argument as a whole is required only if some calculator's key is required.
+ * Passing `{}` is always allowed.
  */
 type BulkPropagatorRunArgs<Calculators extends readonly AnyCalculator[]> =
-  CalculatorsToRunParameters<Calculators> extends infer P
-    ? EmptyObject extends P
-      ? [runParameters?: NoRunParameters]
-      : [runParameters: P]
+  RequiredRunParameters<Calculators> extends infer Required
+    ? OptionalRunParameters<Calculators> extends infer Optional
+      ? EmptyObject extends Required
+        ? [DeclaredKeys<Optional>] extends [never]
+          ? [runParameters?: NoRunParameters]
+          : [runParameters?: Optional]
+        : [runParameters: Required & Optional]
+      : never
     : never;
 
 function ceilToMultipleOf64Bit(bytes: number): number {

@@ -177,6 +177,7 @@ extern "C"
     result += "[\"jdaysPointer\",\"int\"," + std::to_string(offsetof(RunData, jdaysPointer)) + "," + std::to_string(sizeof(zero_rec->jdaysPointer)) + "],";
     result += "[\"jdaysCount\",\"int\"," + std::to_string(offsetof(RunData, jdaysCount)) + "," + std::to_string(sizeof(zero_rec->jdaysCount)) + "],";
 
+    result += "[\"communityDecayCheckEnabled\",\"bool\"," + std::to_string(offsetof(RunData, communityDecayCheckEnabled)) + "," + std::to_string(sizeof(zero_rec->communityDecayCheckEnabled)) + "],";
     result += "[\"eciPositions\",\"int\"," + std::to_string(offsetof(RunData, eciPositions)) + "," + std::to_string(sizeof(zero_rec->eciPositions)) + "],";
     result += "[\"eciVelocities\",\"int\"," + std::to_string(offsetof(RunData, eciVelocities)) + "," + std::to_string(sizeof(zero_rec->eciVelocities)) + "],";
     result += "[\"sgp4Errors\",\"int\"," + std::to_string(offsetof(RunData, sgp4Errors)) + "," + std::to_string(sizeof(zero_rec->sgp4Errors)) + "],";
@@ -239,7 +240,7 @@ extern "C"
   // 3. `if (mrt < 1.0)` check was moved into a place right after `mrt` calculation, instead of the very end of the sgp4 function.
   void EMSCRIPTEN_KEEPALIVE sgp4forJs(
       elsetrec &satrec, double jday,
-      double r[3], double v[3], int8_t &error)
+      double r[3], double v[3], int8_t &error, bool communityDecayCheckEnabled)
   {
     double am, axnl, aynl, betal, cosim, cnod,
         cos2u, coseo1, cosi, cosip, cosisq, cossu, cosu,
@@ -301,6 +302,11 @@ extern "C"
               satrec.d4 * t4;
       tempe = tempe + satrec.bstar * satrec.cc5 * (sin(mm) - satrec.sinmao);
       templ = templ + satrec.t3cof * t3 + t4 * (satrec.t4cof + satrec.t * satrec.t5cof);
+    }
+
+    if (communityDecayCheckEnabled && tempa <= 0) {
+      error = 6;
+      return;
     }
 
     nm = satrec.no_unkozai;
@@ -539,14 +545,15 @@ void calculate_eci(
     elsetrec *__restrict satellites, int satellites_start, int satellites_end,
     double *__restrict jdays, int jdays_start, int jdays_end, int jdays_count,
     double *__restrict eci_positions, double *__restrict eci_velocities,
-    int8_t *__restrict sgp4_errors)
+    int8_t *__restrict sgp4_errors,
+    bool communityDecayCheckEnabled)
 {
   for (int i = satellites_start; i < satellites_end; i++)
   {
     for (int j = jdays_start; j < jdays_end; j++)
     {
       int output_index = (i * jdays_count + j) * 3;
-      sgp4forJs(satellites[i], jdays[j], &eci_positions[output_index], &eci_velocities[output_index], sgp4_errors[output_index / 3]);
+      sgp4forJs(satellites[i], jdays[j], &eci_positions[output_index], &eci_velocities[output_index], sgp4_errors[output_index / 3], communityDecayCheckEnabled);
     }
   }
 }

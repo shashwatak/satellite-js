@@ -17,6 +17,21 @@ export interface EciBaseFormattedOutput {
   error: SatRecError;
 }
 
+// A type alias, not an interface: only aliases get the implicit index signature
+// that satisfies the `Calculator` constraint `RunParameters extends Record<string, unknown>`.
+export type EciBaseRunParameters = {
+  /**
+   * Opt in to the community fix for satellites that decayed long ago, which SGP4
+   * would otherwise propagate to meaningless positions instead of reporting as
+   * decayed. If true, will return SatRecError.Decayed on those satellites.
+   * 
+   * This check is NOT part of the official SGP4 algotithm, so if you need completely compliant
+   * SGP4 output *despite* it sometimes giving garbage positions for decayed satellites,
+   * you should NOT use it.
+   */
+  communityDecayCheckEnabled?: boolean;
+};
+
 /**
  * Performs SGP4 propagation, producing ECI (Earth-Centered Fixed) position
  * and velocity vectors. Base calculator with no dependencies.
@@ -38,7 +53,8 @@ export class EciBaseCalculator
       0,
       [],
       { position: Float64Array; velocity: Float64Array; error: Int8Array },
-      EciBaseFormattedOutput
+      EciBaseFormattedOutput,
+      EciBaseRunParameters
     >
 {
   readonly name = 'eci';
@@ -123,11 +139,13 @@ export class EciBaseCalculator
     );
   }
 
-  getExecutionDescriptor() {
+  getExecutionDescriptor(runParameters: EciBaseRunParameters) {
     const eciVelocitiesPointer =
       this.outputPointer +
       BYTES_PER_VECTOR * this.satellitesCount * this.datesCount;
     return {
+      communityDecayCheckEnabled:
+        runParameters.communityDecayCheckEnabled ?? false,
       eciPositions: this.outputPointer,
       eciVelocities: eciVelocitiesPointer,
       sgp4Errors:
