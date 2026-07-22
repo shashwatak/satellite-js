@@ -1,7 +1,7 @@
 import type { PositionAndVelocity } from '../common-types.js';
 import { minutesPerDay } from '../constants.js';
 import { jday } from '../ext.js';
-import { checkForDecay } from './community-decay-fix.js';
+import { checkForDecay } from './check-for-decay.js';
 import { type SatRec, SatRecError } from './SatRec.js';
 import { sgp4 } from './sgp4.js';
 

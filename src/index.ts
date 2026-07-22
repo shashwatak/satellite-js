@@ -9,7 +9,7 @@ export {
   sgp4,
   gstime,
 } from './propagation.js';
-export { checkForDecay } from './propagation/community-decay-fix.js';
+export { checkForDecay } from './propagation/check-for-decay.js';
 
 export { dopplerFactor } from './dopplerFactor.js';
 
