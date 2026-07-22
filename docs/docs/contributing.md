@@ -51,9 +51,9 @@ The source code is written in [TypeScript](https://www.typescriptlang.org/) and 
 
 In order to build the library follow these steps:
 
-- install [Node.js](https://nodejs.org/) and [Node Package Manager](https://www.npmjs.com/);
+- install [Node.js](https://nodejs.org/) and [Node Package Manager](https://www.npmjs.com/).
 
-- install Emscripten using [Emscripten SDK](https://emscripten.org/docs/tools_reference/emsdk.html);
+- install Emscripten using [Emscripten SDK](https://emscripten.org/docs/tools_reference/emsdk.html). Note that this won't necessarily be the *latest* version, because even patch versions of Emscripten have breaking changes; consult `src-cpp/README.md` to see the version of Emscripten which was used to successfully build and test the latest build.
 
 - install all required packages with NPM by running the following command from repository's root directory:
 
