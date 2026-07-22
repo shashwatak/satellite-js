@@ -24,7 +24,7 @@ import type { SatRec } from './SatRec.js';
  *
  * @example
  * ```ts
- *   const result = propagate(satrec, new Date(), { communityDecayFix: true })
+ *   const result = propagate(satrec, new Date(), { communityDecayCheckEnabled: true })
  *   // result is non-null only if `checkForDecay` too indicates that the satellite HAS NOT decayed.
  * ```
  */
