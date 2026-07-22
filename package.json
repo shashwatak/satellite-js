@@ -64,7 +64,7 @@
     "mkdirp": "^3.0.1",
     "rimraf": "^6.1.2",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   },
   "homepage": "https://shashwatak.github.io/satellite-js/",

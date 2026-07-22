@@ -1,5 +1,5 @@
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
-declare namespace RuntimeExports {
+declare var RuntimeExports: {
     /**
      * Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the
      * emscripten HEAP, returns a copy of that string as a Javascript String object.
@@ -13,12 +13,14 @@ declare namespace RuntimeExports {
      * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
      * @return {string}
      */
-    function UTF8ToString(ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined): string;
-    function stringToUTF8(str: any, outPtr: any, maxBytesToWrite: any): any;
-    function lengthBytesUTF8(str: any): number;
-    let HEAP8: Int8Array;
-    let HEAPF64: Float64Array;
-}
+    UTF8ToString: (ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined) => string;
+    stringToUTF8: (str: any, outPtr: any, maxBytesToWrite: any) => any;
+    lengthBytesUTF8: (str: any) => number;
+    /** @type {!Int8Array} */
+    HEAP8: Int8Array;
+    /** @type {!Float64Array} */
+    HEAPF64: Float64Array;
+};
 interface WasmModule {
   _get_elsetrec_size(): number;
   _get_rundata_size(): number;
