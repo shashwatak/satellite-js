@@ -734,7 +734,7 @@ void calculate_sun_positions(
   {
     double tut1 = (jdays[i] - 2451545.0) / 36525.0;
     double meanlong = fmod(280.460 + 36000.77 * tut1, 360.0);
-    double meananomaly = fmod(357.5277233 + 35999.05034 * tut1 * deg2rad_local, twopi);
+    double meananomaly = fmod((357.5277233 + 35999.05034 * tut1) * deg2rad_local, twopi);
     if (meananomaly < 0.0)
       meananomaly += twopi;
 
