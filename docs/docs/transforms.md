@@ -8,7 +8,7 @@ description: Transform between ECI, ECF, geodetic, and look-angle coordinate fra
 
 These functions implement reference frame and unit conversions.
 
-:::tip Units
+:::tip[Units]
 Usually:
 
 - Positions, ranges, and heights are in **km**
