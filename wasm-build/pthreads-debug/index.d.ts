@@ -1,5 +1,5 @@
 // TypeScript bindings for emscripten-generated code.  Automatically generated at compile time.
-declare namespace RuntimeExports {
+declare var RuntimeExports: {
     /**
      * Given a pointer 'ptr' to a null-terminated UTF8-encoded string in the
      * emscripten HEAP, returns a copy of that string as a Javascript String object.
@@ -13,32 +13,34 @@ declare namespace RuntimeExports {
      * @param {boolean=} ignoreNul - If true, the function will not stop on a NUL character.
      * @return {string}
      */
-    function UTF8ToString(ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined): string;
-    function stringToUTF8(str: any, outPtr: any, maxBytesToWrite: any): any;
-    function lengthBytesUTF8(str: any): number;
+    UTF8ToString: (ptr: number, maxBytesToRead?: number | undefined, ignoreNul?: boolean | undefined) => string;
+    stringToUTF8: (str: any, outPtr: any, maxBytesToWrite: any) => any;
+    lengthBytesUTF8: (str: any) => number;
     /**
      * @param {string|null=} returnType
      * @param {Array=} argTypes
      * @param {Array=} args
      * @param {Object=} opts
      */
-    function ccall(ident: any, returnType?: (string | null) | undefined, argTypes?: any[] | undefined, args?: any[] | undefined, opts?: any | undefined): any;
+    ccall: (ident: any, returnType?: (string | null) | undefined, argTypes?: any[] | undefined, args?: any[] | undefined, opts?: Object | undefined) => any;
     /**
      * @param {string=} returnType
      * @param {Array=} argTypes
      * @param {Object=} opts
      */
-    function cwrap(ident: any, returnType?: string | undefined, argTypes?: any[] | undefined, opts?: any | undefined): (...args: any[]) => any;
-    let HEAP8: any;
-    let HEAPF64: any;
-}
+    cwrap: (ident: any, returnType?: string | undefined, argTypes?: any[] | undefined, opts?: Object | undefined) => (...args: any[]) => any;
+    /** @type {!Int8Array} */
+    HEAP8: Int8Array;
+    /** @type {!Float64Array} */
+    HEAPF64: Float64Array;
+};
 interface WasmModule {
   _get_elsetrec_size(): number;
   _get_rundata_size(): number;
   _create_elsetrec_struct_layout_string_pointer(): number;
   _create_rundata_struct_layout_string_pointer(): number;
   _free_struct_layout_string(_0: number): void;
-  _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number): void;
+  _sgp4forJs(_0: number, _1: number, _2: number, _3: number, _4: number, _5: number): void;
   _calloc_one(_0: number): number;
   _exit_runtime(): void;
   _compute(_0: number, _1: number): number;

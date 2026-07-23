@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sunPos > matches regression snapshot 1`] = `
+{
+  "decl": 0.22260623809616845,
+  "rsun": {
+    "x": -0.8418618297413785,
+    "y": 0.5154552069529749,
+    "z": 0.22344434016196174,
+  },
+  "rtasc": 2.592192597957401,
+}
+`;

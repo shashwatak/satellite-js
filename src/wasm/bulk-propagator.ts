@@ -1,50 +1,144 @@
 import type { SatRec } from '../propagation/SatRec.js';
 import type { Calculator } from './calculators/calculator-interface.js';
 import type { TupleOf } from './calculators/tuple-of.js';
-import type { TypedArray } from './typed-array.js';
-import { topologicalSort } from './toposort.js';
-import { allocateNativeStructArray, writeNativeStructArrayFromSatrecArray } from './elsetrec-struct.js';
 import { allocateDatesArray, writeDatesArray } from './date-to-wasm.js';
-import { allocateRunData, RunData } from './run-data.js';
-import { MultiThreadRuntime, WasmRuntime } from './runtimes/wasm-runtime.js';
+import {
+  allocateNativeStructArray,
+  writeNativeStructArrayFromSatrecArray,
+} from './elsetrec-struct.js';
+import { allocateRunData, type RunData } from './run-data.js';
+import type {
+  MultiThreadRuntime,
+  WasmRuntime,
+} from './runtimes/wasm-runtime.js';
+import { topologicalSort } from './toposort.js';
+import type { TypedArray } from './typed-array.js';
+
+/**
+ * An object type with no properties, used on the *left* of `extends` to test
+ * whether some other type has any required properties.
+ *
+ * Note this is deliberately not the same as {@link NoRunParameters}: as an
+ * assignment *target* this type accepts excess properties, so it cannot be used
+ * to reject unwanted keys.
+ */
+type EmptyObject = Record<never, never>;
+
+/**
+ * Accepts `{}` and nothing else: any property at all fails to be assignable to
+ * `never`. Used as the argument type of `BulkPropagator.run()` when no calculator
+ * requires parameters, so that stray calculator keys are still rejected.
+ */
+type NoRunParameters = Record<string, never>;
+
+/**
+ * The widest `Calculator` shape: matches any calculator regardless of its name,
+ * dependencies, outputs or run parameters. Used purely as a generic constraint.
+ */
+type AnyCalculator = Calculator<
+  string,
+  number,
+  TupleOf<string, number>,
+  TypedArray | Record<string, TypedArray>,
+  unknown,
+  Record<string, unknown>
+>;
 
 export type CalculatorsToFormattedOutput<
-  Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
+  Calculators extends readonly AnyCalculator[],
 > = {
-  [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getFormattedOutput']>;
+  [K in Calculators[number]['name']]: ReturnType<
+    Extract<Calculators[number], { name: K }>['getFormattedOutput']
+  >;
 };
 
 export type CalculatorsToRawOutput<
-  Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
+  Calculators extends readonly AnyCalculator[],
 > = {
-  [K in Calculators[number]['name']]: ReturnType<Extract<Calculators[number], { name: K }>['getRawOutput']>;
+  [K in Calculators[number]['name']]: ReturnType<
+    Extract<Calculators[number], { name: K }>['getRawOutput']
+  >;
 };
 
-type RunParametersOf<C> = C extends Calculator<any, any, any, any, any, infer RP> ? RP : never;
+type RunParametersOf<C> =
+  C extends Calculator<
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    unknown,
+    infer RunParameters
+  >
+    ? RunParameters
+    : never;
 
-type IsEmptyRunParams<T> = {} extends T ? (T extends {} ? true : false) : false;
+type NameOf<C> = C extends { name: infer Name extends string } ? Name : never;
 
-type CalculatorsToRunParameters<
-  Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
-> = {
-  [C in Calculators[number] as C extends { name: infer Name extends string }
-    ? (IsEmptyRunParams<RunParametersOf<C>> extends true ? never : Name)
-    : never]: RunParametersOf<C>
+/**
+ * The explicitly declared keys of `T`, ignoring those contributed by a string
+ * index signature. `Record<string, unknown>` - the `Calculator` default, meaning
+ * "takes no run parameters" - yields `never`, whereas `{ enabled?: boolean }`
+ * yields `'enabled'`. This is what separates a calculator that accepts nothing
+ * from one that accepts only optional parameters.
+ */
+type DeclaredKeys<T> = string extends keyof T ? never : keyof T;
+
+/** True when `T` has at least one *required* property. */
+type HasRequiredRunParams<T> = EmptyObject extends T ? false : true;
+
+/** True when `T` declares any property at all, required or optional. */
+type HasAnyRunParams<T> = [DeclaredKeys<T>] extends [never] ? false : true;
+
+/**
+ * Calculators that *must* be given parameters, because at least one property of
+ * their run parameters is required. Their key is required in `run()`.
+ */
+type RequiredRunParameters<Calculators extends readonly AnyCalculator[]> = {
+  [C in Calculators[number] as HasRequiredRunParams<
+    RunParametersOf<C>
+  > extends true
+    ? NameOf<C>
+    : never]: RunParametersOf<C>;
 };
 
-type BulkPropagatorRunArgs<
-  Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, any, any
-  >[]
-> = CalculatorsToRunParameters<Calculators> extends infer P
-  ? {} extends P ? void : P
-  : never;
+/**
+ * Calculators that *may* be given parameters: they declare properties, but every
+ * one of them is optional. Their key is optional in `run()` - passable, but never
+ * forced. Calculators that declare no properties at all appear in neither map, so
+ * their key stays rejected.
+ */
+type OptionalRunParameters<Calculators extends readonly AnyCalculator[]> = {
+  [C in Calculators[number] as HasRequiredRunParams<
+    RunParametersOf<C>
+  > extends true
+    ? never
+    : HasAnyRunParams<RunParametersOf<C>> extends true
+      ? NameOf<C>
+      : never]?: RunParametersOf<C>;
+};
+
+/**
+ * The parameter list of `BulkPropagator.run()`, expressed as a rest tuple so the
+ * argument itself can be required or optional. Each configured calculator falls
+ * into exactly one of three buckets, based on its run parameters:
+ *
+ *   - at least one required property -> its key is **required**
+ *   - only optional properties -> its key is **optional**, but accepted
+ *   - no properties at all -> its key is **rejected**
+ *
+ * The argument as a whole is required only if some calculator's key is required.
+ * Passing `{}` is always allowed.
+ */
+type BulkPropagatorRunArgs<Calculators extends readonly AnyCalculator[]> =
+  RequiredRunParameters<Calculators> extends infer Required
+    ? OptionalRunParameters<Calculators> extends infer Optional
+      ? EmptyObject extends Required
+        ? [DeclaredKeys<Optional>] extends [never]
+          ? [runParameters?: NoRunParameters]
+          : [runParameters?: Optional]
+        : [runParameters: Required & Optional]
+      : never
+    : never;
 
 function ceilToMultipleOf64Bit(bytes: number): number {
   const bytesPer64Bit = 8;
@@ -120,10 +214,15 @@ function ceilToMultipleOf64Bit(bytes: number): number {
  */
 export class BulkPropagator<
   const Calculators extends readonly Calculator<
-    string, number, TupleOf<string, number>, TypedArray | Record<string, TypedArray>, unknown
+    string,
+    number,
+    TupleOf<string, number>,
+    TypedArray | Record<string, TypedArray>,
+    unknown
   >[],
   Runtime extends WasmRuntime,
-> implements Disposable {
+> implements Disposable
+{
   private readonly calculators: Calculators;
 
   private satrecsPointer: number;
@@ -148,7 +247,10 @@ export class BulkPropagator<
 
   private outputPointersByCalculator: Map<Calculators[number]['name'], number>;
 
-  private calculatorDependenciesOutputsPointers: Map<Calculators[number]['name'], number[]>;
+  private calculatorDependenciesOutputsPointers: Map<
+    Calculators[number]['name'],
+    number[]
+  >;
 
   private isDisposed: boolean = false;
 
@@ -205,7 +307,10 @@ export class BulkPropagator<
       this[Symbol.dispose] = () => this.dispose();
     }
 
-    this.satrecsPointer = allocateNativeStructArray(runtime.module, satRecsCount);
+    this.satrecsPointer = allocateNativeStructArray(
+      runtime.module,
+      satRecsCount,
+    );
     this.allocatedSatrecsCount = satRecsCount;
 
     this.datesPointer = allocateDatesArray(runtime.module, datesCount);
@@ -224,7 +329,10 @@ export class BulkPropagator<
 
     this.runDataPointer = allocateRunData(runtime.module);
 
-    this.allocatedOutputSizeBytes = this.computeTotalOutputSizeBytes(satRecsCount, datesCount);
+    this.allocatedOutputSizeBytes = this.computeTotalOutputSizeBytes(
+      satRecsCount,
+      datesCount,
+    );
     this.outputPointer = runtime.module._malloc(this.allocatedOutputSizeBytes);
     this.outputPointersByCalculator = new Map();
     this.calculatorDependenciesOutputsPointers = new Map();
@@ -245,11 +353,18 @@ export class BulkPropagator<
 
     if (satRecs.length > this.allocatedSatrecsCount) {
       this.runtime.module._free(this.satrecsPointer);
-      this.satrecsPointer = allocateNativeStructArray(this.runtime.module, satRecs.length);
+      this.satrecsPointer = allocateNativeStructArray(
+        this.runtime.module,
+        satRecs.length,
+      );
       this.allocatedSatrecsCount = satRecs.length;
     }
 
-    writeNativeStructArrayFromSatrecArray(this.runtime.module, this.satrecsPointer, satRecs);
+    writeNativeStructArrayFromSatrecArray(
+      this.runtime.module,
+      this.satrecsPointer,
+      satRecs,
+    );
 
     if (satRecs.length !== this.usedSatrecsCount) {
       this.needsOutputRedistribution = true;
@@ -286,7 +401,10 @@ export class BulkPropagator<
     this.hasDates = true;
   }
 
-  private computeTotalOutputSizeBytes(satRecsCount: number, datesCount: number): number {
+  private computeTotalOutputSizeBytes(
+    satRecsCount: number,
+    datesCount: number,
+  ): number {
     let totalBytes = 0;
     for (const calculator of this.calculators) {
       totalBytes += ceilToMultipleOf64Bit(
@@ -312,21 +430,32 @@ export class BulkPropagator<
     this.outputPointersByCalculator = new Map();
     for (const calculator of this.calculators) {
       const sizeBytes = ceilToMultipleOf64Bit(
-        calculator.getOutputBufferSize(this.usedSatrecsCount, this.usedDatesCount),
+        calculator.getOutputBufferSize(
+          this.usedSatrecsCount,
+          this.usedDatesCount,
+        ),
       );
-      this.outputPointersByCalculator.set(calculator.name, this.outputPointer + offsetBytes);
+      this.outputPointersByCalculator.set(
+        calculator.name,
+        this.outputPointer + offsetBytes,
+      );
       offsetBytes += sizeBytes;
     }
 
     this.calculatorDependenciesOutputsPointers = new Map();
     for (const calculator of this.calculators) {
       const dependenciesPointers = calculator.dependencies.map(
+        // biome-ignore lint/style/noNonNullAssertion: set for every calculator in the loop above
         (dependency) => this.outputPointersByCalculator.get(dependency)!,
       );
-      this.calculatorDependenciesOutputsPointers.set(calculator.name, dependenciesPointers);
+      this.calculatorDependenciesOutputsPointers.set(
+        calculator.name,
+        dependenciesPointers,
+      );
 
       calculator.init(
         this.runtime.module,
+        // biome-ignore lint/style/noNonNullAssertion: set for every calculator in the loop above
         this.outputPointersByCalculator.get(calculator.name)!,
         this.usedSatrecsCount,
         this.usedDatesCount,
@@ -339,15 +468,15 @@ export class BulkPropagator<
   /**
    * Executes the bulk propagation for all satellites across all specified dates.
    * Overwrites previous results since allocalted memory is reused. Returns
-   * void on calculation completion for single-threaded runtime, or a Promise
+   * `undefined` on calculation completion for single-threaded runtime, or a Promise
    * for multi-threaded runtime.
    *
    * `setSatRecs` and `setDates` must be called before calling `run`.
    *
-   * @param args - Run arguments including dates and calculator-specific parameters
-   * (if any calculator requires them).
-   * @param args[calculatorName] - Some calculators require additional parameters
-   * (example: `LookAnglesCalculator` requires observer position).
+   * @param runParameters - Calculator-specific parameters, keyed by calculator name.
+   * Required (and type checked) if any configured calculator needs parameters
+   * (example: `LookAnglesCalculator` requires observer position); optional otherwise.
+   * Calculators that need no parameters must not be given a key.
    *
    * @example
    * ```typescript
@@ -371,8 +500,8 @@ export class BulkPropagator<
    * @throws If setSatRecs or setDates has not been called
    */
   run(
-    args?: BulkPropagatorRunArgs<Calculators>,
-  ): Runtime extends MultiThreadRuntime ? Promise<void> : void {
+    ...[runParameters]: BulkPropagatorRunArgs<Calculators>
+  ): Runtime extends MultiThreadRuntime ? Promise<void> : undefined {
     this.checkIfDisposed();
 
     if (!this.hasSatRecs) {
@@ -386,21 +515,29 @@ export class BulkPropagator<
       this.redistributeOutputBuffer();
     }
 
-    const runDataItems = this.calculators.map(
-      (calculator) => {
-        const runParams = (
-          (args ?? {}) as Record<string, RunParametersOf<Calculators>>
-        )[calculator.name];
-        return calculator.getExecutionDescriptor(runParams!);
-      },
+    // `runParameters` is keyed by calculator name, but only for calculators that
+    // actually require parameters; the rest read `undefined` and ignore it.
+    const runParametersByName = (runParameters ?? {}) as Record<
+      string,
+      Record<string, unknown> | undefined
+    >;
+    const runDataItems = this.calculators.map((calculator) =>
+      // Calculators whose run parameters are empty get `{}` and ignore it; the
+      // ones that need parameters are guaranteed a key by `BulkPropagatorRunArgs`.
+      calculator.getExecutionDescriptor(
+        runParametersByName[calculator.name] ?? {},
+      ),
     );
 
-    const runData = Object.assign({
-      satellitesPointer: this.satrecsPointer,
-      satellitesCount: this.usedSatrecsCount,
-      jdaysPointer: this.datesPointer,
-      jdaysCount: this.usedDatesCount,
-    } satisfies Partial<RunData>, ...runDataItems);
+    const runData = Object.assign(
+      {
+        satellitesPointer: this.satrecsPointer,
+        satellitesCount: this.usedSatrecsCount,
+        jdaysPointer: this.datesPointer,
+        jdaysCount: this.usedDatesCount,
+      } satisfies Partial<RunData>,
+      ...runDataItems,
+    );
 
     this.isRunning = true;
 
@@ -415,7 +552,11 @@ export class BulkPropagator<
       this.isRunning = false;
     }
 
-    return result as Runtime extends MultiThreadRuntime ? Promise<void> : void;
+    // `compute` returns `void` for the single-threaded runtime, which is always
+    // `undefined` at runtime.
+    return result as Runtime extends MultiThreadRuntime
+      ? Promise<void>
+      : undefined;
   }
 
   /**
@@ -450,7 +591,10 @@ export class BulkPropagator<
     dateIndex: number,
   ): CalculatorsToFormattedOutput<Calculators> | undefined {
     this.checkIfDisposed();
-    if (satelliteIndex >= this.usedSatrecsCount || dateIndex >= this.usedDatesCount) {
+    if (
+      satelliteIndex >= this.usedSatrecsCount ||
+      dateIndex >= this.usedDatesCount
+    ) {
       return undefined;
     }
     const result: Record<string, unknown> = {};
@@ -502,7 +646,9 @@ export class BulkPropagator<
 
   private checkIfDisposed() {
     if (this.isDisposed) {
-      throw new Error('This BulkPropagator instance is disposed and its memory freed; construct a new one, or check `using` scope or `dispose()` call');
+      throw new Error(
+        'This BulkPropagator instance is disposed and its memory freed; construct a new one, or check `using` scope or `dispose()` call',
+      );
     }
   }
 

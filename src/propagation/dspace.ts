@@ -1,3 +1,8 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: due to the fact that
+ * many variables are first assigned within loops and if statements,
+ * Typescript marks many of them as "used before assigned". To keep the algorithm
+ * as is, non null assertion is used there.
+ */
 import { twoPi } from '../constants.js';
 
 interface DspaceOptions {
@@ -142,17 +147,7 @@ export function dspace(options: DspaceOptions) {
     no,
   } = options;
 
-  let {
-    atime,
-    em,
-    argpm,
-    inclm,
-    xli,
-    mm,
-    xni,
-    nodem,
-    nm,
-  } = options;
+  let { atime, em, argpm, inclm, xli, mm, xni, nodem, nm } = options;
 
   const fasx2 = 0.13130908;
   const fasx4 = 2.8843198;
@@ -160,27 +155,27 @@ export function dspace(options: DspaceOptions) {
   const g22 = 5.7686396;
   const g32 = 0.95240898;
   const g44 = 1.8014998;
-  const g52 = 1.0508330;
+  const g52 = 1.050833;
   const g54 = 4.4108898;
-  // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+  // biome-ignore lint/correctness/noPrecisionLoss: keep original value for search
   const rptim = 4.37526908801129966e-3; // equates to 7.29211514668855e-5 rad/sec
   const stepp = 720.0;
   const stepn = -720.0;
   const step2 = 259200.0;
 
-  let delt;
-  let x2li;
-  let x2omi;
-  let xl;
-  let xldot;
-  let xnddt;
-  let xndt;
-  let xomi;
+  let delt: number;
+  let x2li: number;
+  let x2omi: number;
+  let xl: number;
+  let xldot: number;
+  let xnddt: number;
+  let xndt: number;
+  let xomi: number;
   let dndt = 0.0;
   let ft = 0.0;
 
   //  ----------- calculate deep space resonance effects -----------
-  const theta = (gsto + (tc * rptim)) % twoPi;
+  const theta = (gsto + tc * rptim) % twoPi;
   em += dedt * t;
 
   inclm += didt * t;
@@ -225,40 +220,45 @@ export function dspace(options: DspaceOptions) {
       //  ------------------- dot terms calculated -------------
       //  ----------- near - synchronous resonance terms -------
       if (irez !== 2) {
-        xndt = (del1 * Math.sin(xli - fasx2))
-          + (del2 * Math.sin(2.0 * (xli - fasx4)))
-          + (del3 * Math.sin(3.0 * (xli - fasx6)));
+        xndt =
+          del1 * Math.sin(xli - fasx2) +
+          del2 * Math.sin(2.0 * (xli - fasx4)) +
+          del3 * Math.sin(3.0 * (xli - fasx6));
         xldot = xni + xfact;
-        xnddt = (del1 * Math.cos(xli - fasx2))
-          + (2.0 * del2 * Math.cos(2.0 * (xli - fasx4)))
-          + (3.0 * del3 * Math.cos(3.0 * (xli - fasx6)));
+        xnddt =
+          del1 * Math.cos(xli - fasx2) +
+          2.0 * del2 * Math.cos(2.0 * (xli - fasx4)) +
+          3.0 * del3 * Math.cos(3.0 * (xli - fasx6));
         xnddt *= xldot;
       } else {
         // --------- near - half-day resonance terms --------
-        xomi = argpo + (argpdot * atime);
+        xomi = argpo + argpdot * atime;
         x2omi = xomi + xomi;
         x2li = xli + xli;
-        xndt = (d2201 * Math.sin((x2omi + xli) - g22))
-          + (d2211 * Math.sin(xli - g22))
-          + (d3210 * Math.sin((xomi + xli) - g32))
-          + (d3222 * Math.sin((-xomi + xli) - g32))
-          + (d4410 * Math.sin((x2omi + x2li) - g44))
-          + (d4422 * Math.sin(x2li - g44))
-          + (d5220 * Math.sin((xomi + xli) - g52))
-          + (d5232 * Math.sin((-xomi + xli) - g52))
-          + (d5421 * Math.sin((xomi + x2li) - g54))
-          + (d5433 * Math.sin((-xomi + x2li) - g54));
+        xndt =
+          d2201 * Math.sin(x2omi + xli - g22) +
+          d2211 * Math.sin(xli - g22) +
+          d3210 * Math.sin(xomi + xli - g32) +
+          d3222 * Math.sin(-xomi + xli - g32) +
+          d4410 * Math.sin(x2omi + x2li - g44) +
+          d4422 * Math.sin(x2li - g44) +
+          d5220 * Math.sin(xomi + xli - g52) +
+          d5232 * Math.sin(-xomi + xli - g52) +
+          d5421 * Math.sin(xomi + x2li - g54) +
+          d5433 * Math.sin(-xomi + x2li - g54);
         xldot = xni + xfact;
-        xnddt = (d2201 * Math.cos((x2omi + xli) - g22))
-          + (d2211 * Math.cos(xli - g22))
-          + (d3210 * Math.cos((xomi + xli) - g32))
-          + (d3222 * Math.cos((-xomi + xli) - g32))
-          + (d5220 * Math.cos((xomi + xli) - g52))
-          + (d5232 * Math.cos((-xomi + xli) - g52))
-          + 2.0 * ((d4410 * Math.cos((x2omi + x2li) - g44))
-          + (d4422 * Math.cos(x2li - g44))
-          + (d5421 * Math.cos((xomi + x2li) - g54))
-          + (d5433 * Math.cos((-xomi + x2li) - g54)));
+        xnddt =
+          d2201 * Math.cos(x2omi + xli - g22) +
+          d2211 * Math.cos(xli - g22) +
+          d3210 * Math.cos(xomi + xli - g32) +
+          d3222 * Math.cos(-xomi + xli - g32) +
+          d5220 * Math.cos(xomi + xli - g52) +
+          d5232 * Math.cos(-xomi + xli - g52) +
+          2.0 *
+            (d4410 * Math.cos(x2omi + x2li - g44) +
+              d4422 * Math.cos(x2li - g44) +
+              d5421 * Math.cos(xomi + x2li - g54) +
+              d5433 * Math.cos(-xomi + x2li - g54));
         xnddt *= xldot;
       }
 
@@ -272,19 +272,19 @@ export function dspace(options: DspaceOptions) {
       }
 
       if (iretn === 381) {
-        xli += (xldot * delt) + (xndt * step2);
-        xni += (xndt * delt) + (xnddt * step2);
+        xli += xldot * delt + xndt * step2;
+        xni += xndt * delt + xnddt * step2;
         atime += delt;
       }
     }
 
-    nm = xni + (xndt! * ft) + (xnddt! * ft * ft * 0.5);
-    xl = xli + (xldot! * ft) + (xndt! * ft * ft * 0.5);
+    nm = xni + xndt! * ft + xnddt! * ft * ft * 0.5;
+    xl = xli + xldot! * ft + xndt! * ft * ft * 0.5;
     if (irez !== 1) {
-      mm = (xl - (2.0 * nodem)) + (2.0 * theta);
+      mm = xl - 2.0 * nodem + 2.0 * theta;
       dndt = nm - no;
     } else {
-      mm = (xl - nodem - argpm) + theta;
+      mm = xl - nodem - argpm + theta;
       dndt = nm - no;
     }
     nm = no + dndt;

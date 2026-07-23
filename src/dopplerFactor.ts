@@ -1,6 +1,6 @@
-import { EcfVec3, Kilometer, KilometerPerSecond } from './common-types.js';
+import type { EcfVec3, Kilometer, KilometerPerSecond } from './common-types.js';
 
-const earthRotation = 7.292115E-5;
+const earthRotation = 7.292115e-5;
 const c = 299792.458; // Speed of light in km/s
 
 /**
@@ -25,7 +25,8 @@ export function dopplerFactor(
     z: velocityEcf.z,
   };
 
-  const rangeRate = (rangeX * rangeVel.x + rangeY * rangeVel.y + rangeZ * rangeVel.z) / length;
+  const rangeRate =
+    (rangeX * rangeVel.x + rangeY * rangeVel.y + rangeZ * rangeVel.z) / length;
 
   return 1 - rangeRate / c;
 }

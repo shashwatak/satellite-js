@@ -1,5 +1,8 @@
-import { RunData } from '../run-data.js';
-import { WasmModuleMultiThread, WasmModuleSingleThread } from './wasm-module-interfaces.js';
+import type { RunData } from '../run-data.js';
+import type {
+  WasmModuleMultiThread,
+  WasmModuleSingleThread,
+} from './wasm-module-interfaces.js';
 
 export interface BaseWasmRuntime extends Disposable {
   mode: string;

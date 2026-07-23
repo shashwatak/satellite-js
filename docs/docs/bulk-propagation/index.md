@@ -219,7 +219,7 @@ Once the `run()` call completes, you can:
 Memory behind outputs is reused for every run. This means that `getRawOutput` and the data behind `TypedArray` is only valid before the start of the next `run()` call. 
 :::
 
-### 6. Disposal {#disposal}
+### 6. Disposal {/* #disposal */}
 
 Dispose the `BulkPropagator` and the `runtime`. **If you don't, your app will leak memory.**
 

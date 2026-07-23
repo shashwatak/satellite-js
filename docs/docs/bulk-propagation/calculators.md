@@ -16,7 +16,7 @@ Outputs are packed in [`TypedArray`](https://developer.mozilla.org/docs/Web/Java
 
 ---
 
-## `EciBaseCalculator` {#eci}
+## `EciBaseCalculator` {/* #eci */}
 
 Runs SGP4 propagation and produces ECI position and velocity vectors. This is the WASM equivalent of the pure JS `propagate()`. As the base of calculations, it must be always present.
 
@@ -24,7 +24,7 @@ Runs SGP4 propagation and produces ECI position and velocity vectors. This is th
 |---|---|
 | **Key in the output** | `eci` |
 | **Dependencies** | *none* |
-| **Run parameters** | *none* |
+| **Run parameters** | `{ communityDecayCheckEnabled?: boolean }` - see [community decay check](propagation/community-decay-check.md) |
 | **Formatted output** | `{ position: EciVec3<Kilometer>, velocity: EciVec3<KilometerPerSecond>, error: SatRecError }` |
 | **Raw output** | `{ position: Float64Array, velocity: Float64Array, error: Int8Array }` |
 
@@ -35,7 +35,7 @@ Runs SGP4 propagation and produces ECI position and velocity vectors. This is th
 
 ---
 
-## `GmstCalculator` {#gmst}
+## `GmstCalculator` {/* #gmst */}
 
 Calculates Greenwich Mean Sidereal Time, needed by coordinate-transform calculators. WASM equivalent of `gstime()`.
 
@@ -51,7 +51,7 @@ Calculates Greenwich Mean Sidereal Time, needed by coordinate-transform calculat
 
 ---
 
-## `EcfPositionCalculator` {#ecfPosition}
+## `EcfPositionCalculator` {/* #ecfPosition */}
 
 ECF (Earth-Centered Fixed) position. WASM equivalent of `eciToEcf()` applied to position.
 
@@ -67,7 +67,7 @@ ECF (Earth-Centered Fixed) position. WASM equivalent of `eciToEcf()` applied to 
 
 ---
 
-## `EcfVelocityCalculator` {#ecfVelocity}
+## `EcfVelocityCalculator` {/* #ecfVelocity */}
 
 ECF velocity. WASM equivalent of `eciToEcf()` applied to velocity.
 
@@ -83,7 +83,7 @@ ECF velocity. WASM equivalent of `eciToEcf()` applied to velocity.
 
 ---
 
-## `GeodeticPositionCalculator` {#geodeticPosition}
+## `GeodeticPositionCalculator` {/* #geodeticPosition */}
 
 Geodetic position (latitude, longitude, height). WASM equivalent of `eciToGeodetic()`.
 
@@ -99,7 +99,7 @@ Geodetic position (latitude, longitude, height). WASM equivalent of `eciToGeodet
 
 ---
 
-## `LookAnglesCalculator` {#lookAngles}
+## `LookAnglesCalculator` {/* #lookAngles */}
 
 Look Angles (azimuth, elevation, range). WASM equivalent of `ecfToLookAngles()`.
 
@@ -130,7 +130,7 @@ bulkPropagator.run({
 
 ---
 
-## `DopplerFactorCalculator` {#dopplerFactor}
+## `DopplerFactorCalculator` {/* #dopplerFactor */}
 
 Doppler factor. WASM equivalent of `dopplerFactor()`.
 
@@ -163,7 +163,7 @@ bulkPropagator.run({
 
 ---
 
-## `SunPositionCalculator` {#sunPosition}
+## `SunPositionCalculator` {/* #sunPosition */}
 
 Sun position in the equatorial ECI frame, in AU. WASM equivalent of `sunPos()`.
 
@@ -179,7 +179,7 @@ Sun position in the equatorial ECI frame, in AU. WASM equivalent of `sunPos()`.
 
 ---
 
-## `ShadowFractionCalculator` {#shadowFraction}
+## `ShadowFractionCalculator` {/* #shadowFraction */}
 
 Fraction of the Sun's disc obscured by the Earth. WASM equivalent of `shadowFraction()`.
 

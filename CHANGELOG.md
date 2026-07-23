@@ -1,5 +1,18 @@
 # Changelog
 
+## 7.1.0 (2026-07-23)
+
+- Feature: add `checkForDecay` function that allows filtering satellites decayed long ago but for which SGP4 reports "successful" propagation with garbage positions (see [section in the docs](http://localhost:3000/satellite-js/docs/propagation/community-decay-check])).
+- Feature: add `options: { communityDecayCheckEnabled: boolean }` argument to `propagate` function that internally invokes `checkForDecay`, catches garbage positions and, as usual, returns `null` and sets `SatRec.error = SatRecError.Decayed`. In case you're using `sgp4`, you can invoke `checkForDecay` manually after calling `sgp4()`.
+- Feature: Exposed mean motion with kozai in `SatRec` as `nokozai`.
+- Fix: `sunPos` mean anomaly was not fully converted to radians, making results up to 1.1° off instead of the documented 0.01°. The WASM `SunPositionCalculator` carried the same error and is fixed too. `shadowFraction` itself is unchanged, but its output shifts when it's given `sunPos` results.
+- Test: Unit tests `sunPos`, `shadowFraction`.
+- Chore: bumps to dev dependencies, including to TypeScript 7.
+
+## 7.0.1 (2026-05-15)
+
+- Fix: `propagate` function did not have a `null` return type in its overloads.
+
 ## 7.0.0 (2026-03-24)
 
 - Feature: [Official docs site](https://shashwatak.github.io/satellite-js/). Because of that, Readme is now more concise.

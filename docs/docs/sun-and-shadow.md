@@ -41,8 +41,12 @@ const fraction = shadowFraction(rsun, positionEci);
 
 | Parameter | Type | Description |
 |---|---|---|
-| `sunEciAU` | `EciVec3<AU>` | Sun position from `sunPos().rsun` |
+| `sunEciAU` | `EciVec3<AU>` | Sun position from `sunPos().rsun` or your favorite astronomy library |
 | `satelliteEciKm` | `EciVec3<Kilometer>` | Satellite ECI position from `propagate()` |
+
+:::tip
+While `shadowFraction` works smoothly with `sunPos`, it doesn't *have* to. You can provide sun position calculated by another library, such as [`astronomy-engine`](https://github.com/cosinekitty/astronomy/tree/master/source/js) for example.
+:::
 
 ## Full example
 
