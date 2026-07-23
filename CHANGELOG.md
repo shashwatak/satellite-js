@@ -2,7 +2,7 @@
 
 ## 7.1.0 (2026-07-23)
 
-- Feature: add `checkForDecay` function that allows filtering satellites decayed long ago but for which SGP4 reports "successful" propagation with garbage positions (see [section in the docs](http://localhost:3000/satellite-js/docs/propagation/community-decay-check])).
+- Feature: add `checkForDecay` function that allows filtering satellites decayed long ago but for which SGP4 reports "successful" propagation with garbage positions (see [section in the docs](https://shashwatak.github.io/satellite-js/docs/propagation/community-decay-check)).
 - Feature: add `options: { communityDecayCheckEnabled: boolean }` argument to `propagate` function that internally invokes `checkForDecay`, catches garbage positions and, as usual, returns `null` and sets `SatRec.error = SatRecError.Decayed`. In case you're using `sgp4`, you can invoke `checkForDecay` manually after calling `sgp4()`.
 - Feature: Exposed mean motion with kozai in `SatRec` as `nokozai`.
 - Fix: `sunPos` mean anomaly was not fully converted to radians, making results up to 1.1° off instead of the documented 0.01°. The WASM `SunPositionCalculator` carried the same error and is fixed too. `shadowFraction` itself is unchanged, but its output shifts when it's given `sunPos` results.
