@@ -8,7 +8,7 @@ description: Propagate a satellite orbit using sgp4 or propagate, and handle err
 
 There are two propagation functions, differing by how you supply time:
 - the original `sgp4()` which takes time in minutes since satellite epoch;
-- the wrapper `propagate()`, which takes a `Date` and calls the `sgp4()` appropriately.
+- the wrapper `propagate()`, which takes a `Date`, calculates time since satellite epoch and calls the `sgp4()` appropriately. `propagate()` also takes `options` object for things outside standard SGP4 - see [community decay check](community-decay-check.md).
 
 Both `propagate()` and `sgp4()` functions return position and velocity, as well as mean elements.
 

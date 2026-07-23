@@ -11,7 +11,8 @@ import type { SatRec } from './SatRec.js';
  * Note: this community check DOES NOT EXIST in the original SGP4 algorithm, so your results
  * MAY DIFFER from the results of official SGP4 propagation when using this check.
  *
- * @returns true if the satellite is truly decayed as a result of latest propagation call.
+ * @returns `true` if the satellite is authoritatively decayed as a result of latest propagation call.
+ * If the latest propagation call gave a non-null result, that result should be discarded.
  *
  * @example
  * ```ts
