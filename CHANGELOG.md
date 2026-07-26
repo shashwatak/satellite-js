@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fix: `invjday` truncated the fractional second instead of rounding it, so `invjday(jday(date))` came back a full second early for about half of all inputs that fall exactly on a second, and the array overload could report `sec = -1`. `invjday` now keeps millisecond precision, which also makes it a true inverse of `jday` for dates carrying milliseconds (#75).
+- Test: deterministic `jday`/`invjday` round-trip tests over second, minute, midnight and month/year boundaries.
+
 ## 7.1.0 (2026-07-23)
 
 - Feature: add `checkForDecay` function that allows filtering satellites decayed long ago but for which SGP4 reports "successful" propagation with garbage positions (see [section in the docs](https://shashwatak.github.io/satellite-js/docs/propagation/community-decay-check)).
