@@ -84,13 +84,15 @@ export function shadowFraction(
 
   // otherwise in penumbra, calculate the fraction of the Sun's disc obscured by the Earth using
   // circle–circle intersection area formula
-  const part1 = rS * rS * Math.acos((d * d + rS * rS - rE * rE) / (2 * d * rS));
-  const part2 = rE * rE * Math.acos((d * d + rE * rE - rS * rS) / (2 * d * rE));
-  const part3 =
-    0.5 *
-    Math.sqrt((-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
+  const rS2 = rS * rS;
+  const rE2 = rE * rE;
+  const d2 = d * d;
+
+  const part1 = rS2 * Math.acos((d2 + rS2 - rE2) / (2 * d * rS));
+  const part2 = rE2 * Math.acos((d2 + rE2 - rS2) / (2 * d * rE));
+  const part3 = 0.5 * Math.sqrt((-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
   const overlapArea = part1 + part2 - part3;
-  const sunDiscArea = Math.PI * rS * rS;
+  const sunDiscArea = Math.PI * rS2;
 
   return overlapArea / sunDiscArea;
 }

@@ -57,6 +57,8 @@ export function sunPos(jday: JDay): {
     deg2rad; // rad
 
   const obliquity = (23.439291 - 0.0130042 * tut1) * deg2rad; // rad
+  const sinObliquity = Math.sin(obliquity);
+  const cosObliquity = Math.cos(obliquity);
 
   // --------- find magnitude of sun vector, and it's components ------
   const magr =
@@ -64,13 +66,16 @@ export function sunPos(jday: JDay): {
     0.016708617 * Math.cos(meananomaly) -
     0.000139589 * Math.cos(2.0 * meananomaly); // in au's
 
+  const sinEclp = Math.sin(eclplong_raw);
+  const cosEclp = Math.cos(eclplong_raw);
+
   const rsun: EciVec3<AU> = {
-    x: magr * Math.cos(eclplong_raw),
-    y: magr * Math.cos(obliquity) * Math.sin(eclplong_raw),
-    z: magr * Math.sin(obliquity) * Math.sin(eclplong_raw),
+    x: magr * cosEclp,
+    y: magr * cosObliquity * sinEclp,
+    z: magr * sinObliquity * sinEclp,
   };
 
-  const rtasc_raw = Math.atan(Math.cos(obliquity) * Math.tan(eclplong_raw));
+  const rtasc_raw = Math.atan(cosObliquity * Math.tan(eclplong_raw));
 
   // --- check that rtasc is in the same quadrant as eclplong_raw ----
   let eclplong = eclplong_raw;
@@ -83,7 +88,7 @@ export function sunPos(jday: JDay): {
     rtasc += 0.5 * pi * Math.round((eclplong_raw - rtasc_raw) / (0.5 * pi));
   }
 
-  const decl = Math.asin(Math.sin(obliquity) * Math.sin(eclplong_raw));
+  const decl = Math.asin(sinObliquity * sinEclp);
 
   return { rsun, rtasc, decl };
 }
