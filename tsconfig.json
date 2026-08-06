@@ -20,7 +20,8 @@
     "declaration": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "lib": ["ES2022"]
+    "lib": ["ES2022", "ESNext.Disposable", "DOM"],
+    "types": []
   },
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Strictest (minus esModuleInterop)",

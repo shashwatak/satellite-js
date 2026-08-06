@@ -10,7 +10,7 @@ description: Parse orbital elements (OMM or TLE) into a SatRec object
 You are responsible for providing OMM or TLE. See [Get orbital elements](intro.md#get-orbital-elements).
 :::
 
-## `json2satrec` - From OMM (preferred for new applications) {#json-to-satrec}
+## `json2satrec` - From OMM (preferred for new applications) {/* #json-to-satrec */}
 
 ```ts
 import { json2satrec, OMMJsonObject } from 'satellite.js';
@@ -45,7 +45,7 @@ The function implementation is a bit more relaxed on the precense of required fi
 
 The function currently supports OMM format **version 3** (this is actually the first production version; previous ones were testing). The function parameter, `OMMJsonObject`, is hence fairly strict.
 
-## `twoline2satrec` - From TLE {#twoline-to-satrec}
+## `twoline2satrec` - From TLE {/* #twoline-to-satrec */}
 
 ```ts
 import { twoline2satrec } from 'satellite.js';
@@ -60,7 +60,7 @@ Returns a `SatRec` object, created from the TLEs passed in. `tleLine1` and `tleL
 
 ## `SatRec`
 
-The `SatRec` object is immense and complex; it contains are the Keplerian Elements and the other values pulled from the TLE/OMM, along with calculated values for SGP4 algorithm. While it is vastly complicated, for the basic usage you don't have to do anything with it, except pass it around to [propagation](propagation.md) functions and access the `error` property.
+The `SatRec` object is immense and complex; it contains are the Keplerian Elements and the other values pulled from the TLE/OMM, along with calculated values for SGP4 algorithm. While it is vastly complicated, for the basic usage you don't have to do anything with it, except pass it around to [propagation](propagation/index.md) functions and access the `error` property.
 
 ### Key properties
 
@@ -68,7 +68,7 @@ The `SatRec` object is immense and complex; it contains are the Keplerian Elemen
 
 | Property | Description |
 |---|---|
-| `error` | The error code that is set by SGP4 algorithm in case when propagation fails (see [`SatRecError`](propagation.md#satrecerror)) |
+| `error` | The error code that is set by SGP4 algorithm in case when propagation fails (see [`SatRecError`](propagation/index.md#satrecerror)) |
 | `satnum` | Unique satellite identifier, usually NORAD number |
 | `epochyr` | Full four-digit year of this element set's epoch moment |
 | `epochdays` | Fractional days into the year of the epoch moment |

@@ -201,9 +201,18 @@ export interface SatRec {
    */
   mo: number;
   /**
-   * Mean motion in radians per minute.
+   * Mean motion in radians per minute without kozai.
    */
   no: number;
+  /**
+   * Mean motion in radians per minute with kozai.
+   */
+  nokozai: number;
+
+  /**
+   * sgp4 algorithm internal variable that allows to filter out satellites decayed long ago
+   */
+  tempa: number;
 
   // sgp4fix add unkozai'd variable
   // not used by the library
@@ -220,19 +229,20 @@ export interface SatRec {
   // nm: number;
 }
 
-export type SatRecInit = Pick<SatRec,
-  'error' |
-  'satnum' |
-  'epochyr' |
-  'epochdays' |
-  'ndot' |
-  'nddot' |
-  'bstar' |
-  'inclo' |
-  'nodeo' |
-  'ecco' |
-  'argpo' |
-  'mo' |
-  'no' |
-  'jdsatepoch'
->
+export type SatRecInit = Pick<
+  SatRec,
+  | 'error'
+  | 'satnum'
+  | 'epochyr'
+  | 'epochdays'
+  | 'ndot'
+  | 'nddot'
+  | 'bstar'
+  | 'inclo'
+  | 'nodeo'
+  | 'ecco'
+  | 'argpo'
+  | 'mo'
+  | 'no'
+  | 'jdsatepoch'
+>;

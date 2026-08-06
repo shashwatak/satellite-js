@@ -17,7 +17,16 @@ import type { Calculator } from './calculator-interface.js';
  *
  * Provides formatted output as a number under `shadowFraction` property.
  */
-export class ShadowFractionCalculator implements Calculator<'shadowFraction', 2, ['eci', 'sunPosition'], Float64Array, number> {
+export class ShadowFractionCalculator
+  implements
+    Calculator<
+      'shadowFraction',
+      2,
+      ['eci', 'sunPosition'],
+      Float64Array,
+      number
+    >
+{
   readonly name = 'shadowFraction';
 
   readonly dependencies: ['eci', 'sunPosition'] = ['eci', 'sunPosition'];
@@ -45,6 +54,7 @@ export class ShadowFractionCalculator implements Calculator<'shadowFraction', 2,
   getFormattedOutput(satelliteIndex: number, dateIndex: number): number {
     const rawOutput = this.getRawOutput();
     const index = satelliteIndex * this.datesCount + dateIndex;
+    // biome-ignore lint/style/noNonNullAssertion: index math
     return rawOutput[index]!;
   }
 

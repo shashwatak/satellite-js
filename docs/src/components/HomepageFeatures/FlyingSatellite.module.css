@@ -18,7 +18,8 @@
     sat-twinkle 4.8s linear infinite,
     sat-twinkle 0.79s linear infinite;
   animation-composition: replace, add, add, add, add;
-  animation-timing-function: linear, ease-in-out, ease-in-out, ease-in-out, ease-in-out;
+  animation-timing-function:
+    linear, ease-in-out, ease-in-out, ease-in-out, ease-in-out;
   filter: brightness(1);
 }
 
@@ -32,10 +33,22 @@
 }
 
 @keyframes sat-twinkle {
-  0% { filter: brightness(1); }
-  20% { filter: brightness(1.1); }
-  40% { filter: brightness(0.9); }
-  60% { filter: brightness(1.2); }
-  80% { filter: brightness(0.8); }
-  100% { filter: brightness(1.2); }
+  0% {
+    filter: brightness(1);
+  }
+  20% {
+    filter: brightness(1.1);
+  }
+  40% {
+    filter: brightness(0.9);
+  }
+  60% {
+    filter: brightness(1.2);
+  }
+  80% {
+    filter: brightness(0.8);
+  }
+  100% {
+    filter: brightness(1.2);
+  }
 }

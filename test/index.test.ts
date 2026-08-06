@@ -1,43 +1,42 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  pi,
-  twoPi,
   deg2rad,
-  rad2deg,
-  minutesPerDay,
-  mu,
   earthRadius,
-  xke,
-  vkmpersec,
-  tumin,
   j2,
   j3,
-  j4,
   j3oj2,
+  j4,
+  minutesPerDay,
+  mu,
+  pi,
+  rad2deg,
+  tumin,
+  twoPi,
+  vkmpersec,
   x2o3,
+  xke,
 } from '../src/constants.js';
-
-import { jday, invjday } from '../src/ext.js';
-import { twoline2satrec, json2satrec } from '../src/io.js';
-import { propagate, sgp4, gstime } from '../src/propagation.js';
-
 import { dopplerFactor } from '../src/dopplerFactor.js';
-
+import { invjday, jday } from '../src/ext.js';
+import * as es from '../src/index.js';
+import { checkForDecay } from '../src/index.js';
+import { json2satrec, twoline2satrec } from '../src/io.js';
+import { gstime, propagate, sgp4 } from '../src/propagation.js';
+import { shadowFraction } from '../src/shadow.js';
+import { sunPos } from '../src/sun.js';
 import {
-  radiansToDegrees,
-  degreesToRadians,
   degreesLat,
   degreesLong,
-  radiansLat,
-  radiansLong,
-  geodeticToEcf,
-  eciToGeodetic,
-  eciToEcf,
+  degreesToRadians,
   ecfToEci,
   ecfToLookAngles,
+  eciToEcf,
+  eciToGeodetic,
+  geodeticToEcf,
+  radiansLat,
+  radiansLong,
+  radiansToDegrees,
 } from '../src/transforms.js';
-
-import * as es from '../src/index.js';
 
 function checkConstants(constants: typeof es.constants) {
   expect(constants.pi).toEqual(pi);
@@ -63,10 +62,13 @@ describe('Library export', () => {
   it('json2satrec', () => expect(es.json2satrec).toEqual(json2satrec));
   it('propagate', () => expect(es.propagate).toEqual(propagate));
   it('sgp4', () => expect(es.sgp4).toEqual(sgp4));
+  it('checkForDecay', () => expect(es.checkForDecay).toEqual(checkForDecay));
   it('gstime', () => expect(es.gstime).toEqual(gstime));
   it('jday', () => expect(es.jday).toEqual(jday));
   it('invjday', () => expect(es.invjday).toEqual(invjday));
   it('dopplerFactor', () => expect(es.dopplerFactor).toEqual(dopplerFactor));
+  it('sunPos', () => expect(es.sunPos).toEqual(sunPos));
+  it('shadowFraction', () => expect(es.shadowFraction).toEqual(shadowFraction));
   it('transforms', () => {
     expect(es.radiansToDegrees).toEqual(radiansToDegrees);
     expect(es.degreesToRadians).toEqual(degreesToRadians);

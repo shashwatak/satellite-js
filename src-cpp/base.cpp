@@ -13,7 +13,8 @@ extern "C" {
         0, dateCount, dateCount,
         runData->eciPositions,
         runData->eciVelocities,
-        runData->sgp4Errors);
+        runData->sgp4Errors,
+        runData->communityDecayCheckEnabled);
 
     if (runData->gmstEnabled)
     {

@@ -18,8 +18,9 @@ typedef struct {
   double *__restrict jdaysPointer;
   int jdaysCount;
 
-  // outputs and output-specific parameters
   // ECI is enabled by default (no eciPositionEnabled flag)
+  // outputs and output-specific parameters
+  bool communityDecayCheckEnabled;
   double *__restrict eciPositions;
   double *__restrict eciVelocities;
   int8_t *__restrict sgp4Errors;
@@ -73,7 +74,7 @@ extern "C"
 
   void EMSCRIPTEN_KEEPALIVE sgp4forJs(
       elsetrec &satrec, double jday,
-      double r[3], double v[3], int8_t &error);
+      double r[3], double v[3], int8_t &error, bool communityDecayCheckEnabled);
 
   void* EMSCRIPTEN_KEEPALIVE calloc_one(int size);
 }
@@ -87,7 +88,8 @@ void calculate_eci(
     elsetrec *__restrict satellites, int satellites_start, int satellites_end,
     double *__restrict jdays, int jdays_start, int jdays_end, int jdays_count,
     double *__restrict eci_positions, double *__restrict eci_velocities,
-    int8_t *__restrict sgp4_errors);
+    int8_t *__restrict sgp4_errors,
+    bool communityDecayCheckEnabled);
 
 void calculate_gmst(
     double *__restrict jdays, int jdays_start, int jdays_end,

@@ -15,7 +15,9 @@ const DIMENSIONS = 3;
  *
  * Provides formatted output under `sunPosition` property.
  */
-export class SunPositionCalculator implements Calculator<'sunPosition', 0, [], Float64Array, EciVec3<AU>> {
+export class SunPositionCalculator
+  implements Calculator<'sunPosition', 0, [], Float64Array, EciVec3<AU>>
+{
   readonly name = 'sunPosition';
 
   readonly dependencies: [] = [];
@@ -53,9 +55,11 @@ export class SunPositionCalculator implements Calculator<'sunPosition', 0, [], F
     const rawOutput = this.getRawOutput();
     const index = dateIndex * DIMENSIONS;
     return {
+      // biome-ignore-start lint/style/noNonNullAssertion: index math
       x: rawOutput[index]!,
       y: rawOutput[index + 1]!,
       z: rawOutput[index + 2]!,
+      // biome-ignore-end lint/style/noNonNullAssertion: index math
     };
   }
 

@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { AU, EciVec3 } from './common-types.js';
+import type { AU, EciVec3 } from './common-types.js';
 import { deg2rad, pi, twoPi } from './constants.js';
-import { JDay } from './ext.js';
+import type { JDay } from './ext.js';
 
 /* Line by Line MATLAB-to-Javascript conversion of "sun.mat" from Vallado package */
 /* -----------------------------------------------------------------------------
@@ -34,28 +33,36 @@ import { JDay } from './ext.js';
  *      Computer software in MATLAB: http://celestrak.org/software/vallado-sw.php
  *  --------------------------------------------------------------------------- */
 
-export function sunPos(jday: JDay): { rsun: EciVec3<AU>; rtasc: number; decl: number } {
+export function sunPos(jday: JDay): {
+  rsun: EciVec3<AU>;
+  rtasc: number;
+  decl: number;
+} {
   // -------------------------  implementation   -----------------
   // -------------------  initialize values   --------------------
   const tut1 = (jday - 2451545) / 36525;
 
-  const meanlong = (280.460 + 36000.77 * tut1) % 360; // deg
+  const meanlong = (280.46 + 36000.77 * tut1) % 360; // deg
 
-  let meananomaly = (357.5277233 + 35999.05034 * tut1 * deg2rad) % twoPi; // rad
+  let meananomaly = ((357.5277233 + 35999.05034 * tut1) * deg2rad) % twoPi; // rad
   if (meananomaly < 0) {
     meananomaly += twoPi;
   }
 
-  const eclplong_raw = ((
-    meanlong + 1.914666471 * Math.sin(meananomaly) + 0.019994643 * Math.sin(2.0 * meananomaly)
-  ) % 360.0) * deg2rad; // rad
+  const eclplong_raw =
+    ((meanlong +
+      1.914666471 * Math.sin(meananomaly) +
+      0.019994643 * Math.sin(2.0 * meananomaly)) %
+      360.0) *
+    deg2rad; // rad
 
   const obliquity = (23.439291 - 0.0130042 * tut1) * deg2rad; // rad
 
   // --------- find magnitude of sun vector, and it's components ------
-  const magr = 1.000140612
-    - 0.016708617 * Math.cos(meananomaly)
-    - 0.000139589 * Math.cos(2.0 * meananomaly); // in au's
+  const magr =
+    1.000140612 -
+    0.016708617 * Math.cos(meananomaly) -
+    0.000139589 * Math.cos(2.0 * meananomaly); // in au's
 
   const rsun: EciVec3<AU> = {
     x: magr * Math.cos(eclplong_raw),
