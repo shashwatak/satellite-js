@@ -15,7 +15,7 @@ export interface PropagateOptions {
    * SGP4 output *despite* it sometimes giving garbage positions for decayed satellites,
    * you should NOT use it.
    */
-  communityDecayCheckEnabled: boolean;
+  communityDecayCheckEnabled?: boolean;
 }
 
 export function propagate(

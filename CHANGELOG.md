@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
+
 ## 7.1.0 (2026-07-23)
 
 - Feature: add `checkForDecay` function that allows filtering satellites decayed long ago but for which SGP4 reports "successful" propagation with garbage positions (see [section in the docs](https://shashwatak.github.io/satellite-js/docs/propagation/community-decay-check)).
