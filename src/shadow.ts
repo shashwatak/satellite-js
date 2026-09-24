@@ -27,6 +27,10 @@ function vecScale(v: Vec3, s: number): Vec3 {
   return [v[0] * s, v[1] * s, v[2] * s];
 }
 
+function clamp(val: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, val));
+}
+
 /**
  * Calculate the fraction of the Sun's disc obscured by the Earth as seen from a satellite.
  *
@@ -68,7 +72,7 @@ export function shadowFraction(
   // satellite-earth-antisolar angle,
   // which is equal to sun-satellite-earth angle (as vertically opposite angles)
   // i.e. the angle between the centers of earth and sun as seen from the satellite
-  const d = Math.acos(positionAndAntisolarDot / positionLength);
+  const d = Math.acos(clamp(positionAndAntisolarDot / positionLength, -1, 1));
 
   // fully inside shadow cone if the angular distance between the centers of Earth and Sun
   // is less Earth angular radius minus Sun angular radius
@@ -84,13 +88,24 @@ export function shadowFraction(
 
   // otherwise in penumbra, calculate the fraction of the Sun's disc obscured by the Earth using
   // circle–circle intersection area formula
-  const part1 = rS * rS * Math.acos((d * d + rS * rS - rE * rE) / (2 * d * rS));
-  const part2 = rE * rE * Math.acos((d * d + rE * rE - rS * rS) / (2 * d * rE));
+  const part1 =
+    rS *
+    rS *
+    Math.acos(clamp((d * d + rS * rS - rE * rE) / (2 * d * rS), -1, 1));
+  const part2 =
+    rE *
+    rE *
+    Math.acos(clamp((d * d + rE * rE - rS * rS) / (2 * d * rE), -1, 1));
   const part3 =
     0.5 *
-    Math.sqrt((-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
+    Math.sqrt(
+      Math.max(
+        0,
+        (-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE),
+      ),
+    );
   const overlapArea = part1 + part2 - part3;
   const sunDiscArea = Math.PI * rS * rS;
 
-  return overlapArea / sunDiscArea;
+  return clamp(overlapArea / sunDiscArea, 0, 1);
 }

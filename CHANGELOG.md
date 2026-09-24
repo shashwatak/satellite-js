@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
+- Fix: prevent `NaN` in `shadowFraction` when satellite is collinear with anti-solar direction or at penumbra boundaries.
 
 ## 7.1.0 (2026-07-23)
 
