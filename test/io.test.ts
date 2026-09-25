@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  alpha5ToNumber,
   constants,
   json2satrec,
   type OMMJsonObject,
@@ -67,6 +68,40 @@ describe('OMM Epoch', () => {
     expect(
       json2satrec(goodDataExampleWithEpochEndingInZ as OMMJsonObject),
     ).toEqual(json2satrec(goodDataExample as OMMJsonObject));
+  });
+});
+
+describe('alpha5ToNumber', () => {
+  it('returns five-digit fields unchanged', () => {
+    expect(alpha5ToNumber('25544')).toBe(25544);
+    expect(alpha5ToNumber('00404')).toBe(404);
+    expect(alpha5ToNumber('99999')).toBe(99999);
+  });
+
+  it('decodes Alpha-5 fields, skipping I and O', () => {
+    expect(alpha5ToNumber('A0000')).toBe(100000);
+    expect(alpha5ToNumber('A0404')).toBe(100404);
+    expect(alpha5ToNumber('H9999')).toBe(179999);
+    expect(alpha5ToNumber('J0000')).toBe(180000);
+    expect(alpha5ToNumber('N9999')).toBe(229999);
+    expect(alpha5ToNumber('P0000')).toBe(230000);
+    expect(alpha5ToNumber('T0449')).toBe(270449);
+    expect(alpha5ToNumber('Z9999')).toBe(339999);
+  });
+
+  it('gives NaN for fields the scheme never produces', () => {
+    for (const field of ['I0000', 'O0000', 'a0404', 'A000', 'AA000']) {
+      expect(alpha5ToNumber(field)).toBeNaN();
+    }
+  });
+
+  it('does not change what twoline2satrec returns', () => {
+    const satrec = twoline2satrec(
+      '1 A0000U 26067CY  26195.90649229  .00004770  00000+0  22159-3 0  9994',
+      '2 A0000  97.4593 154.0970 0005590 270.5113  89.5482 15.20467281 15911',
+    );
+    expect(satrec.satnum).toBe('A0000');
+    expect(alpha5ToNumber(satrec.satnum)).toBe(100000);
   });
 });
 
