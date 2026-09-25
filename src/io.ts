@@ -196,15 +196,22 @@ export function json2satrec(
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
 
-  const epoch = new Date(
-    jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : `${jsonobj.EPOCH}Z`,
-  );
+  const epochStr = jsonobj.EPOCH.endsWith('Z')
+    ? jsonobj.EPOCH
+    : `${jsonobj.EPOCH}Z`;
+  const epoch = new Date(epochStr);
+  // Date keeps milliseconds only; CelesTrak and Space-Track write microseconds, so keep the rest of the fraction
+  const fractionDigits = /\.(\d+)Z$/.exec(epochStr)?.[1] ?? '';
+  const beyondMs =
+    fractionDigits.length > 3
+      ? Number(`0.${fractionDigits.slice(3)}`) / 1000
+      : 0; // seconds beyond the milliseconds
   const year = epoch.getUTCFullYear();
-
   const epochyr = Number(year.toString().slice(-2));
   const epochdays =
     (epoch.valueOf() - new Date(Date.UTC(year, 0, 1, 0, 0, 0)).valueOf()) /
       (86400 * 1000) +
+    beyondMs / 86400 +
     1;
 
   let ndot = Number(jsonobj.MEAN_MOTION_DOT);
