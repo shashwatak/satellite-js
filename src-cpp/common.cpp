@@ -797,7 +797,7 @@ void calculate_shadow_fraction(
 
       double angRadEarth = asin(EARTH_RADIUS / posLen);
       double angRadSun = asin(SUN_RADIUS / sunKmLen);
-      double angSep = acos(dotPosAnti / posLen);
+      double angSep = acos(fmin(1.0, fmax(-1.0, dotPosAnti / posLen)));
 
       if (angSep <= angRadEarth - angRadSun)
       {
@@ -815,14 +815,14 @@ void calculate_shadow_fraction(
       double rS = angRadSun;
       double d = angSep;
 
-      double part1 = rS * rS * acos((d * d + rS * rS - rE * rE) / (2.0 * d * rS));
-      double part2 = rE * rE * acos((d * d + rE * rE - rS * rS) / (2.0 * d * rE));
-      double part3 = 0.5 * sqrt(
-          (-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE));
+      double part1 = rS * rS * acos(fmin(1.0, fmax(-1.0, (d * d + rS * rS - rE * rE) / (2.0 * d * rS))));
+      double part2 = rE * rE * acos(fmin(1.0, fmax(-1.0, (d * d + rE * rE - rS * rS) / (2.0 * d * rE))));
+      double part3 = 0.5 * sqrt(fmax(0.0,
+          (-d + rS + rE) * (d + rS - rE) * (d - rS + rE) * (d + rS + rE)));
       double overlapArea = part1 + part2 - part3;
       double sunDiscArea = pi * rS * rS;
 
-      shadow_fraction_values[output_index] = overlapArea / sunDiscArea;
+      shadow_fraction_values[output_index] = fmin(1.0, fmax(0.0, overlapArea / sunDiscArea));
     }
   }
 }
