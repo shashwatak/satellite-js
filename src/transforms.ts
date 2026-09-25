@@ -55,12 +55,17 @@ export function geodeticToEcf({
   const b = 6356.7523142;
   const f = (a - b) / a;
   const e2 = 2 * f - f * f;
-  const normal =
-    a / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
+  const sinLat = Math.sin(latitude);
+  const cosLat = Math.cos(latitude);
+  const sinLon = Math.sin(longitude);
+  const cosLon = Math.cos(longitude);
 
-  const x = (normal + height) * Math.cos(latitude) * Math.cos(longitude);
-  const y = (normal + height) * Math.cos(latitude) * Math.sin(longitude);
-  const z = (normal * (1 - e2) + height) * Math.sin(latitude);
+  const normal =
+    a / Math.sqrt(1 - e2 * (sinLat * sinLat));
+
+  const x = (normal + height) * cosLat * cosLon;
+  const y = (normal + height) * cosLat * sinLon;
+  const z = (normal * (1 - e2) + height) * sinLat;
 
   return {
     x,
@@ -110,8 +115,10 @@ export function ecfToEci(ecf: EcfVec3<number>, gmst: GMSTime): EciVec3<number> {
   // [Y]  =  [S  C  0][Y]
   // [Z]eci  [0  0  1][Z]ecf
   //
-  const X = ecf.x * Math.cos(gmst) - ecf.y * Math.sin(gmst);
-  const Y = ecf.x * Math.sin(gmst) + ecf.y * Math.cos(gmst);
+  const cosGmst = Math.cos(gmst);
+  const sinGmst = Math.sin(gmst);
+  const X = ecf.x * cosGmst - ecf.y * sinGmst;
+  const Y = ecf.x * sinGmst + ecf.y * cosGmst;
   const Z = ecf.z;
   return { x: X, y: Y, z: Z };
 }
@@ -129,8 +136,10 @@ export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime): EcfVec3<number> {
   // [Y]  =  [-S C  0][Y]
   // [Z]ecf  [0  0  1][Z]eci
 
-  const x = eci.x * Math.cos(gmst) + eci.y * Math.sin(gmst);
-  const y = eci.x * -Math.sin(gmst) + eci.y * Math.cos(gmst);
+  const cosGmst = Math.cos(gmst);
+  const sinGmst = Math.sin(gmst);
+  const x = eci.x * cosGmst + eci.y * sinGmst;
+  const y = eci.x * -sinGmst + eci.y * cosGmst;
   const { z } = eci;
 
   return {
@@ -171,17 +180,22 @@ function topocentric(
   const ry = satelliteEcf.y - observerEcf.y;
   const rz = satelliteEcf.z - observerEcf.z;
 
-  const topS =
-    Math.sin(latitude) * Math.cos(longitude) * rx +
-    Math.sin(latitude) * Math.sin(longitude) * ry -
-    Math.cos(latitude) * rz;
+  const sinLat = Math.sin(latitude);
+  const cosLat = Math.cos(latitude);
+  const sinLon = Math.sin(longitude);
+  const cosLon = Math.cos(longitude);
 
-  const topE = -Math.sin(longitude) * rx + Math.cos(longitude) * ry;
+  const topS =
+    sinLat * cosLon * rx +
+    sinLat * sinLon * ry -
+    cosLat * rz;
+
+  const topE = -sinLon * rx + cosLon * ry;
 
   const topZ =
-    Math.cos(latitude) * Math.cos(longitude) * rx +
-    Math.cos(latitude) * Math.sin(longitude) * ry +
-    Math.sin(latitude) * rz;
+    cosLat * cosLon * rx +
+    cosLat * sinLon * ry +
+    sinLat * rz;
 
   return { topS, topE, topZ };
 }
