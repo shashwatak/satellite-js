@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
+- Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
 
 ## 7.1.0 (2026-07-23)
 

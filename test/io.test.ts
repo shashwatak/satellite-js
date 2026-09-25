@@ -6,6 +6,7 @@ import {
   propagate,
   type SatRec,
   SatRecError,
+  sgp4,
   twoline2satrec,
 } from '../src/index.js';
 import goodData from './io.json' with { type: 'json' };
@@ -130,5 +131,50 @@ describe('sgp4 decay issue', () => {
     });
     expect(satrec.error).toBe(SatRecError.None);
     expect(resultFalseFlag).not.toBeNull();
+  });
+});
+
+describe('dspace resonance state persistence', () => {
+  it('persists atime, xli, xni on satrec and matches direct propagation bit-for-bit', () => {
+    // SYNCOM 2 (geosynchronous, resonant irez = 1)
+    const l1 =
+      '1 00553U 63004A   22218.37130816 -.00000093  00000-0  00000-0 0  9993';
+    const l2 =
+      '2 00553  29.6088 301.0790 0740538 155.7290 207.9962  1.16484432 19620';
+
+    const satSeq = twoline2satrec(l1, l2);
+    expect(satSeq.atime).toBe(0);
+
+    // Step 1: 720 min (1 step)
+    sgp4(satSeq, 720);
+    expect(satSeq.atime).toBe(720);
+
+    // Step 2: 1440 min (resumes from atime = 720)
+    const res1440Seq = sgp4(satSeq, 1440);
+    expect(satSeq.atime).toBe(1440);
+
+    // Compare with direct fresh propagation from epoch
+    const satDirect = twoline2satrec(l1, l2);
+    const res1440Direct = sgp4(satDirect, 1440);
+
+    expect(res1440Seq).not.toBeNull();
+    expect(res1440Direct).not.toBeNull();
+    if (res1440Seq && res1440Direct) {
+      expect(res1440Seq.position.x).toBe(res1440Direct.position.x);
+      expect(res1440Seq.position.y).toBe(res1440Direct.position.y);
+      expect(res1440Seq.position.z).toBe(res1440Direct.position.z);
+    }
+
+    // Backward query resets atime cleanly
+    const res360 = sgp4(satSeq, 360);
+    const satDirect360 = twoline2satrec(l1, l2);
+    const resDirect360 = sgp4(satDirect360, 360);
+    expect(res360).not.toBeNull();
+    expect(resDirect360).not.toBeNull();
+    if (res360 && resDirect360) {
+      expect(res360.position.x).toBe(resDirect360.position.x);
+      expect(res360.position.y).toBe(resDirect360.position.y);
+      expect(res360.position.z).toBe(resDirect360.position.z);
+    }
   });
 });
