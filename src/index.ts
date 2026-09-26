@@ -2,7 +2,7 @@
 export * as constants from './constants.js';
 
 export { jday, invjday } from './ext.js';
-export { twoline2satrec, json2satrec } from './io.js';
+export { twoline2satrec, json2satrec, alpha5ToNumber } from './io.js';
 export {
   propagate,
   type PropagateOptions,
