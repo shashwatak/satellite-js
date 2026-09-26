@@ -61,12 +61,26 @@ describe('OMM Epoch', () => {
     expect(goodDataExample.EPOCH.endsWith('Z')).toBe(false);
     const goodDataExampleWithEpochEndingInZ = {
       ...goodDataExample,
-      EPOCH: new Date(`${goodDataExample.EPOCH}Z`).toISOString(),
+      EPOCH: `${goodDataExample.EPOCH}Z`, // a Date round trip would drop the microseconds
     };
     expect(goodDataExampleWithEpochEndingInZ.EPOCH.endsWith('Z')).toBe(true);
     expect(
       json2satrec(goodDataExampleWithEpochEndingInZ as OMMJsonObject),
     ).toEqual(json2satrec(goodDataExample as OMMJsonObject));
+  });
+
+  it('must keep the digits beyond the millisecond', () => {
+    // biome-ignore lint/style/noNonNullAssertion: no "as const" json import
+    const goodDataExample = goodData[0]!;
+    // the fixture's epoch carries microseconds; a Date would keep only the milliseconds
+    const time = /T(\d\d):(\d\d):(\d\d\.\d{4,})$/.exec(goodDataExample.EPOCH);
+    expect(time).not.toBeNull();
+    const [, hh, mm, ss] = time as RegExpExecArray;
+    const expected = Number(hh) * 3600 + Number(mm) * 60 + Number(ss);
+    const satrec = json2satrec(goodDataExample as OMMJsonObject);
+    const secondsOfDay =
+      (satrec.epochdays - Math.floor(satrec.epochdays)) * 86400;
+    expect(Math.abs(secondsOfDay - expected)).toBeLessThan(1e-6);
   });
 });
 
