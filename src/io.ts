@@ -260,14 +260,20 @@ export function json2satrec(
  *
  * Catalog numbers above 99999 are written in a TLE's five-character field as
  * Alpha-5: a leading letter A-Z, skipping I and O, stands for 10-33 in the
- * ten-thousands place, so `'A0000'` is 100000 and `'Z9999'` is 339999. A
- * five-digit field is returned as its number; anything else, including a field
- * starting with I or O, goes through `Number()` and so gives `NaN`.
+ * ten-thousands place, so `'A0000'` is 100000 and `'Z9999'` is 339999.
+ *
+ * A blank or whitespace-only field gives `NaN`, not the 0 that `Number()`
+ * would return for it. Any other field goes through `Number()`: a five-digit
+ * field gives its number, and so does anything else `Number()` accepts, such
+ * as a space-padded `'    5'` (5) or `'1e3'` (1000); a field starting with I
+ * or O, or a malformed one such as `'a0404'`, `'A000'` or `'AA000'`, gives
+ * `NaN`.
  *
  * `twoline2satrec` keeps the field as written in `satrec.satnum`; this function
  * does not change that, it only converts a field when the caller wants a number.
  */
 export function alpha5ToNumber(field: string): number {
+  if (field.trim() === '') return Number.NaN;
   const c = field[0];
   if (
     c !== undefined &&

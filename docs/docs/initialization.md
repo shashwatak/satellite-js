@@ -74,7 +74,7 @@ alpha5ToNumber(satrec.satnum); // 100000
 
 Returns the catalog number written in a TLE's five-character catalog number field, as a number. Numbers above 99999 are written in Alpha-5 format: a leading letter stands for 10 to 33 in the ten-thousands place, skipping I and O, so `'A0000'` is 100000, `'J0000'` is 180000 and `'Z9999'` is 339999. A five-digit field is returned as its number: `'25544'` is 25544 and `'00404'` is 404.
 
-Any other field goes through `Number()`. A field starting with I or O, which Alpha-5 never uses, gives `NaN`, and so does a malformed one such as `'a0404'`, `'A000'` or `'AA000'`. `twoline2satrec` is unchanged: `satnum` keeps the field as written, and this function converts it only when you need a number.
+A blank or whitespace-only field gives `NaN`. Any other field goes through `Number()`: a field starting with I or O, which Alpha-5 never uses, gives `NaN`, and so does a malformed one such as `'a0404'`, `'A000'` or `'AA000'`. `twoline2satrec` is unchanged: `satnum` keeps the field as written, and this function converts it only when you need a number.
 
 ## `SatRec`
 

@@ -95,6 +95,17 @@ describe('alpha5ToNumber', () => {
     }
   });
 
+  it('gives NaN, not 0, for a blank or whitespace-only field', () => {
+    for (const field of ['', ' ', '     ', '\t']) {
+      expect(alpha5ToNumber(field)).toBeNaN();
+    }
+  });
+
+  it('passes any other field to Number()', () => {
+    expect(alpha5ToNumber('    5')).toBe(5);
+    expect(alpha5ToNumber('1e3')).toBe(1000);
+  });
+
   it('does not change what twoline2satrec returns', () => {
     const satrec = twoline2satrec(
       '1 A0000U 26067CY  26195.90649229  .00004770  00000+0  22159-3 0  9994',
