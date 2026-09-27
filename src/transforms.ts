@@ -5,10 +5,14 @@ import type {
   GeodeticLocation,
   GMSTime,
   Kilometer,
+  KilometerPerSecond,
   LookAngles,
   Radians,
 } from './common-types.js';
 import { deg2rad, pi, rad2deg, twoPi } from './constants.js';
+
+// Earth rotation rate in rad/s: the angular velocity of the ECF frame relative to ECI.
+const earthRotation = 7.292115e-5;
 
 export function radiansToDegrees(radians: Radians): Degrees {
   return radians * rad2deg;
@@ -137,6 +141,31 @@ export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime): EcfVec3<number> {
     x,
     y,
     z,
+  };
+}
+
+/**
+ * Converts an ECI velocity to a true ECF velocity.
+ *
+ * `eciToEcf(velocityEci, gmst)` only re-expresses the ECI velocity vector in ECF
+ * axes; the result still contains the motion of the rotating Earth. A true ECF
+ * velocity, the rate of change of the ECF position, also has the velocity of the
+ * rotating frame at the satellite's position, ω × r_ecf, subtracted. That is the
+ * velocity `dopplerFactor` expects.
+ */
+export function eciToEcfVelocity(
+  positionEci: EciVec3<Kilometer>,
+  velocityEci: EciVec3<KilometerPerSecond>,
+  gmst: GMSTime,
+): EcfVec3<KilometerPerSecond> {
+  const positionEcf = eciToEcf(positionEci, gmst);
+  const rotatedVelocity = eciToEcf(velocityEci, gmst);
+
+  // ω points along the z axis, so ω × r_ecf = (-ω·y, ω·x, 0)
+  return {
+    x: rotatedVelocity.x + earthRotation * positionEcf.y,
+    y: rotatedVelocity.y - earthRotation * positionEcf.x,
+    z: rotatedVelocity.z,
   };
 }
 

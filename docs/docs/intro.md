@@ -152,6 +152,7 @@ import {
   gstime,
   degreesToRadians, radiansToDegrees, degreesLong, degreesLat,
   eciToEcf,
+  eciToEcfVelocity,
   geodeticToEcf,
   eciToGeodetic,
   ecfToLookAngles
@@ -169,7 +170,7 @@ const observerGeodetic = {
 
 // You can get ECF, Geodetic, and Look Angles
 const positionEcf   = eciToEcf(positionEci, gmst),
-      velocityEcf   = eciToEcf(velocityEci, gmst),
+      velocityEcf   = eciToEcfVelocity(positionEci, velocityEci, gmst),
       observerEcf   = geodeticToEcf(observerGeodetic),
       positionGd    = eciToGeodetic(positionEci, gmst),
       lookAngles    = ecfToLookAngles(observerGeodetic, positionEcf);

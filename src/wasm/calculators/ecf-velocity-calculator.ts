@@ -7,6 +7,10 @@ const DIMENSIONS = 3;
 /**
  * Calculator for ECF (Earth-Centered Fixed) velocity.
  *
+ * The output is a true ECF velocity, like `eciToEcfVelocity()`: the ECI velocity
+ * rotated into ECF axes, minus the velocity of the rotating frame (ω × r) at the
+ * satellite's position. It is the velocity `DopplerFactorCalculator` consumes.
+ *
  * Depends on:
  * @see EciBaseCalculator
  * @see GmstCalculator

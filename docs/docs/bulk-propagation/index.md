@@ -86,7 +86,7 @@ Available Calculators:
 - `EciBaseCalculator` calculates positions and velocities using SGP4. Also outputs SGP4 errors.
   This is like a pure JS `propagate()`.
 - `GmstCalculator` calculates Greenwich Mean Sidereal Time, needed for further transforms. This is like `gstime()`.
-- `EcfPositionCalculator` and `EcfVelocityCalculator` calculate, respectively, ECF position and velocity. This is like `eciToEcf()`.
+- `EcfPositionCalculator` and `EcfVelocityCalculator` calculate, respectively, ECF position and velocity. These are like `eciToEcf()` and `eciToEcfVelocity()`.
 - `GeodeticPositionCalculator` calculates geodetic position. This is like `eciToGeodetic()`.
 - `LookAnglesCalculator` calculates Look Angles (azimuth, altitude, range). This is like `ecfToLookAngles()`.
 - `DopplerFactorCalculator` calculates Doppler factor. This is like `dopplerFactor()`.
