@@ -70,7 +70,7 @@ The `SatRec` object is immense and complex; it contains are the Keplerian Elemen
 |---|---|
 | `error` | The error code that is set by SGP4 algorithm in case when propagation fails (see [`SatRecError`](propagation/index.md#satrecerror)) |
 | `satnum` | Unique satellite identifier, usually NORAD number |
-| `epochyr` | Full four-digit year of this element set's epoch moment |
+| `epochyr` | Two-digit year of this element set's epoch moment, as written in a TLE (57 to 99 mean 1957 to 1999, 00 to 56 mean 2000 to 2056); the full epoch is in `jdsatepoch` |
 | `epochdays` | Fractional days into the year of the epoch moment |
 | `jdsatepoch` | Julian date of the epoch (computed from `epochyr` and `epochdays`) |
 | `ndot` | First time derivative of the mean motion, in radians/minute² |
