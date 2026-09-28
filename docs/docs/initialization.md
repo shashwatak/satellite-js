@@ -58,6 +58,24 @@ const satrec = twoline2satrec(tleLine1, tleLine2);
 
 Returns a `SatRec` object, created from the TLEs passed in. `tleLine1` and `tleLine2` are the two lines of the TLE, properly formatted (careful with spaces!).
 
+## `alpha5ToNumber` - Catalog number from a TLE field {/* #alpha5-to-number */}
+
+```ts
+import { alpha5ToNumber, twoline2satrec } from 'satellite.js';
+
+const tleLine1 = '1 A0000U 26067CY  26195.90649229  .00004770  00000+0  22159-3 0  9994',
+      tleLine2 = '2 A0000  97.4593 154.0970 0005590 270.5113  89.5482 15.20467281 15911';
+
+const satrec = twoline2satrec(tleLine1, tleLine2);
+
+satrec.satnum;                 // 'A0000'
+alpha5ToNumber(satrec.satnum); // 100000
+```
+
+Returns the catalog number written in a TLE's five-character catalog number field, as a number. Numbers above 99999 are written in Alpha-5 format: a leading letter stands for 10 to 33 in the ten-thousands place, skipping I and O, so `'A0000'` is 100000, `'J0000'` is 180000 and `'Z9999'` is 339999. A five-digit field is returned as its number: `'25544'` is 25544 and `'00404'` is 404.
+
+A blank or whitespace-only field gives `NaN`. Any other field goes through `Number()`: a field starting with I or O, which Alpha-5 never uses, gives `NaN`, and so does a malformed one such as `'a0404'`, `'A000'` or `'AA000'`. `twoline2satrec` is unchanged: `satnum` keeps the field as written, and this function converts it only when you need a number.
+
 ## `SatRec`
 
 The `SatRec` object is immense and complex; it contains are the Keplerian Elements and the other values pulled from the TLE/OMM, along with calculated values for SGP4 algorithm. While it is vastly complicated, for the basic usage you don't have to do anything with it, except pass it around to [propagation](propagation/index.md) functions and access the `error` property.
