@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Feature: add `satellite.js/js`, a JavaScript-only entry point that excludes optional WASM loaders while preserving the existing root API.
+
 - Feature: add `alpha5ToNumber` to convert a TLE catalog number field to a number, decoding the Alpha-5 form used above 99999 (`A0000` = 100000, `Z9999` = 339999, I and O skipped). `twoline2satrec` is unchanged and still returns `satnum` as written.
 - Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
 - Fix: prevent `NaN` in `shadowFraction` when satellite is collinear with anti-solar direction or at penumbra boundaries.
