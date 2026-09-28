@@ -192,3 +192,15 @@ describe('dspace resonance state persistence', () => {
     }
   });
 });
+
+describe('epoch year', () => {
+  it('is the two-digit year of the epoch for both readers', () => {
+    goodData.forEach((jsonObj) => {
+      const twoDigitYear = Number(jsonObj.EPOCH.slice(0, 4)) % 100;
+      expect(twoline2satrec(jsonObj.tleLine1, jsonObj.tleLine2).epochyr).toBe(
+        twoDigitYear,
+      );
+      expect(json2satrec(jsonObj as OMMJsonObject).epochyr).toBe(twoDigitYear);
+    });
+  });
+});

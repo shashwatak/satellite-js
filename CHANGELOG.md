@@ -6,6 +6,7 @@
 - Fix: prevent `NaN` in `shadowFraction` when satellite is collinear with anti-solar direction or at penumbra boundaries.
 - Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
 - Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
+- Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
 
 ## 7.1.0 (2026-07-23)
 
