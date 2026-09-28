@@ -36,7 +36,8 @@ extern "C" {
 
     if (runData->ecfVelocityEnabled)
     {
-      calculate_ecf_position_or_velocity(
+      calculate_ecf_velocity(
+          runData->eciPositions,
           runData->eciVelocities,
           0, satCount,
           runData->gmstValues,

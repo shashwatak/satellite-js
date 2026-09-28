@@ -94,11 +94,14 @@ const observerGd = {
 const gmst = satellite.gstime(new Date());
 
 // You can get ECF, Geodetic, Look Angles, and Doppler Factor.
+// The Doppler factor needs the velocity relative to the rotating Earth:
+// eciToEcfVelocity() removes the Earth's rotation, eciToEcf() would only rotate the axes.
 const positionEcf   = satellite.eciToEcf(positionEci, gmst),
+      velocityEcf   = satellite.eciToEcfVelocity(positionEci, velocityEci, gmst),
       observerEcf   = satellite.geodeticToEcf(observerGd),
       positionGd    = satellite.eciToGeodetic(positionEci, gmst),
       lookAngles    = satellite.ecfToLookAngles(observerGd, positionEcf),
-      dopplerFactor = satellite.dopplerFactor(observerCoordsEcf, positionEcf, velocityEcf);
+      dopplerFactor = satellite.dopplerFactor(observerEcf, positionEcf, velocityEcf);
 
 // The coordinates are all stored in key-value pairs.
 // ECI and ECF are accessed by `x`, `y`, `z` properties.

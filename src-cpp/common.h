@@ -102,6 +102,13 @@ void calculate_ecf_position_or_velocity(
     int dates_start, int dates_end, int dates_count,
     double *__restrict ecf_vectors);
 
+void calculate_ecf_velocity(
+    double *__restrict eci_positions, double *__restrict eci_velocities,
+    int satellites_start, int satellites_end,
+    double *__restrict gmst_values,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict ecf_velocities);
+
 void calculate_geodetic_positions(
     double *__restrict eci_positions,
     int satellites_start, int satellites_end,

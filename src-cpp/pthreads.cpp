@@ -77,7 +77,8 @@ void* thread_function(void* arg) {
 
   if (data->runData->ecfVelocityEnabled)
   {
-    calculate_ecf_position_or_velocity(
+    calculate_ecf_velocity(
+      data->runData->eciPositions,
       data->runData->eciVelocities,
       satellitesStart, satellitesEnd,
       data->runData->gmstValues,

@@ -604,6 +604,36 @@ void calculate_ecf_position_or_velocity(
   }
 }
 
+// True ECF velocity: the ECI velocity rotated into ECF axes, minus the velocity
+// of the rotating frame at the satellite's position, omega x r_ecf.
+// Mirrors eciToEcfVelocity() in src/transforms.ts, including the operation order.
+void calculate_ecf_velocity(
+    double *__restrict eci_positions, double *__restrict eci_velocities,
+    int satellites_start, int satellites_end,
+    double *__restrict gmst_values,
+    int dates_start, int dates_end, int dates_count,
+    double *__restrict ecf_velocities)
+{
+  double earthRotation = 7.292115E-5;
+  for (int i = satellites_start; i < satellites_end; i++)
+  {
+    for (int j = dates_start; j < dates_end; j++)
+    {
+      int index = (i * dates_count + j) * 3;
+      double cos_gmst = cos(gmst_values[j]);
+      double sin_gmst = sin(gmst_values[j]);
+      double ecf_x = eci_positions[index] * cos_gmst + eci_positions[index + 1] * sin_gmst;
+      double ecf_y = eci_positions[index] * (-sin_gmst) + eci_positions[index + 1] * cos_gmst;
+      double rotated_vx = eci_velocities[index] * cos_gmst + eci_velocities[index + 1] * sin_gmst;
+      double rotated_vy = eci_velocities[index] * (-sin_gmst) + eci_velocities[index + 1] * cos_gmst;
+      // omega points along z, so omega x r_ecf = (-omega * y, omega * x, 0)
+      ecf_velocities[index] = rotated_vx + earthRotation * ecf_y;
+      ecf_velocities[index + 1] = rotated_vy - earthRotation * ecf_x;
+      ecf_velocities[index + 2] = eci_velocities[index + 2];
+    }
+  }
+}
+
 void calculate_geodetic_positions(
     double *__restrict eci_positions,
     int satellites_start, int satellites_end,
@@ -698,8 +728,7 @@ void calculate_doppler_factor(
     double observer_ecf_x, double observer_ecf_y, double observer_ecf_z,
     double *__restrict doppler_factors)
 {
-  double earthRotation = 7.292115E-5,
-         c = 299792.458;
+  double c = 299792.458;
   // #pragma clang loop vectorize(enable) vectorize_width(2)
   for (int i = satellites_start; i < satellites_end; i++)
   {
@@ -712,8 +741,10 @@ void calculate_doppler_factor(
       double rangeZ = ecf_positions[position_velocity_index + 2] - observer_ecf_z;
 
       double length = sqrt(rangeX * rangeX + rangeY * rangeY + rangeZ * rangeZ);
-      double rangeVelX = ecf_velocities[position_velocity_index] + earthRotation * observer_ecf_y;
-      double rangeVelY = ecf_velocities[position_velocity_index + 1] - earthRotation * observer_ecf_x;
+      // The observer is stationary in ECF, so the relative velocity is the
+      // satellite's (true) ECF velocity itself.
+      double rangeVelX = ecf_velocities[position_velocity_index];
+      double rangeVelY = ecf_velocities[position_velocity_index + 1];
       double rangeVelZ = ecf_velocities[position_velocity_index + 2];
 
       double rangeRate = (rangeX * rangeVelX + rangeY * rangeVelY + rangeZ * rangeVelZ) / length;
