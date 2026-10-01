@@ -103,3 +103,41 @@ describe('Latitude & longitude conversions', () => {
     });
   });
 });
+
+describe('ECI to geodetic at and near the poles', () => {
+  const b = 6356.7523142; // WGS84 semi-minor axis, the ellipsoid's polar radius
+
+  it('returns the height above the pole for points on the rotation axis', () => {
+    for (const z of [7000, -7000, b, 42164]) {
+      const lla = eciToGeodetic({ x: 0, y: 0, z }, 0);
+      expect(lla.latitude).toBeCloseTo(Math.sign(z) * (Math.PI / 2), 12);
+      expect(lla.height).toBeCloseTo(Math.abs(z) - b, 9);
+    }
+  });
+
+  it('is continuous 1 mm off the rotation axis', () => {
+    const lla = eciToGeodetic({ x: 1e-6, y: 0, z: 7000 }, 0);
+    expect(lla.height).toBeCloseTo(7000 - b, 9);
+  });
+
+  it('inverts geodeticToEcf from pole to pole', () => {
+    const longitude = 0.3;
+    const latitudesDegrees = [
+      -90, -89.999999, -80, -60, -40, -20, 0, 20, 40, 60, 80, 89.999999, 90,
+    ];
+    for (const latitudeDegrees of latitudesDegrees) {
+      for (const height of [0, 400, 35786]) {
+        const latitude = (latitudeDegrees * Math.PI) / 180;
+        const lla = eciToGeodetic(
+          geodeticToEcf({ longitude, latitude, height }),
+          0,
+        );
+        expect(lla.latitude).toBeCloseTo(latitude, 9);
+        expect(lla.height).toBeCloseTo(height, 9);
+        if (Math.abs(latitudeDegrees) < 90) {
+          expect(lla.longitude).toBeCloseTo(longitude, 9);
+        }
+      }
+    }
+  });
+});
