@@ -31,6 +31,7 @@ import {
   ecfToEci,
   ecfToLookAngles,
   eciToEcf,
+  eciToEcfVelocity,
   eciToGeodetic,
   geodeticToEcf,
   radiansLat,
@@ -80,6 +81,7 @@ describe('Library export', () => {
     expect(es.geodeticToEcf).toEqual(geodeticToEcf);
     expect(es.eciToGeodetic).toEqual(eciToGeodetic);
     expect(es.eciToEcf).toEqual(eciToEcf);
+    expect(es.eciToEcfVelocity).toEqual(eciToEcfVelocity);
     expect(es.ecfToEci).toEqual(ecfToEci);
     expect(es.ecfToLookAngles).toEqual(ecfToLookAngles);
   });

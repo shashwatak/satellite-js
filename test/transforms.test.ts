@@ -5,6 +5,7 @@ import {
   ecfToEci,
   ecfToLookAngles,
   eciToEcf,
+  eciToEcfVelocity,
   eciToGeodetic,
   geodeticToEcf,
   radiansLat,
@@ -101,5 +102,39 @@ describe('Latitude & longitude conversions', () => {
     it(`convert invalid longitude value (${item.degrees} degrees) to radians`, () => {
       expect(() => radiansLong(item.degrees)).toThrowError(RangeError);
     });
+  });
+});
+
+describe('ECI to ECF velocity', () => {
+  const earthRotation = 7.292115e-5;
+  const gmst = 1.2345;
+
+  it('is zero for a point fixed to the rotating Earth', () => {
+    // In ECI a point on the equator moves east at ω R; relative to the Earth it is at rest.
+    const radius = 6378.137;
+    const positionEci = {
+      x: radius * Math.cos(gmst),
+      y: radius * Math.sin(gmst),
+      z: 0,
+    };
+    const velocityEci = {
+      x: -earthRotation * radius * Math.sin(gmst),
+      y: earthRotation * radius * Math.cos(gmst),
+      z: 0,
+    };
+    compareVectors(
+      eciToEcfVelocity(positionEci, velocityEci, gmst),
+      { x: 0, y: 0, z: 0 },
+      9,
+    );
+  });
+
+  it('only rotates the axes on the rotation axis, where ω × r is zero', () => {
+    const positionEci = { x: 0, y: 0, z: 7000 };
+    const velocityEci = { x: 1.5, y: -2.5, z: 0.25 };
+    compareVectors(
+      eciToEcfVelocity(positionEci, velocityEci, gmst),
+      eciToEcf(velocityEci, gmst),
+    );
   });
 });
