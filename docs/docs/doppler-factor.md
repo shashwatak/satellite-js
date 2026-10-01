@@ -10,6 +10,10 @@ The `dopplerFactor` function computes the relativistic Doppler ratio for a satel
 
 A value **less than 1** means the satellite is approaching (frequency shifted higher); a value **greater than 1** means it is receding (frequency shifted lower).
 
+:::note[Which velocity to pass]
+`velocityEcf` must be `eciToEcf(velocityEci, gmst)`, the ECI velocity rotated into ECF axes; `dopplerFactor` subtracts the observer's rotation velocity itself. Do not pass the output of [`eciToEcfVelocity`](transforms.md) to this version: that is a true ECF velocity and would put the range rate off by up to ω · R · cos(observer latitude), about 0.46 km/s at the equator. The next major version switches `dopplerFactor` to the true ECF velocity (see [#180](https://github.com/shashwatak/satellite-js/issues/180)).
+:::
+
 ```ts
 import { dopplerFactor } from 'satellite.js';
 
