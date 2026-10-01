@@ -501,11 +501,11 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
           j,
         )!.geodeticPosition;
 
-        expect(wasmGeodeticPosition.latitude).toBeCloseTo(
+        expect(wasmGeodeticPosition.longitude).toBeCloseTo(
           jsGeodeticPosition.longitude,
           11,
         );
-        expect(wasmGeodeticPosition.longitude).toBeCloseTo(
+        expect(wasmGeodeticPosition.latitude).toBeCloseTo(
           jsGeodeticPosition.latitude,
           11,
         );
@@ -1079,11 +1079,11 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
           j,
         )!.geodeticPosition;
 
-        expect(wasmGeodeticPosition.latitude).toBeCloseTo(
+        expect(wasmGeodeticPosition.longitude).toBeCloseTo(
           jsGeodeticPosition.longitude,
           11,
         );
-        expect(wasmGeodeticPosition.longitude).toBeCloseTo(
+        expect(wasmGeodeticPosition.latitude).toBeCloseTo(
           jsGeodeticPosition.latitude,
           11,
         );
