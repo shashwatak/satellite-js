@@ -85,26 +85,26 @@ export function twoline2satrec(longstr1: string, longstr2: string): SatRec {
 
   const satnum = longstr1.substring(2, 7);
 
-  const epochyr = parseInt(longstr1.substring(18, 20), 10);
-  const epochdays = parseFloat(longstr1.substring(20, 32));
-  let ndot = parseFloat(longstr1.substring(33, 43));
-  let nddot = parseFloat(
+  const epochyr = Number(longstr1.substring(18, 20));
+  const epochdays = Number(longstr1.substring(20, 32));
+  let ndot = Number(longstr1.substring(33, 43));
+  let nddot = Number(
     `${longstr1.substring(44, 45)}.${longstr1.substring(45, 50)}E${longstr1.substring(50, 52)}`,
   );
-  const bstar = parseFloat(
+  const bstar = Number(
     `${longstr1.substring(53, 54)}.${longstr1.substring(54, 59)}E${longstr1.substring(59, 61)}`,
   );
 
   // satrec.satnum = longstr2.substring(2, 7);
   // ---- find standard orbital elements ----
-  const inclo = parseFloat(longstr2.substring(8, 16)) * deg2rad;
-  const nodeo = parseFloat(longstr2.substring(17, 25)) * deg2rad;
-  const ecco = parseFloat(`.${longstr2.substring(26, 33).replace(/\s/g, '0')}`);
-  const argpo = parseFloat(longstr2.substring(34, 42)) * deg2rad;
-  const mo = parseFloat(longstr2.substring(43, 51)) * deg2rad;
+  const inclo = Number(longstr2.substring(8, 16)) * deg2rad;
+  const nodeo = Number(longstr2.substring(17, 25)) * deg2rad;
+  const ecco = Number(`.${longstr2.substring(26, 33).replace(/\s/g, '0')}`);
+  const argpo = Number(longstr2.substring(34, 42)) * deg2rad;
+  const mo = Number(longstr2.substring(43, 51)) * deg2rad;
 
   // ---- find no, ndot, nddot ----
-  const no = parseFloat(longstr2.substring(52, 63)) / xpdotp;
+  const no = Number(longstr2.substring(52, 63)) / xpdotp;
   // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
