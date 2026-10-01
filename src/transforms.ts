@@ -91,15 +91,26 @@ export function eciToGeodetic(
   const longitude =
     ((((Math.atan2(eci.y, eci.x) - gmst + pi) % twoPi) + twoPi) % twoPi) - pi;
 
+  // Iterate the latitude until its change is within tolerance, as Kelso's
+  // column says to; 4 to 5 passes are typical, kmax is a safety cap.
   const kmax = 20;
+  const tolerance = 1e-12;
   let k = 0;
-  let latitude = Math.atan2(eci.z, Math.sqrt(eci.x * eci.x + eci.y * eci.y));
-  let C = 0;
-  while (k++ < kmax) {
-    C = 1 / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
-    latitude = Math.atan2(eci.z + a * C * e2 * Math.sin(latitude), R);
-  }
-  const height = R / Math.cos(latitude) - a * C;
+  let latitude = Math.atan2(eci.z, R);
+  let previousLatitude: number;
+  do {
+    previousLatitude = latitude;
+    const sinLatitude = Math.sin(latitude);
+    const C = 1 / Math.sqrt(1 - e2 * (sinLatitude * sinLatitude));
+    latitude = Math.atan2(eci.z + a * C * e2 * sinLatitude, R);
+  } while (Math.abs(latitude - previousLatitude) > tolerance && ++k < kmax);
+
+  // height = R cos(lat) + z sin(lat) - a / C follows from geodeticToEcf and,
+  // unlike R / cos(lat) - a C, has no singularity on the rotation axis.
+  const sinLatitude = Math.sin(latitude);
+  const cosLatitude = Math.cos(latitude);
+  const C = 1 / Math.sqrt(1 - e2 * (sinLatitude * sinLatitude));
+  const height = R * cosLatitude + eci.z * sinLatitude - a / C;
   return { longitude, latitude, height };
 }
 
