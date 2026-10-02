@@ -250,3 +250,31 @@ describe('epoch year', () => {
     });
   });
 });
+
+describe('twoline2satrec numeric fields', () => {
+  // https://github.com/shashwatak/satellite-js/issues/190: column 26 of line 1 is the letter O, so the epoch field
+  // is not wholly numeric; parseFloat() read it up to the letter as 189.7 and set no error.
+  const line1 =
+    '1 69999U 58002D   26189.7O990935 -.00000023  00000+0 -70517-5 0  9996';
+  const line2 =
+    '2 69999  34.2417 341.8745 1487004  19.9191 345.3718 11.62373363189308';
+
+  it('gives NaN for a field that is not wholly numeric', () => {
+    const satrec = twoline2satrec(line1, line2);
+    expect(satrec.epochdays).toBeNaN();
+    expect(satrec.jdsatepoch).toBeNaN();
+  });
+
+  it('still reads the fields around it', () => {
+    const satrec = twoline2satrec(line1, line2);
+    expect(satrec.epochyr).toBe(26);
+    expect(satrec.bstar).toBeCloseTo(-0.70517e-5, 12);
+    expect(satrec.inclo).toBeCloseTo((34.2417 * Math.PI) / 180, 12);
+  });
+
+  it('reads the same set as before with the letter replaced by the 0', () => {
+    const satrec = twoline2satrec(line1.replace('7O99', '7099'), line2);
+    expect(satrec.epochdays).toBeCloseTo(189.70990935, 12);
+    expect(satrec.error).toBe(0);
+  });
+});
