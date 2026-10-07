@@ -4,6 +4,12 @@
 
 - Fix: `invjday` truncated the fractional second instead of rounding it, so `invjday(jday(date))` came back a full second early for about half of all inputs that fall exactly on a second, and the array overload could report `sec = -1`. `invjday` now keeps millisecond precision, which also makes it a true inverse of `jday` for dates carrying milliseconds (#75).
 - Test: deterministic `jday`/`invjday` round-trip tests over second, minute, midnight and month/year boundaries.
+- Feature: add `alpha5ToNumber` to convert a TLE catalog number field to a number, decoding the Alpha-5 form used above 99999 (`A0000` = 100000, `Z9999` = 339999, I and O skipped). `twoline2satrec` is unchanged and still returns `satnum` as written.
+- Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
+- Fix: prevent `NaN` in `shadowFraction` when satellite is collinear with anti-solar direction or at penumbra boundaries.
+- Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
+- Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
+- Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
 
 ## 7.1.0 (2026-07-23)
 

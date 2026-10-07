@@ -79,8 +79,8 @@ export function sunPos(jday: JDay): {
   }
 
   let rtasc = rtasc_raw;
-  if (Math.abs(eclplong_raw - rtasc) > pi * 0.5) {
-    rtasc += 0.5 * pi * Math.round((eclplong_raw - rtasc_raw) / (0.5 * pi));
+  if (Math.abs(eclplong - rtasc) > pi * 0.5) {
+    rtasc += 0.5 * pi * Math.round((eclplong - rtasc_raw) / (0.5 * pi));
   }
 
   const decl = Math.asin(Math.sin(obliquity) * Math.sin(eclplong_raw));

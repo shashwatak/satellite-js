@@ -52,4 +52,33 @@ describe('shadowFraction', () => {
 
     expect(fraction).toBe(0);
   });
+
+  it('does not return NaN when satellite position is collinear with anti-solar direction', () => {
+    // When collinear with anti-solar direction, floating-point roundoff can yield
+    // positionAndAntisolarDot / positionLength = 1.0000000000000002.
+    const sunAU = {
+      x: -0.9258146823277325,
+      y: 0.8157251001253574,
+      z: 0.1244544235070617,
+    };
+    const satKm = {
+      x: 5225.6439775608205,
+      y: -4604.257243034634,
+      z: -702.4672659600999,
+    };
+    const fraction = shadowFraction(sunAU, satKm);
+    expect(Number.isNaN(fraction)).toBe(false);
+    expect(fraction).toBe(1);
+  });
+
+  it('does not return NaN at grazing penumbra boundary', () => {
+    // Near tangent penumbra contact, roundoff can push circle-circle acos arguments
+    // slightly outside [-1, 1] or Heron radicand slightly negative.
+    const sunAU = { x: 1, y: 0, z: 0 };
+    const satKm = { x: -4372.7783284400875, y: 6398.539652946188, z: 0 };
+    const fraction = shadowFraction(sunAU, satKm);
+    expect(Number.isNaN(fraction)).toBe(false);
+    expect(fraction).toBeGreaterThanOrEqual(0);
+    expect(fraction).toBeLessThanOrEqual(1);
+  });
 });

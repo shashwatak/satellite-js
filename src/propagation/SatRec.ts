@@ -42,7 +42,10 @@ export interface SatRec {
    */
   satnum: string;
   /**
-   * Full four-digit year of this element set's epoch moment
+   * Two-digit year of this element set's epoch moment, as written in a TLE
+   * (57 to 99 mean 1957 to 1999, 00 to 56 mean 2000 to 2056). `json2satrec`
+   * stores the last two digits of the OMM epoch year the same way. Use
+   * `jdsatepoch` for the full epoch.
    */
   epochyr: number;
   epochtynumrev: number;
