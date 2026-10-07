@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: The WASM `GeodeticPositionCalculator` results for latitude and longitude were swapped.
 - Fix: `invjday` truncated the fractional second instead of rounding it, so `invjday(jday(date))` came back a full second early for about half of all inputs that fall exactly on a second, and the array overload could report `sec = -1`. `invjday` now keeps millisecond precision, which also makes it a true inverse of `jday` for dates carrying milliseconds (#75).
 - Test: deterministic `jday`/`invjday` round-trip tests over second, minute, midnight and month/year boundaries.
 - Feature: add `alpha5ToNumber` to convert a TLE catalog number field to a number, decoding the Alpha-5 form used above 99999 (`A0000` = 100000, `Z9999` = 339999, I and O skipped). `twoline2satrec` is unchanged and still returns `satnum` as written.
