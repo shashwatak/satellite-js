@@ -10,6 +10,7 @@
 - Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
 - Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
 - Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
+- Fix: `eciToGeodetic` returned a height of about -6400 km for a point on the rotation axis (its `R / cos(latitude)` term collapses there) and was metres off within a millimetre of it. The height is now `R cos(lat) + z sin(lat) - a / C`, which is exact at the poles, and the latitude iteration stops once it has converged instead of always running 20 passes, which makes the function about three times faster. The WASM `GeodeticPositionCalculator` kernel gets the same change.
 
 ## 7.1.0 (2026-07-23)
 

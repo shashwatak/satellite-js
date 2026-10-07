@@ -625,18 +625,28 @@ void calculate_geodetic_positions(
       double longitude = atan2(eci_positions[position_index + 1], eci_positions[position_index]) - gmst_values[j];
       longitude = remainder(longitude, 2 * pi);
 
+      // Iterate the latitude until its change is within tolerance, as Kelso's
+      // column says to; 4 to 5 passes are typical, kmax is a safety cap.
+      // Mirrors eciToGeodetic() in src/transforms.ts, including the operation order.
       int kmax = 20,
           k = 0;
-      double latitude = atan2(
-          eci_positions[position_index + 2],
-          sqrt((eci_positions[position_index] * eci_positions[position_index]) + (eci_positions[position_index + 1] * eci_positions[position_index + 1])));
-      double C;
-      while (k++ < kmax)
+      double tolerance = 1e-12;
+      double latitude = atan2(eci_positions[position_index + 2], R);
+      double previous_latitude;
+      do
       {
-        C = 1 / sqrt(1 - (e2 * (sin(latitude) * sin(latitude))));
-        latitude = atan2(eci_positions[position_index + 2] + (a * C * e2 * sin(latitude)), R);
-      }
-      double height = (R / cos(latitude)) - (a * C);
+        previous_latitude = latitude;
+        double sin_latitude = sin(latitude);
+        double C = 1 / sqrt(1 - (e2 * (sin_latitude * sin_latitude)));
+        latitude = atan2(eci_positions[position_index + 2] + (a * C * e2 * sin_latitude), R);
+      } while (fabs(latitude - previous_latitude) > tolerance && ++k < kmax);
+
+      // height = R cos(lat) + z sin(lat) - a / C follows from the geodetic-to-ECF
+      // transform and, unlike R / cos(lat) - a C, has no singularity on the rotation axis.
+      double sin_latitude = sin(latitude);
+      double cos_latitude = cos(latitude);
+      double C = 1 / sqrt(1 - (e2 * (sin_latitude * sin_latitude)));
+      double height = (R * cos_latitude) + (eci_positions[position_index + 2] * sin_latitude) - (a / C);
       geodetic_positions[position_index] = longitude;
       geodetic_positions[position_index + 1] = latitude;
       geodetic_positions[position_index + 2] = height;
