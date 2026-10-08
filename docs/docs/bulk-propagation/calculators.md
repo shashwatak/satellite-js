@@ -69,7 +69,7 @@ ECF (Earth-Centered Fixed) position. WASM equivalent of `eciToEcf()` applied to 
 
 ## `EcfVelocityCalculator` {/* #ecfVelocity */}
 
-ECF velocity. WASM equivalent of `eciToEcf()` applied to velocity.
+ECF velocity, relative to the rotating Earth. WASM equivalent of `eciToEcfVelocity()`.
 
 | Property | Value |
 |---|---|

@@ -43,11 +43,24 @@ const gmst3 = gstime(year, month, day, hour, minute, second);
 
 ### `eciToEcf` - ECI → ECF
 
+Rotates a vector from ECI axes to ECF axes.
+
 ```ts
 import { eciToEcf } from 'satellite.js';
 
 const positionEcf = eciToEcf(positionEci, gmst);
-const velocityEcf = eciToEcf(velocityEci, gmst);
+```
+
+For a velocity, rotating the axes is not enough; see `eciToEcfVelocity` below.
+
+### `eciToEcfVelocity` - ECI velocity → ECF velocity
+
+An ECF velocity is the velocity relative to the rotating Earth. `eciToEcfVelocity` rotates the ECI velocity into ECF axes and subtracts the velocity of the rotating frame at the satellite's position, ω × r. This is the velocity [`dopplerFactor`](doppler-factor.md) expects. `eciToEcf(velocityEci, gmst)` alone still contains the Earth's rotation, ω × r: about 0.5 km/s for a satellite in low Earth orbit and 3 km/s at geostationary radius.
+
+```ts
+import { eciToEcfVelocity } from 'satellite.js';
+
+const velocityEcf = eciToEcfVelocity(positionEci, velocityEci, gmst);
 ```
 
 ### `ecfToEci` - ECF → ECI

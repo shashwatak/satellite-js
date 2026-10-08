@@ -11,6 +11,7 @@
 - Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
 - Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
 - Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
+- Fix: `dopplerFactor` now uses `velocityEcf` as the true ECF velocity its type describes, instead of silently subtracting the observer's rotation velocity itself. Build the input with the new `eciToEcfVelocity(positionEci, velocityEci, gmst)`, which rotates the ECI velocity into ECF axes and removes the Earth's rotation ([#180](https://github.com/shashwatak/satellite-js/issues/180)). **Results change for callers who pass `eciToEcf(velocityEci, gmst)`**: that vector only has its axes rotated, so with it the range rate is now off by up to ω·R·cos(observer latitude), about 0.46 km/s at the equator (roughly 670 Hz at 437 MHz); switch to `eciToEcfVelocity`. The WASM `DopplerFactorCalculator` carried the same correction and is fixed too, and `EcfVelocityCalculator` now outputs a true ECF velocity, so its `ecfVelocity` output changes accordingly.
 
 ## 7.1.0 (2026-07-23)
 

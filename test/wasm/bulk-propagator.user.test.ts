@@ -14,6 +14,7 @@ import {
   degreesToRadians,
   ecfToLookAngles,
   eciToEcf,
+  eciToEcfVelocity,
   eciToGeodetic,
   geodeticToEcf,
 } from '../../src/transforms.js';
@@ -468,7 +469,11 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
       dates.forEach((date, j) => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
-        const jsEcfVelocity = eciToEcf(eciResult!.velocity, gmst);
+        const jsEcfVelocity = eciToEcfVelocity(
+          eciResult!.position,
+          eciResult!.velocity,
+          gmst,
+        );
         const wasmEcfVelocity = bp.getFormattedOutput(i, j)!.ecfVelocity;
 
         compareVectors(jsEcfVelocity, wasmEcfVelocity, 11);
@@ -576,7 +581,11 @@ describe('Single thread Calculator comparisons with JS transforms', () => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
         const ecfPosition = eciToEcf(eciResult!.position, gmst);
-        const ecfVelocity = eciToEcf(eciResult!.velocity, gmst);
+        const ecfVelocity = eciToEcfVelocity(
+          eciResult!.position,
+          eciResult!.velocity,
+          gmst,
+        );
 
         const jsDopplerFactor = dopplerFactor(
           observerEcf,
@@ -1046,7 +1055,11 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
       dates.forEach((date, j) => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
-        const jsEcfVelocity = eciToEcf(eciResult!.velocity, gmst);
+        const jsEcfVelocity = eciToEcfVelocity(
+          eciResult!.position,
+          eciResult!.velocity,
+          gmst,
+        );
         const wasmEcfVelocity = bp.getFormattedOutput(i, j)!.ecfVelocity;
 
         compareVectors(jsEcfVelocity, wasmEcfVelocity, 11);
@@ -1154,7 +1167,11 @@ describe('multi thread Calculator comparisons with JS transforms', () => {
         const eciResult = propagate(satRec, date);
         const gmst = gstime(date);
         const ecfPosition = eciToEcf(eciResult!.position, gmst);
-        const ecfVelocity = eciToEcf(eciResult!.velocity, gmst);
+        const ecfVelocity = eciToEcfVelocity(
+          eciResult!.position,
+          eciResult!.velocity,
+          gmst,
+        );
 
         const jsDopplerFactor = dopplerFactor(
           observerEcf,

@@ -10,6 +10,10 @@ The `dopplerFactor` function computes the relativistic Doppler ratio for a satel
 
 A value **less than 1** means the satellite is approaching (frequency shifted higher); a value **greater than 1** means it is receding (frequency shifted lower).
 
+:::warning[Use a true ECF velocity]
+`velocityEcf` must be the satellite's velocity **relative to the rotating Earth**. Build it with [`eciToEcfVelocity`](transforms.md), not with `eciToEcf(velocityEci, gmst)`: that call only rotates the axes and still contains the Earth's rotation, which puts the range rate off by up to ω · R · cos(observer latitude), about 0.46 km/s at the equator (roughly 670 Hz at 437 MHz).
+:::
+
 ```ts
 import { dopplerFactor } from 'satellite.js';
 
@@ -20,7 +24,7 @@ const factor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
 |---|---|---|
 | `observerEcf` | `EcfVec3<Kilometer>` | Observer position in ECF |
 | `positionEcf` | `EcfVec3<Kilometer>` | Satellite position in ECF |
-| `velocityEcf` | `EcfVec3<KilometerPerSecond>` | Satellite velocity in ECF |
+| `velocityEcf` | `EcfVec3<KilometerPerSecond>` | Satellite velocity in ECF, relative to the rotating Earth (see [`eciToEcfVelocity`](transforms.md)) |
 
 **Returns:** `number` - the Doppler factor.
 
@@ -29,7 +33,7 @@ const factor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
 ```ts
 import {
   propagate, gstime,
-  eciToEcf, geodeticToEcf,
+  eciToEcf, eciToEcfVelocity, geodeticToEcf,
   degreesToRadians,
   dopplerFactor,
   json2satrec,
@@ -51,7 +55,7 @@ const observerGeodetic = {
 
 const observerEcf  = geodeticToEcf(observerGeodetic);
 const positionEcf  = eciToEcf(state.position, gmst);
-const velocityEcf  = eciToEcf(state.velocity, gmst);
+const velocityEcf  = eciToEcfVelocity(state.position, state.velocity, gmst);
 
 const factor = dopplerFactor(observerEcf, positionEcf, velocityEcf);
 
