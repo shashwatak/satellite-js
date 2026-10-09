@@ -11,6 +11,7 @@
 - Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
 - Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
 - Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
+- Feature: add `satellite.js/js`, a JavaScript-only entry point that excludes optional WASM loaders while preserving the existing root API.
 
 ## 7.1.0 (2026-07-23)
 

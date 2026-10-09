@@ -9,6 +9,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "module-sync": "./dist/index.js"
+    },
+    "./js": {
+      "types": "./dist/js.d.ts",
+      "import": "./dist/js.js",
+      "module-sync": "./dist/js.js"
     }
   },
   "imports": {
