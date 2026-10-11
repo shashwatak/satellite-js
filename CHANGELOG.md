@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix: `dispose()` on the WASM runtimes threw Emscripten's `ExitStatus` after a successful exit and, under Node, reset `process.exitCode` to 0; the single-thread runtime's `[Symbol.dispose]` did nothing, so `using runtime = await createSingleThreadRuntime()` never disposed it. Disposal now exits cleanly and leaves the process's exit code alone, `using` disposes both runtimes, and a second `dispose()` does nothing. Disposing a multi-thread runtime while a computation is still running throws a clear error instead (Emscripten cannot exit then), and anything other than a clean exit is still thrown. A multi-thread run whose input could not be written into WASM memory also no longer leaves the runtime marked as running, which made every later run fail as a parallel one.
 - Fix: The WASM `GeodeticPositionCalculator` results for latitude and longitude were swapped.
 - Fix: `invjday` truncated the fractional second instead of rounding it, so `invjday(jday(date))` came back a full second early for about half of all inputs that fall exactly on a second, and the array overload could report `sec = -1`. `invjday` now keeps millisecond precision, which also makes it a true inverse of `jday` for dates carrying milliseconds (#75).
 - Test: deterministic `jday`/`invjday` round-trip tests over second, minute, midnight and month/year boundaries.
