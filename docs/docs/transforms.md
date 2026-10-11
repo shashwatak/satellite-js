@@ -74,6 +74,16 @@ import { ecfToEci } from 'satellite.js';
 const positionEci = ecfToEci(positionEcf, gmst);
 ```
 
+### `ecfToEciVelocity` - ECF velocity → ECI velocity
+
+The inverse of `eciToEcfVelocity`: it adds the Earth's rotation, ω × r, back to an ECF velocity and rotates the result into ECI axes. `ecfToEci(velocityEcf, gmst)` alone only rotates the axes.
+
+```ts
+import { ecfToEciVelocity } from 'satellite.js';
+
+const velocityEci = ecfToEciVelocity(positionEcf, velocityEcf, gmst);
+```
+
 ### `eciToGeodetic` - ECI → Geodetic
 
 ```ts

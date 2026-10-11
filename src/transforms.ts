@@ -171,6 +171,31 @@ export function eciToEcfVelocity(
   };
 }
 
+/**
+ * Converts a true ECF velocity back to an ECI velocity: the inverse of
+ * `eciToEcfVelocity`.
+ *
+ * It adds the velocity of the rotating frame at the satellite's position,
+ * ω × r_ecf, back to the ECF velocity and rotates the result into ECI axes.
+ * `ecfToEci(velocityEcf, gmst)` alone only rotates the axes, so it leaves the
+ * Earth's rotation out.
+ */
+export function ecfToEciVelocity(
+  positionEcf: EcfVec3<Kilometer>,
+  velocityEcf: EcfVec3<KilometerPerSecond>,
+  gmst: GMSTime,
+): EciVec3<KilometerPerSecond> {
+  // ω points along the z axis, so ω × r_ecf = (-ω·y, ω·x, 0)
+  return ecfToEci(
+    {
+      x: velocityEcf.x - earthRotation * positionEcf.y,
+      y: velocityEcf.y + earthRotation * positionEcf.x,
+      z: velocityEcf.z,
+    },
+    gmst,
+  );
+}
+
 interface Topocentric {
   /**
    * Positive horizontal vector S due south.

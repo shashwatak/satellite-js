@@ -25,6 +25,7 @@ export {
   eciToEcf,
   eciToEcfVelocity,
   ecfToEci,
+  ecfToEciVelocity,
   ecfToLookAngles,
 } from './transforms.js';
 

@@ -29,6 +29,7 @@ import {
   degreesLong,
   degreesToRadians,
   ecfToEci,
+  ecfToEciVelocity,
   ecfToLookAngles,
   eciToEcf,
   eciToEcfVelocity,
@@ -83,6 +84,7 @@ describe('Library export', () => {
     expect(es.eciToEcf).toEqual(eciToEcf);
     expect(es.eciToEcfVelocity).toEqual(eciToEcfVelocity);
     expect(es.ecfToEci).toEqual(ecfToEci);
+    expect(es.ecfToEciVelocity).toEqual(ecfToEciVelocity);
     expect(es.ecfToLookAngles).toEqual(ecfToLookAngles);
   });
 });
