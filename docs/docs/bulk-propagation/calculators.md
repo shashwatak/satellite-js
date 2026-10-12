@@ -95,7 +95,7 @@ Geodetic position (latitude, longitude, height). WASM equivalent of `eciToGeodet
 | **Formatted output** | `GeodeticLocation` object: `{ latitude, longitude, height }` |
 | **Raw output** | `Float64Array` |
 
-**Raw data layout:** `[lat₀, lon₀, h₀, lat₁, lon₁, h₁, …]` for each satellite/date pair.
+**Raw data layout:** `[lon₀, lat₀, h₀, lon₁, lat₁, h₁, …]` for each satellite/date pair.
 
 ---
 

@@ -2,12 +2,16 @@
 
 ## Unreleased
 
+- Fix: The WASM `GeodeticPositionCalculator` results for latitude and longitude were swapped.
+- Fix: `invjday` truncated the fractional second instead of rounding it, so `invjday(jday(date))` came back a full second early for about half of all inputs that fall exactly on a second, and the array overload could report `sec = -1`. `invjday` now keeps millisecond precision, which also makes it a true inverse of `jday` for dates carrying milliseconds (#75).
+- Test: deterministic `jday`/`invjday` round-trip tests over second, minute, midnight and month/year boundaries.
 - Feature: add `alpha5ToNumber` to convert a TLE catalog number field to a number, decoding the Alpha-5 form used above 99999 (`A0000` = 100000, `Z9999` = 339999, I and O skipped). `twoline2satrec` is unchanged and still returns `satnum` as written.
 - Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
 - Fix: prevent `NaN` in `shadowFraction` when satellite is collinear with anti-solar direction or at penumbra boundaries.
 - Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
 - Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
 - Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
+- Feature: add `eciToEcfVelocity(positionEci, velocityEci, gmst)`, which returns a true ECF velocity: the ECI velocity rotated into ECF axes with the Earth's rotation (ω × r) removed, and its inverse `ecfToEciVelocity(positionEcf, velocityEcf, gmst)`. `eciToEcf` and `ecfToEci` only rotate the axes. Note that `dopplerFactor` keeps expecting the rotated-only velocity from `eciToEcf(velocityEci, gmst)` in 7.x and compensates for the observer's rotation itself; passing it the true ECF velocity puts the range rate off by up to ω·R·cos(latitude), about 0.46 km/s at the equator. The next major version switches `dopplerFactor` and the bulk `EcfVelocityCalculator` to the true ECF velocity ([#180](https://github.com/shashwatak/satellite-js/issues/180)).
 - Feature: add `satellite.js/js`, a JavaScript-only entry point that excludes optional WASM loaders while preserving the existing root API.
 
 ## 7.1.0 (2026-07-23)

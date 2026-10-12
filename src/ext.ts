@@ -245,11 +245,22 @@ export function invjday(jd: JDay, asArray?: boolean) {
 
   const { mon, day, hr, minute } = mdhms;
 
-  const sec = mdhms.sec - 0.000000864;
+  // A julian date near 2.45e6 has an ulp of ~40 us, so `sec` lands just under
+  // the true integer about half the time and truncating it drops a whole
+  // second. Round to the nearest millisecond and let Date.UTC carry 60000 ms.
+  const ms = Math.round(mdhms.sec * 1000);
+  const date = new Date(Date.UTC(year, mon - 1, day, hr, minute, 0, ms));
 
   if (asArray) {
-    return [year, mon, day, hr, minute, Math.floor(sec)];
+    return [
+      date.getUTCFullYear(),
+      date.getUTCMonth() + 1,
+      date.getUTCDate(),
+      date.getUTCHours(),
+      date.getUTCMinutes(),
+      date.getUTCSeconds(),
+    ];
   }
 
-  return new Date(Date.UTC(year, mon - 1, day, hr, minute, Math.floor(sec)));
+  return date;
 }

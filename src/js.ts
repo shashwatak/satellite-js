@@ -23,7 +23,9 @@ export {
   geodeticToEcf,
   eciToGeodetic,
   eciToEcf,
+  eciToEcfVelocity,
   ecfToEci,
+  ecfToEciVelocity,
   ecfToLookAngles,
 } from './transforms.js';
 
