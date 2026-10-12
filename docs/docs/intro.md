@@ -22,6 +22,23 @@ Otherwise, please first refer to the following:
 
 :::
 
+## JavaScript-only imports
+
+Use `satellite.js/js` when you only need the JavaScript API and want to keep
+optional WASM loaders out of your dependency graph:
+
+```js
+import { twoline2satrec, propagate, gstime } from 'satellite.js/js';
+```
+
+This entry includes the JavaScript functions, constants, and types from
+`satellite.js`, without the WASM bulk propagation API. It is useful with bundlers
+such as Metro that resolve optional WASM loader dependencies even when the
+application does not call the WASM API. It does not enable WASM in React Native.
+
+Existing imports from `satellite.js` continue to expose both APIs. Use that root
+entry for WASM functions such as `createSingleThreadRuntime` and `BulkPropagator`.
+
 ## Key concepts
 
 1. Orbital elements formats:
