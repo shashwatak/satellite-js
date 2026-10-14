@@ -1,5 +1,6 @@
 import { getNativeStructFieldLayout } from '../native-structs-from-js.js';
 import { passRunDataToWasm, type RunData } from '../run-data.js';
+import { createRuntimeDispose } from './runtime-dispose.js';
 import type { WasmModuleMultiThread } from './wasm-module-interfaces.js';
 import type { MultiThreadRuntime } from './wasm-runtime.js';
 
@@ -32,20 +33,27 @@ export async function createMultiThreadRuntimeFromModule(
       );
     }
     isRunning = true;
-    passRunDataToWasm(wasmModule, runDataLayout, runData, runDataPointer);
     try {
+      passRunDataToWasm(wasmModule, runDataLayout, runData, runDataPointer);
       await originalCompute(options.threadsCount, runDataPointer);
     } finally {
       isRunning = false;
     }
   };
 
+  const disposeRuntime = createRuntimeDispose(wasmModule);
+
   const runtime: MultiThreadRuntime = {
     mode: 'multi',
     module: wasmModule,
     compute,
     dispose: () => {
-      wasmModule._exit_runtime();
+      if (isRunning) {
+        throw new Error(
+          'Cannot dispose the WASM runtime while a computation is running. Make sure to await for the computation to finish before disposing the runtime.',
+        );
+      }
+      disposeRuntime();
     },
     [Symbol.dispose]() {
       this.dispose();

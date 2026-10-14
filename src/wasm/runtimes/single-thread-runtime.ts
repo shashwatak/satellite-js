@@ -1,5 +1,6 @@
 import { getNativeStructFieldLayout } from '../native-structs-from-js.js';
 import { passRunDataToWasm, type RunData } from '../run-data.js';
+import { createRuntimeDispose } from './runtime-dispose.js';
 import type { WasmModuleSingleThread } from './wasm-module-interfaces.js';
 import type { SingleThreadRuntime } from './wasm-runtime.js';
 
@@ -19,13 +20,14 @@ export async function createSingleThreadRuntimeFromModule(
     wasmModule._compute(runDataPointer);
   };
 
-  return {
+  const runtime: SingleThreadRuntime = {
     mode: 'single',
     module: wasmModule,
     compute,
-    dispose: () => {
-      wasmModule._exit_runtime();
+    dispose: createRuntimeDispose(wasmModule),
+    [Symbol.dispose]() {
+      this.dispose();
     },
-    [Symbol.dispose]: () => {},
   };
+  return runtime;
 }
