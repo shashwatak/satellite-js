@@ -105,6 +105,16 @@ describe('sunPos orbital geometry', () => {
     expect(dayOfYear).toBeLessThanOrEqual(190);
   });
 
+  it.each(years)('keeps right ascension within [0, 2π) (%i)', (year) => {
+    // A quadrant-check bug returned rtasc shifted by -2π (outside [0, 2π)) for
+    // dates whose ecliptic longitude was negative, e.g. pre-2000.
+    for (let month = 1; month <= 12; month++) {
+      const { rtasc } = sunPos(jday(year, month, 15, 0, 0, 0));
+      expect(rtasc).toBeGreaterThanOrEqual(0);
+      expect(rtasc).toBeLessThan(2 * Math.PI);
+    }
+  });
+
   it('reproduces the Earth-Sun distance at the J2000.0 epoch', () => {
     // 2000-01-01 12:00 UT is a few days after perihelion, so the Sun is near
     // its closest: 0.9833 AU.

@@ -12,7 +12,7 @@ const DIMENSIONS = 3;
  * @see GmstCalculator
  *
  * Raw outputs are always sorted by satellite index first, then by date index, and packed as:
- *   - `Float64Array`, packed as [lat0, lon0, height0, lat1, lon1, height1, ...]
+ *   - `Float64Array`, packed as [lon0, lat0, height0, lon1, lat1, height1, ...]
  * for each satellite/date pair
  *
  * Provides formatted output under `geodeticPosition` property,
@@ -60,8 +60,8 @@ export class GeodeticPositionCalculator
     const index = (satelliteIndex * this.datesCount + dateIndex) * DIMENSIONS;
     return {
       // biome-ignore-start lint/style/noNonNullAssertion: index math
-      latitude: rawOutput[index]!,
-      longitude: rawOutput[index + 1]!,
+      longitude: rawOutput[index]!,
+      latitude: rawOutput[index + 1]!,
       height: rawOutput[index + 2]!,
       // biome-ignore-end lint/style/noNonNullAssertion: index math
     };

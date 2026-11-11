@@ -85,26 +85,26 @@ export function twoline2satrec(longstr1: string, longstr2: string): SatRec {
 
   const satnum = longstr1.substring(2, 7);
 
-  const epochyr = parseInt(longstr1.substring(18, 20), 10);
-  const epochdays = parseFloat(longstr1.substring(20, 32));
-  let ndot = parseFloat(longstr1.substring(33, 43));
-  let nddot = parseFloat(
+  const epochyr = Number(longstr1.substring(18, 20));
+  const epochdays = Number(longstr1.substring(20, 32));
+  let ndot = Number(longstr1.substring(33, 43));
+  let nddot = Number(
     `${longstr1.substring(44, 45)}.${longstr1.substring(45, 50)}E${longstr1.substring(50, 52)}`,
   );
-  const bstar = parseFloat(
+  const bstar = Number(
     `${longstr1.substring(53, 54)}.${longstr1.substring(54, 59)}E${longstr1.substring(59, 61)}`,
   );
 
   // satrec.satnum = longstr2.substring(2, 7);
   // ---- find standard orbital elements ----
-  const inclo = parseFloat(longstr2.substring(8, 16)) * deg2rad;
-  const nodeo = parseFloat(longstr2.substring(17, 25)) * deg2rad;
-  const ecco = parseFloat(`.${longstr2.substring(26, 33).replace(/\s/g, '0')}`);
-  const argpo = parseFloat(longstr2.substring(34, 42)) * deg2rad;
-  const mo = parseFloat(longstr2.substring(43, 51)) * deg2rad;
+  const inclo = Number(longstr2.substring(8, 16)) * deg2rad;
+  const nodeo = Number(longstr2.substring(17, 25)) * deg2rad;
+  const ecco = Number(`.${longstr2.substring(26, 33).replace(/\s/g, '0')}`);
+  const argpo = Number(longstr2.substring(34, 42)) * deg2rad;
+  const mo = Number(longstr2.substring(43, 51)) * deg2rad;
 
   // ---- find no, ndot, nddot ----
-  const no = parseFloat(longstr2.substring(52, 63)) / xpdotp;
+  const no = Number(longstr2.substring(52, 63)) / xpdotp;
   // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
@@ -196,15 +196,22 @@ export function json2satrec(
 
   const satnum = jsonobj.NORAD_CAT_ID.toString();
 
-  const epoch = new Date(
-    jsonobj.EPOCH.endsWith('Z') ? jsonobj.EPOCH : `${jsonobj.EPOCH}Z`,
-  );
+  const epochStr = jsonobj.EPOCH.endsWith('Z')
+    ? jsonobj.EPOCH
+    : `${jsonobj.EPOCH}Z`;
+  const epoch = new Date(epochStr);
+  // Date keeps milliseconds only; CelesTrak and Space-Track write microseconds, so keep the rest of the fraction
+  const fractionDigits = /\.(\d+)Z$/.exec(epochStr)?.[1] ?? '';
+  const beyondMs =
+    fractionDigits.length > 3
+      ? Number(`0.${fractionDigits.slice(3)}`) / 1000
+      : 0; // seconds beyond the milliseconds
   const year = epoch.getUTCFullYear();
-
   const epochyr = Number(year.toString().slice(-2));
   const epochdays =
     (epoch.valueOf() - new Date(Date.UTC(year, 0, 1, 0, 0, 0)).valueOf()) /
       (86400 * 1000) +
+    beyondMs / 86400 +
     1;
 
   let ndot = Number(jsonobj.MEAN_MOTION_DOT);
@@ -253,4 +260,40 @@ export function json2satrec(
   //  ---------------- initialize SGP4 model -------------------
   initSatrec(satrec, opsmode);
   return satrec;
+}
+
+/**
+ * Converts a TLE catalog number field to a number, decoding the Alpha-5 form.
+ *
+ * Catalog numbers above 99999 are written in a TLE's five-character field as
+ * Alpha-5: a leading letter A-Z, skipping I and O, stands for 10-33 in the
+ * ten-thousands place, so `'A0000'` is 100000 and `'Z9999'` is 339999.
+ *
+ * A blank or whitespace-only field gives `NaN`, not the 0 that `Number()`
+ * would return for it. Any other field goes through `Number()`: a five-digit
+ * field gives its number, and so does anything else `Number()` accepts, such
+ * as a space-padded `'    5'` (5) or `'1e3'` (1000); a field starting with I
+ * or O, or a malformed one such as `'a0404'`, `'A000'` or `'AA000'`, gives
+ * `NaN`.
+ *
+ * `twoline2satrec` keeps the field as written in `satrec.satnum`; this function
+ * does not change that, it only converts a field when the caller wants a number.
+ */
+export function alpha5ToNumber(field: string): number {
+  if (field.trim() === '') return Number.NaN;
+  const c = field[0];
+  if (
+    c !== undefined &&
+    c >= 'A' &&
+    c <= 'Z' &&
+    c !== 'I' &&
+    c !== 'O' &&
+    /^\d{4}$/.test(field.slice(1))
+  ) {
+    let tens = c.charCodeAt(0) - 65 + 10;
+    if (c > 'I') tens -= 1;
+    if (c > 'O') tens -= 1;
+    return tens * 10000 + Number(field.slice(1));
+  }
+  return Number(field);
 }

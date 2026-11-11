@@ -118,7 +118,7 @@ The library exposes its public API from `src/index.ts`. The main modules are:
 
 | Module | Purpose |
 |---|---|
-| `io.ts` | Parsing TLE (`twoline2satrec`) and OMM JSON (`json2satrec`) into `SatRec` |
+| `io.ts` | Parsing TLE (`twoline2satrec`) and OMM JSON (`json2satrec`) into `SatRec`; decoding Alpha-5 catalog number fields (`alpha5ToNumber`) |
 | `propagation.ts` | Re-exports `propagate`, `sgp4`, `gstime` from `propagation/` |
 | `propagation/sgp4.ts` | Core SGP4 propagation algorithm |
 | `propagation/sgp4init.ts` | Initializes `SatRec` with orbital elements |

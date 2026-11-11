@@ -20,7 +20,7 @@ import { dopplerFactor } from '../src/dopplerFactor.js';
 import { invjday, jday } from '../src/ext.js';
 import * as es from '../src/index.js';
 import { checkForDecay } from '../src/index.js';
-import { json2satrec, twoline2satrec } from '../src/io.js';
+import { alpha5ToNumber, json2satrec, twoline2satrec } from '../src/io.js';
 import { gstime, propagate, sgp4 } from '../src/propagation.js';
 import { shadowFraction } from '../src/shadow.js';
 import { sunPos } from '../src/sun.js';
@@ -29,8 +29,10 @@ import {
   degreesLong,
   degreesToRadians,
   ecfToEci,
+  ecfToEciVelocity,
   ecfToLookAngles,
   eciToEcf,
+  eciToEcfVelocity,
   eciToGeodetic,
   geodeticToEcf,
   radiansLat,
@@ -60,6 +62,7 @@ describe('Library export', () => {
   it('constants', () => checkConstants(es.constants));
   it('twoline2satrec', () => expect(es.twoline2satrec).toEqual(twoline2satrec));
   it('json2satrec', () => expect(es.json2satrec).toEqual(json2satrec));
+  it('alpha5ToNumber', () => expect(es.alpha5ToNumber).toEqual(alpha5ToNumber));
   it('propagate', () => expect(es.propagate).toEqual(propagate));
   it('sgp4', () => expect(es.sgp4).toEqual(sgp4));
   it('checkForDecay', () => expect(es.checkForDecay).toEqual(checkForDecay));
@@ -79,7 +82,9 @@ describe('Library export', () => {
     expect(es.geodeticToEcf).toEqual(geodeticToEcf);
     expect(es.eciToGeodetic).toEqual(eciToGeodetic);
     expect(es.eciToEcf).toEqual(eciToEcf);
+    expect(es.eciToEcfVelocity).toEqual(eciToEcfVelocity);
     expect(es.ecfToEci).toEqual(ecfToEci);
+    expect(es.ecfToEciVelocity).toEqual(ecfToEciVelocity);
     expect(es.ecfToLookAngles).toEqual(ecfToLookAngles);
   });
 });

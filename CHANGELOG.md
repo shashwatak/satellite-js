@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+- None
+
+## 7.2.0 (2026-11-12)
+
+- Fix: `json2satrec` kept only the milliseconds of the OMM `EPOCH`, dropping up to 999 µs of a microsecond epoch; the digits beyond the millisecond are now carried into `epochdays`.
+- Feature: add `alpha5ToNumber` to convert a TLE catalog number field to a number, decoding the Alpha-5 form used above 99999 (`A0000` = 100000, `Z9999` = 339999, I and O skipped). `twoline2satrec` is unchanged and still returns `satnum` as written.
+- Feature: add `eciToEcfVelocity(positionEci, velocityEci, gmst)`, which returns a true ECF velocity: the ECI velocity rotated into ECF axes with the Earth's rotation (ω × r) removed, and its inverse `ecfToEciVelocity(positionEcf, velocityEcf, gmst)`. `eciToEcf` and `ecfToEci` only rotate the axes. Note that `dopplerFactor` keeps expecting the rotated-only velocity from `eciToEcf(velocityEci, gmst)` in 7.x and compensates for the observer's rotation itself; passing it the true ECF velocity puts the range rate off by up to ω·R·cos(latitude), about 0.46 km/s at the equator. The next major version switches `dopplerFactor` and the bulk `EcfVelocityCalculator` to the true ECF velocity ([#180](https://github.com/shashwatak/satellite-js/issues/180)).
+- Fix: `eciToGeodetic` returned a height of about -6400 km for a point on the rotation axis (its `R / cos(latitude)` term collapses there) and was metres off within a millimetre of it. The height is now `R cos(lat) + z sin(lat) - a / C`, which is exact at the poles. The WASM `GeodeticPositionCalculator` kernel gets the same change.
+- Fix: `invjday` truncated the fractional second instead of rounding it, so `invjday(jday(date))` came back a full second early for about half of all inputs that fall exactly on a second, and the array overload could report `sec = -1`. `invjday` now keeps millisecond precision, which also makes it a true inverse of `jday` for dates carrying milliseconds (#75).
+- Fix: prevent `NaN` in `shadowFraction` when satellite is collinear with anti-solar direction or at penumbra boundaries.
+- Fix: `PropagateOptions.communityDecayCheckEnabled` is now optional, matching its documented default of `false` and the equivalent `EciBaseRunParameters` type.
+- Fix: The WASM `GeodeticPositionCalculator` results for latitude and longitude were swapped.
+- Fix: `dispose()` on the WASM runtimes threw Emscripten's `ExitStatus` after a successful exit and, under Node, reset `process.exitCode` to 0; the single-thread runtime's `[Symbol.dispose]` did nothing, so `using runtime = await createSingleThreadRuntime()` never disposed it. Disposal now exits cleanly and leaves the process's exit code alone, `using` disposes both runtimes, and a second `dispose()` does nothing. Disposing a multi-thread runtime while a computation is still running throws a clear error instead (Emscripten cannot exit then), and anything other than a clean exit is still thrown. A multi-thread run whose input could not be written into WASM memory also no longer leaves the runtime marked as running, which made every later run fail as a parallel one.
+- Fix: a failed `BulkPropagator.run()` on the multi-thread runtime left an unhandled rejection behind, from an internal copy of the run's promise, which crashes Node by default even when the caller handles the error; a failed run on the single-thread runtime left the propagator marked as running, so `setSatRecs` and `setDates` refused to work afterwards. A propagator disposed during a run now also frees its memory before code awaiting the run resumes, so a `runtime.dispose()` after `await run` no longer exits the runtime first. A second `run()` on the same propagator while one is in progress now throws, as `setSatRecs` and `setDates` do; before, the runtime rejected it, but it still marked the propagator idle while the first run was computing, so `dispose()` freed memory that run was still using.
+- Perf: persist `dspace` resonance variables (`atime`, `xli`, `xni`) on `SatRec` for faster sequential propagation and parity with C++/WASM.
+- Docs: `SatRec.epochyr` holds the two-digit year of the epoch, as written in a TLE; the JSDoc and the docs site described it as a four-digit year.
+- Test: deterministic `jday`/`invjday` round-trip tests over second, minute, midnight and month/year boundaries.
+
 ## 7.1.0 (2026-07-23)
 
 - Feature: add `checkForDecay` function that allows filtering satellites decayed long ago but for which SGP4 reports "successful" propagation with garbage positions (see [section in the docs](https://shashwatak.github.io/satellite-js/docs/propagation/community-decay-check)).

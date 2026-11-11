@@ -224,6 +224,9 @@ export function sgp4(
     const dspaceResult = dspace(dspaceOptions);
 
     ({ em, argpm, inclm, mm, nodem, nm } = dspaceResult);
+    satrec.atime = dspaceResult.atime;
+    satrec.xli = dspaceResult.xli;
+    satrec.xni = dspaceResult.xni;
   }
 
   if (nm <= 0.0) {

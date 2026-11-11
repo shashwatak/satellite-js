@@ -497,12 +497,14 @@ export class BulkPropagator<
    * ```
    *
    * @throws If the instance is disposed
+   * @throws If a run is currently in progress
    * @throws If setSatRecs or setDates has not been called
    */
   run(
     ...[runParameters]: BulkPropagatorRunArgs<Calculators>
   ): Runtime extends MultiThreadRuntime ? Promise<void> : undefined {
     this.checkIfDisposed();
+    this.checkIfRunning('start another run');
 
     if (!this.hasSatRecs) {
       throw new Error('setSatRecs() must be called before run()');
@@ -541,17 +543,28 @@ export class BulkPropagator<
 
     this.isRunning = true;
 
-    const result = this.runtime.compute(runData, this.runDataPointer);
-
-    if (result instanceof Promise) {
-      this.runCompletionPromise = result.finally(() => {
-        this.isRunning = false;
-        this.runCompletionPromise = null;
-      });
-    } else {
+    let result: void | Promise<void>;
+    try {
+      result = this.runtime.compute(runData, this.runDataPointer);
+    } catch (error) {
+      // The single-threaded runtime computes synchronously, so its failures
+      // arrive here rather than as a rejected promise.
       this.isRunning = false;
+      throw error;
     }
 
+    if (result instanceof Promise) {
+      this.runCompletionPromise = result;
+      // The caller gets this bookkeeping promise itself. It settles the same way
+      // as the run, so a failure still reaches the caller (and is still reported
+      // if nobody handles it), without leaving a second, unhandled copy behind.
+      return result.finally(() => {
+        this.isRunning = false;
+        this.runCompletionPromise = null;
+      }) as Runtime extends MultiThreadRuntime ? Promise<void> : undefined;
+    }
+
+    this.isRunning = false;
     // `compute` returns `void` for the single-threaded runtime, which is always
     // `undefined` at runtime.
     return result as Runtime extends MultiThreadRuntime
@@ -690,7 +703,11 @@ export class BulkPropagator<
     };
 
     if (this.runCompletionPromise) {
-      this.runCompletionPromise.finally(freeMemory);
+      // Handlers on the run's own promise run before the promise returned by
+      // run() settles, so the memory is freed before code awaiting the run
+      // resumes (for example to dispose the runtime). Handling both outcomes
+      // keeps a failed run from leaving an unhandled rejection here.
+      this.runCompletionPromise.then(freeMemory, freeMemory);
     } else {
       freeMemory();
     }

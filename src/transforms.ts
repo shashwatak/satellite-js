@@ -5,10 +5,14 @@ import type {
   GeodeticLocation,
   GMSTime,
   Kilometer,
+  KilometerPerSecond,
   LookAngles,
   Radians,
 } from './common-types.js';
 import { deg2rad, pi, rad2deg, twoPi } from './constants.js';
+
+// Earth rotation rate in rad/s: the angular velocity of the ECF frame relative to ECI.
+const earthRotation = 7.292115e-5;
 
 export function radiansToDegrees(radians: Radians): Degrees {
   return radians * rad2deg;
@@ -91,15 +95,26 @@ export function eciToGeodetic(
   const longitude =
     ((((Math.atan2(eci.y, eci.x) - gmst + pi) % twoPi) + twoPi) % twoPi) - pi;
 
+  // Iterate the latitude until its change is within tolerance, as Kelso's
+  // column says to; 4 to 5 passes are typical, kmax is a safety cap.
   const kmax = 20;
+  const tolerance = 1e-12;
   let k = 0;
-  let latitude = Math.atan2(eci.z, Math.sqrt(eci.x * eci.x + eci.y * eci.y));
-  let C = 0;
-  while (k++ < kmax) {
-    C = 1 / Math.sqrt(1 - e2 * (Math.sin(latitude) * Math.sin(latitude)));
-    latitude = Math.atan2(eci.z + a * C * e2 * Math.sin(latitude), R);
-  }
-  const height = R / Math.cos(latitude) - a * C;
+  let latitude = Math.atan2(eci.z, R);
+  let previousLatitude: number;
+  do {
+    previousLatitude = latitude;
+    const sinLatitude = Math.sin(latitude);
+    const C = 1 / Math.sqrt(1 - e2 * (sinLatitude * sinLatitude));
+    latitude = Math.atan2(eci.z + a * C * e2 * sinLatitude, R);
+  } while (Math.abs(latitude - previousLatitude) > tolerance && ++k < kmax);
+
+  // height = R cos(lat) + z sin(lat) - a / C follows from geodeticToEcf and,
+  // unlike R / cos(lat) - a C, has no singularity on the rotation axis.
+  const sinLatitude = Math.sin(latitude);
+  const cosLatitude = Math.cos(latitude);
+  const C = 1 / Math.sqrt(1 - e2 * (sinLatitude * sinLatitude));
+  const height = R * cosLatitude + eci.z * sinLatitude - a / C;
   return { longitude, latitude, height };
 }
 
@@ -138,6 +153,58 @@ export function eciToEcf(eci: EciVec3<number>, gmst: GMSTime): EcfVec3<number> {
     y,
     z,
   };
+}
+
+/**
+ * Converts an ECI velocity to a true ECF velocity.
+ *
+ * `eciToEcf(velocityEci, gmst)` only re-expresses the ECI velocity vector in ECF
+ * axes; the result still contains the motion of the rotating Earth. A true ECF
+ * velocity, the rate of change of the ECF position, also has the velocity of the
+ * rotating frame at the satellite's position, ω × r_ecf, subtracted.
+ *
+ * Note: in this major version `dopplerFactor` still expects the rotated-only
+ * velocity from `eciToEcf(velocityEci, gmst)`, not this function's output.
+ */
+export function eciToEcfVelocity(
+  positionEci: EciVec3<Kilometer>,
+  velocityEci: EciVec3<KilometerPerSecond>,
+  gmst: GMSTime,
+): EcfVec3<KilometerPerSecond> {
+  const positionEcf = eciToEcf(positionEci, gmst);
+  const rotatedVelocity = eciToEcf(velocityEci, gmst);
+
+  // ω points along the z axis, so ω × r_ecf = (-ω·y, ω·x, 0)
+  return {
+    x: rotatedVelocity.x + earthRotation * positionEcf.y,
+    y: rotatedVelocity.y - earthRotation * positionEcf.x,
+    z: rotatedVelocity.z,
+  };
+}
+
+/**
+ * Converts a true ECF velocity back to an ECI velocity: the inverse of
+ * `eciToEcfVelocity`.
+ *
+ * It adds the velocity of the rotating frame at the satellite's position,
+ * ω × r_ecf, back to the ECF velocity and rotates the result into ECI axes.
+ * `ecfToEci(velocityEcf, gmst)` alone only rotates the axes, so it leaves the
+ * Earth's rotation out.
+ */
+export function ecfToEciVelocity(
+  positionEcf: EcfVec3<Kilometer>,
+  velocityEcf: EcfVec3<KilometerPerSecond>,
+  gmst: GMSTime,
+): EciVec3<KilometerPerSecond> {
+  // ω points along the z axis, so ω × r_ecf = (-ω·y, ω·x, 0)
+  return ecfToEci(
+    {
+      x: velocityEcf.x - earthRotation * positionEcf.y,
+      y: velocityEcf.y + earthRotation * positionEcf.x,
+      z: velocityEcf.z,
+    },
+    gmst,
+  );
 }
 
 interface Topocentric {
