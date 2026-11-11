@@ -105,6 +105,26 @@ describe('BulkPropagator basic flow errors', () => {
     );
     await runPromise;
   });
+  it('should throw if run is called during a run', async () => {
+    using multiThreadBp = new BulkPropagator({
+      runtime: multiThreadRuntime,
+      calculators: [new EciBaseCalculator()],
+      satRecsCount: satRecs.length,
+      datesCount: dates.length,
+    });
+    multiThreadBp.setSatRecs(satRecs);
+    multiThreadBp.setDates(dates);
+    const runPromise = multiThreadBp.run();
+    try {
+      expect(() => multiThreadBp.run()).toThrow(
+        /Cannot start another run while a run is in progress/,
+      );
+    } finally {
+      // Let the first run end before `using` disposes the propagator, so a
+      // failing assertion here cannot free memory that run is still using.
+      await runPromise;
+    }
+  });
   it('should throw if used after disposal', () => {
     using multiThreadBp = new BulkPropagator({
       runtime: multiThreadRuntime,
