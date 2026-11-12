@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- None
+- Fix: `alpha5ToNumber` passed any field that is not Alpha-5 to `Number()`, so `'+1234'` gave 1234, `'-1234'` gave -1234 and `'1e3'` gave 1000. It now accepts only digits, optionally padded with leading spaces, or a letter and four digits; anything else gives `NaN`.
+- Fix: since 7.2.0, `twoline2satrec` read a blank numeric field, or one cut off by a short line, as 0 (`Number('')` is 0), so a set with its line 2 cut short got a mean motion of 0. Such a field gives `NaN` again, as in 7.1.0.
 
 ## 7.2.0 (2026-11-12)
 

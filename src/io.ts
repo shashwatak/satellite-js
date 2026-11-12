@@ -24,6 +24,11 @@ function initSatrec(
   });
 }
 
+// A blank TLE field, or one cut off by a short line, is missing, not zero: Number('') and Number('   ') are 0.
+function tleNumber(field: string): number {
+  return field.trim() === '' ? Number.NaN : Number(field);
+}
+
 /* -----------------------------------------------------------------------------
  *
  *                           function twoline2satrec
@@ -85,9 +90,9 @@ export function twoline2satrec(longstr1: string, longstr2: string): SatRec {
 
   const satnum = longstr1.substring(2, 7);
 
-  const epochyr = Number(longstr1.substring(18, 20));
-  const epochdays = Number(longstr1.substring(20, 32));
-  let ndot = Number(longstr1.substring(33, 43));
+  const epochyr = tleNumber(longstr1.substring(18, 20));
+  const epochdays = tleNumber(longstr1.substring(20, 32));
+  let ndot = tleNumber(longstr1.substring(33, 43));
   let nddot = Number(
     `${longstr1.substring(44, 45)}.${longstr1.substring(45, 50)}E${longstr1.substring(50, 52)}`,
   );
@@ -97,14 +102,14 @@ export function twoline2satrec(longstr1: string, longstr2: string): SatRec {
 
   // satrec.satnum = longstr2.substring(2, 7);
   // ---- find standard orbital elements ----
-  const inclo = Number(longstr2.substring(8, 16)) * deg2rad;
-  const nodeo = Number(longstr2.substring(17, 25)) * deg2rad;
+  const inclo = tleNumber(longstr2.substring(8, 16)) * deg2rad;
+  const nodeo = tleNumber(longstr2.substring(17, 25)) * deg2rad;
   const ecco = Number(`.${longstr2.substring(26, 33).replace(/\s/g, '0')}`);
-  const argpo = Number(longstr2.substring(34, 42)) * deg2rad;
-  const mo = Number(longstr2.substring(43, 51)) * deg2rad;
+  const argpo = tleNumber(longstr2.substring(34, 42)) * deg2rad;
+  const mo = tleNumber(longstr2.substring(43, 51)) * deg2rad;
 
   // ---- find no, ndot, nddot ----
-  const no = Number(longstr2.substring(52, 63)) / xpdotp;
+  const no = tleNumber(longstr2.substring(52, 63)) / xpdotp;
   // satrec.nddot= satrec.nddot * Math.pow(10.0, nexp);
   // satrec.bstar= satrec.bstar * Math.pow(10.0, ibexp);
 
@@ -269,18 +274,17 @@ export function json2satrec(
  * Alpha-5: a leading letter A-Z, skipping I and O, stands for 10-33 in the
  * ten-thousands place, so `'A0000'` is 100000 and `'Z9999'` is 339999.
  *
- * A blank or whitespace-only field gives `NaN`, not the 0 that `Number()`
- * would return for it. Any other field goes through `Number()`: a five-digit
- * field gives its number, and so does anything else `Number()` accepts, such
- * as a space-padded `'    5'` (5) or `'1e3'` (1000); a field starting with I
- * or O, or a malformed one such as `'a0404'`, `'A000'` or `'AA000'`, gives
- * `NaN`.
+ * A field of digits, optionally padded with leading spaces as in `'    5'`,
+ * gives its number. Anything else gives `NaN`: a blank field, a sign
+ * (`'+1234'`, `'-1234'`), an exponent (`'1e3'`), an underscore or other
+ * character, a field starting with I or O, or a malformed one such as
+ * `'a0404'`, `'A000'` or `'AA000'`.
  *
  * `twoline2satrec` keeps the field as written in `satrec.satnum`; this function
  * does not change that, it only converts a field when the caller wants a number.
  */
 export function alpha5ToNumber(field: string): number {
-  if (field.trim() === '') return Number.NaN;
+  if (/^ *\d+$/.test(field)) return Number(field);
   const c = field[0];
   if (
     c !== undefined &&
@@ -295,5 +299,5 @@ export function alpha5ToNumber(field: string): number {
     if (c > 'O') tens -= 1;
     return tens * 10000 + Number(field.slice(1));
   }
-  return Number(field);
+  return Number.NaN;
 }

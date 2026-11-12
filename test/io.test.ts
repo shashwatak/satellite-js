@@ -115,9 +115,32 @@ describe('alpha5ToNumber', () => {
     }
   });
 
-  it('passes any other field to Number()', () => {
+  it('reads a digit field padded with leading spaces', () => {
     expect(alpha5ToNumber('    5')).toBe(5);
-    expect(alpha5ToNumber('1e3')).toBe(1000);
+    expect(alpha5ToNumber(' 1234')).toBe(1234);
+  });
+
+  it('gives NaN for a field that is not digits or a letter and four digits', () => {
+    for (const field of [
+      '+1234',
+      '-1234',
+      '+0000',
+      '-0000',
+      '1e3',
+      '1_234',
+      '0x4d2',
+      '12.34',
+      '1 234',
+      '1234 ',
+      '\t1234',
+      'A+123',
+      'A-123',
+      'A 123',
+      'A123 ',
+      '１２３４５',
+    ]) {
+      expect(alpha5ToNumber(field)).toBeNaN();
+    }
   });
 
   it('does not change what twoline2satrec returns', () => {
@@ -275,6 +298,64 @@ describe('twoline2satrec numeric fields', () => {
   it('reads the same set as before with the letter replaced by the 0', () => {
     const satrec = twoline2satrec(line1.replace('7O99', '7099'), line2);
     expect(satrec.epochdays).toBeCloseTo(189.70990935, 12);
+    expect(satrec.error).toBe(0);
+  });
+});
+
+describe('twoline2satrec blank fields', () => {
+  // A field that is blank, or cut off by a short line, is missing: it gives NaN, as parseFloat() did before 7.2.0,
+  // not the 0 that Number() gives for an empty or all-space string.
+  const line1 =
+    '1 69999U 58002D   26189.70990935 -.00000023  00000+0 -70517-5 0  9996';
+  const line2 =
+    '2 69999  34.2417 341.8745 1487004  19.9191 345.3718 11.62373363189308';
+  const blank = (line: string, start: number, end: number) =>
+    line.slice(0, start) + ' '.repeat(end - start) + line.slice(end);
+
+  it('gives NaN for each numeric field left blank', () => {
+    const cases: [string, 1 | 2, number, number][] = [
+      ['epochyr', 1, 18, 20],
+      ['epochdays', 1, 20, 32],
+      ['ndot', 1, 33, 43],
+      ['inclo', 2, 8, 16],
+      ['nodeo', 2, 17, 25],
+      ['argpo', 2, 34, 42],
+      ['mo', 2, 43, 51],
+      ['nokozai', 2, 52, 63],
+    ];
+    const good = twoline2satrec(line1, line2);
+    for (const [field, line, start, end] of cases) {
+      const satrec =
+        line === 1
+          ? twoline2satrec(blank(line1, start, end), line2)
+          : twoline2satrec(line1, blank(line2, start, end));
+      expect(satrec[field as keyof SatRec], field).toBeNaN();
+      for (const other of cases) {
+        if (
+          other[0] !== field &&
+          !(field === 'epochyr' || field === 'epochdays')
+        ) {
+          expect(
+            satrec[other[0] as keyof SatRec],
+            `${other[0]} beside ${field}`,
+          ).toBe(good[other[0] as keyof SatRec]);
+        }
+      }
+    }
+  });
+
+  it('gives NaN for a mean motion past the end of a short line 2', () => {
+    for (const short of [line2.slice(0, 51), 'DELTA 2 R/B(1)          ', '']) {
+      expect(twoline2satrec(line1, short).nokozai).toBeNaN();
+    }
+  });
+
+  it('reads the same values from the unedited set', () => {
+    const satrec = twoline2satrec(line1, line2);
+    expect(satrec.epochyr).toBe(26);
+    expect(satrec.epochdays).toBe(189.70990935);
+    expect(satrec.nokozai * constants.xpdotp).toBeCloseTo(11.62373363, 10);
+    expect(satrec.inclo).toBeCloseTo((34.2417 * Math.PI) / 180, 12);
     expect(satrec.error).toBe(0);
   });
 });
